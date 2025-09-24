@@ -4,6 +4,7 @@ import 'package:pharmaci/core/design_system/tokens/app_colors.dart';
 import 'package:pharmaci/core/design_system/tokens/app_spacing.dart';
 import 'package:pharmaci/core/design_system/tokens/app_text_styles.dart';
 import 'package:pharmaci/presentation/providers/simple_auth_provider.dart';
+import 'package:pharmaci/core/app/app.dart';
 
 class SimpleLoginScreen extends StatefulWidget {
   const SimpleLoginScreen({super.key});
@@ -42,7 +43,10 @@ class _SimpleLoginScreenState extends State<SimpleLoginScreen> {
           SnackBar(content: Text(err), backgroundColor: AppColors.error),
         );
       } else {
-        Navigator.of(context).pop();
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false,
+        );
       }
     } finally {
       if (mounted) setState(() => _loading = false);
