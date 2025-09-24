@@ -1,0 +1,1 @@
+// Drug details display widget

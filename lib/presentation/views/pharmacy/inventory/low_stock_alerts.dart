@@ -1,0 +1,1 @@
+// Low stock alerts display

@@ -1,0 +1,1 @@
+// Drug information card widget

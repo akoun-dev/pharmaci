@@ -1,0 +1,1 @@
+// Pharmacy business hours model

@@ -1,0 +1,1 @@
+// Pharmacy details screen

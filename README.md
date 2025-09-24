@@ -1,391 +1,183 @@
-# PharmaCi
+# Supabase CLI
 
-🏥 **PharmaCi** est une application mobile innovante qui centralise et facilite l'accès aux informations sur la disponibilité des médicaments dans toutes les pharmacies de Côte d'Ivoire, en commençant par Abidjan.
+[![Coverage Status](https://coveralls.io/repos/github/supabase/cli/badge.svg?branch=main)](https://coveralls.io/github/supabase/cli?branch=main) [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/supabase-cli/setup-cli/master?style=flat-square&label=Bitbucket%20Canary)](https://bitbucket.org/supabase-cli/setup-cli/pipelines) [![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/sweatybridge%2Fsetup-cli?label=Gitlab%20Canary)
+](https://gitlab.com/sweatybridge/setup-cli/-/pipelines)
 
-## 📋 Table des matières
+[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
-- [Présentation du projet](#présentation-du-projet)
-- [Objectifs](#objectifs)
-- [Public cible](#public-cible)
-- [Fonctionnalités](#fonctionnalités)
-- [Architecture technique](#architecture-technique)
-- [Installation](#installation)
-- [Développement](#développement)
-- [Contribution](#contribution)
-- [Licence](#licence)
+This repository contains all the functionality for Supabase CLI.
 
-## 🎯 Présentation du projet
+- [x] Running Supabase locally
+- [x] Managing database migrations
+- [x] Creating and deploying Supabase Functions
+- [x] Generating types directly from your database schema
+- [x] Making authenticated HTTP requests to [Management API](https://supabase.com/docs/reference/api/introduction)
 
-PharmaCi est une solution numérique qui répond à un problème crucial en Côte d'Ivoire : la difficulté pour les patients de trouver rapidement des médicaments disponibles dans les pharmacies. L'application agit comme un pont entre les citoyens, les médecins, les hôpitaux et les pharmacies en fournissant des informations en temps réel sur la disponibilité des médicaments.
+## Getting started
 
-> **Note importante** : PharmaCi n'est pas une plateforme de vente en ligne, mais un service de recherche et de localisation de médicaments qui respecte les réglementations ivoiriennes en matière de santé et de données.
+### Install the CLI
 
-## 🚀 Objectifs
-
-### Objectif principal
-
-- **Sauver des vies** en permettant de trouver rapidement des médicaments essentiels, notamment en situation d'urgence
-- **Réduire la perte de temps** et les déplacements inutiles des patients en quête d'un médicament
-- **Faciliter la transparence** et la communication entre les pharmacies, les patients et les institutions médicales
-
-### Objectifs spécifiques
-
-- ✅ Base de données centralisée des stocks disponibles
-- ✅ Recherche de médicaments par nom ou molécule
-- ✅ Géolocalisation des pharmacies avec le produit recherché
-- ✅ Indication de la fraîcheur des données (dernière mise à jour)
-- ✅ Mise à jour facile des stocks pour les pharmacies
-- ✅ Canaux alternatifs : SMS, USSD, WhatsApp Bot
-- ✅ **Phase 1 - Assistant IA de Santé Personnel** : Conseils médicaux instantanés
-- ✅ **Phase 1 - Système d'Avis et de Notation** : Évaluations détaillées des pharmacies
-- ✅ **Phase 1 - Mode Urgence Amélioré** : Accès rapide aux pharmacies de garde
-- ✅ **Phase 1 - Paiement Mobile et Réservation Avancée** : Transactions simplifiées
-
-## 👥 Public cible
-
-### Grand public
-
-- Patients cherchant un médicament
-- Personnes en situation d'urgence
-
-### Professionnels de santé
-
-- Médecins et hôpitaux pour prescrire et vérifier la disponibilité
-- Pharmaciens pour accroître leur visibilité et mieux informer leur clientèle
-
-### Institutions
-
-- Ministère de la Santé
-- Ordre des Pharmaciens
-- Assureurs santé
-
-## 🔧 Fonctionnalités
-
-### Pour les patients et citoyens
-
-- **Recherche intelligente** de médicaments par nom, molécule ou catégorie
-- **Géolocalisation** des pharmacies avec le produit disponible
-- **Navigation intégrée** vers la pharmacie choisie
-- **Réservation en ligne** de médicaments
-- **Suivi de réservation** en temps réel
-- **Accès hors ligne** aux informations précédemment consultées
-- **Notifications** de disponibilité de médicaments
-
-#### 🆕 Phase 1 - Fonctionnalités Avancées
-
-- **Assistant IA de Santé Personnel** :
-  - Conseils médicaux instantanés par chat vocal ou texte
-  - Historique des conversations et réponses sauvegardées
-  - Catégories prédéfinies (médicaments, symptômes, posologie, interactions)
-  - Indicateurs de fiabilité des réponses
-
-- **Système d'Avis et de Notation** :
-  - Évaluation des pharmacies avec système d'étoiles
-  - Commentaires détaillés avec points forts/faibles
-  - Système de vérification et votes utiles
-  - Signalement et modération des avis
-
-- **Mode Urgence Amélioré** :
-  - Minuteur d'urgence de 5 minutes avec alertes
-  - Catégorisation des urgences (fièvre, douleur, allergie, blessure)
-  - Accès immédiat aux pharmacies de garde
-  - Carte interactive avec itinéraires vers les pharmacies les plus proches
-
-- **Paiement Mobile et Réservation Avancée** :
-  - Paiement par Orange Money, MTN Money, Wave
-  - Réservation de plusieurs médicaments avec gestion des quantités
-  - Créneaux horaires et options de livraison express
-  - Suivi des transactions et reçus numériques
-
-### Pour les pharmaciens
-
-- **Gestion de stock** intuitive et rapide
-- **Mises à jour en temps réel** des disponibilités
-- **Tableau de bord** avec statistiques et analytics
-- **Alertes de stock faible** automatiques
-- **Synchronisation automatique** avec le système central
-- **Gestion des réservations** et des demandes
-- **Interface web complémentaire** pour la gestion
-
-### Canaux d'accès multiples
-
-- **Application mobile** (Android/iOS) - Interface principale
-- **SMS** - Pour les utilisateurs sans smartphone
-- **USSD** - Accès rapide et universel
-- **WhatsApp Bot** - Conversationnel et accessible
-
-## 🏗️ Architecture technique
-
-### Stack technologique
-
-- **Framework** : Flutter 3.9.2+ (multi-plateforme)
-- **Langage** : Dart
-- **Architecture** : Clean Architecture avec Domain-Driven Design
-- **State Management** : Provider Pattern
-- **Base de données** : PostgreSQL via Supabase
-- **Géolocalisation** : OpenStreetMap avec flutter_map
-- **Authentification** : JWT via Supabase Auth
-- **IA** : Simulation d'assistant de santé avec scoring de confiance
-- **Cartographie** : OpenStreetMap avec tiles et markers personnalisés
-
-### Structure du projet
-
-```text
-lib/
-├── core/                    # Cœur de l'application
-│   ├── app/                # Configuration app
-│   ├── constants/          # Constantes
-│   └── utils/              # Utilitaires
-├── data/                   # Couche données
-│   ├── datasources/        # Sources de données
-│   ├── models/             # Modèles de données
-│   └── repositories/       # Implémentations
-├── domain/                 # Couche métier
-│   ├── entities/           # Entités métier
-│   └── usecases/           # Cas d'utilisation
-└── presentation/           # Couche présentation
-    ├── providers/          # State management
-    ├── widgets/            # Composants réutilisables
-    └── views/              # Écrans de l'application
-```
-
-### Modèles de données principaux
-
-- **DrugEntity** : Informations sur les médicaments
-- **PharmacyEntity** : Détails des pharmacies
-- **StockEntity** : Gestion des stocks
-- **ReservationEntity** : Suivi des réservations
-- **HealthAssistantEntity** : Conversations avec l'assistant IA
-- **ReviewEntity** : Avis et évaluations des utilisateurs
-- **PaymentEntity** : Transactions et paiements mobiles
-
-## 📦 Installation
-
-### Prérequis
-
-- Flutter SDK 3.9.2 ou supérieur
-- Dart SDK
-- Android Studio / VS Code
-- Émulateur Android ou appareil iOS
-- Accès Internet
-
-### Configuration du projet
-
-1. **Cloner le dépôt**
-
-   ```bash
-   git clone https://github.com/votre-organisation/pharmaci.git
-   cd pharmaci
-   ```
-
-2. **Installer les dépendances**
-
-   ```bash
-   flutter pub get
-   ```
-
-3. **Configurer les variables d'environnement**
-
-   ```bash
-   cp lib/core/config/env.example.dart lib/core/config/env.dart
-   # Éditer le fichier env.dart avec vos configurations
-   ```
-
-4. **Lancer l'application**
-
-   ```bash
-   flutter run
-   ```
-
-### Configuration des plateformes
-
-#### Android
-
-- Ouvrir `android/app/src/main/AndroidManifest.xml`
-- Configurer les permissions nécessaires
-- Générer la clé de signature
-
-#### iOS
-
-- Ouvrir `ios/Runner.xcworkspace`
-- Configurer les permissions dans `Info.plist`
-- Générer les certificats de signature
-
-## 🛠️ Développement
-
-### Commandes utiles
+Available via [NPM](https://www.npmjs.com) as dev dependency. To install:
 
 ```bash
-# Installation des dépendances
-flutter pub get
-
-# Analyse du code
-flutter analyze
-
-# Exécution des tests
-flutter test
-
-# Build debug
-flutter run
-
-# Build release APK
-flutter build apk --release
-
-# Build iOS
-flutter build ios --release
-
-# Nettoyage du projet
-flutter clean
+npm i supabase --save-dev
 ```
 
-### Cartes (OpenStreetMap)
-
-L'application utilise OpenStreetMap avec flutter_map pour la cartographie :
-
-- Configuration automatique via le package flutter_map
-- Tiles OpenStreetMap pour l'affichage des cartes
-- Pas besoin de clé API (contrairement à Google Maps)
-- Markers personnalisés pour les pharmacies et position utilisateur
-- Support offline avec le cache des tiles
-
-### Configuration Supabase
-
-Copiez le modèle d'environnement et renseignez vos secrets:
+To install the beta release channel:
 
 ```bash
-cp lib/core/config/env.example.dart lib/core/config/env.dart
-# puis éditez lib/core/config/env.dart
+npm i supabase@beta --save-dev
 ```
 
-Les réservations côté pharmacien utilisent `Env.demoPharmacyId` pour charger les réservations associées.
+When installing with yarn 4, you need to disable experimental fetch with the following nodejs config.
 
-### Base de données
+```
+NODE_OPTIONS=--no-experimental-fetch yarn add supabase
+```
 
-Le schéma de la base de données est défini dans `lib/core/database/schema.sql` et inclut :
-- Tables principales : users, pharmacies, drugs, pharmacy_stocks, reservations
-- Tables Phase 1 : payments, reviews, health_assistant_conversations
-- Fonctions PostgreSQL pour les calculs de distance et recherche géolocalisée
-- Politiques RLS (Row Level Security) pour la sécurité des données
+> **Note**
+For Bun versions below v1.0.17, you must add `supabase` as a [trusted dependency](https://bun.sh/guides/install/trusted) before running `bun add -D supabase`.
 
-### Structure de développement
+<details>
+  <summary><b>macOS</b></summary>
 
-Le projet suit les principes **Clean Architecture** et **Domain-Driven Design** :
+  Available via [Homebrew](https://brew.sh). To install:
 
-#### 1. Couche Domain (`lib/domain/`)
+  ```sh
+  brew install supabase/tap/supabase
+  ```
 
-Contient la logique métier pure sans dépendances externes :
+  To install the beta release channel:
+  
+  ```sh
+  brew install supabase/tap/supabase-beta
+  brew link --overwrite supabase-beta
+  ```
+  
+  To upgrade:
 
-- **Entities** : Objets métier principaux
-- **Use Cases** : Cas d'utilisation par fonctionnalité
+  ```sh
+  brew upgrade supabase
+  ```
+</details>
 
-#### 2. Couche Data (`lib/data/`)
+<details>
+  <summary><b>Windows</b></summary>
 
-Gère l'accès aux données :
+  Available via [Scoop](https://scoop.sh). To install:
 
-- **Repositories** : Interfaces d'accès aux données
-- **Datasources** : API, base de données locale
-- **Models** : DTOs et modèles de données
+  ```powershell
+  scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+  scoop install supabase
+  ```
 
-#### 3. Couche Presentation (`lib/presentation/`)
+  To upgrade:
 
-Interface utilisateur et interactions :
+  ```powershell
+  scoop update supabase
+  ```
+</details>
 
-- **Providers** : Gestion d'état avec Provider
-- **Widgets** : Composants réutilisables
-- **Views** : Écrans organisés par fonctionnalités
+<details>
+  <summary><b>Linux</b></summary>
 
-### Conventions de codage
+  Available via [Homebrew](https://brew.sh) and Linux packages.
 
-- Utiliser `camelCase` pour les variables et fonctions
-- Utiliser `PascalCase` pour les classes et types
-- Commenter le code en français
-- Suivre les guidelines Flutter et Dart
-- Tests unitaires obligatoires pour les cas d'utilisation
+  #### via Homebrew
 
-### Tests
+  To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+
+  #### via Linux packages
+
+  Linux packages are provided in [Releases](https://github.com/supabase/cli/releases). To install, download the `.apk`/`.deb`/`.rpm`/`.pkg.tar.zst` file depending on your package manager and run the respective commands.
+
+  ```sh
+  sudo apk add --allow-untrusted <...>.apk
+  ```
+
+  ```sh
+  sudo dpkg -i <...>.deb
+  ```
+
+  ```sh
+  sudo rpm -i <...>.rpm
+  ```
+
+  ```sh
+  sudo pacman -U <...>.pkg.tar.zst
+  ```
+</details>
+
+<details>
+  <summary><b>Other Platforms</b></summary>
+
+  You can also install the CLI via [go modules](https://go.dev/ref/mod#go-install) without the help of package managers.
+
+  ```sh
+  go install github.com/supabase/cli@latest
+  ```
+
+  Add a symlink to the binary in `$PATH` for easier access:
+
+  ```sh
+  ln -s "$(go env GOPATH)/bin/cli" /usr/bin/supabase
+  ```
+
+  This works on other non-standard Linux distros.
+</details>
+
+<details>
+  <summary><b>Community Maintained Packages</b></summary>
+
+  Available via [pkgx](https://pkgx.sh/). Package script [here](https://github.com/pkgxdev/pantry/blob/main/projects/supabase.com/cli/package.yml).
+  To install in your working directory:
+
+  ```bash
+  pkgx install supabase
+  ```
+
+  Available via [Nixpkgs](https://nixos.org/). Package script [here](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/supabase-cli/default.nix).
+</details>
+
+### Run the CLI
 
 ```bash
-# Exécuter tous les tests
-flutter test
-
-# Exécuter les tests avec coverage
-flutter test --coverage
-
-# Tests d'intégration
-flutter drive
+supabase bootstrap
 ```
 
-## 🤝 Contribution
+Or using npx:
 
-Nous accueillons avec plaisir les contributions à PharmaCi ! Pour contribuer :
+```bash
+npx supabase bootstrap
+```
 
-1. **Forker** le projet
-2. **Créer une branche** pour votre fonctionnalité
+The bootstrap command will guide you through the process of setting up a Supabase project using one of the [starter](https://github.com/supabase-community/supabase-samples/blob/main/samples.json) templates.
 
-   ```bash
-   git checkout -b feature/ma-nouvelle-fonctionnalite
-   ```
+## Docs
 
-3. **Commiter** vos changements
+Command & config reference can be found [here](https://supabase.com/docs/reference/cli/about).
 
-   ```bash
-   git commit -m "feat: ajoute ma nouvelle fonctionnalite"
-   ```
+## Breaking changes
 
-4. **Pusher** vers votre branche
+We follow semantic versioning for changes that directly impact CLI commands, flags, and configurations.
 
-   ```bash
-   git push origin feature/ma-nouvelle-fonctionnalite
-   ```
+However, due to dependencies on other service images, we cannot guarantee that schema migrations, seed.sql, and generated types will always work for the same CLI major version. If you need such guarantees, we encourage you to pin a specific version of CLI in package.json.
 
-5. **Créer une Pull Request**
+## Developing
 
-### Style de commits
+To run from source:
 
-- `feat:` : Nouvelle fonctionnalité
-- `fix:` : Correction de bug
-- `docs:` : Documentation
-- `style:` : Style/formatage
-- `refactor:` : Refactoring
-- `test:` : Tests
-- `chore:` : Tâches de maintenance
-
-## 📱 Démonstration et Screenshots
-
-### Phase 1 - Interface Utilisateur
-
-L'application inclut désormais 4 fonctionnalités majeures implémentées :
-
-1. **Assistant IA de Santé** - Chat interface avec entrée vocale
-2. **Système d'Avis** - Évaluations détaillées avec pros/cons
-3. **Mode Urgence** - Interface rouge avec minuterie et actions rapides
-4. **Paiement Mobile** - Intégration Orange Money, MTN, Wave
-
-### Démo en direct
-
-Pour tester l'application :
-- Clonez le dépôt et configurez l'environnement
-- Lancez `flutter run` sur votre appareil ou émulateur
-- Testez les nouvelles fonctionnalités dans les sections correspondantes
-
-## 📞 Contact et Support
-
-Pour toute question, suggestion ou problème :
-
-- **Email** : contact@pharmaci.ci
-- **Site web** : <https://pharmaci.ci>
-- **Support technique** : support@pharmaci.ci
-
-## 📄 Licence
-
-Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
-## 🙏 Remerciements
-
-- À tous les pharmaciens partenaires pour leur collaboration
-- Au Ministère de la Santé de Côte d'Ivoire pour leur soutien
-- À la communauté médicale pour leurs précieux retours
-
----
-
-Développé avec ❤️ pour la santé publique en Côte d'Ivoire
+```sh
+# Go >= 1.22
+go run . help
+```

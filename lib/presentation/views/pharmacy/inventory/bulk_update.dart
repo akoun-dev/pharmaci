@@ -1,0 +1,1 @@
+// Bulk stock update functionality
