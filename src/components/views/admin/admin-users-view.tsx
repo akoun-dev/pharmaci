@@ -57,11 +57,9 @@ interface UserData {
   city: string | null;
   createdAt: string;
   linkedPharmacyId: string | null;
-  _count: {
-    orders: number;
-    reviews: number;
-    favorites: number;
-  };
+  orderCount: number;
+  reviewCount: number;
+  favoriteCount: number;
 }
 
 type RoleTab = 'all' | 'patient' | 'pharmacist' | 'admin';
@@ -467,15 +465,15 @@ export function AdminUsersView() {
                             <div className="flex items-center gap-2.5 text-[11px] text-muted-foreground">
                               <span className="flex items-center gap-0.5">
                                 <ShoppingBag className="h-3 w-3" />
-                                {user._count.orders}
+                                {user.orderCount}
                               </span>
                               <span className="flex items-center gap-0.5">
                                 <Star className="h-3 w-3" />
-                                {user._count.reviews}
+                                {user.reviewCount}
                               </span>
                               <span className="flex items-center gap-0.5">
                                 <Heart className="h-3 w-3" />
-                                {user._count.favorites}
+                                {user.favoriteCount}
                               </span>
                             </div>
                             <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
