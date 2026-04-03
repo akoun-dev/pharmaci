@@ -14,6 +14,13 @@ import {
   Bell,
   Settings,
   Tag,
+  LayoutDashboard,
+  Users,
+  Building2,
+  Star,
+  FlaskConical,
+  BarChart3,
+  Shield,
 } from 'lucide-react';
 import { useAppStore, View } from '@/store/app-store';
 import { AuthScreen } from '@/components/auth/auth-screen';
@@ -40,9 +47,17 @@ import { PharmacistPromotionsView } from '@/components/views/pharmacist/ph-promo
 import { PharmacistSettingsView } from '@/components/views/pharmacist/ph-settings-view';
 import { PharmacistReportsView } from '@/components/views/pharmacist/ph-reports-view';
 import { PharmacistFaqView } from '@/components/views/pharmacist/ph-faq-view';
+import { AdminDashboardView } from '@/components/views/admin/admin-dashboard-view';
+import { AdminUsersView } from '@/components/views/admin/admin-users-view';
+import { AdminPharmaciesView } from '@/components/views/admin/admin-pharmacies-view';
+import { AdminOrdersView } from '@/components/views/admin/admin-orders-view';
+import { AdminMedicationsView } from '@/components/views/admin/admin-medications-view';
+import { AdminReviewsView } from '@/components/views/admin/admin-reviews-view';
+import { AdminAnalyticsView } from '@/components/views/admin/admin-analytics-view';
 
 type PatientTabKey = 'home' | 'search' | 'favorites' | 'order-history' | 'profile';
 type PharmacistTabKey = 'ph-dashboard' | 'ph-stock-list' | 'ph-orders' | 'ph-notifications' | 'ph-profile';
+type AdminTabKey = 'admin-dashboard' | 'admin-users' | 'admin-pharmacies' | 'admin-orders' | 'admin-medications' | 'admin-reviews' | 'admin-analytics';
 
 const patientTabs: { key: PatientTabKey; label: string; icon: typeof Home }[] = [
   { key: 'home', label: 'Accueil', icon: Home },
@@ -58,6 +73,16 @@ const pharmacistTabs: { key: PharmacistTabKey; label: string; icon: typeof Home 
   { key: 'ph-orders', label: 'Commandes', icon: ClipboardList },
   { key: 'ph-notifications', label: 'Alertes', icon: Bell },
   { key: 'ph-profile', label: 'Profil', icon: User },
+];
+
+const adminTabs: { key: AdminTabKey; label: string; icon: typeof Home }[] = [
+  { key: 'admin-dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+  { key: 'admin-users', label: 'Utilisateurs', icon: Users },
+  { key: 'admin-pharmacies', label: 'Pharmacies', icon: Building2 },
+  { key: 'admin-orders', label: 'Commandes', icon: ClipboardList },
+  { key: 'admin-medications', label: 'Médicaments', icon: FlaskConical },
+  { key: 'admin-reviews', label: 'Avis', icon: Star },
+  { key: 'admin-analytics', label: 'Analyses', icon: BarChart3 },
 ];
 
 const patientViewToTab: Partial<Record<View, PatientTabKey>> = {
@@ -87,6 +112,17 @@ const pharmacistViewToTab: Partial<Record<View, PharmacistTabKey>> = {
   'ph-settings': 'ph-profile',
   'ph-reports': 'ph-dashboard',
   'ph-faq': 'ph-profile',
+};
+
+const adminViewToTab: Partial<Record<View, AdminTabKey>> = {
+  'admin-dashboard': 'admin-dashboard',
+  'admin-users': 'admin-users',
+  'admin-pharmacies': 'admin-pharmacies',
+  'admin-orders': 'admin-orders',
+  'admin-medications': 'admin-medications',
+  'admin-reviews': 'admin-reviews',
+  'admin-analytics': 'admin-analytics',
+  'admin-settings': 'admin-dashboard',
 };
 
 function PatientViewRenderer() {
@@ -154,6 +190,35 @@ function PharmacistViewRenderer() {
   );
 }
 
+function AdminViewRenderer() {
+  const { currentView } = useAppStore();
+
+  const views: Record<string, React.ReactNode> = {
+    'admin-dashboard': <AdminDashboardView />,
+    'admin-users': <AdminUsersView />,
+    'admin-pharmacies': <AdminPharmaciesView />,
+    'admin-orders': <AdminOrdersView />,
+    'admin-medications': <AdminMedicationsView />,
+    'admin-reviews': <AdminReviewsView />,
+    'admin-analytics': <AdminAnalyticsView />,
+    'admin-settings': <AdminDashboardView />,
+  };
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={currentView}
+        initial={{ opacity: 0, x: 10 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -10 }}
+        transition={{ duration: 0.2 }}
+      >
+        {views[currentView]}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 export function AppShell() {
   const { currentView, setCurrentView, isAuthenticated, currentUser, setCurrentUser, logout } = useAppStore();
   const mounted = useSyncExternalStore(
@@ -162,6 +227,7 @@ export function AppShell() {
     () => false
   );
 
+  const isAdmin = currentUser?.role === 'admin';
   const isPharmacist = currentUser?.role === 'pharmacist';
 
   // Check session on mount
@@ -220,17 +286,114 @@ export function AppShell() {
     return <AuthScreen />;
   }
 
+  // ═══════════════════════════════════════════
+  // ADMIN INTERFACE
+  // ═══════════════════════════════════════════
+  if (isAdmin) {
+    const activeTab = adminViewToTab[currentView] || 'admin-dashboard';
+
+    const handleTabClick = (key: AdminTabKey) => {
+      setCurrentView(key);
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
+        {/* Sidebar */}
+        <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-col z-50">
+          {/* Logo */}
+          <div className="p-5 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center">
+              <Shield className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-lg text-foreground">PharmApp CI</h1>
+              <p className="text-[10px] text-violet-600 font-medium">Administration</p>
+            </div>
+          </div>
+
+          {/* User info */}
+          <div className="mx-4 mb-4 p-3 bg-violet-50 dark:bg-violet-950/50 rounded-xl">
+            <p className="text-sm font-semibold text-violet-800 dark:text-violet-300">{currentUser?.name}</p>
+            <p className="text-[11px] text-violet-600 dark:text-violet-400">{currentUser?.email}</p>
+          </div>
+
+          {/* Nav items */}
+          <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
+            {adminTabs.map((tab) => {
+              const isActive = activeTab === tab.key;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => handleTabClick(tab.key)}
+                  className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-400'
+                      : 'text-muted-foreground hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-foreground'
+                  }`}
+                >
+                  <Icon className="h-4.5 w-4.5" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Logout */}
+          <div className="px-3 mb-2">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-all duration-200"
+            >
+              Se déconnecter
+            </button>
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+            <p className="text-[10px] text-muted-foreground text-center">
+              PharmApp CI © 2025
+            </p>
+          </div>
+        </aside>
+
+        {/* Main content */}
+        <main className="flex-1 lg:pl-64">
+          <AdminViewRenderer />
+        </main>
+
+        {/* Mobile bottom nav */}
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 lg:hidden pb-safe">
+          <div className="flex items-center justify-around px-1 py-1">
+            {adminTabs.slice(0, 5).map((tab) => {
+              const isActive = activeTab === tab.key;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => handleTabClick(tab.key)}
+                  className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-xl transition-all duration-200 min-w-0 flex-1 ${
+                    isActive
+                      ? 'text-violet-700 bg-violet-50'
+                      : 'text-muted-foreground hover:text-violet-600'
+                  }`}
+                >
+                  <Icon className="h-[18px] w-[18px]" />
+                  <span className="text-[9px] font-medium leading-tight truncate max-w-full">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════════
+  // PHARMACIST INTERFACE
+  // ═══════════════════════════════════════════
   if (isPharmacist) {
     const activeTab = pharmacistViewToTab[currentView] || 'ph-dashboard';
-    const isDetailView =
-      currentView === 'ph-stock-detail' ||
-      currentView === 'ph-stock-add' ||
-      currentView === 'ph-order-detail' ||
-      currentView === 'ph-messages' ||
-      currentView === 'ph-promotions' ||
-      currentView === 'ph-settings' ||
-      currentView === 'ph-reports' ||
-      currentView === 'ph-faq';
 
     const handleTabClick = (key: PharmacistTabKey) => {
       setCurrentView(key);
@@ -238,7 +401,6 @@ export function AppShell() {
 
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        {/* Main content */}
         <main className="flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 pt-0 lg:pl-64">
           <PharmacistViewRenderer />
         </main>
@@ -274,7 +436,6 @@ export function AppShell() {
 
         {/* Sidebar navigation (desktop) */}
         <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-950 border-r border-emerald-100 dark:border-emerald-900/50 flex-col z-50">
-          {/* Logo */}
           <div className="p-6 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center">
               <Pill className="h-6 w-6 text-white" />
@@ -285,13 +446,11 @@ export function AppShell() {
             </div>
           </div>
 
-          {/* User info */}
           <div className="mx-4 mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl">
             <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">{currentUser?.name}</p>
             <p className="text-[11px] text-emerald-600 dark:text-emerald-400">{currentUser?.email}</p>
           </div>
 
-          {/* Nav items */}
           <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
             {pharmacistTabs.map((tab) => {
               const isActive = activeTab === tab.key;
@@ -348,7 +507,6 @@ export function AppShell() {
             </div>
           </nav>
 
-          {/* Logout */}
           <div className="px-3 mb-2">
             <button
               onClick={handleLogout}
@@ -358,7 +516,6 @@ export function AppShell() {
             </button>
           </div>
 
-          {/* Footer */}
           <div className="p-4 border-t border-emerald-100 dark:border-emerald-900/50">
             <p className="text-[10px] text-muted-foreground text-center">
               PharmApp CI © 2025
@@ -369,13 +526,10 @@ export function AppShell() {
     );
   }
 
-  // === PATIENT INTERFACE ===
+  // ═══════════════════════════════════════════
+  // PATIENT INTERFACE
+  // ═══════════════════════════════════════════
   const activeTab = patientViewToTab[currentView] || 'home';
-  const isDetailView =
-    currentView === 'pharmacy-detail' ||
-    currentView === 'medication-detail' ||
-    currentView === 'pharmacy-dashboard' ||
-    currentView === 'order-confirmation';
 
   const handleTabClick = (key: PatientTabKey) => {
     setCurrentView(key);
@@ -383,12 +537,10 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Main content */}
       <main className="flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 pt-0 lg:pl-64">
         <PatientViewRenderer />
       </main>
 
-      {/* Bottom navigation (mobile) */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900/95 backdrop-blur-md border-t border-emerald-100 dark:border-emerald-900/50 lg:hidden pb-safe">
         <div className="flex items-center justify-around px-0.5 py-1 max-w-2xl mx-auto">
           {patientTabs.map((tab) => {
@@ -417,9 +569,7 @@ export function AppShell() {
         </div>
       </nav>
 
-      {/* Sidebar navigation (desktop) */}
       <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-950 border-r border-emerald-100 dark:border-emerald-900/50 flex-col z-50">
-        {/* Logo */}
         <div className="p-6 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center">
             <Pill className="h-6 w-6 text-white" />
@@ -430,7 +580,6 @@ export function AppShell() {
           </div>
         </div>
 
-        {/* Nav items */}
         <nav className="flex-1 px-3 space-y-1 mt-4">
           {patientTabs.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -452,7 +601,6 @@ export function AppShell() {
           })}
         </nav>
 
-        {/* Logout in sidebar */}
         <div className="px-3 mb-2">
           <button
             onClick={handleLogout}
@@ -462,7 +610,6 @@ export function AppShell() {
           </button>
         </div>
 
-        {/* Footer */}
         <div className="p-4 border-t border-emerald-100 dark:border-emerald-900/50">
           <p className="text-[10px] text-muted-foreground text-center">
             PharmApp CI © 2025

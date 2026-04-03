@@ -33,7 +33,16 @@ export type View =
   | 'ph-promotions'
   | 'ph-settings'
   | 'ph-reports'
-  | 'ph-faq';
+  | 'ph-faq'
+  // Admin views
+  | 'admin-dashboard'
+  | 'admin-users'
+  | 'admin-pharmacies'
+  | 'admin-orders'
+  | 'admin-medications'
+  | 'admin-reviews'
+  | 'admin-analytics'
+  | 'admin-settings';
 
 export interface CurrentUser {
   id: string;
@@ -111,7 +120,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     set((state) => {
       if (state.viewHistory.length === 0) {
         // No history — go to default view
-        const defaultView = state.currentUser?.role === 'pharmacist' ? 'ph-dashboard' : 'home';
+        const role = state.currentUser?.role;
+        let defaultView: View = 'home';
+        if (role === 'pharmacist') defaultView = 'ph-dashboard';
+        else if (role === 'admin') defaultView = 'admin-dashboard';
         return {
           currentView: defaultView,
           previousView: null,
@@ -215,7 +227,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         currentUser: user,
         isAuthenticated: !!user,
         currentUserId: user?.id || '',
-        currentView: user?.role === 'pharmacist' ? 'ph-dashboard' : 'home',
+        currentView: user?.role === 'admin' ? 'admin-dashboard' : user?.role === 'pharmacist' ? 'ph-dashboard' : 'home',
         viewHistory: [],
         previousView: null,
         darkMode,

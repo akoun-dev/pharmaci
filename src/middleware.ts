@@ -57,6 +57,11 @@ export async function middleware(request: NextRequest) {
   const userId = String(payload.userId ?? '');
   const userRole = String(payload.role ?? '');
 
+  if (pathname.startsWith('/api/admin/')) {
+    if (userRole !== 'admin') return forbidden('Accès réservé aux administrateurs.');
+    return authenticatedNext(userId, userRole);
+  }
+
   if (pathname.startsWith('/api/pharmacist/')) {
     if (userRole !== 'pharmacist') return forbidden('Accès réservé aux pharmaciens.');
     return authenticatedNext(userId, userRole);

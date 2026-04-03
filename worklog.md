@@ -2175,3 +2175,339 @@ Stage Summary:
 - Import handles medication creation, stock updates, and error reporting
 - All accessible via the 3-dot menu in the stock list header
 
+
+---
+## Task ID: admin-role-setup - setup-agent
+### Work Task
+Update seed file and middleware to support the new admin role for PharmApp CI.
+
+### Work Summary
+
+#### Files Modified:
+
+1. **`prisma/seed.ts`** — Added admin user to seed data:
+   - Added "Admin PharmApp" user as the 5th user (last in the array) with:
+     - Email: admin@pharmapp.ci
+     - Phone: +225 01 00 00 00 00
+     - Password: demo1234 (bcrypt hashed)
+     - Role: "admin"
+     - City: Abidjan
+     - Auth provider: email
+   - Added console.log line showing admin credentials: `Admin: admin@pharmapp.ci → Password: demo1234`
+
+2. **`src/middleware.ts`** — Added admin route protection:
+   - Added `/api/admin/` route guard BEFORE the existing pharmacist check
+   - Only users with `role === 'admin'` can access `/api/admin/*` endpoints
+   - Returns 403 "Accès réservé aux administrateurs." if non-admin tries to access
+   - Admin routes get authenticated headers (X-User-Id, X-User-Role) on success
+
+#### Operations Performed:
+- Ran `npm run db:push` — database already in sync with Prisma schema
+- Ran `npx tsx prisma/seed.ts` — seed completed successfully with 5 users (was 4), 10 pharmacies, 12 medications
+- Ran `npm run lint` — zero errors
+
+#### Admin Credentials:
+- admin@pharmapp.ci / demo1234
+
+Zero lint errors. Database re-seeded with admin user.
+---
+## Task ID: 3
+Agent: full-stack-developer
+Task: Create admin API endpoints
+
+Work Log:
+- Created /api/admin/dashboard with global stats
+- Created /api/admin/users with list and CRUD
+- Created /api/admin/pharmacies with list and CRUD
+- Created /api/admin/orders with list and detail/update
+- Created /api/admin/medications with list and CRUD
+- Created /api/admin/reviews with list and delete
+- Created /api/admin/analytics with advanced analytics
+
+Stage Summary:
+- 12 API route files created for admin panel
+- All routes protected with admin role check
+- Full CRUD operations for users, pharmacies, medications
+- Analytics endpoint for advanced reporting
+
+---
+## Task ID: admin-pharmacies-view
+### Work Task
+Create the admin pharmacies management view at `src/components/views/admin/admin-pharmacies-view.tsx`.
+
+### Work Summary
+
+#### File Created:
+**`src/components/views/admin/admin-pharmacies-view.tsx`** (~530 lines) — Admin pharmacies list with search, filters, pagination, and detail dialog:
+
+- **Header**: ViewHeader with Building2 icon (violet-600), search toggle button, filter toggle button with active filter count badge
+- **Search**: Animated search bar (violet theme) with 400ms debounce on query, resets page to 1 on search
+- **Filter panel**: Animated expandable panel with two Select dropdowns:
+  - Ville: Toutes les villes / Abidjan / Bouaké / San Pédro / Daloa / Yamoussoukro / Korhogo / Man
+  - Statut garde: Tous / En garde / Pas en garde
+  - "Réinitialiser" button to clear all filters
+- **Pharmacy cards**: Each card shows:
+  - Building2 icon + name + city/district with MapPin
+  - Badges: Garde (amber), 24h/24 (blue), Partenaire (violet)
+  - Address (truncated), Rating (star + number + review count), Phone
+  - Medication count (Package icon), Order count (ShoppingCart icon)
+  - Created date (Calendar icon)
+  - Hover: violet border + shadow, Active: scale-[0.99]
+- **Detail Dialog**: shadcn Dialog with violet gradient header, ScrollArea content:
+  - Status badges (Garde, 24h, Partenaire)
+  - Star rating visualization (5 stars with partial fill)
+  - Contact info card: Address, Phone, Email, Open hours (MapPin, Phone, Mail, Clock icons)
+  - Description, Services badges (livraison, drive, etc.), Payment method badges (Orange Money, Wave, etc.)
+  - Stats grid (4 cards): Médicaments, Commandes, Avis, Favoris
+  - Stock summary: Products, In-stock count, Total quantity
+  - Parking info, GPS coordinates (font-mono), Created/Updated dates
+  - Fetches full detail from `/api/admin/pharmacies/[id]` on open
+- **Pagination**: Previous/Next buttons + page number buttons (max 5 visible with ellipsis), resets on filter change
+- **States**: Loading skeletons (5 cards), Error state with retry, Empty state with clear filters option
+- **Responsive**: `max-w-2xl mx-auto px-4 sm:px-6`, responsive padding and text sizes
+- **Theme**: Violet/purple throughout (border-violet-100, bg-violet-50, text-violet-600, etc.)
+- **French**: All labels, buttons, and messages in French
+- **Zero lint errors** on the new file (pre-existing error in admin-dashboard-view.tsx from another agent)
+
+
+---
+## Task ID: admin-orders-view - frontend-developer
+### Work Task
+Create the admin orders management view at `/home/z/my-project/src/components/views/admin/admin-orders-view.tsx` for PharmApp CI with violet/purple admin theme.
+
+### Work Summary
+
+#### File Created:
+
+1. **`src/components/views/admin/admin-orders-view.tsx`** (~560 lines) — Complete admin orders management view:
+   - **Header**: "Gestion des commandes" title with ClipboardList icon (violet), total count badge, refresh button with spinning animation
+   - **Search + Date Filters**: Search input with Search icon, collapsible date range filter (from/to) with animated expand/collapse, clear filters button
+   - **Status Filter Tabs**: 6 scrollable pill buttons (Toutes, En attente, Confirmées, Prêtes, Récupérées, Annulées) with count badges from API `orderStats` — violet-600 active state, violet-50 inactive state
+   - **Stats Summary Card**: Grid showing count + revenue per status (pending, confirmed, ready, cancelled) from `orderStats` API response
+   - **Order Cards**: Each card shows:
+     - Order ID (first 8 chars) + status badge (same colors as pharmacist view)
+     - Patient avatar (initial) + name + phone
+     - Medication commercial name + generic name + pharmacy name/city
+     - Quantity, total price (FCFA), payment method badge
+     - Relative timestamp + chevron indicator
+   - **Order Detail Dialog**: Click any order to open a dialog with:
+     - Violet gradient header with order ID
+     - Full patient info (name, phone, email, city)
+     - Pharmacy info (name, address, city)
+     - Medication info (commercial name, generic name, form, category)
+     - Order details grid (quantity, total, payment method, creation date, pickup time, notes)
+     - Verification code display if available (verified/not verified badge)
+     - **Status update buttons** in footer with valid transitions per status:
+       - pending → confirmed / cancelled
+       - confirmed → ready / cancelled
+       - ready → picked_up / cancelled
+       - cancelled → pending (reactivate)
+       - picked_up → no actions (finalized)
+   - **Pagination**: Full pagination controls with first/prev/next/last buttons, numbered page buttons with ellipsis for large page ranges, "X–Y sur Z commandes" info text
+   - **Loading state**: Skeleton placeholders for tabs and order cards
+   - **Error state**: Red error card with AlertCircle icon and retry button
+   - **Empty state**: Contextual messages based on active filter tab
+
+#### API Integration:
+- `GET /api/admin/orders?limit=20&offset=0&status=...&q=...&dateFrom=...&dateTo=...` — fetches orders with all filters, receives `{ items, total, orderStats }` response
+- `PATCH /api/admin/orders/[id]` with `{ status: "..." }` — updates order status, optimistic local state update, toast notifications for success/error
+
+#### Design:
+- Violet/purple admin theme throughout (violet-50, violet-100, violet-200, violet-300, violet-400, violet-600, violet-700)
+- Follows pharmacist orders view patterns exactly (same card layout, status config, animation patterns)
+- `max-w-2xl mx-auto px-4 sm:px-6` mobile-first responsive layout
+- Framer Motion staggered entrance animations on order cards
+- shadcn/ui: Card, CardContent, Badge, Button, Input, Label, Skeleton, Separator, Dialog
+- Lucide icons: ClipboardList, Pill, Package, Clock, RefreshCw, AlertCircle, Inbox, CreditCard, ChevronRight, Search, Calendar, X, Loader2, Building2, User, Phone, MapPin, ChevronLeft, ChevronsLeft, ChevronsRight
+- All text in French
+- Zero lint errors
+
+---
+## Task ID: admin-analytics-view - frontend-developer
+### Work Task
+Create the admin analytics view at `/home/z/my-project/src/components/views/admin/admin-analytics-view.tsx` with CSS-only charts, period selector, and violet theme.
+
+### Work Summary
+
+#### File Created:
+
+1. **`src/components/views/admin/admin-analytics-view.tsx`** (~430 lines) — Admin analytics dashboard:
+   - **Header**: "Analyses détaillées" with violet BarChart3 icon and back navigation via ViewHeader
+   - **Period selector pills**: 4 pill buttons in a violet-50 container (Aujourd'hui, Cette semaine, Ce mois, Cette année) — active state: white bg with violet text and shadow
+   - **Top metrics grid** (2×2): 4 cards with colored icon circles:
+     - Chiffre d'affaires (violet/DollarSign) — formatted as FCFA
+     - Total commandes (blue/ShoppingCart)
+     - Panier moyen (emerald/TrendingUp) — formatted as FCFA
+     - Nouveaux utilisateurs (amber/UserPlus)
+   - **CA par pharmacie** — Horizontal bar chart: Each row shows pharmacy name + gradient violet bar (width proportional to revenue) + formatted FCFA value. Hover reveals value inside bar. Scrollable (max-h-96).
+   - **Commandes par ville** — Vertical bar chart with Y-axis labels, dashed grid lines, gradient violet bars, hover tooltips showing city+count, X-axis city labels.
+   - **Nouvelles inscriptions** — Vertical bar chart (blue gradient bars) showing user registrations by month, with same Y-axis + grid + tooltip pattern.
+   - **Catégories de médicaments** — Stacked horizontal bar (rounded-full) with 12-color palette, followed by a flex-wrap legend showing category name, count, and percentage.
+   - **Loading skeleton**: Full skeleton for all 4 chart cards + 4 metric cards
+   - **Error state**: Red card with AlertTriangle icon + Réessayer button
+   - **Empty states**: Dedicated icon + message for each chart when data is empty
+   - All charts are pure CSS div-based (no recharts/chart.js), using gradient backgrounds, transition animations, and hover effects — matching the pharmacist reports view pattern
+   - Fetches from `/api/admin/analytics?period={today|week|month|year}`
+   - Framer Motion staggered entrance animations
+   - Violet/purple theme throughout (border-violet-100 cards, violet-600/400 gradients, violet-50/100 backgrounds)
+   - All text in French, responsive design with `max-w-2xl mx-auto`
+   - shadcn/ui: Card, CardContent, CardHeader, CardTitle, Badge, Button, Skeleton
+   - Lucide icons: BarChart3, TrendingUp, TrendingDown, Building2, MapPin, Users, FlaskConical, RefreshCw, AlertTriangle, DollarSign, ShoppingCart, UserPlus
+
+Lint passes with zero errors.
+---
+## Task ID: admin-reviews-view - frontend-developer
+### Work Task
+Create admin reviews management view at `/home/z/my-project/src/components/views/admin/admin-reviews-view.tsx`.
+
+### Work Summary
+
+Created **`src/components/views/admin/admin-reviews-view.tsx`** — Complete admin reviews management view for PharmApp CI with violet/purple theme.
+
+#### Features Implemented:
+
+1. **Data Fetching**: Fetches from `/api/admin/reviews?limit=20&offset=0` with query params for rating, replyStatus, and search (`q`).
+
+2. **Filtering**:
+   - **Rating filter tabs**: 6 scrollable pill buttons (Toutes, 5★, 4★, 3★, 2★, 1★) — violet active state matching admin orders pattern.
+   - **Reply status filter**: 3 options (Toutes, Avec réponse, Sans réponse) in expandable filter panel.
+   - **Search**: Text search by patient or pharmacy name.
+   - **Clear filters**: "Effacer les filtres" button appears when any filter is active.
+
+3. **Rating Distribution Summary**: Animated bar chart at top showing:
+   - Average rating (computed from distribution data) with star display.
+   - Total reviews count.
+   - Per-star-level horizontal bars (5→1) with color coding (emerald for 4-5, amber for 3, red for 1-2).
+   - Animated bar widths using Framer Motion with staggered delays.
+
+4. **Review Cards**: Each card shows:
+   - User avatar (first letter in violet circle) + name + pharmacy name/city.
+   - Star rating display (filled amber stars, gray empty stars).
+   - Comment text.
+   - Reply section (if any): violet-50 background, Reply icon, "Réponse de la pharmacie" label, reply text, reply date (relative + full).
+   - "Sans réponse" amber badge for reviews without reply.
+   - Delete button (Trash2 icon, red hover state).
+   - Footer: relative creation date + color-coded rating badge (emerald/amber/red).
+   - Staggered entrance animations per card.
+
+5. **Delete with Confirmation**: 
+   - AlertDialog with review preview (user avatar, name, star rating, comment excerpt, pharmacy info).
+   - "Supprimer" (red) and "Annuler" (violet outline) buttons.
+   - Loading spinner during deletion.
+   - Optimistic local state update (removes review, decrements total, updates rating distribution).
+   - Toast notifications for success/error.
+
+6. **Pagination**: Full pagination controls matching admin orders pattern:
+   - First/prev/next/last buttons with ChevronsLeft/Right icons.
+   - Page number buttons with active state.
+   - Ellipsis for large page ranges.
+   - "X–Y sur Z avis" page info text.
+
+7. **States**:
+   - Loading: Skeleton placeholders for distribution bar, filter tabs, and 3 review cards.
+   - Error: Red error card with AlertCircle icon and "Réessayer" button.
+   - Empty: Inbox icon with contextual message (different for filtered vs unfiltered).
+
+#### Styling:
+- Violet/purple theme: `bg-violet-600`, `border-violet-100/200/300`, `text-violet-700`, `bg-violet-50`.
+- Mobile-first responsive: `max-w-2xl mx-auto px-4 sm:px-6`.
+- All shadcn/ui components used: Card, CardContent, Badge, Button, Input, Skeleton, AlertDialog.
+- Lucide icons: Star, MessageSquare, Trash2, Search, Filter, RefreshCw, AlertCircle, Inbox, Building2, Reply, BarChart3, X, Loader2, ChevronLeft/Right.
+- Framer Motion: AnimatePresence for filter panel, staggered card animations, animated distribution bars.
+- All text in French.
+- `npm run lint` passes with zero errors.
+
+---
+## Task ID: admin-medications-view - frontend-developer
+### Work Task
+Create the admin medications management view at `/home/z/my-project/src/components/views/admin/admin-medications-view.tsx`.
+
+### Work Summary
+
+#### File Created:
+
+1. **`src/components/views/admin/admin-medications-view.tsx`** (~1250 lines) — Admin medications management view:
+   - **Header**: "Gestion des médicaments" with FlaskConical icon (violet), total count badge, refresh button, and "Créer" action button
+   - **Search bar**: Searches by name, commercial name, and active principle with clear button
+   - **Category filter pills**: Dynamically populated from API response `categories` array, scrollable horizontal row with violet-600 active state, "Toutes" pill showing total count
+   - **Prescription filter tabs**: 3 pill buttons (Tous, Ordonnance, Libre) with ShieldAlert/ShieldCheck icons, passed as `needsPrescription` query parameter
+   - **Medication cards**: Each card shows:
+     - Commercial name (primary, bold) + generic name (secondary, muted)
+     - Prescription badge: red "Ordonnance" or green "Libre" with shield icons
+     - Category badge with color-coded styling (rose for Antalgique, amber for Antibiotique, etc.)
+     - Form badge with Pill icon (Comprimé, Gélule, Aérosol, etc.)
+     - Active principle with Activity icon
+     - Pathology with FileText icon
+     - Footer: pharmacy count (Building2), order count (Package), relative time, Eye icon
+   - **Detail dialog**: Violet→purple gradient header, scrollable body with:
+     - Status badges row (category, form, prescription)
+     - Info grid: generic name, active principle, pathology, dosage
+     - Description card
+     - Side effects card (amber warning styling)
+     - Stats section: orders count, pharmacy stock count, creation date
+     - Pharmacy stocks section: fetches from `/api/admin/medications/{id}/stocks`, shows pharmacy name, city, stock status badge, quantity, price in FCFA
+   - **Create medication dialog**: Violet→purple gradient header, form fields:
+     - Commercial name (required) + Generic name (required) — Input
+     - Active principle + Category — Input (grid 2-col)
+     - Form — Select dropdown with 12 medication forms (Comprimé, Gélule, Aérosol, Sirop, etc.)
+     - Pathology — Input
+     - Prescription toggle — Switch with contextual description
+     - Description — Textarea
+     - Dosage — Input
+     - Side effects — Textarea with amber AlertTriangle icon
+     - POST to `/api/admin/medications` with validation, loading state, toast feedback
+   - **Pagination**: Full pagination controls matching admin-orders-view pattern (first/prev/pages/next/last), page info text
+   - **Loading skeleton**: Header, search bar, category pills, 3 card skeletons
+   - **Error state**: Red error card with AlertTriangle icon and retry button
+   - **Empty state**: Inbox icon with contextual message + "Effacer les filtres" button when filters are active
+   - **API integration**: Fetches from `/api/admin/medications?limit=20&offset=0` with `q`, `category`, `needsPrescription` query parameters
+   - Framer Motion staggered card entrance animations
+   - Responsive: `max-w-2xl mx-auto px-4 sm:px-6`, mobile-first design
+   - All text in French, violet/purple admin theme throughout
+   - Uses shadcn/ui: Card, Badge, Button, Input, Label, Skeleton, Separator, Textarea, Switch, Dialog, Select
+   - Uses lucide-react: FlaskConical, Search, Plus, Eye, Pill, AlertTriangle, RefreshCw, ChevronRight/Left, Clock, FileText, Activity, Package, Building2, Loader2, X
+   - Custom inline SVG ShieldCheckIcon and ShieldAlertIcon components (to avoid lucide naming conflicts)
+
+`npm run lint` passes with zero errors. Component is already registered in app-shell.tsx and app-store.ts by a prior agent.
+
+---
+Task ID: admin-panel
+Agent: Main Agent + 5 Sub-agents
+Task: Build complete admin interface for PharmApp CI with 360° platform view
+
+Work Log:
+- Updated prisma/seed.ts: Added admin user (admin@pharmapp.ci / demo1234, role: "admin")
+- Updated src/middleware.ts: Added /api/admin/ route protection (admin role check before pharmacist check)
+- Updated src/store/app-store.ts: Added 8 admin views to View type, admin role handling in goBack() and setCurrentUser()
+- Updated src/components/app-shell.tsx: Complete admin interface with violet/purple theme sidebar, mobile bottom nav, AdminViewRenderer
+
+Created 12 Admin API Routes:
+1. GET /api/admin/dashboard — Global platform stats (users by role, pharmacies, medications, orders by status, revenue, top 5 pharmacies/medications, recent orders, 6-month revenue trend)
+2. GET /api/admin/users — List users with role/search filters + pagination
+3. GET|PATCH|DELETE /api/admin/users/[id] — User CRUD with role management
+4. GET /api/admin/pharmacies — List pharmacies with city/guard/search filters + stock summaries
+5. GET|PATCH|DELETE /api/admin/pharmacies/[id] — Pharmacy CRUD with full stats
+6. GET /api/admin/orders — List all orders across all pharmacies with status/date/search filters
+7. GET|PATCH /api/admin/orders/[id] — Order detail + status management with stock restoration
+8. GET|POST /api/admin/medications — List/create medications with category/prescription filters
+9. GET|PATCH|DELETE /api/admin/medications/[id] — Medication CRUD with pharmacy stock info
+10. GET /api/admin/reviews — List reviews with rating/reply filters + rating distribution
+11. DELETE /api/admin/reviews/[id] — Delete review + recalculate pharmacy rating
+12. GET /api/admin/analytics — Advanced analytics by period (revenue by pharmacy, orders by city, user registrations, medication categories)
+
+Created 7 Admin Frontend Views:
+1. admin-dashboard-view.tsx — KPI grid, top pharmacies/medications, recent orders, revenue trend chart
+2. admin-users-view.tsx — User list with role badges, search, role editing dialog
+3. admin-pharmacies-view.tsx — Pharmacy cards with ratings, guard status, detail dialog
+4. admin-orders-view.tsx — Order list with status filters, date range, status update dialog
+5. admin-medications-view.tsx — Medication catalog with categories, create dialog, stock info
+6. admin-reviews-view.tsx — Review list with rating distribution, delete confirmation
+7. admin-analytics-view.tsx — CSS-only charts for revenue/orders/registrations/categories
+
+Stage Summary:
+- Complete admin panel with 360° platform view
+- Violet/purple theme distinguishes admin from patient (emerald) and pharmacist (emerald)
+- 12 API endpoints with admin role protection
+- 7 frontend views with responsive design (mobile + desktop)
+- Admin credentials: admin@pharmapp.ci / demo1234
+- Zero lint errors, all APIs tested and working
