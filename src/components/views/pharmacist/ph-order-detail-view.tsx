@@ -1,0 +1,875 @@
+'use client';
+
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ArrowLeft,
+  Phone,
+  Pill,
+  Package,
+  Clock,
+  CreditCard,
+  User,
+  Calendar,
+  MessageSquare,
+  CheckCircle2,
+  Circle,
+  XCircle,
+  Loader2,
+  Truck,
+  CheckCircle,
+  QrCode,
+  ScanLine,
+  ShieldCheck,
+  Keyboard,
+  Camera,
+  SearchCode,
+  Smartphone,
+} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { ViewHeader } from '@/components/view-header';
+import { useAppStore } from '@/store/app-store';
+import { PAYMENT_LABELS } from '@/lib/navigation';
+import { toast } from 'sonner';
+
+interface OrderData {
+  id: string;
+  status: string;
+  deliveryStatus: string;
+  quantity: number;
+  totalPrice: number;
+  note?: string | null;
+  paymentMethod?: string | null;
+  pickupTime?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  verificationCode?: string | null;
+  verifiedAt?: string | null;
+  user: {
+    name: string;
+    phone: string | null;
+  };
+  pharmacy: {
+    name: string;
+    address: string;
+    city: string;
+    phone: string;
+  };
+  medication: {
+    name: string;
+    commercialName: string;
+    form?: string;
+    needsPrescription?: boolean;
+  };
+}
+
+const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
+  pending: {
+    label: 'En attente',
+    className: 'bg-amber-100 text-amber-700 border-amber-200',
+  },
+  confirmed: {
+    label: 'Confirmée',
+    className: 'bg-blue-100 text-blue-700 border-blue-200',
+  },
+  ready: {
+    label: 'Prêtée',
+    className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  },
+  picked_up: {
+    label: 'Récupérée',
+    className: 'bg-gray-100 text-gray-600 border-gray-200',
+  },
+  cancelled: {
+    label: 'Annulée',
+    className: 'bg-red-100 text-red-700 border-red-200',
+  },
+};
+
+const TIMELINE_STEPS = [
+  { status: 'pending', label: 'En attente' },
+  { status: 'confirmed', label: 'Confirmée' },
+  { status: 'ready', label: 'Prêtée' },
+  { status: 'picked_up', label: 'Récupérée' },
+];
+
+const DELIVERY_STATUS_CONFIG: Record<string, { label: string; className: string; icon: string }> = {
+  pickup: { label: 'Retrait', className: 'bg-gray-100 text-gray-600 border-gray-200', icon: 'Package' },
+  preparing: { label: 'En préparation', className: 'bg-blue-100 text-blue-700 border-blue-200', icon: 'Loader2' },
+  ready: { label: 'Prêt', className: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: 'CheckCircle2' },
+  delivering: { label: 'En livraison', className: 'bg-amber-100 text-amber-700 border-amber-200', icon: 'Truck' },
+  delivered: { label: 'Livré', className: 'bg-green-100 text-green-700 border-green-200', icon: 'CheckCircle' },
+};
+
+const DELIVERY_STATUS_OPTIONS = [
+  { value: 'pickup', label: 'Retrait' },
+  { value: 'preparing', label: 'En préparation' },
+  { value: 'ready', label: 'Prêt' },
+  { value: 'delivering', label: 'En livraison' },
+  { value: 'delivered', label: 'Livré' },
+];
+
+const STATUS_FLOW_ORDER = ['pending', 'confirmed', 'ready', 'picked_up'];
+
+function formatPrice(price: number): string {
+  return price.toLocaleString('fr-FR', { useGrouping: true }) + ' FCFA';
+}
+
+function formatDate(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('fr-FR', {
+      day: 'numeric', month: 'long', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+function formatShortDate(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('fr-FR', {
+      day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+function getUnitPrice(totalPrice: number, quantity: number): number {
+  return quantity > 0 ? totalPrice / quantity : 0;
+}
+
+export function PharmacistOrderDetailView() {
+  const { selectedOrderId, goBack, setCurrentView, selectOrder } = useAppStore();
+
+  const [order, setOrder] = useState<OrderData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updating, setUpdating] = useState(false);
+
+  // Verification state
+  const [verifyDialogOpen, setVerifyDialogOpen] = useState(false);
+  const [verifyCode, setVerifyCode] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [scanMode, setScanMode] = useState(false);
+  const [scanError, setScanError] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const fetchOrder = useCallback(async () => {
+    if (!selectedOrderId) return;
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`/api/pharmacist/orders/${selectedOrderId}`);
+      if (!res.ok) throw new Error('Commande non trouvée');
+      const data = await res.json();
+      setOrder(data);
+    } catch {
+      setError('Impossible de charger la commande');
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedOrderId]);
+
+  useEffect(() => {
+    fetchOrder();
+  }, [fetchOrder]);
+
+  // Cleanup scanner resources
+  const cleanupScanner = useCallback(() => {
+    if (scanIntervalRef.current) {
+      clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => cleanupScanner();
+  }, [cleanupScanner]);
+
+  const updateStatus = async (newStatus: string, label: string) => {
+    if (!selectedOrderId || updating) return;
+    try {
+      setUpdating(true);
+      const res = await fetch(`/api/pharmacist/orders/${selectedOrderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!res.ok) throw new Error('Erreur serveur');
+      const updated = await res.json();
+      setOrder(updated);
+      toast.success(`Commande ${label.toLowerCase()} avec succès`);
+    } catch {
+      toast.error("Impossible de mettre à jour la commande");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const updateDeliveryStatus = async (newDeliveryStatus: string) => {
+    if (!selectedOrderId || updating) return;
+    try {
+      setUpdating(true);
+      const res = await fetch(`/api/pharmacist/orders/${selectedOrderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deliveryStatus: newDeliveryStatus }),
+      });
+      if (!res.ok) throw new Error('Erreur serveur');
+      const updated = await res.json();
+      setOrder(updated);
+      toast.success('Statut de livraison mis à jour');
+    } catch {
+      toast.error("Impossible de mettre à jour le statut de livraison");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleVerify = async (code: string) => {
+    if (!code.trim() || verifying) return;
+    const normalized = code.toUpperCase().trim();
+    try {
+      setVerifying(true);
+      setVerifyError(null);
+      const res = await fetch('/api/pharmacist/orders/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: normalized }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setVerifyError(data.error || 'Erreur de vérification');
+        toast.error(data.error || 'Code invalide');
+        return;
+      }
+
+      if (data.alreadyVerified) {
+        toast.info('Cette commande a déjà été vérifiée');
+      } else {
+        toast.success('Commande vérifiée avec succès !');
+      }
+
+      // If the verified order matches the current one, update it
+      if (data.id === order?.id) {
+        setOrder(data);
+      } else {
+        selectOrder(data.id);
+        setCurrentView('ph-order-detail');
+      }
+
+      setVerifyCode('');
+      cleanupScanner();
+      setVerifyDialogOpen(false);
+    } catch {
+      setVerifyError('Erreur serveur');
+      toast.error('Erreur de vérification');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const startCameraScan = async () => {
+    try {
+      setScanError(null);
+      setScanMode(true);
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
+      });
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+
+      // Use BarcodeDetector API if available
+      if ('BarcodeDetector' in window) {
+        const barcodeDetector = new (window as any).BarcodeDetector({
+          formats: ['qr_code'],
+        });
+
+        scanIntervalRef.current = setInterval(async () => {
+          if (!videoRef.current || videoRef.current.readyState < 2) return;
+          try {
+            const barcodes = await barcodeDetector.detect(videoRef.current);
+            if (barcodes.length > 0) {
+              const text = barcodes[0].rawValue;
+              // Extract verification code from: PHARMAPP-{orderId}-{code}
+              const match = text.match(/PHARMAPP-[a-zA-Z0-9]+-([A-Z2-9]{6})$/);
+              if (match) {
+                cleanupScanner();
+                await handleVerify(match[1]);
+              } else if (/^[A-Z2-9]{6}$/.test(text.toUpperCase().trim())) {
+                cleanupScanner();
+                await handleVerify(text.toUpperCase().trim());
+              }
+            }
+          } catch {
+            // detection failed, continue scanning
+          }
+        }, 500);
+      } else {
+        setScanError('La détection QR n\'est pas supportée sur ce navigateur. Utilisez la saisie manuelle.');
+      }
+    } catch (err) {
+      setScanError('Impossible d\'accéder à la caméra. Vérifiez les permissions.');
+      setScanMode(false);
+    }
+  };
+
+  const stopCameraScan = () => {
+    cleanupScanner();
+    setScanMode(false);
+  };
+
+  // Loading
+  if (loading) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+        <Skeleton className="h-8 w-56" />
+        <Skeleton className="h-32 rounded-xl" />
+        <Skeleton className="h-40 rounded-xl" />
+        <Skeleton className="h-48 rounded-xl" />
+        <div className="h-24" />
+      </div>
+    );
+  }
+
+  // Error
+  if (error || !order) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4">
+        <ViewHeader title="Détail de la commande" back onBack={goBack} />
+        <Card className="border-red-200">
+          <CardContent className="p-8 text-center">
+            <XCircle className="h-10 w-10 text-red-400 mx-auto mb-3" />
+            <h3 className="font-semibold mb-1">Erreur</h3>
+            <p className="text-sm text-muted-foreground mb-4">{error || 'Commande non trouvée'}</p>
+            <Button onClick={goBack} variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const statusInfo = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
+  const unitPrice = getUnitPrice(order.totalPrice, order.quantity);
+  const isCancelled = order.status === 'cancelled';
+  const currentStepIndex = STATUS_FLOW_ORDER.indexOf(order.status);
+  const isVerified = !!order.verifiedAt;
+  const isPickedUp = order.status === 'picked_up';
+
+  return (
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 pb-32">
+      {/* Header */}
+      <ViewHeader
+        title="Détail de la commande"
+        back
+        onBack={goBack}
+        action={
+          <div className="flex items-center gap-1.5">
+            {isVerified && (
+              <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 border-0">
+                <ShieldCheck className="h-3 w-3 mr-0.5" />
+                Vérifié
+              </Badge>
+            )}
+            <Badge variant="outline" className={`text-[11px] px-2 py-0.5 ${statusInfo.className}`}>
+              {statusInfo.label}
+            </Badge>
+          </div>
+        }
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25 }}
+        className="space-y-4"
+      >
+        {/* ── Verification Card ── */}
+        {!isCancelled && order.verificationCode && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card className={`overflow-hidden transition-colors ${isVerified ? 'border-emerald-300 bg-emerald-50/40' : 'border-amber-200 bg-amber-50/30'}`}>
+              <CardContent className="p-4 space-y-3">
+                {/* Top: icon + label + code */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {isVerified ? (
+                      <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                        <ShieldCheck className="h-5 w-5 text-emerald-600" />
+                      </div>
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                        <SearchCode className="h-5 w-5 text-amber-600" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-semibold truncate">
+                        {isVerified ? 'Commande vérifiée' : 'En attente de vérification'}
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground">
+                        {isVerified
+                          ? `Vérifiée le ${formatShortDate(order.verifiedAt!)}`
+                          : 'Saisissez ou scannez le code du patient'}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-xl font-bold tracking-[0.25em] text-emerald-700 font-mono shrink-0">
+                    {order.verificationCode}
+                  </span>
+                </div>
+
+                {/* Action buttons */}
+                {!isVerified && (
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => { setVerifyCode(''); setVerifyError(null); setScanMode(false); setVerifyDialogOpen(true); }}
+                      className="flex-1 h-10 bg-emerald-600 hover:bg-emerald-700 text-white text-xs"
+                    >
+                      <Keyboard className="h-4 w-4 mr-1.5" />
+                      Saisir le code
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => { setVerifyCode(''); setVerifyError(null); setScanError(null); setScanMode(true); setVerifyDialogOpen(true); }}
+                      className="flex-1 h-10 border-emerald-200 text-emerald-700 hover:bg-emerald-50 text-xs"
+                    >
+                      <ScanLine className="h-4 w-4 mr-1.5" />
+                      Scanner QR
+                    </Button>
+                  </div>
+                )}
+
+                {/* Verified message */}
+                {isVerified && (
+                  <div className="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-100/80 rounded-lg p-2.5">
+                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                    <span>
+                      Le patient a présenté son code.
+                      {isPickedUp ? ' Commande récupérée.' : ' Vous pouvez maintenant marquer la commande comme récupérée.'}
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* ── Patient Info Card ── */}
+        <Card className="border-emerald-100">
+          <CardContent className="p-4 space-y-3">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Patient</h3>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                <User className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-sm">{order.user.name}</p>
+                {order.user.phone ? (
+                  <a href={`tel:${order.user.phone}`} className="flex items-center gap-1.5 text-xs text-emerald-600 hover:underline mt-0.5" onClick={(e) => e.stopPropagation()}>
+                    <Phone className="h-3 w-3" />
+                    {order.user.phone}
+                  </a>
+                ) : (
+                  <p className="text-xs text-muted-foreground mt-0.5">Pas de téléphone</p>
+                )}
+              </div>
+            </div>
+            {order.pickupTime && (
+              <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 rounded-lg p-2.5">
+                <Clock className="h-3.5 w-3.5 shrink-0" />
+                <span>Heure de récupération : <strong>{order.pickupTime}</strong></span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* ── Order Info Card ── */}
+        <Card className="border-emerald-100">
+          <CardContent className="p-4 space-y-3">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Détails de la commande</h3>
+
+            <div className="flex items-start gap-2.5">
+              <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+                <Pill className="h-4 w-4 text-emerald-600" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-sm truncate">{order.medication.commercialName || order.medication.name}</p>
+                  {order.medication.needsPrescription && (
+                    <Badge className="bg-red-100 text-red-700 text-[10px] px-1.5 py-0 border-0 shrink-0">Ordonnance</Badge>
+                  )}
+                </div>
+                {order.medication.name !== order.medication.commercialName && (
+                  <p className="text-xs text-muted-foreground truncate">{order.medication.name}</p>
+                )}
+                {order.medication.form && <p className="text-[11px] text-muted-foreground">{order.medication.form}</p>}
+              </div>
+            </div>
+
+            <Separator className="bg-emerald-100/80" />
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Quantité</span>
+                <span className="font-medium flex items-center gap-1.5">
+                  <Package className="h-3.5 w-3.5 text-muted-foreground" />{order.quantity}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Prix unitaire</span>
+                <span className="font-medium">{formatPrice(unitPrice)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm font-semibold pt-1 border-t border-emerald-100/80">
+                <span>Total</span>
+                <span className="text-emerald-700">{formatPrice(order.totalPrice)}</span>
+              </div>
+            </div>
+
+            <Separator className="bg-emerald-100/80" />
+
+            {order.paymentMethod && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground flex items-center gap-1.5"><CreditCard className="h-3.5 w-3.5" />Paiement</span>
+                <Badge variant="outline" className="text-xs px-2 py-0.5 border-gray-200">
+                  {PAYMENT_LABELS[order.paymentMethod] || order.paymentMethod}
+                </Badge>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />Passée le</span>
+              <span className="text-xs">{formatDate(order.createdAt)}</span>
+            </div>
+
+            {order.note && (
+              <>
+                <Separator className="bg-emerald-100/80" />
+                <div className="bg-amber-50 rounded-lg p-3">
+                  <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 mb-1">
+                    <MessageSquare className="h-3.5 w-3.5" />Note du patient
+                  </p>
+                  <p className="text-sm text-amber-800">{order.note}</p>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* ── Delivery Status Card ── */}
+        <Card className="border-emerald-100">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Statut de livraison</h3>
+              <Badge variant="outline" className={`text-[11px] px-2 py-0.5 ${DELIVERY_STATUS_CONFIG[order.deliveryStatus]?.className || DELIVERY_STATUS_CONFIG.pickup.className}`}>
+                {DELIVERY_STATUS_CONFIG[order.deliveryStatus]?.label || 'Retrait'}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                order.deliveryStatus === 'pickup' ? 'bg-gray-100' :
+                order.deliveryStatus === 'preparing' ? 'bg-blue-100' :
+                order.deliveryStatus === 'ready' ? 'bg-emerald-100' :
+                order.deliveryStatus === 'delivering' ? 'bg-amber-100' : 'bg-green-100'
+              }`}>
+                {order.deliveryStatus === 'pickup' && <Package className="h-5 w-5 text-gray-600" />}
+                {order.deliveryStatus === 'preparing' && <Loader2 className="h-5 w-5 text-blue-600" />}
+                {order.deliveryStatus === 'ready' && <CheckCircle2 className="h-5 w-5 text-emerald-600" />}
+                {order.deliveryStatus === 'delivering' && <Truck className="h-5 w-5 text-amber-600" />}
+                {order.deliveryStatus === 'delivered' && <CheckCircle className="h-5 w-5 text-green-600" />}
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-sm">{DELIVERY_STATUS_CONFIG[order.deliveryStatus]?.label || 'Retrait'}</p>
+                <p className="text-xs text-muted-foreground">
+                  {order.deliveryStatus === 'pickup' && 'Le patient viendra récupérer en pharmacie'}
+                  {order.deliveryStatus === 'preparing' && 'La commande est en cours de préparation'}
+                  {order.deliveryStatus === 'ready' && 'Prête à être récupérée ou livrée'}
+                  {order.deliveryStatus === 'delivering' && 'Le livreur est en route'}
+                  {order.deliveryStatus === 'delivered' && 'Commande livrée avec succès'}
+                </p>
+              </div>
+            </div>
+
+            {(order.status === 'confirmed' || order.status === 'ready') && (
+              <div className="space-y-2">
+                <Separator className="bg-emerald-100/80" />
+                <Select value={order.deliveryStatus} onValueChange={updateDeliveryStatus} disabled={updating}>
+                  <SelectTrigger className="h-10 border-emerald-200 text-sm">
+                    <SelectValue placeholder="Changer le statut de livraison" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DELIVERY_STATUS_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* ── Timeline ── */}
+        <Card className="border-emerald-100">
+          <CardContent className="p-4 space-y-4">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Suivi de la commande</h3>
+
+            {isCancelled ? (
+              <div className="flex flex-col items-center py-4">
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-3">
+                  <XCircle className="h-6 w-6 text-red-500" />
+                </div>
+                <p className="font-semibold text-red-700">Commande annulée</p>
+              </div>
+            ) : (
+              <div className="relative">
+                {TIMELINE_STEPS.map((step, index) => {
+                  const stepIndex = STATUS_FLOW_ORDER.indexOf(step.status);
+                  const isCompleted = currentStepIndex >= stepIndex;
+                  const isCurrent = currentStepIndex === stepIndex;
+                  const isLast = index === TIMELINE_STEPS.length - 1;
+                  return (
+                    <div key={step.status} className="flex gap-3">
+                      <div className="flex flex-col items-center">
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-colors ${isCompleted ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                          {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
+                        </div>
+                        {!isLast && <div className={`w-0.5 h-10 transition-colors ${isCompleted && index < currentStepIndex ? 'bg-emerald-500' : 'bg-gray-200'}`} />}
+                      </div>
+                      <div className="pt-1 pb-6">
+                        <p className={`text-sm font-medium ${isCompleted ? (isCurrent ? 'text-emerald-700' : 'text-emerald-600') : 'text-muted-foreground'}`}>{step.label}</p>
+                        {isCurrent && <p className="text-[11px] text-emerald-500 mt-0.5">Étape en cours</p>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* ── Fixed Action Buttons ── */}
+      {order.status === 'pending' && (
+        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6">
+            <Card className="border-emerald-200 shadow-lg">
+              <CardContent className="p-3 flex gap-2">
+                <Button className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm" onClick={() => updateStatus('confirmed', 'Confirmée')} disabled={updating}>
+                  {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
+                  Confirmer
+                </Button>
+                <Button variant="outline" className="flex-1 h-11 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 text-sm" onClick={() => updateStatus('cancelled', 'Annulée')} disabled={updating}>
+                  {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <XCircle className="h-4 w-4 mr-2" />}
+                  Annuler
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {order.status === 'confirmed' && (
+        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6">
+            <Card className="border-emerald-200 shadow-lg">
+              <CardContent className="p-3">
+                <Button className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm" onClick={() => updateStatus('ready', 'Prêtée')} disabled={updating}>
+                  {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
+                  Préparer la commande
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {order.status === 'ready' && (
+        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6">
+            <Card className="border-emerald-200 shadow-lg">
+              <CardContent className="p-3">
+                <Button className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm" onClick={() => updateStatus('picked_up', 'Récupérée')} disabled={updating}>
+                  {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
+                  Marquer comme récupérée
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* ── Verify Dialog ── */}
+      <Dialog open={verifyDialogOpen} onOpenChange={(open) => {
+        if (!open) { cleanupScanner(); setScanMode(false); setVerifyCode(''); setVerifyError(null); setScanError(null); }
+        setVerifyDialogOpen(open);
+      }}>
+        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-emerald-200">
+          <DialogHeader className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-4 text-white shrink-0">
+            <DialogTitle className="text-base flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5" />
+              Vérifier une commande
+            </DialogTitle>
+            <DialogDescription className="text-emerald-200 text-xs mt-1">
+              Saisissez le code du patient ou scannez le QR code
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="p-5 space-y-4">
+            {/* Mode toggle */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => { cleanupScanner(); setScanMode(false); setScanError(null); }}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${!scanMode ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
+              >
+                <Keyboard className="h-4 w-4" />
+                Saisie manuelle
+              </button>
+              <button
+                onClick={() => { setScanError(null); startCameraScan(); }}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${scanMode ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
+              >
+                <Camera className="h-4 w-4" />
+                Scanner QR
+              </button>
+            </div>
+
+            {/* Camera view */}
+            {scanMode && (
+              <div className="relative bg-black rounded-xl overflow-hidden aspect-[4/3]">
+                <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+                {!streamRef.current && !scanError && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white/70 space-y-2">
+                    <Camera className="h-8 w-8" />
+                    <p className="text-xs">Démarrage de la caméra...</p>
+                  </div>
+                )}
+                {verifying && (
+                  <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
+                    <Loader2 className="h-8 w-8 text-white animate-spin" />
+                    <p className="text-xs text-white">Vérification en cours...</p>
+                  </div>
+                )}
+                {/* QR scanning overlay */}
+                {streamRef.current && !verifying && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-48 h-48 border-2 border-white/50 rounded-2xl">
+                      <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-emerald-400 rounded-tl-xl -translate-x-[1px] -translate-y-[1px]" />
+                      <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-emerald-400 rounded-tr-xl translate-x-[1px] -translate-y-[1px]" />
+                      <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-emerald-400 rounded-bl-xl -translate-x-[1px] translate-y-[1px]" />
+                      <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-emerald-400 rounded-br-xl translate-x-[1px] translate-y-[1px]" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Camera scan error */}
+            {scanMode && scanError && (
+              <div className="flex items-start gap-2 bg-red-50 rounded-lg p-3">
+                <XCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                <p className="text-xs text-red-700">{scanError}</p>
+              </div>
+            )}
+
+            {/* Camera scan instruction */}
+            {scanMode && !scanError && streamRef.current && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground justify-center">
+                <Smartphone className="h-3.5 w-3.5" />
+                <span>Pointez la caméra vers le QR code du patient</span>
+              </div>
+            )}
+
+            {/* Divider */}
+            <div className="flex items-center gap-3">
+              <Separator className="flex-1" />
+              <span className="text-[11px] text-muted-foreground">ou</span>
+              <Separator className="flex-1" />
+            </div>
+
+            {/* Manual code input (always visible) */}
+            <div className="space-y-3">
+              <label className="text-xs font-medium text-muted-foreground">Code de vérification (6 caractères)</label>
+              <Input
+                value={verifyCode}
+                onChange={(e) => {
+                  const val = e.target.value.toUpperCase().replace(/[^A-Z2-9]/g, '').slice(0, 6);
+                  setVerifyCode(val);
+                  setVerifyError(null);
+                }}
+                placeholder="Ex: A3K9X2"
+                className="h-12 text-center text-2xl font-mono tracking-[0.4em] font-bold border-emerald-200 focus:border-emerald-400"
+                maxLength={6}
+                disabled={verifying}
+                autoFocus={!scanMode}
+              />
+              <Button
+                onClick={() => handleVerify(verifyCode)}
+                disabled={verifyCode.length !== 6 || verifying}
+                className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm disabled:opacity-40"
+              >
+                {verifying ? (
+                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Vérification...</>
+                ) : (
+                  <><ShieldCheck className="h-4 w-4 mr-2" />Vérifier le code</>
+                )}
+              </Button>
+            </div>
+
+            {/* Verify error */}
+            {verifyError && (
+              <div className="flex items-start gap-2 bg-red-50 rounded-lg p-3">
+                <XCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                <p className="text-xs text-red-700">{verifyError}</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
