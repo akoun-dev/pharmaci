@@ -54,6 +54,7 @@ import { AdminOrdersView } from '@/components/views/admin/admin-orders-view';
 import { AdminMedicationsView } from '@/components/views/admin/admin-medications-view';
 import { AdminReviewsView } from '@/components/views/admin/admin-reviews-view';
 import { AdminAnalyticsView } from '@/components/views/admin/admin-analytics-view';
+import { AdminSettingsView } from '@/components/views/admin/admin-settings-view';
 
 type PatientTabKey = 'home' | 'search' | 'favorites' | 'order-history' | 'profile';
 type PharmacistTabKey = 'ph-dashboard' | 'ph-stock-list' | 'ph-orders' | 'ph-notifications' | 'ph-profile';
@@ -201,7 +202,7 @@ function AdminViewRenderer() {
     'admin-medications': <AdminMedicationsView />,
     'admin-reviews': <AdminReviewsView />,
     'admin-analytics': <AdminAnalyticsView />,
-    'admin-settings': <AdminDashboardView />,
+    'admin-settings': <AdminSettingsView />,
   };
 
   return (
@@ -337,6 +338,19 @@ export function AppShell() {
                 </button>
               );
             })}
+            <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-800">
+              <button
+                onClick={() => setCurrentView('admin-settings')}
+                className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  currentView === 'admin-settings'
+                    ? 'bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-400'
+                    : 'text-muted-foreground hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-foreground'
+                }`}
+              >
+                <Settings className="h-4.5 w-4.5" />
+                Paramètres
+              </button>
+            </div>
           </nav>
 
           {/* Logout */}

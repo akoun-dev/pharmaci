@@ -178,22 +178,38 @@ export function AdminDashboardView() {
       if (!res.ok) throw new Error('Erreur lors du chargement du tableau de bord');
 
       const json = await res.json();
+      // Map from nested API structure to flat view structure
+      const api = json;
       setData({
-        totalUsers: json.totalUsers ?? 0,
-        usersByRole: json.usersByRole ?? { patient: 0, pharmacist: 0, admin: 0 },
-        totalPharmacies: json.totalPharmacies ?? 0,
-        guardPharmaciesCount: json.guardPharmaciesCount ?? 0,
-        totalMedications: json.totalMedications ?? 0,
-        totalOrders: json.totalOrders ?? 0,
-        ordersByStatus: json.ordersByStatus ?? {},
-        totalRevenue: json.totalRevenue ?? 0,
-        newUsersThisMonth: json.newUsersThisMonth ?? 0,
-        newOrdersToday: json.newOrdersToday ?? 0,
-        avgOrderValue: json.avgOrderValue ?? 0,
-        topPharmacies: json.topPharmacies ?? [],
-        topMedications: json.topMedications ?? [],
-        recentOrders: json.recentOrders ?? [],
-        monthlyRevenueTrend: json.monthlyRevenueTrend ?? [],
+        totalUsers: api.users?.total ?? 0,
+        usersByRole: {
+          patient: api.users?.byRole?.patients ?? 0,
+          pharmacist: api.users?.byRole?.pharmacists ?? 0,
+          admin: api.users?.byRole?.admins ?? 0,
+        },
+        totalPharmacies: api.pharmacies?.total ?? 0,
+        guardPharmaciesCount: api.pharmacies?.onGuard ?? 0,
+        totalMedications: api.medications?.total ?? 0,
+        totalOrders: api.orders?.total ?? 0,
+        ordersByStatus: api.orders?.byStatus ?? {},
+        totalRevenue: api.revenue?.total ?? 0,
+        newUsersThisMonth: api.users?.newThisMonth ?? 0,
+        newOrdersToday: api.orders?.newToday ?? 0,
+        avgOrderValue: api.orders?.averageValue ?? 0,
+        topPharmacies: (api.topPharmacies ?? []).map((p: Record<string, unknown>) => ({
+          id: p.pharmacyId,
+          name: p.name,
+          revenue: p.revenue,
+          orderCount: 0,
+        })),
+        topMedications: (api.topMedications ?? []).map((m: Record<string, unknown>) => ({
+          id: m.medicationId,
+          name: m.name,
+          orderCount: m.orderCount,
+          quantitySold: m.totalQuantity,
+        })),
+        recentOrders: api.recentOrders ?? [],
+        monthlyRevenueTrend: api.revenue?.monthlyTrend ?? [],
       });
     } catch (err: unknown) {
       const message =

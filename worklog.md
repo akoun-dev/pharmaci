@@ -672,7 +672,62 @@ Create 2 pharmacist order management views: Orders List View and Order Detail Vi
 
 1. **`src/components/views/pharmacist/ph-orders-view.tsx`** (384 lines) — Pharmacist orders list:
    - **Header**: "Commandes" title with ClipboardList icon, order count badge, refresh button (spinning animation)
-   - **Filter tabs**: 6 scrollable pill buttons (Toutes, En attente, Confirmées, Prêtées, Récupérées, Annulées) — each shows count badge, active tab in emerald-600, inactive in emerald-50
+   - **Filter tabs**: 6 scrollable pill buttons (Toutes, En attente, Confirmées, Prêtées, Récupérées, Annulées) — eac
+
+---
+## Task ID: admin-fixes - main-agent
+### Work Task
+Fix dashboard API/view data mismatch bug, create missing medications stocks API endpoint, create admin settings view, and update app shell.
+
+### Work Summary
+
+#### Files Modified:
+
+1. **`src/components/views/admin/admin-dashboard-view.tsx`** (lines 180-213) — Fixed critical data mapping bug:
+   - The `fetchData` callback's `setData()` was reading flat keys from the nested API response, causing all KPI cards to display 0
+   - Updated to correctly map from nested API structure (`api.users.total`, `api.pharmacies.onGuard`, `api.orders.byStatus`, `api.revenue.total`, etc.) to the flat structure the view component expects
+   - Key mapping corrections:
+     - `api.users.byRole.patients` → `usersByRole.patient` (plural→singular)
+     - `api.users.byRole.pharmacists` → `usersByRole.pharmacist` (plural→singular)
+     - `api.pharmacies.onGuard` → `guardPharmaciesCount`
+     - `api.orders.newToday` → `newOrdersToday`
+     - `api.orders.averageValue` → `avgOrderValue`
+     - `api.revenue.monthlyTrend` → `monthlyRevenueTrend`
+   - Also mapped `topPharmacies` array fields: `pharmacyId` → `id`
+   - Also mapped `topMedications` array fields: `medicationId` → `id`, `totalQuantity` → `quantitySold`
+
+2. **`src/components/app-shell.tsx`** — 3 changes:
+   - **Line 57**: Added import for `AdminSettingsView` from `@/components/views/admin/admin-settings-view`
+   - **Line 205**: Changed `'admin-settings': <AdminDashboardView />` to `'admin-settings': <AdminSettingsView />` in AdminViewRenderer
+   - **Lines 341-353**: Added separator + "Paramètres" button (Settings icon) below the main admin tabs in the desktop sidebar nav, with active state matching `currentView === 'admin-settings'`
+   - Note: `adminViewToTab` already had `'admin-settings': 'admin-dashboard'` at line 125 (no change needed)
+
+#### Files Created:
+
+3. **`src/app/api/admin/medications/[id]/stocks/route.ts`** (61 lines) — New API endpoint:
+   - GET handler with admin auth verification (JWT session cookie + role check)
+   - Accepts medication `id` from URL params
+   - Queries all `PharmacyMedication` records for the given medication via Prisma
+   - Includes pharmacy `name` and `city` via relation
+   - Maps to response format matching the `PharmacyStock` interface: `{ pharmacyId, pharmacyName, pharmacyCity, quantity, price, inStock }`
+   - Returns `{ stocks: [...] }` matching what admin-medications-view.tsx expects at line 324
+   - Proper error handling: 401, 403, 500
+
+4. **`src/components/views/admin/admin-settings-view.tsx`** (286 lines) — New admin settings view:
+   - **Header**: Violet gradient banner with Settings icon and "Paramètres" title
+   - **App info section**: Card with app name (PharmApp CI), version (v1.0.0), environment (Production), region (Côte d'Ivoire)
+   - **Database stats section**: Fetches real stats from `/api/admin/dashboard` API, displays 4 stat blocks (users, pharmacies, medications, orders) in a 2×2/4×1 responsive grid with violet theme
+   - **Admin account section**: Card showing admin name, email, phone from store currentUser, with Shield badge
+   - **Danger zone**: Red-themed card with AlertDialog confirmation for "Réinitialiser les données" button (UI only, shows toast on confirm)
+   - **Footer**: Copyright text
+   - Uses violet color theme consistent with other admin views
+   - All shadcn/ui components: Card, Badge, Button, Skeleton, Separator, AlertDialog
+   - All lucide-react icons: Settings, Info, Database, User, Shield, Globe, Server, HardDrive, Users, Building2, Pill, ShoppingCart, TriangleAlert
+   - Framer Motion staggered animations
+   - French locale throughout
+   - `'use client'` directive
+
+All changes pass `npm run lint` with zero errors. Dev server compiles and runs successfully.h shows count badge, active tab in emerald-600, inactive in emerald-50
    - **Order cards**: Each card displays:
      - Order ID (first 8 chars, monospace)
      - Patient name + phone with avatar initial
@@ -2511,3 +2566,33 @@ Stage Summary:
 - 7 frontend views with responsive design (mobile + desktop)
 - Admin credentials: admin@pharmapp.ci / demo1234
 - Zero lint errors, all APIs tested and working
+
+---
+## Task ID: admin-fix-360
+### Work Task
+Fix critical admin dashboard data mismatch, add missing API endpoint, create admin settings view, and update admin sidebar navigation.
+
+### Work Summary
+
+#### Bug Fix: Dashboard API/View Data Mismatch (CRITICAL)
+**File:** `src/components/views/admin/admin-dashboard-view.tsx` (lines 180-213)
+- API returns nested structure (`users.total`, `orders.byStatus`, `revenue.total`) but view expected flat keys (`totalUsers`, `ordersByStatus`, `totalRevenue`)
+- Fixed mapping: nested→flat, plural→singular keys, `pharmacyId`→`id`, `totalQuantity`→`quantitySold`
+
+#### New API: Medication Stocks
+**File:** `src/app/api/admin/medications/[id]/stocks/route.ts` (new, 61 lines)
+- GET with admin auth, returns pharmacy stocks for a medication
+
+#### New View: Admin Settings
+**File:** `src/components/views/admin/admin-settings-view.tsx` (new, 347 lines)
+- App info, DB stats (live), admin account, danger zone
+
+#### Updated: App Shell
+**File:** `src/components/app-shell.tsx`
+- Added AdminSettingsView import and route mapping
+- Added "Paramètres" button in admin sidebar
+
+### Verification
+- lint: zero errors
+- DB reseeded: 5 users, 10 pharmacies, 12 medications
+- Admin login: admin@pharmapp.ci / demo1234 — all API endpoints verified
