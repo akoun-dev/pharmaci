@@ -169,8 +169,12 @@ export function PharmacistOrdersView() {
   const [total, setTotal] = useState(0);
   const [loadingMore, setLoadingMore] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({ all: 0 });
   const currentLimit = 10;
   const offsetRef = useRef(0);
+  // Keep a ref for search debounce
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   // Verification dialog state
   const [verifyDialogOpen, setVerifyDialogOpen] = useState(false);
@@ -184,6 +188,17 @@ export function PharmacistOrdersView() {
   const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const pharmacyId = currentUser?.linkedPharmacyId;
+
+  // Debounce search query
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, [searchQuery]);
 
   const fetchOrders = useCallback(async (append = false) => {
     if (!pharmacyId) {
@@ -203,6 +218,9 @@ export function PharmacistOrdersView() {
         offset: String(offsetRef.current),
       });
       if (activeTab !== 'all') params.set('status', activeTab);
+      if (debouncedSearch) params.set('q', debouncedSearch);
+      if (dateFrom) params.set('dateFrom', dateFrom);
+      if (dateTo) params.set('dateTo', dateTo);
       const res = await fetch(`/api/pharmacist/orders?${params}`);
       if (!res.ok) throw new Error('Erreur serveur');
       const data = await res.json();
@@ -214,6 +232,10 @@ export function PharmacistOrdersView() {
       }
       setTotal(data.total || 0);
       offsetRef.current = offsetRef.current + fetchedOrders.length;
+      // Use API-provided status counts (global, not affected by search/date filters)
+      if (data.statusCounts) {
+        setStatusCounts(data.statusCounts);
+      }
     } catch {
       setError('Impossible de charger les commandes');
     } finally {
@@ -221,7 +243,7 @@ export function PharmacistOrdersView() {
       setRefreshing(false);
       setLoadingMore(false);
     }
-  }, [pharmacyId, activeTab, currentLimit]);
+  }, [pharmacyId, activeTab, currentLimit, debouncedSearch, dateFrom, dateTo]);
 
   useEffect(() => {
     setOrders([]);
@@ -346,35 +368,16 @@ export function PharmacistOrdersView() {
     }
   };
 
-  // Count per status
-  const statusCounts: Record<string, number> = { all: total };
-  orders.forEach((o) => {
-    statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
-  });
-
+  // Client-side order type filter (reservation vs commande)
   const typeFiltered = orderTypeTab === 'all'
     ? orders
     : orderTypeTab === 'reservation'
     ? orders.filter((o) => !!o.pickupTime)
     : orders.filter((o) => !o.pickupTime);
 
-  const filteredOrders = typeFiltered.filter((o) => {
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      if (!o.user.name.toLowerCase().includes(q)) return false;
-    }
-    if (dateFrom) {
-      const from = new Date(dateFrom); from.setHours(0, 0, 0, 0);
-      if (new Date(o.createdAt) < from) return false;
-    }
-    if (dateTo) {
-      const to = new Date(dateTo); to.setHours(23, 59, 59, 999);
-      if (new Date(o.createdAt) > to) return false;
-    }
-    return true;
-  });
-
   const hasMore = orders.length < total;
+
+  const hasActiveFilters = searchQuery || dateFrom || dateTo;
 
   // Loading skeletons
   if (loading) {
@@ -436,7 +439,7 @@ export function PharmacistOrdersView() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Rechercher par patient..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm border-emerald-200 focus:border-emerald-400" />
           </div>
-          <Button variant="outline" size="icon" className={`h-10 w-10 shrink-0 ${showFilters ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-emerald-200'}`} onClick={() => setShowFilters(!showFilters)}>
+          <Button variant="outline" size="icon" className={`h-10 w-10 shrink-0 ${showFilters || hasActiveFilters ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-emerald-200'}`} onClick={() => setShowFilters(!showFilters)}>
             <Calendar className="h-4 w-4" />
           </Button>
         </div>
@@ -455,6 +458,28 @@ export function PharmacistOrdersView() {
             </Button>
           </div>
         )}
+        {hasActiveFilters && !showFilters && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {searchQuery && (
+              <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 gap-1">
+                &quot;{searchQuery}&quot;
+                <button onClick={() => setSearchQuery('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
+              </Badge>
+            )}
+            {dateFrom && (
+              <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 gap-1">
+                {dateFrom}
+                <button onClick={() => setDateFrom('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
+              </Badge>
+            )}
+            {dateTo && (
+              <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 gap-1">
+                → {dateTo}
+                <button onClick={() => setDateTo('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Order type toggle */}
@@ -471,7 +496,7 @@ export function PharmacistOrdersView() {
         })}
       </div>
 
-      {/* Filter tabs */}
+      {/* Filter tabs — uses global statusCounts from API */}
       <div className="flex gap-1.5 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-none">
         {FILTER_TABS.map((tab) => {
           const count = statusCounts[tab.key] || 0;
@@ -488,18 +513,24 @@ export function PharmacistOrdersView() {
       </div>
 
       {/* Orders list */}
-      {filteredOrders.length === 0 ? (
+      {typeFiltered.length === 0 ? (
         <Card className="border-emerald-100">
           <CardContent className="p-8 text-center">
             <Inbox className="h-10 w-10 text-emerald-300 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">{activeTab === 'all' ? 'Aucune commande' : `Aucune commande ${STATUS_CONFIG[activeTab]?.label?.toLowerCase() || ''}`}</h3>
-            <p className="text-sm text-muted-foreground">{activeTab === 'all' ? 'Les nouvelles commandes apparaîtront ici' : `Aucune commande avec le statut "${STATUS_CONFIG[activeTab]?.label || ''}"`}</p>
+            <p className="text-sm text-muted-foreground">{hasActiveFilters ? 'Aucune commande ne correspond à vos filtres' : activeTab === 'all' ? 'Les nouvelles commandes apparaîtront ici' : `Aucune commande avec le statut "${STATUS_CONFIG[activeTab]?.label || ''}"`}</p>
+            {hasActiveFilters && (
+              <Button variant="outline" className="mt-3 border-emerald-200 text-emerald-700 hover:bg-emerald-50" onClick={clearFilters}>
+                <X className="h-3 w-3 mr-1" />
+                Effacer les filtres
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (
         <AnimatePresence mode="wait">
           <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }} className="space-y-3">
-            {filteredOrders.map((order, index) => {
+            {typeFiltered.map((order, index) => {
               const statusInfo = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
               const deliveryInfo = DELIVERY_STATUS_CONFIG[order.deliveryStatus] || DELIVERY_STATUS_CONFIG.pickup;
               const isReservation = !!order.pickupTime;
@@ -614,7 +645,7 @@ export function PharmacistOrdersView() {
       )}
 
       {/* Load more */}
-      {filteredOrders.length > 0 && hasMore && (
+      {typeFiltered.length > 0 && hasMore && (
         <div className="flex justify-center mt-4">
           <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore} className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 px-6">
             {loadingMore ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Chargement...</>) : (`Charger plus (${total - orders.length} restantes)`)}

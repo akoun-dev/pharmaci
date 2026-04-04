@@ -23,6 +23,7 @@ import {
   Mail,
   SlidersHorizontal,
   Eye,
+  Trash2,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,7 +45,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { ViewHeader } from '@/components/view-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
@@ -179,6 +191,11 @@ export function AdminPharmaciesView() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailData, setDetailData] = useState<Record<string, unknown> | null>(null);
 
+  // Delete confirmation
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletePharmacy, setDeletePharmacy] = useState<PharmacyItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   // ── Fetch pharmacies list ──
   const fetchPharmacies = useCallback(async () => {
     setLoading(true);
@@ -250,6 +267,44 @@ export function AdminPharmaciesView() {
       toast.error('Erreur serveur');
     } finally {
       setDetailLoading(false);
+    }
+  };
+
+  // ── Delete handler ──
+  const openDeleteDialog = () => {
+    if (!selectedPharmacy) return;
+    setDeletePharmacy(selectedPharmacy);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeletePharmacy = async () => {
+    if (!deletePharmacy || deleting) return;
+    try {
+      setDeleting(true);
+      const res = await fetch(`/api/admin/pharmacies/${deletePharmacy.id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Erreur lors de la suppression');
+      }
+
+      // Close detail dialog and remove from list
+      setDetailOpen(false);
+      setSelectedPharmacy(null);
+      setPharmacies((prev) => prev.filter((p) => p.id !== deletePharmacy.id));
+      setTotal((prev) => Math.max(0, prev - 1));
+
+      toast.success(`Pharmacie "${deletePharmacy.name}" supprimée avec succès`);
+      setDeleteDialogOpen(false);
+      setDeletePharmacy(null);
+
+      // Re-fetch to keep pagination consistent
+      fetchPharmacies();
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de la suppression');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -650,8 +705,14 @@ export function AdminPharmaciesView() {
       </div>
 
       {/* ── Pharmacy Detail Dialog ── */}
-      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-violet-200 max-h-[90dvh]">
+      <Dialog open={detailOpen} onOpenChange={(open) => {
+        if (!open) {
+          setSelectedPharmacy(null);
+          setDetailData(null);
+        }
+        setDetailOpen(open);
+      }}>
+        <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-violet-200 max-h-[90dvh] flex flex-col">
           <DialogHeader className="bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <Building2 className="h-5 w-5" />
@@ -932,8 +993,67 @@ export function AdminPharmaciesView() {
               )}
             </div>
           </ScrollArea>
+
+          {/* Dialog footer with delete button */}
+          <DialogFooter className="px-5 py-3 border-t border-violet-100 shrink-0 flex-row gap-2">
+            <Button
+              variant="outline"
+              className="flex-1 border-violet-200 text-violet-700 hover:bg-violet-50"
+              onClick={() => setDetailOpen(false)}
+            >
+              Fermer
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+              onClick={openDeleteDialog}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Supprimer
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ── Delete Pharmacy Confirmation Dialog ── */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="sm:max-w-md mx-auto rounded-2xl border-red-200">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-700">
+              <Trash2 className="h-5 w-5" />
+              Supprimer la pharmacie
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm">
+              Êtes-vous sûr de vouloir supprimer la pharmacie{' '}
+              <span className="font-semibold text-foreground">"{deletePharmacy?.name}"</span> ?
+              Cette action est irréversible. Tous les stocks, commandes et avis associés
+              seront également supprimés.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:gap-0">
+            <AlertDialogCancel disabled={deleting}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeletePharmacy}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700 text-white focus:ring-red-600"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Suppression...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer définitivement
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

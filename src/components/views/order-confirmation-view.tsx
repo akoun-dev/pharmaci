@@ -79,29 +79,47 @@ export function OrderConfirmationView() {
       setError('Utilisateur non connecté');
       return;
     }
+    if (!selectedOrderId) {
+      setLoading(false);
+      setError('Aucune commande sélectionnée');
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch('/api/orders');
-      const data = await res.json();
-      const orders: OrderData[] = Array.isArray(data) ? data : [];
-      const found = selectedOrderId
-        ? orders.find((o) => o.id === selectedOrderId)
-        : orders[0];
+      // Fetch the specific order directly by ID
+      const res = await fetch(`/api/orders/${selectedOrderId}`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(data?.error || 'Commande non trouvée');
+        return;
+      }
+      const found: OrderData = await res.json();
       if (found) {
         setOrder(found);
-        // Fetch pharmacy detail for lat/lng
-        try {
-          const pharmRes = await fetch(`/api/pharmacies/${found.pharmacyId}`);
-          const pharmData = await pharmRes.json();
+        // Pharmacy coordinates are already included in /api/orders/[id] response
+        if (found.pharmacy && 'latitude' in found.pharmacy && 'longitude' in found.pharmacy) {
+          const pharm = found.pharmacy as unknown as { latitude: number; longitude: number; paymentMethods?: string; parkingInfo?: string };
           setPharmacyDetail({
-            latitude: pharmData.latitude,
-            longitude: pharmData.longitude,
-            paymentMethods: pharmData.paymentMethods || '[]',
-            parkingInfo: pharmData.parkingInfo,
+            latitude: pharm.latitude,
+            longitude: pharm.longitude,
+            paymentMethods: pharm.paymentMethods || '[]',
+            parkingInfo: pharm.parkingInfo,
           });
-        } catch {
-          // pharmacy detail fetch is non-critical
+        } else {
+          // Fallback: fetch pharmacy detail separately
+          try {
+            const pharmRes = await fetch(`/api/pharmacies/${found.pharmacyId}`);
+            const pharmData = await pharmRes.json();
+            setPharmacyDetail({
+              latitude: pharmData.latitude,
+              longitude: pharmData.longitude,
+              paymentMethods: pharmData.paymentMethods || '[]',
+              parkingInfo: pharmData.parkingInfo,
+            });
+          } catch {
+            // pharmacy detail fetch is non-critical
+          }
         }
       } else {
         setError('Commande non trouvée');

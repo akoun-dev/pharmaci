@@ -19,12 +19,15 @@ import {
   Loader2,
   Building2,
   Reply,
-  BarChart3,
+  Send,
+  Pencil,
+  Eye,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   AlertDialog,
@@ -36,6 +39,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { ViewHeader } from '@/components/view-header';
 import { toast } from 'sonner';
 
@@ -140,7 +150,7 @@ function StarRating({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md
 
 // ── Rating Distribution Bar ────────────────────────────────────────────────
 
-function RatingDistributionBar({ distribution, total }: { distribution: RatingDistribution; total: number }) {
+function RatingDistributionBar({ distribution }: { distribution: RatingDistribution }) {
   const maxCount = Math.max(
     ...[5, 4, 3, 2, 1].map((r) => distribution[String(r)] || 0),
     1
@@ -162,7 +172,7 @@ function RatingDistributionBar({ distribution, total }: { distribution: RatingDi
           <div className="text-center">
             <p className="text-2xl font-bold text-violet-700">{avg}</p>
             <StarRating rating={Math.round(Number(avg))} size="md" />
-            <p className="text-[11px] text-muted-foreground mt-0.5">{total} avis</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{totalRatings} avis</p>
           </div>
           <div className="flex-1 space-y-1.5">
             {[5, 4, 3, 2, 1].map((star) => {
@@ -214,14 +224,37 @@ export function AdminReviewsView() {
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Rating distribution
-  const [ratingDistribution, setRatingDistribution] = useState<RatingDistribution>({});
+  // Global rating distribution (fetched once on mount, re-fetched on delete)
+  const [globalDistribution, setGlobalDistribution] = useState<RatingDistribution>({});
 
   // Delete dialog
   const [deleteTarget, setDeleteTarget] = useState<ReviewData | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // ── Fetch ──
+  // Detail / Reply dialog
+  const [detailReview, setDetailReview] = useState<ReviewData | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [replySending, setReplySending] = useState(false);
+
+  // ── Fetch global distribution (no filters) ──
+  const fetchGlobalDistribution = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/reviews?limit=1&offset=0');
+      if (res.ok) {
+        const data = await res.json();
+        setGlobalDistribution(data.ratingDistribution || {});
+      }
+    } catch {
+      // silent
+    }
+  }, []);
+
+  // Fetch global distribution on mount
+  useEffect(() => {
+    fetchGlobalDistribution();
+  }, [fetchGlobalDistribution]);
+
+  // ── Fetch reviews (list only, no distribution) ──
   const fetchReviews = useCallback(async () => {
     try {
       setLoading(true);
@@ -236,7 +269,7 @@ export function AdminReviewsView() {
         params.set('rating', String(activeRating));
       }
       if (replyFilter !== 'all') {
-        params.set('replyStatus', replyFilter);
+        params.set('hasReply', replyFilter);
       }
       if (searchQuery.trim()) {
         params.set('q', searchQuery.trim());
@@ -248,7 +281,6 @@ export function AdminReviewsView() {
 
       setReviews(Array.isArray(data.items) ? data.items : []);
       setTotal(data.total || 0);
-      setRatingDistribution(data.ratingDistribution || {});
     } catch {
       setError('Impossible de charger les avis');
     } finally {
@@ -271,6 +303,7 @@ export function AdminReviewsView() {
     if (refreshing) return;
     setRefreshing(true);
     fetchReviews();
+    fetchGlobalDistribution();
   };
 
   const clearFilters = () => {
@@ -309,12 +342,8 @@ export function AdminReviewsView() {
       setReviews((prev) => prev.filter((r) => r.id !== deleteTarget.id));
       setTotal((prev) => Math.max(0, prev - 1));
 
-      // Update rating distribution
-      const starKey = String(deleteTarget.rating);
-      setRatingDistribution((prev) => ({
-        ...prev,
-        [starKey]: Math.max(0, (prev[starKey] || 1) - 1),
-      }));
+      // Re-fetch global distribution after delete
+      fetchGlobalDistribution();
 
       toast.success('Avis supprimé avec succès');
       setDeleteTarget(null);
@@ -324,6 +353,58 @@ export function AdminReviewsView() {
     } finally {
       setDeleting(false);
     }
+  };
+
+  // ── Reply handler ──
+  const handleSendReply = async () => {
+    if (!detailReview || !replyText.trim()) return;
+
+    try {
+      setReplySending(true);
+      const res = await fetch(`/api/admin/reviews/${detailReview.id}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reply: replyText.trim() }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Erreur lors de la réponse');
+      }
+
+      const data = await res.json();
+
+      // Update detail review locally
+      setDetailReview({
+        ...detailReview,
+        reply: data.reply,
+        replyAt: data.replyAt,
+      });
+
+      // Update the review in the list too
+      setReviews((prev) =>
+        prev.map((r) =>
+          r.id === detailReview.id
+            ? { ...r, reply: data.reply, replyAt: data.replyAt }
+            : r
+        )
+      );
+
+      toast.success(detailReview.reply ? 'Réponse modifiée avec succès' : 'Réponse envoyée avec succès');
+      setReplyText('');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur serveur';
+      toast.error(message);
+    } finally {
+      setReplySending(false);
+    }
+  };
+
+  // ── Open detail dialog ──
+  const openDetail = (review: ReviewData) => {
+    setDetailReview(review);
+    // Pre-fill reply text if editing an existing reply
+    setReplyText(review.reply || '');
   };
 
   // ── Loading skeleton ──
@@ -395,8 +476,8 @@ export function AdminReviewsView() {
         }
       />
 
-      {/* ── Rating Distribution Summary ── */}
-      <RatingDistributionBar distribution={ratingDistribution} total={total} />
+      {/* ── Rating Distribution Summary (global, not affected by filters) ── */}
+      <RatingDistributionBar distribution={globalDistribution} />
 
       {/* ── Search + Filters ── */}
       <div className="space-y-2 mb-3">
@@ -527,7 +608,7 @@ export function AdminReviewsView() {
               >
                 <Card className="border-violet-100 overflow-hidden hover:border-violet-300 transition-colors duration-150">
                   <CardContent className="p-4 space-y-2.5">
-                    {/* Top row: User + Rating + Delete */}
+                    {/* Top row: User + Rating + Actions */}
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
                         <div className="w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center flex-shrink-0">
@@ -548,17 +629,8 @@ export function AdminReviewsView() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         <StarRating rating={review.rating} />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-red-500 hover:bg-red-50"
-                          onClick={() => setDeleteTarget(review)}
-                          aria-label="Supprimer l'avis"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
                       </div>
                     </div>
 
@@ -589,34 +661,57 @@ export function AdminReviewsView() {
                       </div>
                     )}
 
-                    {/* No reply badge */}
-                    {!review.reply && (
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] px-2 py-0.5 border-amber-200 bg-amber-50 text-amber-700"
-                      >
-                        <MessageSquare className="h-2.5 w-2.5 mr-1" />
-                        Sans réponse
-                      </Badge>
-                    )}
-
                     {/* Footer */}
                     <div className="border-t border-violet-100/80 flex items-center justify-between">
                       <span className="text-[11px] text-muted-foreground pt-2">
                         {formatRelativeTime(review.createdAt)}
                       </span>
-                      <Badge
-                        variant="outline"
-                        className={`text-[10px] px-2 py-0 ${
-                          review.rating >= 4
-                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                            : review.rating === 3
-                              ? 'border-amber-200 bg-amber-50 text-amber-700'
-                              : 'border-red-200 bg-red-50 text-red-700'
-                        }`}
-                      >
-                        {review.rating}/5
-                      </Badge>
+                      <div className="flex items-center gap-1 pt-1">
+                        {/* Reply status badge */}
+                        {review.reply ? (
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] px-2 py-0 border-emerald-200 bg-emerald-50 text-emerald-700"
+                          >
+                            <Reply className="h-2.5 w-2.5 mr-1" />
+                            Répondu
+                          </Badge>
+                        ) : (
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] px-2 py-0 border-amber-200 bg-amber-50 text-amber-700"
+                          >
+                            <MessageSquare className="h-2.5 w-2.5 mr-1" />
+                            Sans réponse
+                          </Badge>
+                        )}
+
+                        {/* View / Reply button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-violet-600 hover:bg-violet-50"
+                          onClick={() => openDetail(review)}
+                          aria-label="Voir / Répondre"
+                        >
+                          {review.reply ? (
+                            <Pencil className="h-3.5 w-3.5" />
+                          ) : (
+                            <Reply className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
+
+                        {/* Delete button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-red-500 hover:bg-red-50"
+                          onClick={() => setDeleteTarget(review)}
+                          aria-label="Supprimer l'avis"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -792,6 +887,139 @@ export function AdminReviewsView() {
           </>
         )}
       </AlertDialog>
+
+      {/* ── Detail / Reply Dialog ── */}
+      <Dialog open={!!detailReview} onOpenChange={(open) => !open && setDetailReview(null)}>
+        {detailReview && (
+          <DialogContent className="sm:max-w-lg rounded-2xl border-violet-200 max-h-[85dvh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-base">
+                <Eye className="h-4.5 w-4.5 text-violet-600" />
+                Détail de l&apos;avis
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Consultez et répondez à cet avis
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 mt-2">
+              {/* Review author & pharmacy */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-violet-50 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-semibold text-violet-700">
+                      {detailReview.user.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm">{detailReview.user.name}</p>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Building2 className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">
+                        {detailReview.pharmacy.name}
+                        {detailReview.pharmacy.city && ` — ${detailReview.pharmacy.city}`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <StarRating rating={detailReview.rating} size="md" />
+              </div>
+
+              {/* Date & rating badge */}
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-muted-foreground">
+                  {formatDateFull(detailReview.createdAt)}
+                </span>
+                <Badge
+                  variant="outline"
+                  className={`text-[10px] px-2 py-0 ${
+                    detailReview.rating >= 4
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                      : detailReview.rating === 3
+                        ? 'border-amber-200 bg-amber-50 text-amber-700'
+                        : 'border-red-200 bg-red-50 text-red-700'
+                  }`}
+                >
+                  {detailReview.rating}/5
+                </Badge>
+              </div>
+
+              {/* Comment */}
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-sm leading-relaxed">{detailReview.comment}</p>
+              </div>
+
+              {/* Existing reply */}
+              {detailReview.reply && (
+                <div className="bg-violet-50 border border-violet-100 rounded-lg p-3 space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Reply className="h-3.5 w-3.5 text-violet-600" />
+                    <span className="text-xs font-semibold text-violet-700">
+                      Réponse de la pharmacie
+                    </span>
+                    {detailReview.replyAt && (
+                      <span className="text-[10px] text-muted-foreground ml-auto">
+                        {formatRelativeTime(detailReview.replyAt)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm leading-relaxed">{detailReview.reply}</p>
+                </div>
+              )}
+
+              {/* Reply input */}
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">
+                  {detailReview.reply ? 'Modifier la réponse' : 'Écrire une réponse'}
+                </p>
+                <Textarea
+                  placeholder="Votre réponse..."
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  className="min-h-[80px] text-sm border-violet-200 focus:border-violet-400 resize-none"
+                  disabled={replySending}
+                />
+                <div className="flex justify-end gap-2">
+                  {detailReview.reply && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-violet-200 text-violet-700 hover:bg-violet-50 text-xs"
+                      onClick={() => setReplyText(detailReview.reply || '')}
+                      disabled={replySending}
+                    >
+                      Réinitialiser
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    className="bg-violet-600 hover:bg-violet-700 text-white text-xs"
+                    onClick={handleSendReply}
+                    disabled={replySending || !replyText.trim()}
+                  >
+                    {replySending ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                        Envoi...
+                      </>
+                    ) : detailReview.reply ? (
+                      <>
+                        <Send className="h-3.5 w-3.5 mr-1.5" />
+                        Modifier
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-3.5 w-3.5 mr-1.5" />
+                        Répondre
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
     </div>
   );
 }

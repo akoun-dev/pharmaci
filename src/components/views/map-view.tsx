@@ -36,6 +36,7 @@ export function MapView() {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [locateRequested, setLocateRequested] = useState(false);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -212,20 +213,21 @@ export function MapView() {
     userMarkerRef.current = marker;
   }, [location, mapReady]);
 
-  // Fly to user location
-  const handleLocateMe = async () => {
-    setLocating(true);
-    requestLocation();
+  // Fly to user location when GPS resolves after a locate request
+  useEffect(() => {
+    if (!locateRequested || !location) return;
+    const map = mapInstanceRef.current;
+    if (map) {
+      map.flyTo([location.lat, location.lng], 13, { duration: 1 });
+    }
+    setLocating(false);
+    setLocateRequested(false);
+  }, [location, locateRequested]);
 
-    // Wait a bit for location to update
-    setTimeout(() => {
-      const map = mapInstanceRef.current;
-      const loc = location;
-      if (map && loc) {
-        map.flyTo([loc.lat, loc.lng], 13, { duration: 1 });
-      }
-      setLocating(false);
-    }, 1500);
+  const handleLocateMe = () => {
+    setLocating(true);
+    setLocateRequested(true);
+    requestLocation();
   };
 
   // Expose openGoogleMaps globally for popup buttons

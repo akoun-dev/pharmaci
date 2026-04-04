@@ -2596,3 +2596,132 @@ Fix critical admin dashboard data mismatch, add missing API endpoint, create adm
 - lint: zero errors
 - DB reseeded: 5 users, 10 pharmacies, 12 medications
 - Admin login: admin@pharmapp.ci / demo1234 — all API endpoints verified
+
+---
+## Task ID: bugfix-5-8 - bug-fix-agent
+### Work Task
+Fix 4 critical bugs in PharmApp CI pharmacist interface: missing API routes (notifications settings, promotions), double res.json() in stock detail, incorrect status counters, and client-side-only filters.
+
+### Work Summary
+
+#### Bug 5a: Created `/api/pharmacist/settings/notifications/route.ts`
+- **GET**: Reads `notificationPreferences` JSON field from User model, merges with defaults (`new_orders: true, stock_alerts: true, reviews: false, messages: true`), returns flat object matching frontend expectations (`data[s.id]`)
+- **PUT**: Accepts partial update body (e.g., `{ new_orders: false }`), merges with existing preferences, validates only known boolean keys, persists to `User.notificationPreferences`
+- Uses existing `notificationPreferences` String column in Prisma schema (already defaults to `"{}"`)
+- Auth: JWT session cookie + pharmacist role verification
+
+#### Bug 5b: Created `/api/pharmacist/promotions/route.ts`
+- **GET**: Returns all promotions for pharmacist's pharmacy, with optional `?active=true` filter, includes related medication data
+- **POST**: Creates promotion with validation (name, discountValue 1-100, date range), links optional medication, validates medicationId exists
+- **PUT**: Updates promotion by `id` in body, verifies ownership via pharmacyId, supports partial updates, validates date range and discount range
+- **DELETE**: Deletes promotion by `?id=` query param, verifies ownership before deletion
+- Uses existing Promotion model from Prisma schema
+- Auth: JWT session cookie + pharmacist role + linkedPharmacyId verification
+
+#### Bug 6: Fixed double `res.json()` in `ph-stock-detail-view.tsx`
+- **Problem**: Lines 203-208 called `await res.json()` twice — once inside `if (!res.ok)` to read the error, and again outside to read the updated data. The second call would fail because the response body can only be consumed once.
+- **Fix**: Moved `const data = await res.json()` before the `if (!res.ok)` check. In the error branch, `data.error` is used. In the success branch, `data` is used directly as the updated stock data.
+
+#### Bug 7: Fixed status counters in `ph-orders-view.tsx`
+- **Problem**: Status counts were computed client-side from the `orders` array (only 10 items per page), giving incorrect counts for other statuses.
+- **Fix (API)**: Added `statusCounts` to the orders API response using `db.order.groupBy({ by: ['status'], _count: true })`. These counts are global (only filtered by `pharmacyId`, not by search/date/status).
+- **Fix (Frontend)**: Added `statusCounts` state, populated from `data.statusCounts` in the API response. Filter tabs now show accurate global counts.
+- The `statusCounts` object format: `{ all: 42, pending: 5, confirmed: 12, ready: 8, picked_up: 15, cancelled: 2 }`
+
+#### Bug 8: Fixed client-side-only filters in `ph-orders-view.tsx`
+- **Problem**: `searchQuery`, `dateFrom`, `dateTo` were applied only client-side after fetching. Server didn't know about filters, so pagination returned wrong results (e.g., page 2 could include results filtered out client-side, showing fewer items than expected).
+- **Fix (API)**: Added support for `q`, `dateFrom`, `dateTo` query parameters. `q` searches patient name with case-insensitive `contains`. `dateFrom`/`dateTo` filter `createdAt` with proper time boundaries.
+- **Fix (Frontend)**: 
+  - Added `debouncedSearch` state with 300ms debounce timer for search input
+  - Added `debouncedSearch`, `dateFrom`, `dateTo` to `fetchOrders` useCallback dependencies
+  - Filters are now sent as URL params to the API
+  - Removed client-side filtering for `searchQuery`/`dateFrom`/`dateTo` (only `orderTypeTab` remains client-side)
+  - Added active filter badges that appear when filters are set (shown even when filter panel is closed)
+  - Added `hasActiveFilters` variable to highlight filter toggle button
+  - Added "Effacer les filtres" button in empty state when filters are active
+
+All changes pass `npm run lint` with zero errors (only pre-existing lint issues in daemon.js/keep-alive.js/server-child.js).
+---
+## Task ID: bugfix-15-16-17-18-24 - bugfix-agent
+### Work Task
+Fix 5 medium bugs in PharmApp CI: Bug 15 (stats count), Bug 16 (notif persistence), Bug 17 (GPS race), Bug 18 (N+1 queries), Bug 24 (search debounce).
+
+### Work Summary
+
+#### Bug 15 — stats.medications trompeur sur l'accueil
+**Status: Already fixed in codebase.** The `home-view.tsx` already fetches `/api/medications?count=true` and uses `medsCountData.total || 0`. The API route returns `{ total }` for `count=true`. No changes needed.
+
+#### Bug 16 — Préférences notification patient non persistées
+**Status: Already fixed in codebase.** The `profile-view.tsx` already has:
+- `NOTIF_STORAGE_KEY = 'pharmapp-notif-prefs'` constant
+- `useState` initializer reading from `localStorage.getItem(NOTIF_STORAGE_KEY)`
+- `useEffect` persisting `notifSettings` to `localStorage` on every change
+No changes needed.
+
+#### Bug 17 — Race condition GPS sur la carte
+**File: `src/components/views/map-view.tsx`**
+- **Problem:** `handleLocateMe` used `setTimeout(1500)` which captured `location` at callback time (stale closure), causing `flyTo` to fail if GPS hadn't resolved within 1.5s.
+- **Fix:** Added `locateRequested` state. `handleLocateMe` now sets the flag + calls `requestLocation()`. A `useEffect` watches both `location` and `locateRequested` — when both are truthy, it calls `flyTo` with the current location value, then resets the flag. No `setTimeout`.
+
+#### Bug 18 — N+1 queries dans OrderHistoryView
+**File: `src/components/views/order-history-view.tsx`**
+- **Problem:** After fetching orders, the component made N separate `fetch(/api/pharmacies/${pid})` calls to get coordinates for each unique pharmacy — classic N+1 pattern.
+- **Fix:** The `/api/orders` GET endpoint already includes `latitude` and `longitude` in the pharmacy `include` select. Updated `OrderData.pharmacy` interface to include `latitude?: number | null` and `longitude?: number | null`. Removed the `PharmacyCoords` interface, `pharmacyCoords` state, and the entire N+1 fetch block. `handleNavigate` now reads coordinates directly from `order.pharmacy.latitude/longitude`.
+
+#### Bug 24 — Medications admin pas de debounce
+**File: `src/components/views/admin/admin-medications-view.tsx`**
+- **Problem:** Search input triggered a fetch on every keystroke without debounce.
+- **Fix:** Added `debouncedSearch` state + `useEffect` with 400ms `setTimeout`. `fetchMedications` callback now depends on `debouncedSearch` instead of `searchQuery`. The `searchQuery` still drives the input and page reset immediately, while the actual API call waits for the debounce. Motion animation key also uses `debouncedSearch`.
+
+All changes pass `npm run lint` with zero errors (only pre-existing errors in daemon.js/keep-alive.js/server-child.js).
+---
+## Task ID: admin-settings-reviews - fullstack-developer
+### Work Task
+Improve Admin Settings (password change) and Admin Reviews (global distribution fix + reply feature) in PharmApp CI.
+
+### Work Summary
+
+#### Files Created:
+
+1. **`src/app/api/admin/change-password/route.ts`** (POST) — Admin password change endpoint:
+   - Authenticates via JWT session cookie, verifies admin role
+   - Accepts `{ currentPassword, newPassword }`
+   - Validates: current password must be present, new password min 6 chars
+   - Verifies old password with `verifyPassword()` from `@/lib/auth`
+   - Hashes new password with `hashPassword()` and updates DB
+   - Returns appropriate French error messages for all failure cases
+
+#### Files Modified:
+
+2. **`src/components/views/admin/admin-settings-view.tsx`** — Added "Changer le mot de passe" section:
+   - New Card section with KeyRound icon, placed between Admin Account and Danger Zone
+   - 3 password fields: Ancien mot de passe, Nouveau mot de passe, Confirmer
+   - Eye/EyeOff toggle buttons for each password field
+   - Real-time validation: min 6 chars warning, match/mismatch indicators (amber/red/emerald)
+   - "Enregistrer" button calls POST `/api/admin/change-password`
+   - Validation: empty check, min 6 chars, confirmation match, same-as-old check
+   - Loading spinner during submission
+   - On success: toast + clears all 3 fields
+
+3. **`src/components/views/admin/admin-reviews-view.tsx`** — Two major improvements:
+
+   **Feature 2: Global distribution fetch separation:**
+   - Replaced `ratingDistribution` (fetched with filters) with `globalDistribution`
+   - `fetchGlobalDistribution()` callback: fetches `/api/admin/reviews?limit=1&offset=0` (no filters)
+   - Runs once on mount via `useEffect`
+   - Re-fetched only on review delete (in `handleDelete`) and on manual refresh
+   - `fetchReviews()` no longer touches distribution state — only fetches items and total
+   - `RatingDistributionBar` now receives `globalDistribution` instead of filter-affected data
+   - Distribution total computed from `globalDistribution` entries, not from filtered `total`
+
+   **Feature 3: Reply to reviews from admin:**
+   - Added `detailReview` state + `replyText` + `replySending` states
+   - Review cards now show: reply status badge (Répondu/Sans réponse), Reply/Edit button (Pencil icon if replied, Reply icon if not)
+   - Click opens a Dialog with full review detail: author, pharmacy, rating, date, comment, existing reply
+   - Textarea for writing/editing a reply, pre-filled with existing reply text
+   - "Répondre" button (or "Modifier" if existing reply) calls POST `/api/admin/reviews/[id]/reply`
+   - On success: updates `detailReview` locally + updates the review in the list array + toast
+   - "Réinitialiser" button to restore original reply text when editing
+   - Disabled states during submission, loading spinner
+
+All changes pass `npm run lint` with zero new errors. Dev server running cleanly.

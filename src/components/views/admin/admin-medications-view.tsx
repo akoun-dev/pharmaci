@@ -22,6 +22,9 @@ import {
   Building2,
   Loader2,
   X,
+  Pencil,
+  Trash2,
+  Check,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -47,6 +50,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { ViewHeader } from '@/components/view-header';
 import { toast } from 'sonner';
 
@@ -243,6 +256,15 @@ export function AdminMedicationsView() {
   const [pharmacyStocks, setPharmacyStocks] = useState<PharmacyStock[]>([]);
   const [stocksLoading, setStocksLoading] = useState(false);
 
+  // Edit mode in detail dialog
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState<CreateForm>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+
+  // Delete confirmation
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   // Create dialog
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CreateForm>(EMPTY_FORM);
@@ -313,6 +335,7 @@ export function AdminMedicationsView() {
   const handleMedClick = async (med: MedicationData) => {
     setSelectedMed(med);
     setPharmacyStocks([]);
+    setIsEditing(false);
     setDetailOpen(true);
 
     // Fetch pharmacy stocks for this medication
@@ -327,6 +350,136 @@ export function AdminMedicationsView() {
       // silently fail - stocks are optional info
     } finally {
       setStocksLoading(false);
+    }
+  };
+
+  const closeDetailDialog = () => {
+    setDetailOpen(false);
+    setSelectedMed(null);
+    setIsEditing(false);
+    setEditForm(EMPTY_FORM);
+  };
+
+  // ── Edit medication ──
+  const startEditing = () => {
+    if (!selectedMed) return;
+    setEditForm({
+      name: selectedMed.name,
+      commercialName: selectedMed.commercialName,
+      activePrinciple: selectedMed.activePrinciple,
+      category: selectedMed.category,
+      form: selectedMed.form,
+      needsPrescription: selectedMed.needsPrescription,
+      description: selectedMed.description,
+      dosage: selectedMed.dosage,
+      sideEffects: selectedMed.sideEffects,
+      pathology: selectedMed.pathology,
+    });
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    setEditForm(EMPTY_FORM);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedMed || saving) return;
+    if (!editForm.name.trim()) {
+      toast.error('Le nom générique est requis');
+      return;
+    }
+    if (!editForm.commercialName.trim()) {
+      toast.error('Le nom commercial est requis');
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const res = await fetch(`/api/admin/medications/${selectedMed.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editForm.name.trim(),
+          commercialName: editForm.commercialName.trim(),
+          activePrinciple: editForm.activePrinciple.trim(),
+          category: editForm.category.trim() || undefined,
+          form: editForm.form || undefined,
+          needsPrescription: editForm.needsPrescription,
+          description: editForm.description.trim() || undefined,
+          dosage: editForm.dosage.trim() || undefined,
+          sideEffects: editForm.sideEffects.trim() || undefined,
+          pathology: editForm.pathology.trim() || undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Erreur de modification');
+      }
+
+      // Update local state
+      const updatedMed: MedicationData = {
+        ...selectedMed,
+        name: editForm.name.trim(),
+        commercialName: editForm.commercialName.trim(),
+        activePrinciple: editForm.activePrinciple.trim(),
+        category: editForm.category.trim(),
+        form: editForm.form,
+        needsPrescription: editForm.needsPrescription,
+        description: editForm.description.trim(),
+        dosage: editForm.dosage.trim(),
+        sideEffects: editForm.sideEffects.trim(),
+        pathology: editForm.pathology.trim(),
+      };
+
+      setSelectedMed(updatedMed);
+      setMedications((prev) =>
+        prev.map((m) => (m.id === selectedMed.id ? updatedMed : m))
+      );
+      setIsEditing(false);
+      toast.success('Médicament modifié avec succès');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur serveur';
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // ── Delete medication ──
+  const openDeleteDialog = () => {
+    if (!selectedMed) return;
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteMedication = async () => {
+    if (!selectedMed || deleting) return;
+    try {
+      setDeleting(true);
+      const res = await fetch(`/api/admin/medications/${selectedMed.id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Erreur de suppression');
+      }
+
+      // Close dialog and remove from list
+      closeDetailDialog();
+      setMedications((prev) => prev.filter((m) => m.id !== selectedMed.id));
+      setTotal((prev) => Math.max(0, prev - 1));
+
+      toast.success(`Médicament "${selectedMed.commercialName || selectedMed.name}" supprimé`);
+      setDeleteDialogOpen(false);
+
+      // Re-fetch to keep pagination consistent
+      fetchMedications();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur serveur';
+      toast.error(message);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -786,227 +939,454 @@ export function AdminMedicationsView() {
       )}
 
       {/* ── Medication Detail Dialog ── */}
-      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+      <Dialog open={detailOpen} onOpenChange={(open) => { if (!open) closeDetailDialog(); }}>
         {selectedMed && (
           <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-violet-200 max-h-[90dvh] flex flex-col">
             {/* Dialog header */}
             <DialogHeader className="bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-4 text-white shrink-0">
               <DialogTitle className="text-base flex items-center gap-2">
                 <FlaskConical className="h-5 w-5" />
-                {selectedMed.commercialName || selectedMed.name}
+                {isEditing
+                  ? editForm.commercialName || editForm.name
+                  : selectedMed.commercialName || selectedMed.name}
               </DialogTitle>
               <DialogDescription className="text-violet-200 text-xs mt-1">
-                Fiche détaillée du médicament
+                {isEditing ? 'Modifier les informations du médicament' : 'Fiche détaillée du médicament'}
               </DialogDescription>
             </DialogHeader>
 
             {/* Dialog body - scrollable */}
             <div className="p-5 space-y-4 overflow-y-auto flex-1">
-              {/* Status badges row */}
-              <div className="flex items-center gap-2 flex-wrap">
-                {selectedMed.category && (
-                  <Badge
-                    variant="outline"
-                    className={`text-[11px] px-2 py-0.5 ${getCategoryColor(selectedMed.category)}`}
-                  >
-                    {selectedMed.category}
-                  </Badge>
-                )}
-                {selectedMed.form && (
-                  <Badge
-                    variant="outline"
-                    className="text-[11px] px-2 py-0.5 border-gray-200 text-gray-600"
-                  >
-                    <Pill className="h-3 w-3 mr-0.5" />
-                    {getFormLabel(selectedMed.form)}
-                  </Badge>
-                )}
-                <Badge
-                  variant="outline"
-                  className={`text-[11px] px-2 py-0.5 border-0 ${
-                    selectedMed.needsPrescription
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-emerald-100 text-emerald-700'
-                  }`}
-                >
-                  {selectedMed.needsPrescription ? (
-                    <ShieldAlertIcon className="h-3 w-3 mr-0.5" />
-                  ) : (
-                    <ShieldCheckIcon className="h-3 w-3 mr-0.5" />
-                  )}
-                  {selectedMed.needsPrescription ? 'Sur ordonnance' : 'Sans ordonnance'}
-                </Badge>
-              </div>
-
-              <Separator />
-
-              {/* Info grid */}
-              <div className="grid grid-cols-2 gap-3">
-                {selectedMed.name !== selectedMed.commercialName && (
-                  <div>
-                    <p className="text-[11px] text-muted-foreground">Nom générique</p>
-                    <p className="text-sm font-medium truncate">{selectedMed.name}</p>
+              {isEditing ? (
+                /* ── EDIT MODE ── */
+                <>
+                  {/* Commercial name */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium">
+                      Nom commercial <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      value={editForm.commercialName}
+                      onChange={(e) => setEditForm((f) => ({ ...f, commercialName: e.target.value }))}
+                      className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                    />
                   </div>
-                )}
-                {selectedMed.activePrinciple && (
-                  <div>
-                    <p className="text-[11px] text-muted-foreground">Principe actif</p>
-                    <p className="text-sm font-medium truncate flex items-center gap-1">
-                      <Activity className="h-3.5 w-3.5 text-violet-500 flex-shrink-0" />
-                      {selectedMed.activePrinciple}
-                    </p>
-                  </div>
-                )}
-                {selectedMed.pathology && (
-                  <div>
-                    <p className="text-[11px] text-muted-foreground">Pathologie(s)</p>
-                    <p className="text-sm font-medium truncate flex items-center gap-1">
-                      <FileText className="h-3.5 w-3.5 text-violet-500 flex-shrink-0" />
-                      {selectedMed.pathology}
-                    </p>
-                  </div>
-                )}
-                {selectedMed.dosage && (
-                  <div>
-                    <p className="text-[11px] text-muted-foreground">Dosage</p>
-                    <p className="text-sm font-medium truncate">{selectedMed.dosage}</p>
-                  </div>
-                )}
-              </div>
 
-              {/* Description */}
-              {selectedMed.description && (
-                <div>
-                  <p className="text-[11px] text-muted-foreground mb-1">Description</p>
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-sm">{selectedMed.description}</p>
+                  {/* Generic name */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium">
+                      Nom générique <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      value={editForm.name}
+                      onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                      className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                    />
                   </div>
-                </div>
-              )}
 
-              {/* Side effects */}
-              {selectedMed.sideEffects && (
-                <div>
-                  <p className="text-[11px] text-muted-foreground mb-1 flex items-center gap-1">
-                    <AlertTriangle className="h-3 w-3" />
-                    Effets secondaires
-                  </p>
-                  <div className="bg-amber-50 border border-amber-100 rounded-lg p-3">
-                    <p className="text-sm text-amber-900">{selectedMed.sideEffects}</p>
-                  </div>
-                </div>
-              )}
-
-              <Separator />
-
-              {/* Stats */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Statistiques
-                </h4>
-                <div className="bg-gray-50 rounded-lg p-3">
+                  {/* Active principle + Category */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-[11px] text-muted-foreground">Commandes</p>
-                      <p className="text-sm font-bold text-violet-700 flex items-center gap-1">
-                        <Package className="h-3.5 w-3.5" />
-                        {selectedMed.orderCount}
-                      </p>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium">Principe actif</Label>
+                      <Input
+                        value={editForm.activePrinciple}
+                        onChange={(e) => setEditForm((f) => ({ ...f, activePrinciple: e.target.value }))}
+                        className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                      />
                     </div>
-                    <div>
-                      <p className="text-[11px] text-muted-foreground">Pharmacies (stock)</p>
-                      <p className="text-sm font-bold text-violet-700 flex items-center gap-1">
-                        <Building2 className="h-3.5 w-3.5" />
-                        {selectedMed.pharmacyCount}
-                      </p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-[11px] text-muted-foreground">Ajouté le</p>
-                      <p className="text-xs flex items-center gap-1">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        {formatRelativeTime(selectedMed.createdAt)}
-                        {' — '}
-                        {formatDateFull(selectedMed.createdAt)}
-                      </p>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium">Catégorie</Label>
+                      <Input
+                        value={editForm.category}
+                        onChange={(e) => setEditForm((f) => ({ ...f, category: e.target.value }))}
+                        className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                      />
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Pharmacy stocks */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <Building2 className="h-3.5 w-3.5" />
-                  Stock par pharmacie
-                </h4>
-                {stocksLoading ? (
-                  <div className="space-y-2">
-                    {[1, 2, 3].map((i) => (
-                      <Skeleton key={i} className="h-16 rounded-lg" />
-                    ))}
-                  </div>
-                ) : pharmacyStocks.length === 0 ? (
-                  <div className="bg-gray-50 rounded-lg p-4 text-center">
-                    <p className="text-xs text-muted-foreground">
-                      Aucune pharmacie ne propose ce médicament
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {pharmacyStocks.map((stock) => (
-                      <div
-                        key={stock.pharmacyId}
-                        className="bg-gray-50 rounded-lg p-3 flex items-center justify-between gap-3"
+                  {/* Form + Pathology */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium">Forme</Label>
+                      <Select
+                        value={editForm.form}
+                        onValueChange={(val) => setEditForm((f) => ({ ...f, form: val }))}
                       >
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium truncate">
-                            {stock.pharmacyName}
-                          </p>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Building2 className="h-2.5 w-2.5" />
-                            {stock.pharmacyCity}
+                        <SelectTrigger className="h-10 text-sm border-violet-200 w-full">
+                          <SelectValue placeholder="Sélectionner" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {MEDICATION_FORMS.map((form) => (
+                            <SelectItem key={form} value={form}>
+                              {form}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium">Pathologie(s)</Label>
+                      <Input
+                        value={editForm.pathology}
+                        onChange={(e) => setEditForm((f) => ({ ...f, pathology: e.target.value }))}
+                        className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Prescription toggle */}
+                  <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                    <div className="flex items-center gap-2">
+                      {editForm.needsPrescription ? (
+                        <ShieldAlertIcon className="h-5 w-5 text-red-500" />
+                      ) : (
+                        <ShieldCheckIcon className="h-5 w-5 text-emerald-500" />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium">Ordonnance requise</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {editForm.needsPrescription
+                            ? 'Ce médicament nécessite une ordonnance'
+                            : 'Disponible sans ordonnance'}
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={editForm.needsPrescription}
+                      onCheckedChange={(val) =>
+                        setEditForm((f) => ({ ...f, needsPrescription: val }))
+                      }
+                    />
+                  </div>
+
+                  <Separator />
+
+                  {/* Description */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium">Description</Label>
+                    <Textarea
+                      value={editForm.description}
+                      onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
+                      className="text-sm border-violet-200 focus:border-violet-400 min-h-[80px]"
+                      rows={3}
+                    />
+                  </div>
+
+                  {/* Dosage */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium">Dosage</Label>
+                    <Input
+                      value={editForm.dosage}
+                      onChange={(e) => setEditForm((f) => ({ ...f, dosage: e.target.value }))}
+                      className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                    />
+                  </div>
+
+                  {/* Side effects */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3 text-amber-500" />
+                      Effets secondaires
+                    </Label>
+                    <Textarea
+                      value={editForm.sideEffects}
+                      onChange={(e) => setEditForm((f) => ({ ...f, sideEffects: e.target.value }))}
+                      className="text-sm border-violet-200 focus:border-violet-400 min-h-[60px]"
+                      rows={2}
+                    />
+                  </div>
+                </>
+              ) : (
+                /* ── VIEW MODE ── */
+                <>
+                  {/* Status badges row */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {selectedMed.category && (
+                      <Badge
+                        variant="outline"
+                        className={`text-[11px] px-2 py-0.5 ${getCategoryColor(selectedMed.category)}`}
+                      >
+                        {selectedMed.category}
+                      </Badge>
+                    )}
+                    {selectedMed.form && (
+                      <Badge
+                        variant="outline"
+                        className="text-[11px] px-2 py-0.5 border-gray-200 text-gray-600"
+                      >
+                        <Pill className="h-3 w-3 mr-0.5" />
+                        {getFormLabel(selectedMed.form)}
+                      </Badge>
+                    )}
+                    <Badge
+                      variant="outline"
+                      className={`text-[11px] px-2 py-0.5 border-0 ${
+                        selectedMed.needsPrescription
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-emerald-100 text-emerald-700'
+                      }`}
+                    >
+                      {selectedMed.needsPrescription ? (
+                        <ShieldAlertIcon className="h-3 w-3 mr-0.5" />
+                      ) : (
+                        <ShieldCheckIcon className="h-3 w-3 mr-0.5" />
+                      )}
+                      {selectedMed.needsPrescription ? 'Sur ordonnance' : 'Sans ordonnance'}
+                    </Badge>
+                  </div>
+
+                  <Separator />
+
+                  {/* Info grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {selectedMed.name !== selectedMed.commercialName && (
+                      <div>
+                        <p className="text-[11px] text-muted-foreground">Nom générique</p>
+                        <p className="text-sm font-medium truncate">{selectedMed.name}</p>
+                      </div>
+                    )}
+                    {selectedMed.activePrinciple && (
+                      <div>
+                        <p className="text-[11px] text-muted-foreground">Principe actif</p>
+                        <p className="text-sm font-medium truncate flex items-center gap-1">
+                          <Activity className="h-3.5 w-3.5 text-violet-500 flex-shrink-0" />
+                          {selectedMed.activePrinciple}
+                        </p>
+                      </div>
+                    )}
+                    {selectedMed.pathology && (
+                      <div>
+                        <p className="text-[11px] text-muted-foreground">Pathologie(s)</p>
+                        <p className="text-sm font-medium truncate flex items-center gap-1">
+                          <FileText className="h-3.5 w-3.5 text-violet-500 flex-shrink-0" />
+                          {selectedMed.pathology}
+                        </p>
+                      </div>
+                    )}
+                    {selectedMed.dosage && (
+                      <div>
+                        <p className="text-[11px] text-muted-foreground">Dosage</p>
+                        <p className="text-sm font-medium truncate">{selectedMed.dosage}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  {selectedMed.description && (
+                    <div>
+                      <p className="text-[11px] text-muted-foreground mb-1">Description</p>
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-sm">{selectedMed.description}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Side effects */}
+                  {selectedMed.sideEffects && (
+                    <div>
+                      <p className="text-[11px] text-muted-foreground mb-1 flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" />
+                        Effets secondaires
+                      </p>
+                      <div className="bg-amber-50 border border-amber-100 rounded-lg p-3">
+                        <p className="text-sm text-amber-900">{selectedMed.sideEffects}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <Separator />
+
+                  {/* Stats */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Statistiques
+                    </h4>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-[11px] text-muted-foreground">Commandes</p>
+                          <p className="text-sm font-bold text-violet-700 flex items-center gap-1">
+                            <Package className="h-3.5 w-3.5" />
+                            {selectedMed.orderCount}
                           </p>
                         </div>
-                        <div className="text-right flex-shrink-0">
-                          <Badge
-                            variant="outline"
-                            className={`text-[10px] px-1.5 py-0 border-0 ${
-                              stock.inStock
-                                ? 'bg-emerald-100 text-emerald-700'
-                                : 'bg-red-100 text-red-700'
-                            }`}
-                          >
-                            {stock.inStock ? 'En stock' : 'Rupture'}
-                          </Badge>
-                          <p className="text-[11px] text-muted-foreground mt-0.5">
-                            Qté: {stock.quantity}
-                            {stock.price > 0 && (
-                              <span className="ml-1">
-                                · {stock.price.toLocaleString('fr-FR')} FCFA
-                              </span>
-                            )}
+                        <div>
+                          <p className="text-[11px] text-muted-foreground">Pharmacies (stock)</p>
+                          <p className="text-sm font-bold text-violet-700 flex items-center gap-1">
+                            <Building2 className="h-3.5 w-3.5" />
+                            {selectedMed.pharmacyCount}
+                          </p>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="text-[11px] text-muted-foreground">Ajouté le</p>
+                          <p className="text-xs flex items-center gap-1">
+                            <Clock className="h-3 w-3 text-muted-foreground" />
+                            {formatRelativeTime(selectedMed.createdAt)}
+                            {' — '}
+                            {formatDateFull(selectedMed.createdAt)}
                           </p>
                         </div>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                )}
-              </div>
+
+                  {/* Pharmacy stocks */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                      <Building2 className="h-3.5 w-3.5" />
+                      Stock par pharmacie
+                    </h4>
+                    {stocksLoading ? (
+                      <div className="space-y-2">
+                        {[1, 2, 3].map((i) => (
+                          <Skeleton key={i} className="h-16 rounded-lg" />
+                        ))}
+                      </div>
+                    ) : pharmacyStocks.length === 0 ? (
+                      <div className="bg-gray-50 rounded-lg p-4 text-center">
+                        <p className="text-xs text-muted-foreground">
+                          Aucune pharmacie ne propose ce médicament
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {pharmacyStocks.map((stock) => (
+                          <div
+                            key={stock.pharmacyId}
+                            className="bg-gray-50 rounded-lg p-3 flex items-center justify-between gap-3"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium truncate">
+                                {stock.pharmacyName}
+                              </p>
+                              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Building2 className="h-2.5 w-2.5" />
+                                {stock.pharmacyCity}
+                              </p>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <Badge
+                                variant="outline"
+                                className={`text-[10px] px-1.5 py-0 border-0 ${
+                                  stock.inStock
+                                    ? 'bg-emerald-100 text-emerald-700'
+                                    : 'bg-red-100 text-red-700'
+                                }`}
+                              >
+                                {stock.inStock ? 'En stock' : 'Rupture'}
+                              </Badge>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">
+                                Qté: {stock.quantity}
+                                {stock.price > 0 && (
+                                  <span className="ml-1">
+                                    · {stock.price.toLocaleString('fr-FR')} FCFA
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Dialog footer */}
-            <DialogFooter className="px-5 py-3 border-t border-violet-100 shrink-0">
-              <Button
-                variant="outline"
-                className="w-full border-violet-200 text-violet-700 hover:bg-violet-50"
-                onClick={() => setDetailOpen(false)}
-              >
-                Fermer
-              </Button>
+            <DialogFooter className="px-5 py-3 border-t border-violet-100 shrink-0 flex-row gap-2">
+              {isEditing ? (
+                <>
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-violet-200 text-violet-700 hover:bg-violet-50"
+                    onClick={cancelEditing}
+                    disabled={saving}
+                  >
+                    Annuler
+                  </Button>
+                  <Button
+                    className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
+                    onClick={handleSaveEdit}
+                    disabled={saving}
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                        Enregistrement...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-4 w-4 mr-1.5" />
+                        Enregistrer
+                      </>
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    onClick={openDeleteDialog}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1.5" />
+                    Supprimer
+                  </Button>
+                  <Button
+                    className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
+                    onClick={startEditing}
+                  >
+                    <Pencil className="h-4 w-4 mr-1.5" />
+                    Modifier
+                  </Button>
+                </>
+              )}
             </DialogFooter>
           </DialogContent>
         )}
       </Dialog>
+
+      {/* ── Delete Medication Confirmation Dialog ── */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="sm:max-w-md mx-auto rounded-2xl border-red-200">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-700">
+              <Trash2 className="h-5 w-5" />
+              Supprimer le médicament
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm">
+              Êtes-vous sûr de vouloir supprimer le médicament{' '}
+              <span className="font-semibold text-foreground">
+                "{selectedMed?.commercialName || selectedMed?.name}"
+              </span> ?
+              Cette action est irréversible. Tous les stocks associés seront également supprimés.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:gap-0">
+            <AlertDialogCancel disabled={deleting}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteMedication}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700 text-white focus:ring-red-600"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Suppression...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer définitivement
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* ── Create Medication Dialog ── */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>

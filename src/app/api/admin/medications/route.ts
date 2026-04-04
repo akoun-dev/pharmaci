@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const [medications, total] = await Promise.all([
+    const [medications, total, categoryRows] = await Promise.all([
       db.medication.findMany({
         where,
         select: {
@@ -80,7 +80,14 @@ export async function GET(request: NextRequest) {
         skip: offset,
       }),
       db.medication.count({ where }),
+      db.medication.findMany({
+        distinct: ['category'],
+        select: { category: true },
+        where: { category: { not: null } },
+      }),
     ]);
+
+    const categories = categoryRows.map((r) => r.category).filter(Boolean);
 
     return NextResponse.json({
       items: medications.map((m) => ({
@@ -106,6 +113,7 @@ export async function GET(request: NextRequest) {
       total,
       limit,
       offset,
+      categories,
     });
   } catch (error) {
     console.error('Erreur liste médicaments admin:', error);

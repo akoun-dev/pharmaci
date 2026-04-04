@@ -200,7 +200,7 @@ export function AdminDashboardView() {
           id: p.pharmacyId,
           name: p.name,
           revenue: p.revenue,
-          orderCount: 0,
+          orderCount: p.orderCount ?? 0,
         })),
         topMedications: (api.topMedications ?? []).map((m: Record<string, unknown>) => ({
           id: m.medicationId,

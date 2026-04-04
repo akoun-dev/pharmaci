@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
     const rating = searchParams.get('rating');
     const pharmacyId = searchParams.get('pharmacyId');
     const hasReply = searchParams.get('hasReply');
+    const q = searchParams.get('q');
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
     const offset = parseInt(searchParams.get('offset') || '0');
 
@@ -43,6 +44,14 @@ export async function GET(request: NextRequest) {
       where.reply = { not: null };
     } else if (hasReply === 'false') {
       where.reply = null;
+    }
+
+    if (q) {
+      where.OR = [
+        { comment: { contains: q, mode: 'insensitive' } },
+        { user: { name: { contains: q, mode: 'insensitive' } } },
+        { pharmacy: { name: { contains: q, mode: 'insensitive' } } },
+      ];
     }
 
     const [reviews, total] = await Promise.all([

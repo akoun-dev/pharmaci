@@ -7,8 +7,11 @@ import { useAppStore } from '@/store/app-store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +37,7 @@ import {
   Pill,
   ShoppingCart,
   TriangleAlert,
+  KeyRound,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -78,6 +82,15 @@ export function AdminSettingsView() {
   const [dbStats, setDbStats] = useState<DbStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
+  /* ---- Password change state ---- */
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+
   /* ---- Fetch DB stats ---- */
   const fetchStats = useCallback(async () => {
     try {
@@ -104,6 +117,55 @@ export function AdminSettingsView() {
   }, [fetchStats]);
 
   const firstName = currentUser?.name?.split(' ')[0] ?? 'Admin';
+
+  /* ---- Password change handler ---- */
+  const handleChangePassword = async () => {
+    // Validation
+    if (!currentPassword.trim()) {
+      toast.error('Veuillez saisir votre ancien mot de passe');
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast.error('Le nouveau mot de passe doit contenir au moins 6 caractères');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('La confirmation ne correspond pas au nouveau mot de passe');
+      return;
+    }
+    if (currentPassword === newPassword) {
+      toast.error('Le nouveau mot de passe doit être différent de l\'ancien');
+      return;
+    }
+
+    try {
+      setPwLoading(true);
+      const res = await fetch('/api/admin/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Erreur serveur');
+      }
+
+      toast.success('Mot de passe modifié avec succès');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erreur serveur';
+      toast.error(message);
+    } finally {
+      setPwLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 lg:pb-6 pt-6">
@@ -228,6 +290,144 @@ export function AdminSettingsView() {
               <InfoRow icon={<Globe className="h-4 w-4 text-violet-500" />} label="Email" value={currentUser?.email ?? '—'} />
               <Separator />
               <InfoRow icon={<User className="h-4 w-4 text-violet-500" />} label="Téléphone" value={currentUser?.phone ?? 'Non renseigné'} />
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* ─── CHANGE PASSWORD ─── */}
+        <motion.div variants={itemVariants}>
+          <Card className="border-violet-100">
+            <CardHeader className="flex flex-row items-center gap-3 pb-3 px-4 pt-4">
+              <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-violet-100">
+                <KeyRound className="h-4.5 w-4.5 text-violet-600" />
+              </div>
+              <CardTitle className="text-sm sm:text-base font-semibold">
+                Changer le mot de passe
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4 space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Modifiez votre mot de passe pour sécuriser votre compte.
+              </p>
+
+              <div className="space-y-3">
+                {/* Current password */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="current-pw" className="text-xs font-medium text-muted-foreground">
+                    Ancien mot de passe
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="current-pw"
+                      type={showCurrentPw ? 'text' : 'password'}
+                      placeholder="Saisissez l'ancien mot de passe"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      className="pr-10 h-11 text-sm border-violet-200 focus:border-violet-400"
+                      disabled={pwLoading}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-violet-600 transition-colors"
+                      onClick={() => setShowCurrentPw(!showCurrentPw)}
+                      tabIndex={-1}
+                      aria-label={showCurrentPw ? 'Masquer' : 'Afficher'}
+                    >
+                      {showCurrentPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* New password */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="new-pw" className="text-xs font-medium text-muted-foreground">
+                    Nouveau mot de passe
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="new-pw"
+                      type={showNewPw ? 'text' : 'password'}
+                      placeholder="Minimum 6 caractères"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="pr-10 h-11 text-sm border-violet-200 focus:border-violet-400"
+                      disabled={pwLoading}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-violet-600 transition-colors"
+                      onClick={() => setShowNewPw(!showNewPw)}
+                      tabIndex={-1}
+                      aria-label={showNewPw ? 'Masquer' : 'Afficher'}
+                    >
+                      {showNewPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {newPassword.length > 0 && newPassword.length < 6 && (
+                    <p className="text-[11px] text-amber-600">
+                      Le mot de passe doit contenir au moins 6 caractères
+                    </p>
+                  )}
+                </div>
+
+                {/* Confirm password */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="confirm-pw" className="text-xs font-medium text-muted-foreground">
+                    Confirmer le mot de passe
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="confirm-pw"
+                      type={showConfirmPw ? 'text' : 'password'}
+                      placeholder="Retapez le nouveau mot de passe"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className={`pr-10 h-11 text-sm ${
+                        confirmPassword.length > 0 && confirmPassword !== newPassword
+                          ? 'border-red-300 focus:border-red-400'
+                          : confirmPassword.length > 0 && confirmPassword === newPassword
+                            ? 'border-emerald-300 focus:border-emerald-400'
+                            : 'border-violet-200 focus:border-violet-400'
+                      }`}
+                      disabled={pwLoading}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-violet-600 transition-colors"
+                      onClick={() => setShowConfirmPw(!showConfirmPw)}
+                      tabIndex={-1}
+                      aria-label={showConfirmPw ? 'Masquer' : 'Afficher'}
+                    >
+                      {showConfirmPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {confirmPassword.length > 0 && confirmPassword !== newPassword && (
+                    <p className="text-[11px] text-red-600">
+                      Les mots de passe ne correspondent pas
+                    </p>
+                  )}
+                  {confirmPassword.length > 0 && confirmPassword === newPassword && newPassword.length >= 6 && (
+                    <p className="text-[11px] text-emerald-600">
+                      Les mots de passe correspondent
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <Button
+                onClick={handleChangePassword}
+                disabled={pwLoading || !currentPassword || !newPassword || !confirmPassword}
+                className="w-full bg-violet-600 hover:bg-violet-700 text-white h-11"
+              >
+                {pwLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Enregistrement...
+                  </>
+                ) : (
+                  'Enregistrer'
+                )}
+              </Button>
             </CardContent>
           </Card>
         </motion.div>

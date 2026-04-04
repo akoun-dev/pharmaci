@@ -19,6 +19,7 @@ import {
   Heart,
   UserCog,
   Inbox,
+  Trash2,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,9 +44,21 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { ViewHeader } from '@/components/view-header';
+import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
 interface UserData {
@@ -131,6 +144,7 @@ function formatRelativeTime(dateStr: string): string {
 }
 
 export function AdminUsersView() {
+  const { currentUserId } = useAppStore();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -148,6 +162,11 @@ export function AdminUsersView() {
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [newRole, setNewRole] = useState<string>('');
   const [saving, setSaving] = useState(false);
+
+  // Delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteUser, setDeleteUser] = useState<UserData | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -250,6 +269,39 @@ export function AdminUsersView() {
       toast.error(err.message || 'Erreur lors de la modification du rôle');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // ── Delete user handler ──
+  const openDeleteDialog = (e: React.MouseEvent, user: UserData) => {
+    e.stopPropagation();
+    setDeleteUser(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteUser || deleting) return;
+    try {
+      setDeleting(true);
+      const res = await fetch(`/api/admin/users/${deleteUser.id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Erreur lors de la suppression');
+      }
+
+      // Remove from local list
+      setUsers((prev) => prev.filter((u) => u.id !== deleteUser.id));
+      setTotal((prev) => Math.max(0, prev - 1));
+
+      toast.success(`Utilisateur "${deleteUser.name}" supprimé avec succès`);
+      setDeleteDialogOpen(false);
+      setDeleteUser(null);
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de la suppression');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -405,6 +457,7 @@ export function AdminUsersView() {
               const roleInfo = ROLE_CONFIG[user.role] || ROLE_CONFIG.patient;
               const avatarColor = getAvatarColor(user.name);
               const initial = user.name.charAt(0).toUpperCase();
+              const isCurrentUser = user.id === currentUserId;
 
               return (
                 <motion.div
@@ -503,6 +556,18 @@ export function AdminUsersView() {
                                 <UserCog className="h-4 w-4" />
                                 Modifier le rôle
                               </DropdownMenuItem>
+                              {!isCurrentUser && (
+                                <>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={(e) => openDeleteDialog(e, user)}
+                                    className="gap-2 text-sm cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                    Supprimer
+                                  </DropdownMenuItem>
+                                </>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
@@ -665,6 +730,46 @@ export function AdminUsersView() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* ── Delete User Confirmation Dialog ── */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="sm:max-w-md mx-auto rounded-2xl border-red-200">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-700">
+              <Trash2 className="h-5 w-5" />
+              Supprimer l'utilisateur
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm">
+              Êtes-vous sûr de vouloir supprimer l utilisateur{' '}
+              <span className="font-semibold text-foreground">"{deleteUser?.name}"</span> ?
+              Cette action est irréversible. Toutes les données associées (commandes, avis, favoris)
+              seront également supprimées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:gap-0">
+            <AlertDialogCancel disabled={deleting}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700 text-white focus:ring-red-600"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Suppression...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer définitivement
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

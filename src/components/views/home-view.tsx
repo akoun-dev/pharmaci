@@ -86,21 +86,21 @@ export function HomeView() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [guardRes, allPharmaciesRes, medsRes] = await Promise.all([
+        const [guardRes, allPharmaciesRes, medsCountRes] = await Promise.all([
           fetch('/api/pharmacies?isGuard=true&limit=5'),
           fetch('/api/pharmacies?limit=50'),
-          fetch('/api/medications?limit=12'),
+          fetch('/api/medications?count=true'),
         ]);
         const guardData = await guardRes.json();
         const allData = await allPharmaciesRes.json();
-        const medsData = await medsRes.json();
+        const medsCountData = await medsCountRes.json();
 
         setGuardPharmacies(guardData);
         setAllPharmacies(allData);
         const cities = new Set(allData.map((p: any) => p.city));
         setStats({
           pharmacies: allData.length,
-          medications: medsData.length,
+          medications: medsCountData.total || 0,
           cities: cities.size,
         });
       } catch (error) {

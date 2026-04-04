@@ -200,18 +200,18 @@ export function PharmacistStockDetailView() {
         body: JSON.stringify({ price: parsedPrice, quantity: parsedQuantity, inStock: editInStock, needsPrescription: editNeedsPrescription, expirationDate: editExpirationDate || null }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || 'Erreur lors de la mise à jour');
       }
 
-      const updated = await res.json();
-      setStock(updated);
-      setEditPrice(String(updated.price));
-      setEditQuantity(String(updated.quantity));
-      setEditInStock(updated.inStock);
-      setEditNeedsPrescription(updated.needsPrescription || false);
-      setEditExpirationDate(updated.expirationDate ? updated.expirationDate.split('T')[0] : '');
+      setStock(data);
+      setEditPrice(String(data.price));
+      setEditQuantity(String(data.quantity));
+      setEditInStock(data.inStock);
+      setEditNeedsPrescription(data.needsPrescription || false);
+      setEditExpirationDate(data.expirationDate ? data.expirationDate.split('T')[0] : '');
       toast.success('Stock mis à jour avec succès');
       setHistoryOffset(0);
       fetchHistory(false);

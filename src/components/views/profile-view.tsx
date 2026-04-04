@@ -83,12 +83,29 @@ export function ProfileView() {
   const [passwordSaving, setPasswordSaving] = useState(false);
 
   // Notification settings
-  const [notifSettings, setNotifSettings] = useState<NotificationSetting[]>([
+  const NOTIF_STORAGE_KEY = 'pharmapp-notif-prefs';
+  const defaultNotifSettings: NotificationSetting[] = [
     { id: 'order_updates', label: 'Mises à jour de commandes', description: 'Notifications pour les changements de statut', icon: ShoppingCart, enabled: true },
     { id: 'promotions', label: 'Promotions', description: 'Offres spéciales et réductions', icon: Tag, enabled: true },
     { id: 'stock_alerts', label: 'Alertes stock', description: 'Quand un médicament recherché est disponible', icon: Bell, enabled: false },
     { id: 'news', label: 'Actualités', description: 'Nouvelles fonctionnalités et informations', icon: Info, enabled: false },
-  ]);
+  ];
+  const [notifSettings, setNotifSettings] = useState<NotificationSetting[]>(() => {
+    if (typeof window === 'undefined') return defaultNotifSettings;
+    try {
+      const saved = localStorage.getItem(NOTIF_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as Record<string, boolean>;
+        return defaultNotifSettings.map((s) => ({
+          ...s,
+          enabled: parsed[s.id] !== undefined ? parsed[s.id] : s.enabled,
+        }));
+      }
+    } catch {
+      // ignore parse errors
+    }
+    return defaultNotifSettings;
+  });
 
   const fetchUser = useCallback(async () => {
     if (!currentUserId) {
@@ -213,6 +230,19 @@ export function ProfileView() {
       setPasswordSaving(false);
     }
   };
+
+  // Persist notification settings to localStorage
+  useEffect(() => {
+    try {
+      const prefs: Record<string, boolean> = {};
+      notifSettings.forEach((s) => {
+        prefs[s.id] = s.enabled;
+      });
+      localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(prefs));
+    } catch {
+      // ignore storage errors
+    }
+  }, [notifSettings]);
 
   const handleToggleNotif = (id: string) => {
     setNotifSettings((prev) =>

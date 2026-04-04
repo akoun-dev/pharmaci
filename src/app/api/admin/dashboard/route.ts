@@ -105,6 +105,7 @@ export async function GET(request: NextRequest) {
             city: pharmacy?.city || '',
             rating: pharmacy?.rating || 0,
             revenue: g._sum.totalPrice || 0,
+            orderCount: g._count,
           };
         });
       }),

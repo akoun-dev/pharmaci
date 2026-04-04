@@ -35,6 +35,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 
 interface OrderData {
@@ -55,16 +65,14 @@ interface OrderData {
     address: string;
     city: string;
     phone: string;
+    latitude?: number | null;
+    longitude?: number | null;
   };
   medication: {
     name: string;
     commercialName: string;
     form?: string;
   };
-}
-
-interface PharmacyCoords {
-  [pharmacyId: string]: { latitude: number; longitude: number };
 }
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
@@ -138,9 +146,11 @@ export function OrderHistoryView() {
 
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [pharmacyCoords, setPharmacyCoords] = useState<PharmacyCoords>({});
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancellingOrder, setCancellingOrder] = useState<OrderData | null>(null);
+  const [cancelling, setCancelling] = useState(false);
 
   const fetchOrders = useCallback(async () => {
     if (!currentUserId) {
@@ -152,29 +162,6 @@ export function OrderHistoryView() {
       const res = await fetch('/api/orders');
       const data = await res.json();
       setOrders(Array.isArray(data) ? data : []);
-
-      // Pre-fetch coordinates for all pharmacies in the orders
-      const uniquePharmacyIds = [
-        ...new Set(
-          (Array.isArray(data) ? data : []).map((o: OrderData) => o.pharmacyId)
-        ),
-      ];
-      const coords: PharmacyCoords = {};
-      await Promise.allSettled(
-        uniquePharmacyIds.map(async (pid) => {
-          try {
-            const pharmRes = await fetch(`/api/pharmacies/${pid}`);
-            const pharmData = await pharmRes.json();
-            coords[pid] = {
-              latitude: pharmData.latitude,
-              longitude: pharmData.longitude,
-            };
-          } catch {
-            // non-critical
-          }
-        })
-      );
-      setPharmacyCoords(coords);
     } catch {
       console.error('Error fetching orders');
     } finally {
@@ -191,10 +178,9 @@ export function OrderHistoryView() {
     setCurrentView('pharmacy-detail');
   };
 
-  const handleNavigate = (pharmacyId: string) => {
-    const coords = pharmacyCoords[pharmacyId];
-    if (coords) {
-      openGoogleMaps(coords.latitude, coords.longitude);
+  const handleNavigate = (order: OrderData) => {
+    if (order.pharmacy.latitude && order.pharmacy.longitude) {
+      openGoogleMaps(order.pharmacy.latitude, order.pharmacy.longitude);
     }
   };
 
@@ -231,6 +217,38 @@ export function OrderHistoryView() {
     };
 
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+  };
+
+  const handleCancelOrder = async () => {
+    if (!cancellingOrder) return;
+    setCancelling(true);
+    try {
+      // Optimistic: remove from local list immediately
+      setOrders(prev => prev.filter(o => o.id !== cancellingOrder.id));
+      setCancelDialogOpen(false);
+
+      const res = await fetch(`/api/orders/${cancellingOrder.id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        // Rollback on failure
+        await fetchOrders();
+        const data = await res.json().catch(() => null);
+        toast.error(data?.error || 'Impossible d\'annuler cette commande');
+      } else {
+        toast.success('Commande annulée avec succès');
+      }
+    } catch {
+      await fetchOrders();
+      toast.error('Erreur réseau lors de l\'annulation');
+    } finally {
+      setCancelling(false);
+      setCancellingOrder(null);
+    }
+  };
+
+  const openCancelDialog = (order: OrderData, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setCancellingOrder(order);
+    setCancelDialogOpen(true);
   };
 
   const handleCopyCode = () => {
@@ -421,6 +439,40 @@ export function OrderHistoryView() {
 
                         {/* Action row */}
                         <div className="flex items-center gap-2">
+                          {(order.status === 'pending' || order.status === 'confirmed') && (
+                            <AlertDialog open={cancelDialogOpen && cancellingOrder?.id === order.id} onOpenChange={(open) => { if (!open) { setCancelDialogOpen(false); setCancellingOrder(null); } else { openCancelDialog(order); } }}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-9 px-3 border-red-200 text-red-600 hover:bg-red-50 text-xs"
+                                onClick={(e) => openCancelDialog(order, e)}
+                                disabled={cancelling}
+                              >
+                                <X className="h-3.5 w-3.5 mr-1.5" />
+                                Annuler
+                              </Button>
+                              <AlertDialogContent className="sm:max-w-md">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Annuler la commande</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Êtes-vous sûr de vouloir annuler votre commande de <strong>{order.medication.commercialName || order.medication.name}</strong> auprès de <strong>{order.pharmacy.name}</strong> ? Cette action est irréversible.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel disabled={cancelling}>
+                                    Non, garder
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={handleCancelOrder}
+                                    disabled={cancelling}
+                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                  >
+                                    {cancelling ? 'Annulation...' : 'Oui, annuler'}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
                           {isActive && order.verificationCode && (
                             <Button
                               variant="outline"
@@ -450,8 +502,8 @@ export function OrderHistoryView() {
                             variant="outline"
                             size="sm"
                             className="h-9 px-3 border-emerald-200 text-emerald-700 hover:bg-emerald-50 text-xs"
-                            onClick={() => handleNavigate(order.pharmacyId)}
-                            disabled={!pharmacyCoords[order.pharmacyId]}
+                            onClick={() => handleNavigate(order)}
+                            disabled={!order.pharmacy.latitude || !order.pharmacy.longitude}
                           >
                             <Navigation className="h-3.5 w-3.5 mr-1.5" />
                             Y aller

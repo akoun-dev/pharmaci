@@ -123,14 +123,14 @@ export function AdminAnalyticsView() {
       if (!res.ok) throw new Error('Erreur lors du chargement des analyses');
       const json = await res.json();
       setData({
-        totalRevenue: json.totalRevenue ?? 0,
-        totalOrders: json.totalOrders ?? 0,
-        avgOrderValue: json.avgOrderValue ?? 0,
-        newUsers: json.newUsers ?? 0,
+        totalRevenue: json.summary?.totalRevenue ?? 0,
+        totalOrders: json.summary?.totalOrders ?? 0,
+        avgOrderValue: json.summary?.averageOrderValue ?? 0,
+        newUsers: json.summary?.newUsers ?? 0,
         revenueByPharmacy: json.revenueByPharmacy ?? [],
         ordersByCity: json.ordersByCity ?? [],
-        userRegistrationsByMonth: json.userRegistrationsByMonth ?? [],
-        medicationCategories: json.medicationCategories ?? [],
+        userRegistrationsByMonth: json.userRegistrations ?? [],
+        medicationCategories: json.categoryDistribution ?? [],
       });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur inconnue';

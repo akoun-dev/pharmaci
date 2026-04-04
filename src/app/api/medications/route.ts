@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category') || '';
     const pathology = searchParams.get('pathology') || '';
     const limit = parseInt(searchParams.get('limit') || '50');
+    const countOnly = searchParams.get('count') === 'true';
 
     const where: Record<string, unknown> = {};
 
@@ -24,6 +25,12 @@ export async function GET(request: NextRequest) {
     }
     if (pathology) {
       where.pathology = { contains: pathology };
+    }
+
+    // If count=true, return only the total count
+    if (countOnly) {
+      const total = await db.medication.count({ where });
+      return NextResponse.json({ total });
     }
 
     const medications = await db.medication.findMany({

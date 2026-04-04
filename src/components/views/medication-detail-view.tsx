@@ -195,12 +195,21 @@ export function MedicationDetailView() {
     return list;
   }, [medication, filterCity, filterGuard, sortBy, userLocation]);
 
-  // Price stats
-  const cheapestPrice = filteredPharmacies.length > 0 ? filteredPharmacies[0]?.price : null;
-  const mostExpensivePrice = filteredPharmacies.length > 0 ? filteredPharmacies[filteredPharmacies.length - 1]?.price : null;
-  const cheapestPharmacy = filteredPharmacies.length > 0 ? filteredPharmacies[0] : null;
-  const averagePrice = filteredPharmacies.length > 0
-    ? Math.round(filteredPharmacies.reduce((sum, p) => sum + p.price, 0) / filteredPharmacies.length)
+  // Price stats — always sorted by price ascending for accurate cheapest/most expensive
+  const priceSorted = useMemo(() => {
+    if (!medication) return [];
+    let list = [...medication.availablePharmacies];
+    if (filterCity) list = list.filter(p => p.city === filterCity);
+    if (filterGuard === true) list = list.filter(p => p.isGuard);
+    list.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
+    return list;
+  }, [medication, filterCity, filterGuard]);
+
+  const cheapestPrice = priceSorted.length > 0 ? priceSorted[0]?.price : null;
+  const mostExpensivePrice = priceSorted.length > 0 ? priceSorted[priceSorted.length - 1]?.price : null;
+  const cheapestPharmacy = priceSorted.length > 0 ? priceSorted[0] : null;
+  const averagePrice = priceSorted.length > 0
+    ? Math.round(priceSorted.reduce((sum, p) => sum + p.price, 0) / priceSorted.length)
     : null;
 
   // Distance helper for pharmacies

@@ -26,7 +26,7 @@ export async function GET(
           take: 20,
         },
         _count: {
-          select: { reviews: true },
+          select: { reviews: true, orders: true, favorites: true },
         },
       },
     });

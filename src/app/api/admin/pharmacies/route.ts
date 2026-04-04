@@ -167,3 +167,82 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const session = await getSessionFromCookie(request);
+    if (!session) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    }
+
+    const admin = await db.user.findUnique({
+      where: { id: session.userId },
+      select: { role: true },
+    });
+
+    if (!admin || admin.role !== 'admin') {
+      return NextResponse.json({ error: 'Accès réservé aux administrateurs' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { name, address, city, district, phone, email, isGuard, isOpen24h, isPartner, openTime, closeTime, description, latitude, longitude } = body;
+
+    // Validation
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return NextResponse.json({ error: 'Le nom de la pharmacie est requis' }, { status: 400 });
+    }
+    if (!city || typeof city !== 'string' || city.trim().length === 0) {
+      return NextResponse.json({ error: 'La ville est requise' }, { status: 400 });
+    }
+
+    // Check name uniqueness
+    const existing = await db.pharmacy.findFirst({ where: { name: name.trim() } });
+    if (existing) {
+      return NextResponse.json({ error: 'Une pharmacie avec ce nom existe déjà' }, { status: 400 });
+    }
+
+    const pharmacy = await db.pharmacy.create({
+      data: {
+        name: name.trim(),
+        address: address?.trim() || null,
+        city: city.trim(),
+        district: district?.trim() || null,
+        phone: phone?.trim() || null,
+        email: email?.trim() || null,
+        isGuard: !!isGuard,
+        isOpen24h: !!isOpen24h,
+        isPartner: !!isPartner,
+        openTime: openTime?.trim() || null,
+        closeTime: closeTime?.trim() || null,
+        description: description?.trim() || null,
+        latitude: latitude != null ? Number(latitude) : null,
+        longitude: longitude != null ? Number(longitude) : null,
+      },
+    });
+
+    return NextResponse.json({
+      id: pharmacy.id,
+      name: pharmacy.name,
+      address: pharmacy.address,
+      city: pharmacy.city,
+      district: pharmacy.district,
+      phone: pharmacy.phone,
+      email: pharmacy.email,
+      isGuard: pharmacy.isGuard,
+      isOpen24h: pharmacy.isOpen24h,
+      isPartner: pharmacy.isPartner,
+      openTime: pharmacy.openTime,
+      closeTime: pharmacy.closeTime,
+      description: pharmacy.description,
+      latitude: pharmacy.latitude,
+      longitude: pharmacy.longitude,
+      rating: pharmacy.rating,
+      reviewCount: pharmacy.reviewCount,
+      createdAt: pharmacy.createdAt.toISOString(),
+      updatedAt: pharmacy.updatedAt.toISOString(),
+    }, { status: 201 });
+  } catch (error) {
+    console.error('Erreur création pharmacie admin:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+  }
+}
