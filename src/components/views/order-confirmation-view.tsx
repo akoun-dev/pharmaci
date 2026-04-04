@@ -19,6 +19,7 @@ import {
   Copy,
   ShieldCheck,
   Layers,
+  PartyPopper,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -238,7 +239,9 @@ export function OrderConfirmationView() {
         />
         <Card className="border-emerald-100">
           <CardContent className="p-8 text-center">
-            <div className="text-4xl mb-3">🎉</div>
+            <div className="text-4xl mb-3 flex justify-center">
+              <PartyPopper className="w-12 h-12 text-emerald-600" />
+            </div>
             <h3 className="font-semibold mb-1">
               {error || 'Commande terminée'}
             </h3>

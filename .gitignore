@@ -1,67 +1,169 @@
-```gitignore
 # Dependencies
 node_modules/
 
-# Build outputs
+# Build artifacts
 dist/
 build/
 *.js.map
-*.ts.map
+*.tsbuildinfo
 
 # Environment variables
 .env
 .env.local
-*.env.*
+.env.*
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # Logs
 *.log
 
 # Coverage
 coverage/
-htmlcov/
-.coverage
+.nyc_output/
+istanbul/
 
-# IDE files
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# TypeScript/JavaScript specific
+lib/
+out/
+dist/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tsbuildinfo
+*.js.map
+*.jsx.map
+*.ts.map
+*.tsx.map
+
+# React specific
+.next/
+.nuxt/
+public/build/
+
+# Testing
+coverage/
+junit.xml
+*.lcov
+*.profdata
+*.gcda
+*.gcno
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Icon?
+*/Icon?
+.dSYM/
+*.dSYM/
+.vs/
+*.swp
+*.swo
+*~
+
+# Python (if applicable)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/
+.mypy_cache/
+.pytest_cache/
+.hypothesis/
+
+# Node.js (if applicable)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+build/
+coverage/
+.nyc_output/
+out/
+lib/
+es/
+esm/
+cjs/
+umd/
+*.min.js
+*.bundle.js
+*.css.map
+*.js.map
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*.tmp
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-.venv/
-venv/
-.env
-.env.local
-
-# Compiled and binary files
-*.exe
-*.dll
-*.so
-*.a
-*.o
-*.obj
-*.out
-*.class
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Testing
-.mypy_cache/
-.pytest_cache/
-.nyc_output/
-coverage/
-
-# Distribution / packaging
-*.tar.gz
-*.whl
-*.egg-info/
-```
+*~%
+*~$
+*~\#
+*~\$
+*~\%
+*~\^
+*~\&
+*~\*
+*~\(
+*~\)
+*~\[
+*~\]
+*~\{
+*~\}
+*~\|
+*~\\
+*~\/
+*~\:
+*~\;
+*~\"
+*~\'
+*~\,
+*~\.
+*~\<
+*~\>
+*~\?
+*~\+
+*~\=
+*~\-
+*~\_

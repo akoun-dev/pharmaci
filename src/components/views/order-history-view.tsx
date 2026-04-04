@@ -20,6 +20,7 @@ import {
   Copy,
   Download,
   X,
+  FileText,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -318,7 +319,9 @@ export function OrderHistoryView() {
         ) : orders.length === 0 ? (
           <Card className="border-emerald-100">
             <CardContent className="p-8 text-center">
-              <div className="text-4xl mb-3">📋</div>
+              <div className="text-4xl mb-3 flex justify-center">
+                <FileText className="w-12 h-12 text-emerald-600" />
+              </div>
               <h3 className="font-semibold mb-1">
                 Aucune commande pour le moment
               </h3>

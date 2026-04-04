@@ -15,6 +15,7 @@ import {
   X,
   ArrowRight,
   Activity,
+  ZoomIn,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -306,7 +307,9 @@ export function HomeView() {
                     </div>
                   ) : (
                     <div className="p-6 text-center">
-                      <p className="text-2xl mb-1.5">🔍</p>
+                      <div className="flex justify-center mb-1.5">
+                        <ZoomIn className="w-8 h-8 text-gray-400" />
+                      </div>
                       <p className="text-xs text-gray-400">Aucun résultat pour « {searchText} »</p>
                     </div>
                   )}
@@ -401,7 +404,9 @@ export function HomeView() {
                 </div>
               ) : (
                 <>
-                  <p className="text-3xl mb-2">📍</p>
+                  <div className="flex justify-center mb-2">
+                    <MapPin className="w-10 h-10 text-emerald-600" />
+                  </div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-3">
                     Activez votre GPS pour voir les pharmacies les plus proches
                   </p>

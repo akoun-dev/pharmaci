@@ -3,7 +3,7 @@
 import { logger } from '@/lib/logger';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Pill, Building2, SlidersHorizontal, X, MapPin, LocateFixed } from 'lucide-react';
+import { Search, Pill, Building2, SlidersHorizontal, X, MapPin, LocateFixed, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -204,12 +204,23 @@ export function SearchView() {
         {nearMe && tab === 'pharmacies' && (
           <div className="flex items-center gap-2 mb-3 bg-indigo-50 rounded-xl px-3 py-2">
             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${status === 'granted' ? 'bg-indigo-500' : 'bg-amber-500'}`} />
-            <span className="text-xs text-indigo-700 font-medium">
-              {status === 'granted'
-                ? '📍 Résultats triés par proximité (GPS activé)'
-                : status === 'loading'
-                  ? '📡 Localisation en cours...'
-                  : '⚠️ GPS non disponible — position estimée (Abidjan)'}
+            <span className="text-xs text-indigo-700 font-medium flex items-center gap-1.5">
+              {status === 'granted' ? (
+                <>
+                  <MapPin className="w-3.5 h-3.5" />
+                  Résultats triés par proximité (GPS activé)
+                </>
+              ) : status === 'loading' ? (
+                <>
+                  <LocateFixed className="w-3.5 h-3.5 animate-pulse" />
+                  Localisation en cours...
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  GPS non disponible — position estimée (Abidjan)
+                </>
+              )}
             </span>
           </div>
         )}
@@ -338,8 +349,12 @@ export function SearchView() {
         <div className="space-y-2 sm:space-y-3">
           {!loading && displayResults.length === 0 && (
             <div className="text-center py-12">
-              <div className="text-4xl mb-3">
-                {tab === 'medications' ? '💊' : '🏥'}
+              <div className="text-4xl mb-3 flex justify-center">
+                {tab === 'medications' ? (
+                  <Pill className="w-12 h-12 text-emerald-600" />
+                ) : (
+                  <Building2 className="w-12 h-12 text-emerald-600" />
+                )}
               </div>
               <p className="text-sm text-muted-foreground">
                 {searchQuery

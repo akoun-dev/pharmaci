@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Building2,
   BarChart3,
+  Boxes,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -203,7 +204,9 @@ export function PharmacyDashboardView() {
           ) : stocks.length === 0 ? (
             <Card className="border-emerald-100">
               <CardContent className="p-6 text-center">
-                <p className="text-4xl mb-2">📦</p>
+                <div className="flex justify-center mb-2">
+                  <Boxes className="w-10 h-10 text-emerald-600" />
+                </div>
                 <p className="text-sm text-muted-foreground">Aucun médicament enregistré</p>
               </CardContent>
             </Card>
