@@ -65,10 +65,10 @@ interface MedicationData {
   dosage: string;
   sideEffects: string;
   createdAt: string;
-  _count: {
-    orders: number;
-    stocks: number;
-  };
+  pharmacyCount: number;
+  orderCount: number;
+  alternativeCount: number;
+  genericCount: number;
 }
 
 interface PharmacyStock {
@@ -666,11 +666,11 @@ export function AdminMedicationsView() {
                       <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Building2 className="h-3 w-3" />
-                          {med._count.stocks} pharmacie{med._count.stocks > 1 ? 's' : ''}
+                          {med.pharmacyCount} pharmacie{med.pharmacyCount > 1 ? 's' : ''}
                         </span>
                         <span className="flex items-center gap-1">
                           <Package className="h-3 w-3" />
-                          {med._count.orders} commande{med._count.orders > 1 ? 's' : ''}
+                          {med.orderCount} commande{med.orderCount > 1 ? 's' : ''}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
@@ -910,14 +910,14 @@ export function AdminMedicationsView() {
                       <p className="text-[11px] text-muted-foreground">Commandes</p>
                       <p className="text-sm font-bold text-violet-700 flex items-center gap-1">
                         <Package className="h-3.5 w-3.5" />
-                        {selectedMed._count.orders}
+                        {selectedMed.orderCount}
                       </p>
                     </div>
                     <div>
                       <p className="text-[11px] text-muted-foreground">Pharmacies (stock)</p>
                       <p className="text-sm font-bold text-violet-700 flex items-center gap-1">
                         <Building2 className="h-3.5 w-3.5" />
-                        {selectedMed._count.stocks}
+                        {selectedMed.pharmacyCount}
                       </p>
                     </div>
                     <div className="col-span-2">
