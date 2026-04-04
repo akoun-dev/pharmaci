@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { logger } from '@/lib/logger';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +20,7 @@ interface MedicationCardProps {
   onClick: (id: string) => void;
 }
 
-export function MedicationCard({ medication, onClick }: MedicationCardProps) {
+export const MedicationCard = React.memo(function MedicationCard({ medication, onClick }: MedicationCardProps) {
   return (
     <motion.div whileTap={{ scale: 0.98 }}>
       <Card
@@ -79,4 +80,4 @@ export function MedicationCard({ medication, onClick }: MedicationCardProps) {
       </Card>
     </motion.div>
   );
-}
+});

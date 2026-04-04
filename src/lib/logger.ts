@@ -28,7 +28,7 @@ export const logger: Logger = isDevelopment
     }
   : {
       log: () => {},
-      error: () => {}, // Consider using a proper logging service in production
+      error: (...args: unknown[]) => console.error('[PROD ERROR]', ...args), // Log errors in production for debugging
       warn: () => {},
       info: () => {},
       debug: () => {},

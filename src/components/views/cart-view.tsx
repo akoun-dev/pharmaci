@@ -207,14 +207,22 @@ export function CartView() {
                     />
                   ))}
 
-                  {/* Pharmacy subtotal */}
+                  {/* Pharmacy subtotal with order count hint */}
                   <div className="px-3.5 py-2.5 bg-gray-50/50 dark:bg-gray-900/30 border-t border-emerald-50">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs text-muted-foreground">
                         Sous-total {pharmacyName}
                       </span>
                       <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
                         {formatFCFA(pharmacySubtotal)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                      <Package className="h-3 w-3" />
+                      <span>
+                        {pharmacyItems.length === 1
+                          ? '1 médicament'
+                          : `${pharmacyItems.length} médicaments`} • 1 commande créée
                       </span>
                     </div>
                   </div>
@@ -348,11 +356,23 @@ export function CartView() {
               <Separator className="bg-emerald-100" />
 
               {/* Order count info */}
-              {groupCount > 1 && (
+              {groupCount > 1 ? (
                 <div className="flex items-start gap-2 p-2.5 bg-amber-50 dark:bg-amber-950/30 rounded-xl">
                   <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
-                    {groupCount} commandes seront créées — une par pharmacie
+                  <div className="flex-1">
+                    <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed mb-1">
+                      <strong>{groupCount} commandes seront créées</strong> — une par pharmacie
+                    </p>
+                    <p className="text-[10px] text-amber-600 dark:text-amber-500">
+                      Chaque pharmacie préparera votre commande indépendamment
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start gap-2 p-2.5 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl">
+                  <Store className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed">
+                    <strong>1 commande sera créée</strong> auprès de votre pharmacie
                   </p>
                 </div>
               )}

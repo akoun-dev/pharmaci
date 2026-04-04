@@ -1,12 +1,12 @@
 'use client';
 
-import { logger } from '@/lib/logger';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Clock, Star, Shield, Heart } from 'lucide-react';
 import { RatingStars } from '@/components/rating-stars';
 import { motion } from 'framer-motion';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
 interface PharmacyCardProps {
@@ -45,7 +45,7 @@ function isOpen(openTime?: string, closeTime?: string, is24h?: boolean): boolean
   return currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
 }
 
-export function PharmacyCard({
+export const PharmacyCard = React.memo(function PharmacyCard({
   pharmacy,
   onClick,
   showServices = true,
@@ -56,12 +56,10 @@ export function PharmacyCard({
   const [isFav, setIsFav] = useState(pharmacy.isFavorite || false);
   const open = isOpen(pharmacy.openTime, pharmacy.closeTime, pharmacy.isOpen24h);
 
-  // Sync local state when prop changes (adjust during render per React docs)
-  const [prevFavProp, setPrevFavProp] = useState(pharmacy.isFavorite);
-  if (prevFavProp !== pharmacy.isFavorite) {
-    setPrevFavProp(pharmacy.isFavorite);
+  // Sync local state when prop changes
+  useEffect(() => {
     setIsFav(pharmacy.isFavorite || false);
-  }
+  }, [pharmacy.isFavorite]);
 
   const handleFavorite = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -168,4 +166,4 @@ export function PharmacyCard({
       </Card>
     </motion.div>
   );
-}
+});

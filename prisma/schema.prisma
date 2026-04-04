@@ -99,7 +99,7 @@ model Medication {
   stocks         PharmacyMedication[]
   alternatives   MedicationAlternative[] @relation("MedToAlternatives")
   genericOf      MedicationAlternative[] @relation("AlternativeToMed")
-  orders         Order[]
+  orderItems     OrderItem[]
   stockHistory   StockHistory[]
   promotions     Promotion[]
 }
@@ -146,11 +146,10 @@ model Order {
   id               String    @id @default(cuid())
   userId           String
   pharmacyId       String
-  medicationId     String
   status           String    @default("pending")
   deliveryStatus   String    @default("pickup")
-  quantity         Int       @default(1)
-  totalPrice       Float
+  totalQuantity    Int       @default(0)
+  totalPrice       Float     @default(0)
   note             String?
   paymentMethod    String?
   pickupTime       String?
@@ -161,12 +160,29 @@ model Order {
 
   user       User       @relation(fields: [userId], references: [id])
   pharmacy   Pharmacy   @relation(fields: [pharmacyId], references: [id])
-  medication Medication @relation(fields: [medicationId], references: [id])
+  items      OrderItem[]
 
   @@index([userId])
   @@index([pharmacyId])
   @@index([status])
   @@index([createdAt])
+  @@index([verificationCode])
+}
+
+model OrderItem {
+  id               String   @id @default(cuid())
+  orderId          String
+  medicationId     String
+  quantity         Int
+  price            Float
+  stockId          String?
+  createdAt        DateTime @default(now())
+
+  order       Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  medication Medication @relation(fields: [medicationId], references: [id])
+
+  @@index([orderId])
+  @@index([medicationId])
 }
 
 model Review {

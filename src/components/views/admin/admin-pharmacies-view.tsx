@@ -12,7 +12,6 @@ import {
   Phone,
   Clock,
   ChevronRight,
-  ChevronLeft,
   AlertCircle,
   X,
   Loader2,
@@ -61,6 +60,7 @@ import {
 import { ViewHeader } from '@/components/view-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
+import { SmartPagination } from '@/components/ui/smart-pagination';
 
 // ── Types ──
 interface PharmacyItem {
@@ -647,61 +647,16 @@ export function AdminPharmaciesView() {
         )}
 
         {/* ── Pagination ── */}
-        {!loading && !error && pharmacies.length > 0 && totalPages > 1 && (
-          <div className="flex items-center justify-between mt-4 px-1">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 border-violet-200 text-violet-700 hover:bg-violet-50 disabled:opacity-40"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Préc.
-            </Button>
-
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                let pageNum: number;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (page <= 3) {
-                  pageNum = i + 1;
-                } else if (page >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = page - 2 + i;
-                }
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setPage(pageNum)}
-                    className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
-                      page === pageNum
-                        ? 'bg-violet-600 text-white'
-                        : 'text-violet-700 hover:bg-violet-50'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-              {totalPages > 5 && page < totalPages - 2 && (
-                <span className="text-xs text-muted-foreground px-1">...</span>
-              )}
-            </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 border-violet-200 text-violet-700 hover:bg-violet-50 disabled:opacity-40"
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            >
-              Suiv.
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          </div>
+        {!loading && !error && pharmacies.length > 0 && (
+          <SmartPagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            total={total}
+            pageSize={PAGE_SIZE}
+            theme="violet"
+            className="mt-4"
+          />
         )}
       </div>
 

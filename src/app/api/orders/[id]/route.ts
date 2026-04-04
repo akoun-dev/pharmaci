@@ -25,7 +25,11 @@ export async function GET(
             latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
           },
         },
-        medication: { select: { name: true, commercialName: true, form: true, needsPrescription: true } },
+        items: {
+          include: {
+            medication: { select: { name: true, commercialName: true, form: true, needsPrescription: true } },
+          },
+        },
       },
     });
 
@@ -59,6 +63,13 @@ export async function DELETE(
 
     const order = await db.order.findUnique({
       where: { id },
+      include: {
+        items: {
+          include: {
+            medication: true,
+          },
+        },
+      },
     });
 
     if (!order) {
@@ -76,16 +87,20 @@ export async function DELETE(
       );
     }
 
-    // Restore stock quantity
-    await db.pharmacyMedication.update({
-      where: {
-        pharmacyId_medicationId: { pharmacyId: order.pharmacyId, medicationId: order.medicationId },
-      },
-      data: {
-        quantity: { increment: order.quantity },
-        inStock: true,
-      },
-    });
+    // Restore stock quantity for all items
+    await Promise.all(
+      order.items.map(item =>
+        db.pharmacyMedication.update({
+          where: {
+            pharmacyId_medicationId: { pharmacyId: order.pharmacyId, medicationId: item.medicationId },
+          },
+          data: {
+            quantity: { increment: item.quantity },
+            inStock: true,
+          },
+        })
+      )
+    );
 
     const updatedOrder = await db.order.update({
       where: { id },
@@ -97,7 +112,11 @@ export async function DELETE(
             latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
           },
         },
-        medication: { select: { name: true, commercialName: true, form: true, needsPrescription: true } },
+        items: {
+          include: {
+            medication: { select: { name: true, commercialName: true, form: true, needsPrescription: true } },
+          },
+        },
       },
     });
 

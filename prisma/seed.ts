@@ -58,6 +58,7 @@ async function seed() {
   await db.message.deleteMany();
   await db.notification.deleteMany();
   await db.stockHistory.deleteMany();
+  await db.orderItem.deleteMany();
   await db.order.deleteMany();
   await db.review.deleteMany();
   await db.pharmacyMedication.deleteMany();
@@ -212,18 +213,32 @@ async function seed() {
     const createdAt = new Date();
     createdAt.setDate(createdAt.getDate() - daysAgo);
 
+    // Generate verification code
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let verificationCode = '';
+    for (let k = 0; k < 6; k++) {
+      verificationCode += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
     await db.order.create({
       data: {
         userId: user.id,
         pharmacyId: pharmacyPharmacy.id,
-        medicationId: stock.medicationId,
         status,
-        quantity: qty,
+        totalQuantity: qty,
         totalPrice: Math.round(stock.price * qty),
         paymentMethod: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
         pickupTime: `${8 + Math.floor(Math.random() * 10)}:00`,
         note: i % 4 === 0 ? "Urgent svp" : null,
+        verificationCode,
         createdAt,
+        items: {
+          create: {
+            medicationId: stock.medicationId,
+            quantity: qty,
+            price: stock.price,
+          }
+        }
       }
     });
   }

@@ -47,21 +47,21 @@ export interface RateLimitOptions {
  * Default rate limit configurations
  */
 export const RateLimits = {
-  /** Strict rate limit for authentication endpoints */
+  /** No rate limit for authentication endpoints (development) */
   auth: {
-    limit: 5,
+    limit: 999999,
     windowMs: 15 * 60 * 1000, // 15 minutes
   } as RateLimitOptions,
 
-  /** Moderate rate limit for API routes */
+  /** No rate limit for API routes (development) */
   api: {
-    limit: 100,
+    limit: 999999,
     windowMs: 15 * 60 * 1000, // 15 minutes
   } as RateLimitOptions,
 
-  /** Lenient rate limit for public endpoints */
+  /** No rate limit for public endpoints (development) */
   public: {
-    limit: 200,
+    limit: 999999,
     windowMs: 15 * 60 * 1000, // 15 minutes
   } as RateLimitOptions,
 };

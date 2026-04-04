@@ -12,9 +12,6 @@ import {
   AlertTriangle,
   RefreshCw,
   ChevronRight,
-  ChevronLeft,
-  ChevronsLeft,
-  ChevronsRight,
   Inbox,
   Clock,
   FileText,
@@ -63,6 +60,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { ViewHeader } from '@/components/view-header';
 import { toast } from 'sonner';
+import { SmartPagination } from '@/components/ui/smart-pagination';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -324,8 +322,6 @@ export function AdminMedicationsView() {
 
   // ── Pagination helpers ──
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const hasPrev = currentPage > 1;
-  const hasNext = currentPage < totalPages;
 
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return;
@@ -843,101 +839,14 @@ export function AdminMedicationsView() {
       )}
 
       {/* ── Pagination ── */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-1.5 mt-6">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 border-violet-200 text-violet-700 hover:bg-violet-50 disabled:opacity-40"
-            disabled={!hasPrev}
-            onClick={() => goToPage(1)}
-            aria-label="Première page"
-          >
-            <ChevronsLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 border-violet-200 text-violet-700 hover:bg-violet-50 disabled:opacity-40"
-            disabled={!hasPrev}
-            onClick={() => goToPage(currentPage - 1)}
-            aria-label="Page précédente"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-
-          <div className="flex items-center gap-1 mx-2">
-            {(() => {
-              const pages: (number | string)[] = [];
-              const start = Math.max(1, currentPage - 2);
-              const end = Math.min(totalPages, currentPage + 2);
-
-              if (start > 1) {
-                pages.push(1);
-                if (start > 2) pages.push('...');
-              }
-              for (let i = start; i <= end; i++) {
-                pages.push(i);
-              }
-              if (end < totalPages) {
-                if (end < totalPages - 1) pages.push('...');
-                pages.push(totalPages);
-              }
-              return pages.map((page, idx) =>
-                typeof page === 'string' ? (
-                  <span
-                    key={`dots-${idx}`}
-                    className="text-xs text-muted-foreground px-1"
-                  >
-                    ...
-                  </span>
-                ) : (
-                  <button
-                    key={page}
-                    onClick={() => goToPage(page)}
-                    className={`h-9 w-9 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${
-                      page === currentPage
-                        ? 'bg-violet-600 text-white shadow-sm'
-                        : 'hover:bg-violet-50 text-violet-700'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                )
-              );
-            })()}
-          </div>
-
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 border-violet-200 text-violet-700 hover:bg-violet-50 disabled:opacity-40"
-            disabled={!hasNext}
-            onClick={() => goToPage(currentPage + 1)}
-            aria-label="Page suivante"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 border-violet-200 text-violet-700 hover:bg-violet-50 disabled:opacity-40"
-            disabled={!hasNext}
-            onClick={() => goToPage(totalPages)}
-            aria-label="Dernière page"
-          >
-            <ChevronsRight className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
-
-      {/* ── Page info ── */}
-      {total > 0 && (
-        <p className="text-center text-[11px] text-muted-foreground mt-2">
-          {(currentPage - 1) * PAGE_SIZE + 1}–
-          {Math.min(currentPage * PAGE_SIZE, total)} sur {total} médicaments
-        </p>
-      )}
+      <SmartPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={goToPage}
+        total={total}
+        pageSize={PAGE_SIZE}
+        theme="violet"
+      />
 
       {/* ── Medication Detail Dialog ── */}
       <Dialog open={detailOpen} onOpenChange={(open) => { if (!open) closeDetailDialog(); }}>

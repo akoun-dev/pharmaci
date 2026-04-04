@@ -18,6 +18,7 @@ import {
   Download,
   Copy,
   ShieldCheck,
+  Layers,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -29,11 +30,12 @@ import { useAppStore } from '@/store/app-store';
 import { openGoogleMaps, PAYMENT_LABELS } from '@/lib/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
+import { groupOrdersByPharmacy, type OrderGroup } from '@/lib/order-utils';
 
 interface OrderData {
   id: string;
   status: string;
-  quantity: number;
+  totalQuantity: number;
   totalPrice: number;
   note?: string | null;
   paymentMethod?: string | null;
@@ -47,11 +49,16 @@ interface OrderData {
     city: string;
     phone: string;
   };
-  medication: {
-    name: string;
-    commercialName: string;
-    form?: string;
-  };
+  items: {
+    id: string;
+    quantity: number;
+    price: number;
+    medication: {
+      name: string;
+      commercialName: string;
+      form?: string;
+    };
+  }[];
 }
 
 interface PharmacyDetail {
@@ -70,6 +77,7 @@ export function OrderConfirmationView() {
   } = useAppStore();
 
   const [order, setOrder] = useState<OrderData | null>(null);
+  const [relatedOrders, setRelatedOrders] = useState<OrderData[]>([]);
   const [pharmacyDetail, setPharmacyDetail] = useState<PharmacyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -98,6 +106,21 @@ export function OrderConfirmationView() {
       const found: OrderData = await res.json();
       if (found) {
         setOrder(found);
+
+        // Fetch all orders to find related ones from the same pharmacy
+        const allOrdersRes = await fetch('/api/orders');
+        if (allOrdersRes.ok) {
+          const allOrders: OrderData[] = await allOrdersRes.json();
+          // Get orders from the same pharmacy created within the last hour
+          const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+          const related = allOrders.filter(
+            o => o.pharmacyId === found.pharmacyId &&
+            o.id !== found.id &&
+            new Date(o.createdAt) > oneHourAgo
+          );
+          setRelatedOrders(related);
+        }
+
         // Pharmacy coordinates are already included in /api/orders/[id] response
         if (found.pharmacy && 'latitude' in found.pharmacy && 'longitude' in found.pharmacy) {
           const pharm = found.pharmacy as unknown as { latitude: number; longitude: number; paymentMethods?: string; parkingInfo?: string };
@@ -136,7 +159,7 @@ export function OrderConfirmationView() {
     fetchOrder();
   }, [fetchOrder]);
 
-  const unitPrice = order ? Math.round(order.totalPrice / order.quantity) : 0;
+  const unitPrice = order && order.items.length > 0 ? order.items[0].price : 0;
 
   const handleNavigate = () => {
     if (pharmacyDetail) {
@@ -215,17 +238,18 @@ export function OrderConfirmationView() {
         />
         <Card className="border-emerald-100">
           <CardContent className="p-8 text-center">
-            <div className="text-4xl mb-3">😕</div>
+            <div className="text-4xl mb-3">🎉</div>
             <h3 className="font-semibold mb-1">
-              {error || 'Commande introuvable'}
+              {error || 'Commande terminée'}
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              La commande demandée n&apos;a pas pu être trouvée.
+              {error || 'Votre commande a été enregistrée avec succès.'}
             </p>
             <Button
               onClick={() => setCurrentView('order-history')}
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
+              <ClipboardList className="h-4 w-4 mr-2" />
               Voir mes commandes
             </Button>
           </CardContent>
@@ -354,37 +378,59 @@ export function OrderConfirmationView() {
             </div>
 
             <CardContent className="p-4 space-y-3">
-              {/* Medication */}
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                  <Pill className="h-5 w-5 text-emerald-600" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-sm truncate">
-                    {order.medication.commercialName || order.medication.name}
-                  </p>
-                  {order.medication.form && (
-                    <p className="text-xs text-muted-foreground">
-                      {order.medication.form}
+              {/* Medications */}
+              {order.items.length === 1 ? (
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                    <Pill className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm truncate">
+                      {order.items[0].medication.commercialName || order.items[0].medication.name}
                     </p>
-                  )}
+                    {order.items[0].medication.form && (
+                      <p className="text-xs text-muted-foreground">
+                        {order.items[0].medication.form}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-2">
+                  {order.items.map((item, idx) => (
+                    <div key={item.id || idx} className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                        <Pill className="h-5 w-5 text-emerald-600" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-sm truncate">
+                          {item.medication.commercialName || item.medication.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Quantité: {item.quantity} × {item.price.toLocaleString()} FCFA
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="border-t border-emerald-100" />
 
               {/* Price breakdown */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Quantité</span>
-                  <span className="font-medium">{order.quantity}</span>
+                  <span className="text-muted-foreground">Quantité totale</span>
+                  <span className="font-medium">{order.totalQuantity}</span>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Prix unitaire</span>
-                  <span className="font-medium">
-                    {unitPrice.toLocaleString()} FCFA
-                  </span>
-                </div>
+                {order.items.length === 1 && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Prix unitaire</span>
+                    <span className="font-medium">
+                      {unitPrice.toLocaleString()} FCFA
+                    </span>
+                  </div>
+                )}
                 <div className="border-t border-emerald-100 pt-1.5 flex items-center justify-between">
                   <span className="text-sm font-semibold">Total</span>
                   <span className="text-lg font-bold text-emerald-700">
@@ -427,6 +473,63 @@ export function OrderConfirmationView() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Related Orders Info */}
+        {relatedOrders.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+          >
+            <Card className="border-emerald-200 bg-emerald-50 dark:bg-emerald-950/40">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-200 dark:bg-emerald-800 flex items-center justify-center flex-shrink-0">
+                    <Layers className="h-5 w-5 text-emerald-700 dark:text-emerald-300" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-sm text-emerald-900 dark:text-emerald-100 mb-1">
+                      Commandes groupées
+                    </h3>
+                    <p className="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed">
+                      Vous avez <strong>{relatedOrders.length + 1} commande(s)</strong> auprès de <strong>{order.pharmacy.name}</strong>.
+                      {relatedOrders.length > 0 && (
+                        <span className="block mt-1">
+                          Tous les médicaments seront disponibles au même point de retrait.
+                        </span>
+                      )}
+                    </p>
+                    {relatedOrders.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {relatedOrders.slice(0, 3).map((relatedOrder) => (
+                          <Badge
+                            key={relatedOrder.id}
+                            variant="secondary"
+                            className="text-[10px] bg-white dark:bg-gray-900 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+                          >
+                            <Pill className="h-2.5 w-2.5 mr-1" />
+                            {relatedOrder.items.length === 1
+                              ? (relatedOrder.items[0].medication.commercialName || relatedOrder.items[0].medication.name)
+                              : `${relatedOrder.items.length} médicament${relatedOrder.items.length > 1 ? 's' : ''}`
+                            }
+                          </Badge>
+                        ))}
+                        {relatedOrders.length > 3 && (
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] bg-white dark:bg-gray-900 text-muted-foreground"
+                          >
+                            +{relatedOrders.length - 3} autre(s)
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Action Buttons */}
         <motion.div

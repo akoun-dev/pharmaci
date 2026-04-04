@@ -14,14 +14,159 @@ function generateVerificationCode(): string {
 
 export async function POST(request: NextRequest) {
   try {
-    // Read userId from auth headers (set by middleware)
-    const userId = request.headers.get('X-User-Id');
-
-    if (!userId) {
+    // Require authentication — use session cookie
+    const { getSessionFromCookie } = await import('@/lib/auth');
+    const session = await getSessionFromCookie(request);
+    if (!session) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
+    const userId = session.userId;
 
     const body = await request.json();
+
+    // Check if this is a multi-item order (new format) or single item (legacy format)
+    const isMultiItemOrder = body.items && Array.isArray(body.items) && body.pharmacyId;
+
+    if (isMultiItemOrder) {
+      // Multi-item order: create ONE order with multiple items (all from same pharmacy)
+      const { pharmacyId, items, note, paymentMethod, deliveryType, deliveryAddress } = body;
+
+      if (!pharmacyId || !items || items.length === 0) {
+        return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
+      }
+
+      // Verify all stocks are available first
+      const stockChecks = await Promise.all(
+        items.map(async (item) => {
+          const { medicationId, quantity } = item;
+          const orderQuantity = Math.max(1, Math.min(100, parseInt(quantity) || 1));
+
+          const stock = await db.pharmacyMedication.findUnique({
+            where: {
+              pharmacyId_medicationId: { pharmacyId, medicationId },
+            },
+          });
+
+          if (!stock || !stock.inStock) {
+            return {
+              medicationId,
+              available: false,
+              error: 'Médicament non disponible',
+            };
+          }
+
+          if (stock.quantity < orderQuantity) {
+            return {
+              medicationId,
+              available: false,
+              error: 'Stock insuffisant',
+            };
+          }
+
+          return {
+            medicationId,
+            available: true,
+            quantity: orderQuantity,
+            price: stock.price,
+          };
+        })
+      );
+
+      // Check if any stock check failed
+      const errors = stockChecks.filter(c => !c.available).map(c => ({
+        medicationId: c.medicationId,
+        error: c.error,
+      }));
+
+      if (errors.length > 0) {
+        return NextResponse.json({ error: 'Certains médicaments ne sont pas disponibles', errors }, { status: 400 });
+      }
+
+      // Calculate totals
+      const totalQuantity = items.reduce((sum, item) => {
+        const check = stockChecks.find(c => c.medicationId === item.medicationId);
+        return sum + (check?.quantity || 0);
+      }, 0);
+      const totalPrice = items.reduce((sum, item) => {
+        const check = stockChecks.find(c => c.medicationId === item.medicationId);
+        return sum + (check?.quantity || 0) * (check?.price || 0);
+      }, 0);
+
+      // Generate a unique verification code
+      let verificationCode = generateVerificationCode();
+      let codeExists = true;
+      let attempts = 0;
+      while (codeExists && attempts < 10) {
+        const existing = await db.order.findUnique({ where: { verificationCode } });
+        if (!existing) {
+          codeExists = false;
+        } else {
+          verificationCode = generateVerificationCode();
+          attempts++;
+        }
+      }
+
+      // Create ONE order with multiple items
+      const order = await db.order.create({
+        data: {
+          userId,
+          pharmacyId,
+          totalQuantity,
+          totalPrice,
+          note: note?.trim() || null,
+          paymentMethod: paymentMethod || null,
+          deliveryStatus: deliveryType === 'delivery' ? 'preparing' : 'pickup',
+          status: 'pending',
+          verificationCode,
+          items: {
+            create: items.map(item => {
+              const check = stockChecks.find(c => c.medicationId === item.medicationId);
+              return {
+                medicationId: item.medicationId,
+                quantity: check?.quantity || 1,
+                price: check?.price || 0,
+              };
+            }),
+          },
+        },
+        include: {
+          user: { select: { name: true, phone: true } },
+          pharmacy: {
+            select: {
+              name: true, address: true, city: true, phone: true,
+              latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
+            },
+          },
+          items: {
+            include: {
+              medication: { select: { name: true, commercialName: true, form: true } },
+            },
+          },
+        },
+      });
+
+      // Decrement all stocks
+      await Promise.all(
+        items.map(async (item) => {
+          const check = stockChecks.find(c => c.medicationId === item.medicationId);
+          await db.pharmacyMedication.update({
+            where: {
+              pharmacyId_medicationId: { pharmacyId, medicationId: item.medicationId },
+            },
+            data: {
+              quantity: { decrement: check?.quantity || 0 },
+              inStock: ((check?.quantity || 0) - 1) <= 0 ? false : true,
+            },
+          });
+        })
+      );
+
+      logger.info('Order created with multiple items', { orderId: order.id, userId, pharmacyId, itemCount: items.length });
+
+      return NextResponse.json(order, { status: 201 });
+    }
+
+    // Legacy single-item order format
     const { pharmacyId, medicationId, quantity, note, paymentMethod, pickupTime } = body;
 
     if (!pharmacyId || !medicationId) {
@@ -29,7 +174,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate quantity
-    const orderQuantity = Math.max(1, Math.min(100, parseInt(quantity) || 1)); // Between 1 and 100
+    const orderQuantity = Math.max(1, Math.min(100, parseInt(quantity) || 1));
 
     // Verify stock exists and is available
     const stock = await db.pharmacyMedication.findUnique({
@@ -66,14 +211,20 @@ export async function POST(request: NextRequest) {
       data: {
         userId,
         pharmacyId,
-        medicationId,
-        quantity: orderQuantity,
+        totalQuantity: orderQuantity,
         totalPrice,
         note: note?.trim() || null,
         paymentMethod: paymentMethod || null,
         pickupTime: pickupTime || null,
         status: 'pending',
         verificationCode,
+        items: {
+          create: {
+            medicationId,
+            quantity: orderQuantity,
+            price: stock.price,
+          },
+        },
       },
       include: {
         user: { select: { name: true, phone: true } },
@@ -83,7 +234,11 @@ export async function POST(request: NextRequest) {
             latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
           },
         },
-        medication: { select: { name: true, commercialName: true, form: true } },
+        items: {
+          include: {
+            medication: { select: { name: true, commercialName: true, form: true } },
+          },
+        },
       },
     });
 
@@ -147,7 +302,11 @@ export async function GET(request: NextRequest) {
               latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
             },
           },
-          medication: { select: { name: true, commercialName: true, form: true, needsPrescription: true } },
+          items: {
+            include: {
+              medication: { select: { name: true, commercialName: true, form: true, needsPrescription: true } },
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
       }),

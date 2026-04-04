@@ -52,7 +52,7 @@ interface OrderData {
   id: string;
   status: string;
   deliveryStatus: string;
-  quantity: number;
+  totalQuantity: number;
   totalPrice: number;
   note?: string | null;
   paymentMethod?: string | null;
@@ -69,11 +69,16 @@ interface OrderData {
     latitude?: number | null;
     longitude?: number | null;
   };
-  medication: {
-    name: string;
-    commercialName: string;
-    form?: string;
-  };
+  items: {
+    id: string;
+    quantity: number;
+    price: number;
+    medication: {
+      name: string;
+      commercialName: string;
+      form?: string;
+    };
+  }[];
 }
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
@@ -162,7 +167,9 @@ export function OrderHistoryView() {
       setLoading(true);
       const res = await fetch('/api/orders');
       const data = await res.json();
-      setOrders(Array.isArray(data) ? data : []);
+      // API returns { items: orders[], pagination: {...} }
+      const ordersList = Array.isArray(data) ? data : (data.items || []);
+      setOrders(ordersList);
     } catch {
       logger.error('Error fetching orders');
     } finally {
@@ -347,21 +354,29 @@ export function OrderHistoryView() {
                   >
                     <Card className="border-emerald-100 overflow-hidden">
                       <CardContent className="p-4 space-y-2.5">
-                        {/* Top row: medication + status badge */}
+                        {/* Top row: medications + status badge */}
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-start gap-2 min-w-0 flex-1">
                             <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-0.5">
                               <Pill className="h-4 w-4 text-emerald-600" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="font-semibold text-sm truncate">
-                                {order.medication.commercialName ||
-                                  order.medication.name}
-                              </p>
-                              {order.medication.name !==
-                                order.medication.commercialName && (
-                                <p className="text-xs text-muted-foreground truncate">
-                                  {order.medication.name}
+                              {order.items.length === 1 ? (
+                                <>
+                                  <p className="font-semibold text-sm truncate">
+                                    {order.items[0].medication.commercialName ||
+                                      order.items[0].medication.name}
+                                  </p>
+                                  {order.items[0].medication.name !==
+                                    order.items[0].medication.commercialName && (
+                                    <p className="text-xs text-muted-foreground truncate">
+                                      {order.items[0].medication.name}
+                                    </p>
+                                  )}
+                                </>
+                              ) : (
+                                <p className="font-semibold text-sm truncate">
+                                  {order.items.length} médicament{order.items.length > 1 ? 's' : ''}
                                 </p>
                               )}
                             </div>
@@ -373,6 +388,17 @@ export function OrderHistoryView() {
                             {statusInfo.label}
                           </Badge>
                         </div>
+
+                        {/* Multiple medications list */}
+                        {order.items.length > 1 && (
+                          <div className="ml-10 space-y-1">
+                            {order.items.map((item, idx) => (
+                              <div key={item.id || idx} className="text-xs text-muted-foreground">
+                                • {item.quantity}x {item.medication.commercialName || item.medication.name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
                         {/* Pharmacy (clickable) */}
                         <button
@@ -406,7 +432,7 @@ export function OrderHistoryView() {
                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Package className="h-3 w-3" />
-                            {order.quantity}
+                            {order.totalQuantity}
                           </span>
                           <span className="font-semibold text-foreground">
                             {order.totalPrice.toLocaleString()} FCFA
@@ -456,7 +482,10 @@ export function OrderHistoryView() {
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>Annuler la commande</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Êtes-vous sûr de vouloir annuler votre commande de <strong>{order.medication.commercialName || order.medication.name}</strong> auprès de <strong>{order.pharmacy.name}</strong> ? Cette action est irréversible.
+                                    Êtes-vous sûr de vouloir annuler votre commande de <strong>{order.items.length === 1
+                                      ? (order.items[0].medication.commercialName || order.items[0].medication.name)
+                                      : `${order.items.length} médicaments`}
+                                    </strong> auprès de <strong>{order.pharmacy.name}</strong> ? Cette action est irréversible.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -576,12 +605,25 @@ export function OrderHistoryView() {
 
                 {/* Order info */}
                 <div className="bg-gray-50 rounded-lg p-3 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Médicament</span>
-                    <span className="font-medium truncate ml-2 text-right">
-                      {selectedOrder.medication.commercialName || selectedOrder.medication.name}
-                    </span>
-                  </div>
+                  {selectedOrder.items.length === 1 ? (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">Médicament</span>
+                      <span className="font-medium truncate ml-2 text-right">
+                        {selectedOrder.items[0].medication.commercialName || selectedOrder.items[0].medication.name}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-start justify-between text-xs">
+                      <span className="text-muted-foreground">Médicaments</span>
+                      <div className="text-right ml-2 space-y-0.5">
+                        {selectedOrder.items.map((item, idx) => (
+                          <div key={item.id || idx} className="font-medium">
+                            {item.quantity}x {item.medication.commercialName || item.medication.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Pharmacie</span>
                     <span className="font-medium truncate ml-2 text-right">

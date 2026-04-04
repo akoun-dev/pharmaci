@@ -94,95 +94,52 @@ export function CartCheckoutView() {
         paymentMethod,
       };
 
-      // Try batch API first
       let firstOrderId: string | null = null;
-      let batchSuccess = false;
+      let pharmacyCount = 1;
 
-      try {
-        const batchRes = await fetch('/api/orders/batch', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+      // Use batch API - creates one order per medication, grouped by pharmacy
+      const batchRes = await fetch('/api/orders/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-        if (batchRes.ok) {
-          const batchData = await batchRes.json();
-          if (batchData.orders && batchData.orders.length > 0) {
-            firstOrderId = batchData.orders[0].id;
-            batchSuccess = true;
+      if (batchRes.ok) {
+        const batchData = await batchRes.json();
+        if (batchData.orders && batchData.orders.length > 0) {
+          firstOrderId = batchData.orders[0].id;
+          pharmacyCount = batchData.pharmacyCount || 1;
+
+          // Show appropriate success message
+          if (pharmacyCount > 1) {
+            toast.success(`${pharmacyCount} commandes créées — une par pharmacie`);
+          } else {
+            toast.success('Commande créée avec succès');
           }
-        }
-      } catch {
-        // Batch API failed, fall back to individual orders
-      }
 
-      // Fallback: create individual orders per pharmacy
-      if (!batchSuccess) {
-        let anySuccess = false;
-        const pharmacyGroups = Array.from(groups.entries());
-
-        for (const [, pharmacyItems] of pharmacyGroups) {
-          try {
-            const orderPayload = {
-              pharmacyId: pharmacyItems[0].pharmacyId,
-              items: pharmacyItems.map((item) => ({
-                medicationId: item.medicationId,
-                quantity: item.quantity,
-                stockId: item.stockId,
-                price: item.price,
-              })),
-              note: note || undefined,
-              paymentMethod,
-              deliveryType,
-              deliveryAddress:
-                deliveryType === 'delivery' ? deliveryAddress : undefined,
-            };
-
-            const res = await fetch('/api/orders', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(orderPayload),
-            });
-
-            if (res.ok) {
-              const data = await res.json();
-              if (!anySuccess && data.id) {
-                firstOrderId = data.id;
-                anySuccess = true;
-              }
-            } else {
-              const errData = await res.json().catch(() => null);
-              logger.error(
-                'Order creation failed for pharmacy:',
-                pharmacyItems[0].pharmacyName,
-                errData?.error
-              );
-            }
-          } catch {
-            logger.error(
-              'Network error for pharmacy:',
-              pharmacyItems[0].pharmacyName
-            );
+          // Log any partial errors
+          if (batchData.errors && batchData.errors.length > 0) {
+            logger.warn('Some items failed to order:', batchData.errors);
           }
+        } else {
+          throw new Error('Aucune commande créée');
         }
-
-        if (!anySuccess) {
-          throw new Error(
-            'Impossible de créer les commandes. Veuillez réessayer.'
-          );
-        }
+      } else {
+        const errData = await batchRes.json().catch(() => null);
+        throw new Error(errData?.error || 'Erreur lors de la création des commandes');
       }
 
       // Success — clear cart and navigate
       clearCart();
-      toast.success(
-        `Commande${groupCount > 1 ? '(s)' : ''} passée${groupCount > 1 ? 's' : ''} avec succès !`
-      );
 
-      if (firstOrderId) {
-        selectOrder(firstOrderId);
-        setCurrentView('order-confirmation');
+      // Always redirect to order history after successful order creation
+      // This is better when multiple orders are created
+      if (pharmacyCount > 1) {
+        // For multiple pharmacies, show order history with grouped view
+        setCurrentView('order-history');
       } else {
+        // For single pharmacy, we could show confirmation, but history is more reliable
+        // since it shows all orders including newly created ones
         setCurrentView('order-history');
       }
     } catch (error) {
