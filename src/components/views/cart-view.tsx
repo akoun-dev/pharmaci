@@ -17,6 +17,7 @@ import {
   Pill,
   AlertCircle,
   Search,
+  Banknote,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -31,12 +32,7 @@ import { PAYMENT_LABELS } from '@/lib/navigation';
 import { toast } from 'sonner';
 
 const PAYMENT_METHODS = [
-  { value: 'sur_place', label: 'Sur place', icon: '🏪' },
-  { value: 'especes', label: 'Espèces', icon: '💵' },
-  { value: 'orange_money', label: 'Orange Money', icon: '🟠' },
-  { value: 'wave', label: 'Wave', icon: '🌊' },
-  { value: 'mtn_money', label: 'MTN Money', icon: '🟡' },
-  { value: 'carte', label: 'Carte', icon: '💳' },
+  { value: 'especes', label: 'Espèces', icon: Banknote },
 ];
 
 function formatFCFA(amount: number): string {
@@ -49,13 +45,11 @@ export function CartView() {
     deliveryType,
     deliveryAddress,
     note,
-    paymentMethod,
     removeItem,
     updateQuantity,
     setDeliveryType,
     setDeliveryAddress,
     setNote,
-    setPaymentMethod,
     getItemCount,
     getSubtotal,
     getPharmacyGroups,
@@ -335,21 +329,13 @@ export function CartView() {
                     Mode de paiement
                   </label>
                 </div>
-                <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-                  {PAYMENT_METHODS.map((method) => (
-                    <button
-                      key={method.value}
-                      onClick={() => setPaymentMethod(method.value)}
-                      className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-all duration-200 border ${
-                        paymentMethod === method.value
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:border-emerald-600 dark:text-emerald-400'
-                          : 'border-gray-200 dark:border-gray-700 text-muted-foreground hover:border-emerald-300 dark:hover:border-emerald-800'
-                      }`}
-                    >
-                      <span className="text-sm">{method.icon}</span>
-                      <span className="truncate">{method.label}</span>
-                    </button>
-                  ))}
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl border border-emerald-100 dark:border-emerald-800">
+                  <div className="flex items-center gap-2">
+                    <Banknote className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                      Paiement en espèces à la récupération en pharmacie
+                    </p>
+                  </div>
                 </div>
               </div>
 

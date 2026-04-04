@@ -23,7 +23,6 @@ interface CartState {
   deliveryType: 'pickup' | 'delivery';
   deliveryAddress: string;
   note: string;
-  paymentMethod: string;
   // Actions
   addItem: (item: Omit<CartItem, 'id'>) => void;
   removeItem: (id: string) => void;
@@ -48,7 +47,6 @@ export const useCartStore = create<CartState>()(
       deliveryType: 'pickup',
       deliveryAddress: '',
       note: '',
-      paymentMethod: 'sur_place',
 
       addItem: (item) =>
         set((state) => {
@@ -91,13 +89,11 @@ export const useCartStore = create<CartState>()(
           deliveryType: 'pickup',
           deliveryAddress: '',
           note: '',
-          paymentMethod: 'sur_place',
         })),
 
       setDeliveryType: (type) => set(() => ({ deliveryType: type })),
       setDeliveryAddress: (address) => set(() => ({ deliveryAddress: address })),
       setNote: (note) => set(() => ({ note })),
-      setPaymentMethod: (method) => set(() => ({ paymentMethod: method })),
 
       getItemCount: () => {
         return get().items.reduce((sum, item) => sum + item.quantity, 0);

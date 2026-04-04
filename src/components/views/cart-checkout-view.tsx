@@ -14,6 +14,7 @@ import {
   Pill,
   Loader2,
   AlertTriangle,
+  Banknote,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +23,6 @@ import { Separator } from '@/components/ui/separator';
 import { ViewHeader } from '@/components/view-header';
 import { useCartStore } from '@/store/cart-store';
 import { useAppStore } from '@/store/app-store';
-import { PAYMENT_LABELS } from '@/lib/navigation';
 import { toast } from 'sonner';
 
 function formatFCFA(amount: number): string {
@@ -41,7 +41,6 @@ export function CartCheckoutView() {
     deliveryType,
     deliveryAddress,
     note,
-    paymentMethod,
     clearCart,
     getSubtotal,
     getPharmacyGroups,
@@ -55,10 +54,6 @@ export function CartCheckoutView() {
   const groups = getPharmacyGroups();
   const groupCount = groups.size;
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-
-  const paymentLabel =
-    PAYMENT_LABELS[paymentMethod] ||
-    (paymentMethod === 'sur_place' ? 'Sur place' : paymentMethod);
 
   const handleConfirm = useCallback(async () => {
     if (items.length === 0) {
@@ -74,14 +69,14 @@ export function CartCheckoutView() {
     setIsSubmitting(true);
 
     try {
-      // Build items payload
+      // Build items payload - payment method is always 'especes' (cash on pickup)
       const payloadItems = items.map((item) => ({
         pharmacyId: item.pharmacyId,
         medicationId: item.medicationId,
         quantity: item.quantity,
         stockId: item.stockId,
         note: note || undefined,
-        paymentMethod,
+        paymentMethod: 'especes',
         deliveryType,
         deliveryAddress: deliveryType === 'delivery' ? deliveryAddress : undefined,
       }));
@@ -91,7 +86,7 @@ export function CartCheckoutView() {
         deliveryType,
         deliveryAddress: deliveryType === 'delivery' ? deliveryAddress : undefined,
         note: note || undefined,
-        paymentMethod,
+        paymentMethod: 'especes',
       };
 
       let firstOrderId: string | null = null;
@@ -158,7 +153,6 @@ export function CartCheckoutView() {
     deliveryType,
     deliveryAddress,
     note,
-    paymentMethod,
     groups,
     groupCount,
     clearCart,
@@ -328,15 +322,15 @@ export function CartCheckoutView() {
 
               {/* Payment method */}
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/40 flex items-center justify-center flex-shrink-0">
-                  <Wallet className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
+                  <Banknote className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs text-muted-foreground">
                     Mode de paiement
                   </p>
                   <p className="text-sm font-semibold text-foreground">
-                    {paymentLabel}
+                    Espèces - Paiement à la récupération en pharmacie
                   </p>
                 </div>
               </div>
