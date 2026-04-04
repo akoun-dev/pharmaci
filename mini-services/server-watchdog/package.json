@@ -1,0 +1,6 @@
+{
+  "name": "pharma-ci-watchdog",
+  "scripts": {
+    "dev": "bun --hot index.ts"
+  }
+}
