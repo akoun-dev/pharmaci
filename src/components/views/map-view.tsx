@@ -23,8 +23,8 @@ import { openGoogleMaps, haversineDistance, formatDistance } from '@/lib/navigat
 type MapFilter = 'all' | 'guard' | '24h';
 type SortMode = 'distance' | 'rating';
 
-const MAP_CENTER: [number, number] = [7.5, -5.5];
-const MAP_ZOOM = 7;
+const MAP_CENTER: [number, number] = [5.35, -4.00]; // Centré sur Abidjan
+const MAP_ZOOM = 12;
 const MAP_HEIGHT = 300;
 
 export function MapView() {
@@ -54,7 +54,8 @@ export function MapView() {
       if (f === '24h') url += '&is24h=true';
       const res = await fetch(url);
       const data = await res.json();
-      setPharmacies(Array.isArray(data) ? data : []);
+      // L'API retourne { items: [...], pagination: {...} }
+      setPharmacies(Array.isArray(data.items) ? data.items : []);
     } catch (error) {
       logger.error('Error fetching pharmacies:', error);
     } finally {
