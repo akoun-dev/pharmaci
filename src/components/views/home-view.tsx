@@ -13,12 +13,7 @@ import {
   LocateFixed,
   X,
   ArrowRight,
-  Syringe,
-  Bug,
-  Tablets,
-  Apple,
   Activity,
-  Flame,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -354,40 +349,6 @@ export function HomeView() {
               </div>
             </>
           )}
-        </motion.div>
-
-        {/* Catégories populaires */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.11 }}
-        >
-          <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-            <Pill className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
-            <h3 className="font-semibold text-sm text-foreground">Catégories populaires</h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { label: 'Antalgiques', icon: <Tablets className="h-3.5 w-3.5" />, color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100', query: 'Antalgiques' },
-              { label: 'Antibiotiques', icon: <Bug className="h-3.5 w-3.5" />, color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100', query: 'Antibiotiques' },
-              { label: 'Antipaludéens', icon: <Syringe className="h-3.5 w-3.5" />, color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100', query: 'Antipaludéens' },
-              { label: 'Vitamines', icon: <Apple className="h-3.5 w-3.5" />, color: 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100', query: 'Vitamines' },
-              { label: 'Antihypertenseurs', icon: <Activity className="h-3.5 w-3.5" />, color: 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100', query: 'Antihypertenseurs' },
-              { label: 'Anti-inflammatoires', icon: <Flame className="h-3.5 w-3.5" />, color: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100', query: 'Anti-inflammatoires' },
-            ].map((cat) => (
-              <button
-                key={cat.label}
-                onClick={() => {
-                  setSearchQuery(cat.query);
-                  setCurrentView('search');
-                }}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium border transition-all duration-200 active:scale-95 ${cat.color}`}
-              >
-                {cat.icon}
-                {cat.label}
-              </button>
-            ))}
-          </div>
         </motion.div>
 
         {/* Pharmacies proches — Nearest pharmacies */}
