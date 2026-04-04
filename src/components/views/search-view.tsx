@@ -363,9 +363,10 @@ export function SearchView() {
                 ) : (
                   <PharmacyCard
                     key={item.id}
-                    pharmacy={{ ...item, services: item.services || [] }}
+                    pharmacy={{ ...item, services: item.services || [], isFavorite: item.isFavorite || false }}
                     onClick={handlePharmacyClick}
                     distance={item.distance}
+                    onFavoriteChange={() => fetchResults()}
                   />
                 )
               )}

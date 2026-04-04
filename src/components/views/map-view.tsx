@@ -28,7 +28,7 @@ const MAP_ZOOM = 12;
 const MAP_HEIGHT = 300;
 
 export function MapView() {
-  const { selectPharmacy, setCurrentView } = useAppStore();
+  const { selectPharmacy, setCurrentView, currentUserId } = useAppStore();
   const { location, status, requestLocation } = useUserLocation();
   const [pharmacies, setPharmacies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +49,8 @@ export function MapView() {
   const fetchPharmacies = useCallback(async (f: MapFilter) => {
     setLoading(true);
     try {
-      let url = '/api/pharmacies?limit=50';
+      const uidParam = currentUserId ? `&userId=${currentUserId}` : '';
+      let url = `/api/pharmacies?limit=50${uidParam}`;
       if (f === 'guard') url += '&isGuard=true';
       if (f === '24h') url += '&is24h=true';
       const res = await fetch(url);
@@ -61,7 +62,7 @@ export function MapView() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [currentUserId]);
 
   useEffect(() => {
     fetchPharmacies('all');
@@ -423,10 +424,11 @@ export function MapView() {
                     {cityPharmacies.map((p: any) => (
                       <PharmacyCard
                         key={p.id}
-                        pharmacy={{ ...p, services: p.services || [] }}
+                        pharmacy={{ ...p, services: p.services || [], isFavorite: p.isFavorite || false }}
                         onClick={handlePharmacyClick}
                         compact
                         distance={p.distance}
+                        onFavoriteChange={() => fetchPharmacies(filter)}
                       />
                     ))}
                   </div>
