@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -163,7 +164,7 @@ export function OrderHistoryView() {
       const data = await res.json();
       setOrders(Array.isArray(data) ? data : []);
     } catch {
-      console.error('Error fetching orders');
+      logger.error('Error fetching orders');
     } finally {
       setLoading(false);
     }

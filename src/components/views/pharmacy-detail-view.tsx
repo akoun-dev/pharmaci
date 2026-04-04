@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -114,7 +115,7 @@ export function PharmacyDetailView() {
       setPharmacy(data);
       setIsFav(data.isFavorite || false);
     } catch (error) {
-      console.error('Error fetching pharmacy:', error);
+      logger.error('Error fetching pharmacy:', error);
       toast.error('Erreur lors du chargement');
     } finally {
       setLoading(false);

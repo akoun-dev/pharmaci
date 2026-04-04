@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
       }))
     );
   } catch (error) {
-    console.error('Error fetching favorites:', error);
+    logger.error('Error fetching favorites:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ isFavorite: true, favorite }, { status: 201 });
   } catch (error) {
-    console.error('Error toggling favorite:', error);
+    logger.error('Error toggling favorite:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

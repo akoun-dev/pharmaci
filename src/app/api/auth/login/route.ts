@@ -1,9 +1,29 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { signToken, verifyPassword, createSessionCookie } from '@/lib/auth';
+import { rateLimit, RateLimits } from '@/lib/rate-limit';
 
 // POST /api/auth/login
 export async function POST(request: Request) {
+  // Apply rate limiting for login attempts
+  const rateLimitResult = await rateLimit(RateLimits.auth)(request);
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: rateLimitResult.error, code: 'RATE_LIMIT_EXCEEDED' },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': rateLimitResult.resetAt.toISOString(),
+          'Retry-After': Math.ceil((rateLimitResult.resetAt.getTime() - Date.now()) / 1000).toString(),
+        },
+      }
+    );
+  }
+
   try {
     const body = await request.json();
     const { email, password, phone, authProvider } = body;
@@ -31,7 +51,7 @@ export async function POST(request: Request) {
       const token = await signToken({ userId: user.id, email: user.email, role: user.role, provider: user.authProvider });
       const cookie = createSessionCookie(token);
 
-      return NextResponse.json(
+      const response = NextResponse.json(
         {
           message: 'Connexion réussie',
           token,
@@ -39,6 +59,13 @@ export async function POST(request: Request) {
         },
         { headers: { 'Set-Cookie': cookie } }
       );
+
+      // Add rate limit headers
+      response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString());
+      response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
+      response.headers.set('X-RateLimit-Reset', rateLimitResult.resetAt.toISOString());
+
+      return response;
     }
 
     // --- Phone login ---
@@ -64,22 +91,15 @@ export async function POST(request: Request) {
         data: { otpCode, otpExpiresAt },
       });
 
-      const response: Record<string, string> = {
+      return NextResponse.json({
         message: 'OTP envoyé',
         userId: user.id,
-      };
-
-      // Only include demo code in non-production environments
-      if (process.env.NODE_ENV !== 'production') {
-        response._demoCode = otpCode;
-      }
-
-      return NextResponse.json(response);
+      });
     }
 
     return NextResponse.json({ error: 'Identifiants requis (email ou téléphone)' }, { status: 400 });
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error('Login error:', error);
     return NextResponse.json({ error: 'Erreur lors de la connexion' }, { status: 500 });
   }
 }

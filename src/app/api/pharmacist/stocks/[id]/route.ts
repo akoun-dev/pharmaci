@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -41,7 +42,7 @@ export async function GET(
 
     return NextResponse.json(stock);
   } catch (error) {
-    console.error('Error fetching pharmacist stock:', error);
+    logger.error('Error fetching pharmacist stock:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -158,7 +159,7 @@ export async function PUT(
 
     return NextResponse.json(updatedStock);
   } catch (error) {
-    console.error('Error updating pharmacist stock:', error);
+    logger.error('Error updating pharmacist stock:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -213,7 +214,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting pharmacist stock:', error);
+    logger.error('Error deleting pharmacist stock:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

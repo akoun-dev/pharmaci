@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -53,7 +54,7 @@ export async function GET(
 
     return NextResponse.json({ stocks: mapped });
   } catch (error) {
-    console.error('Erreur récupération stocks médicament:', error);
+    logger.error('Erreur récupération stocks médicament:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
 import ExcelJS from 'exceljs';
@@ -111,7 +112,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error generating template:', error);
+    logger.error('Error generating template:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

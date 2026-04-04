@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Pill, Building2, SlidersHorizontal, X, MapPin, LocateFixed } from 'lucide-react';
@@ -69,10 +70,11 @@ export function SearchView() {
       }
 
       const res = await fetch(url);
-      const data = await res.json();
+      const resData = await res.json();
+      const data = resData.items || resData;
       setResults(data);
     } catch (error) {
-      console.error('Error searching:', error);
+      logger.error('Error searching:', error);
     } finally {
       setLoading(false);
     }

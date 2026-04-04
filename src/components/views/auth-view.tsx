@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {

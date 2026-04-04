@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -40,7 +41,7 @@ export function FavoritesView() {
       const data = await res.json();
       setFavorites(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching favorites:', error);
+      logger.error('Error fetching favorites:', error);
     } finally {
       setLoading(false);
     }

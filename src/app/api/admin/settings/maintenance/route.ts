@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
 import { promises as fs } from 'fs';
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
     const status = await readMaintenance();
     return NextResponse.json(status);
   } catch (error) {
-    console.error('Error fetching maintenance status:', error);
+    logger.error('Error fetching maintenance status:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -73,7 +74,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true, ...data });
   } catch (error) {
-    console.error('Error updating maintenance status:', error);
+    logger.error('Error updating maintenance status:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

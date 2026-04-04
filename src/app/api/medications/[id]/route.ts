@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -56,7 +57,7 @@ export async function GET(
       })),
     });
   } catch (error) {
-    console.error('Error fetching medication:', error);
+    logger.error('Error fetching medication:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

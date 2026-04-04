@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { type ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useAppStore } from '@/store/app-store';

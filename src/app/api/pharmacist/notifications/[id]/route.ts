@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -51,7 +52,7 @@ export async function PUT(
       read: updated.read,
     });
   } catch (error) {
-    console.error('Error marking notification as read:', error);
+    logger.error('Error marking notification as read:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

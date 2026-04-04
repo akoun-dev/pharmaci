@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -64,7 +65,7 @@ export async function DELETE(
       pharmacyReviewCount: pharmacyReviews.length,
     });
   } catch (error) {
-    console.error('Erreur suppression avis admin:', error);
+    logger.error('Erreur suppression avis admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

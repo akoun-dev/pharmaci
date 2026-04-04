@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
       updatedAt: pharmacy.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error('Error fetching pharmacist profile:', error);
+    logger.error('Error fetching pharmacist profile:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -157,7 +158,7 @@ export async function PUT(request: NextRequest) {
       updatedAt: updated.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error('Error updating pharmacist profile:', error);
+    logger.error('Error updating pharmacist profile:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -262,7 +263,7 @@ export async function POST(request: NextRequest) {
       ...result,
     });
   } catch (error) {
-    console.error('Error importing stocks:', error);
+    logger.error('Error importing stocks:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

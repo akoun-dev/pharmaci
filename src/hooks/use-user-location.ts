@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useState, useCallback } from 'react';
 
 const DEFAULT_LAT = 5.36;

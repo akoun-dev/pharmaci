@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -50,8 +51,10 @@ export function HomeView() {
         fetch(`/api/medications?q=${encodeURIComponent(query)}&limit=4`),
         fetch(`/api/pharmacies?q=${encodeURIComponent(query)}&limit=3${currentUserId ? `&userId=${currentUserId}` : ''}`),
       ]);
-      const medsData = await medsRes.json();
-      const pharmaData = await pharmaRes.json();
+      const medsResData = await medsRes.json();
+      const pharmaResData = await pharmaRes.json();
+      const medsData = medsResData.items || medsResData;
+      const pharmaData = pharmaResData.items || pharmaResData;
       setSearchResults({ medications: medsData, pharmacies: pharmaData });
     } catch {
       setSearchResults({ medications: [], pharmacies: [] });
@@ -92,9 +95,12 @@ export function HomeView() {
           fetch(`/api/pharmacies?limit=50${uidParam}`),
           fetch('/api/medications?count=true'),
         ]);
-        const guardData = await guardRes.json();
-        const allData = await allPharmaciesRes.json();
+        const guardResData = await guardRes.json();
+        const allPharmaciesResData = await allPharmaciesRes.json();
         const medsCountData = await medsCountRes.json();
+
+        const guardData = guardResData.items || guardResData;
+        const allData = allPharmaciesResData.items || allPharmaciesResData;
 
         setGuardPharmacies(guardData);
         setAllPharmacies(allData);
@@ -105,7 +111,7 @@ export function HomeView() {
           cities: cities.size,
         });
       } catch (error) {
-        console.error('Error fetching home data:', error);
+        logger.error('Error fetching home data:', error);
       } finally {
         setLoading(false);
       }

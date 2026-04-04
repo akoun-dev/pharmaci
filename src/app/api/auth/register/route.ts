@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { signToken, hashPassword, createSessionCookie } from '@/lib/auth';
@@ -184,22 +185,15 @@ export async function POST(request: Request) {
         },
       });
 
-      const response: Record<string, unknown> = {
+      return NextResponse.json({
         message: 'Code de vérification envoyé par SMS',
         user: { id: user.id, name: user.name, phone: user.phone, role: user.role, authProvider: user.authProvider },
-      };
-
-      // Only include demo code in non-production environments
-      if (process.env.NODE_ENV !== 'production') {
-        response._demoCode = otpCode;
-      }
-
-      return NextResponse.json(response);
+      });
     }
 
     return NextResponse.json({ error: "Méthode d'authentification non supportée" }, { status: 400 });
   } catch (error) {
-    console.error('Register error:', error);
+    logger.error('Register error:', error);
     return NextResponse.json({ error: "Erreur lors de l'inscription" }, { status: 500 });
   }
 }

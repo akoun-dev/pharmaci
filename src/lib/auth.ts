@@ -2,13 +2,18 @@
  * JWT Authentication utility for Pharma CI.
  * Uses jose (Edge-compatible) with HS256 for session management.
  */
+import { logger } from '@/lib/logger';
 import { SignJWT, jwtVerify } from 'jose';
 import { hash, compare } from 'bcryptjs';
 import { cookies } from 'next/headers';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'pharmapp-ci-dev-secret-key-2025'
-);
+function getJwtSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is required but not set');
+  }
+  return new TextEncoder().encode(secret);
+}
 
 const COOKIE_NAME = 'pharmapp-session';
 
@@ -25,13 +30,13 @@ export async function signToken(payload: JwtPayload): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 }
 
 /** Verify a JWT token and return payload, or null if invalid */
 export async function verifyToken(token: string): Promise<JwtPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     return {
       userId: payload.userId as string,
       email: payload.email as string,

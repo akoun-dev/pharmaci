@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -151,14 +152,14 @@ export function CartCheckoutView() {
               }
             } else {
               const errData = await res.json().catch(() => null);
-              console.error(
+              logger.error(
                 'Order creation failed for pharmacy:',
                 pharmacyItems[0].pharmacyName,
                 errData?.error
               );
             }
           } catch {
-            console.error(
+            logger.error(
               'Network error for pharmacy:',
               pharmacyItems[0].pharmacyName
             );
@@ -185,7 +186,7 @@ export function CartCheckoutView() {
         setCurrentView('order-history');
       }
     } catch (error) {
-      console.error('Order submission error:', error);
+      logger.error('Order submission error:', error);
       toast.error(
         error instanceof Error
           ? error.message

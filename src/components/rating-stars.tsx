@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { Star } from 'lucide-react';
 
 interface RatingStarsProps {

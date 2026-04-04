@@ -34,6 +34,12 @@ model User {
   notifications Notification[]
   sentMessages  Message[] @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+  @@index([city])
+  @@index([linkedPharmacyId])
 }
 
 model Pharmacy {
@@ -67,6 +73,11 @@ model Pharmacy {
   favorites   Favorite[]
   stockHistory StockHistory[]
   promotions  Promotion[]
+
+  @@index([city, district])
+  @@index([isGuard])
+  @@index([isOpen24h])
+  @@index([rating])
 }
 
 model Medication {
@@ -151,6 +162,11 @@ model Order {
   user       User       @relation(fields: [userId], references: [id])
   pharmacy   Pharmacy   @relation(fields: [pharmacyId], references: [id])
   medication Medication @relation(fields: [medicationId], references: [id])
+
+  @@index([userId])
+  @@index([pharmacyId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Review {
@@ -201,6 +217,9 @@ model Notification {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, read])
+  @@index([createdAt])
 }
 
 model Message {
@@ -231,4 +250,7 @@ model Promotion {
 
   pharmacy   Pharmacy   @relation(fields: [pharmacyId], references: [id])
   medication Medication? @relation(fields: [medicationId], references: [id])
+
+  @@index([pharmacyId, isActive])
+  @@index([startDate, endDate])
 }

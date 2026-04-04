@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(reviews);
   } catch (error) {
-    console.error('Error fetching reviews:', error);
+    logger.error('Error fetching reviews:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(review, { status: 201 });
   } catch (error) {
-    console.error('Error creating review:', error);
+    logger.error('Error creating review:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

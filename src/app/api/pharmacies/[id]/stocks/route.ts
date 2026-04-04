@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -47,7 +48,7 @@ export async function PUT(
 
     return NextResponse.json(stock);
   } catch (error) {
-    console.error('Error updating stock:', error);
+    logger.error('Error updating stock:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

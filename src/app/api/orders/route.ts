@@ -1,4 +1,6 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
+import { paginationSchema } from '@/lib/validations';
 import { NextRequest, NextResponse } from 'next/server';
 
 function generateVerificationCode(): string {
@@ -26,6 +28,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
     }
 
+    // Validate quantity
+    const orderQuantity = Math.max(1, Math.min(100, parseInt(quantity) || 1)); // Between 1 and 100
+
     // Verify stock exists and is available
     const stock = await db.pharmacyMedication.findUnique({
       where: {
@@ -37,22 +42,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Médicament non disponible dans cette pharmacie' }, { status: 400 });
     }
 
-    if (stock.quantity < (quantity || 1)) {
+    if (stock.quantity < orderQuantity) {
       return NextResponse.json({ error: 'Stock insuffisant' }, { status: 400 });
     }
 
-    const orderQuantity = quantity || 1;
     const totalPrice = stock.price * orderQuantity;
 
     // Generate unique verification code
     let verificationCode = generateVerificationCode();
     let codeExists = true;
-    while (codeExists) {
+    let attempts = 0;
+    while (codeExists && attempts < 10) {
       const existing = await db.order.findUnique({ where: { verificationCode } });
       if (!existing) {
         codeExists = false;
       } else {
         verificationCode = generateVerificationCode();
+        attempts++;
       }
     }
 
@@ -63,7 +69,7 @@ export async function POST(request: NextRequest) {
         medicationId,
         quantity: orderQuantity,
         totalPrice,
-        note: note || null,
+        note: note?.trim() || null,
         paymentMethod: paymentMethod || null,
         pickupTime: pickupTime || null,
         status: 'pending',
@@ -92,10 +98,12 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    logger.info('Order created', { orderId: order.id, userId, pharmacyId });
+
     return NextResponse.json(order, { status: 201 });
   } catch (error) {
-    console.error('Error creating order:', error);
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    logger.error('Error creating order:', error);
+    return NextResponse.json({ error: 'Erreur lors de la création de la commande' }, { status: 500 });
   }
 }
 
@@ -109,23 +117,54 @@ export async function GET(request: NextRequest) {
     }
     const userId = session.userId;
 
-    const orders = await db.order.findMany({
-      where: { userId },
-      include: {
-        pharmacy: {
-          select: {
-            name: true, address: true, city: true, phone: true,
-            latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
-          },
-        },
-        medication: { select: { name: true, commercialName: true, form: true, needsPrescription: true } },
-      },
-      orderBy: { createdAt: 'desc' },
+    const { searchParams } = new URL(request.url);
+
+    // Validate pagination parameters
+    const pagination = paginationSchema.safeParse({
+      page: searchParams.get('page') || undefined,
+      limit: searchParams.get('limit') || undefined,
     });
 
-    return NextResponse.json(orders);
+    const { page = 1, limit = 20 } = pagination.success ? pagination.data : { page: 1, limit: 20 };
+
+    // Optional status filter
+    const status = searchParams.get('status');
+
+    const where: Record<string, unknown> = { userId };
+    if (status) {
+      where.status = status;
+    }
+
+    const [orders, total] = await Promise.all([
+      db.order.findMany({
+        where,
+        take: limit,
+        skip: (page - 1) * limit,
+        include: {
+          pharmacy: {
+            select: {
+              name: true, address: true, city: true, phone: true,
+              latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
+            },
+          },
+          medication: { select: { name: true, commercialName: true, form: true, needsPrescription: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      db.order.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      items: orders,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
-    console.error('Error fetching orders:', error);
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    logger.error('Error fetching orders:', error);
+    return NextResponse.json({ error: 'Erreur lors de la récupération des commandes' }, { status: 500 });
   }
 }

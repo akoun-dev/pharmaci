@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -43,7 +44,7 @@ export function PharmacyDashboardView() {
         setSelectedPharmacyId(data[0].id);
       }
     } catch (error) {
-      console.error('Error fetching pharmacies:', error);
+      logger.error('Error fetching pharmacies:', error);
     }
   }, []);
 
@@ -55,7 +56,7 @@ export function PharmacyDashboardView() {
       const data = await res.json();
       setStocks(data);
     } catch (error) {
-      console.error('Error fetching stocks:', error);
+      logger.error('Error fetching stocks:', error);
     } finally {
       setLoading(false);
     }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ stocks, total, limit, offset });
   } catch (error) {
-    console.error('Error fetching pharmacist stocks:', error);
+    logger.error('Error fetching pharmacist stocks:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -159,7 +160,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(stock, { status: 201 });
   } catch (error) {
-    console.error('Error creating pharmacist stock:', error);
+    logger.error('Error creating pharmacist stock:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

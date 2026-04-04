@@ -6,20 +6,41 @@ Pharmaci est une application web moderne qui permet aux patients de trouver des 
 
 ## Table des matières
 
-- [Fonctionnalités](#fonctionnalités)
-- [Architecture](#architecture)
-- [Technologies](#technologies)
-- [Prérequis](#prérequis)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Base de données](#base-de-données)
-- [Structure du projet](#structure-du-projet)
-- [API Routes](#api-routes)
-- [Comptes de démonstration](#comptes-de-démonstration)
-- [Développement](#développement)
-- [Déploiement](#déploiement)
-- [Contribuer](#contribuer)
-- [Licence](#licence)
+- [Pharmaci](#pharmaci)
+  - [Table des matières](#table-des-matières)
+  - [Fonctionnalités](#fonctionnalités)
+    - [Pour les Patients](#pour-les-patients)
+    - [Pour les Pharmaciens](#pour-les-pharmaciens)
+    - [Pour les Administrateurs](#pour-les-administrateurs)
+  - [Architecture](#architecture)
+  - [Technologies](#technologies)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [DevOps](#devops)
+  - [Prérequis](#prérequis)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [Base de données](#base-de-données)
+    - [Schéma de la base de données](#schéma-de-la-base-de-données)
+  - [Structure du projet](#structure-du-projet)
+  - [API Routes](#api-routes)
+    - [Authentification](#authentification)
+    - [Médicaments](#médicaments)
+    - [Pharmacies](#pharmacies)
+    - [Commandes](#commandes)
+    - [Pharmaciens](#pharmaciens)
+    - [Admin](#admin)
+  - [Comptes de démonstration](#comptes-de-démonstration)
+  - [Développement](#développement)
+    - [Scripts utiles](#scripts-utiles)
+  - [Déploiement](#déploiement)
+    - [Build de production](#build-de-production)
+    - [Avec Docker](#avec-docker)
+    - [Avec Caddy (Reverse Proxy)](#avec-caddy-reverse-proxy)
+  - [Contribuer](#contribuer)
+    - [Convention de commits](#convention-de-commits)
+  - [Licence](#licence)
+  - [Contact](#contact)
 
 ## Fonctionnalités
 
@@ -419,7 +440,7 @@ Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de
 ## Contact
 
 - **Projet:** [Pharmaci](https://github.com/votre-username/pharmaci)
-- **Email:** contact@pharmapp.ci
+- **Email:** contact@pharmaci.ci
 
 ---
 

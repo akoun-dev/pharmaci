@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
       pharmacy: updated.pharmacy,
     });
   } catch (error) {
-    console.error('Error verifying order:', error);
+    logger.error('Error verifying order:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

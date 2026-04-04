@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import {
   Navigation,
@@ -55,7 +56,7 @@ export function MapView() {
       const data = await res.json();
       setPharmacies(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching pharmacies:', error);
+      logger.error('Error fetching pharmacies:', error);
     } finally {
       setLoading(false);
     }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -62,7 +63,7 @@ export async function GET(
 
     return NextResponse.json({ history, total, limit, offset });
   } catch (error) {
-    console.error('Error fetching stock history:', error);
+    logger.error('Error fetching stock history:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

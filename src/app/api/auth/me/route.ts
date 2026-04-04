@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ user });
   } catch (error) {
-    console.error('Session error:', error);
+    logger.error('Session error:', error);
     return NextResponse.json({ error: 'Erreur de session' }, { status: 500 });
   }
 }

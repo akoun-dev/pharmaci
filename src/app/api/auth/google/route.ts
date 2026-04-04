@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 
 // GET /api/auth/google — Google OAuth placeholder

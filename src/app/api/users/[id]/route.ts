@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -51,7 +52,7 @@ export async function GET(
 
     return NextResponse.json(publicUser);
   } catch (error) {
-    console.error('Error fetching user:', error);
+    logger.error('Error fetching user:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

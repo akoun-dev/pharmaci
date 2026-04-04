@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -150,7 +151,7 @@ export async function GET(
       })),
     });
   } catch (error) {
-    console.error('Erreur détail médicament admin:', error);
+    logger.error('Erreur détail médicament admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -216,7 +217,7 @@ export async function PATCH(
       updatedAt: updated.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error('Erreur mise à jour médicament admin:', error);
+    logger.error('Erreur mise à jour médicament admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -286,7 +287,7 @@ export async function DELETE(
       deletedId: id,
     });
   } catch (error) {
-    console.error('Erreur suppression médicament admin:', error);
+    logger.error('Erreur suppression médicament admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

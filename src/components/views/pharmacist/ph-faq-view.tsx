@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/store/app-store';

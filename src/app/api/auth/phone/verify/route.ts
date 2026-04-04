@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { signToken, createSessionCookie } from '@/lib/auth';
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
       { headers: { 'Set-Cookie': cookie } }
     );
   } catch (error) {
-    console.error('Phone verify error:', error);
+    logger.error('Phone verify error:', error);
     return NextResponse.json({ error: 'Erreur lors de la vérification' }, { status: 500 });
   }
 }

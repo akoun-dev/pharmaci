@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie, verifyPassword, hashPassword } from '@/lib/auth';
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: 'Mot de passe modifié avec succès' });
   } catch (error) {
-    console.error('Erreur changement mot de passe admin:', error);
+    logger.error('Erreur changement mot de passe admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

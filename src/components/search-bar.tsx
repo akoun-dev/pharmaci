@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useRef, useEffect } from 'react';

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -89,7 +90,7 @@ export async function GET(
       medication: order.medication,
     });
   } catch (error) {
-    console.error('Erreur détail commande admin:', error);
+    logger.error('Erreur détail commande admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -186,7 +187,7 @@ export async function PATCH(
       medication: updatedOrder.medication,
     });
   } catch (error) {
-    console.error('Erreur mise à jour commande admin:', error);
+    logger.error('Erreur mise à jour commande admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

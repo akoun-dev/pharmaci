@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/lib/logger';
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -124,7 +125,7 @@ export function ProfileView() {
         setEditAddress(data.address || '');
       }
     } catch (error) {
-      console.error('Error fetching user:', error);
+      logger.error('Error fetching user:', error);
     } finally {
       setLoading(false);
     }

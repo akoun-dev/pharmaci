@@ -2,14 +2,20 @@
  * Next.js Middleware for Pharma CI API route protection.
  * Uses jose (Edge-compatible) to verify JWT tokens stored in cookies.
  */
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
 const COOKIE_NAME = 'pharmapp-session';
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'pharmapp-ci-dev-secret-key-2025'
-);
+
+function getJwtSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is required but not set');
+  }
+  return new TextEncoder().encode(secret);
+}
 
 function getToken(request: NextRequest): string | null {
   return request.cookies.get(COOKIE_NAME)?.value ?? null;
@@ -48,7 +54,7 @@ export async function middleware(request: NextRequest) {
 
   let payload: Record<string, unknown>;
   try {
-    const result = await jwtVerify(token, JWT_SECRET);
+    const result = await jwtVerify(token, getJwtSecret());
     payload = result.payload as Record<string, unknown>;
   } catch {
     return unauthorized('Session invalide ou expirée.');

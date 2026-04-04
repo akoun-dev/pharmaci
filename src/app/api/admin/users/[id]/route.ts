@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -137,7 +138,7 @@ export async function GET(
       })),
     });
   } catch (error) {
-    console.error('Erreur détail utilisateur admin:', error);
+    logger.error('Erreur détail utilisateur admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -231,7 +232,7 @@ export async function PATCH(
       updatedAt: updatedUser.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error('Erreur mise à jour utilisateur admin:', error);
+    logger.error('Erreur mise à jour utilisateur admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -308,7 +309,7 @@ export async function DELETE(
       deletedId: id,
     });
   } catch (error) {
-    console.error('Erreur suppression utilisateur admin:', error);
+    logger.error('Erreur suppression utilisateur admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

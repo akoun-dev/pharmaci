@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -51,7 +52,7 @@ export async function POST(
       replyAt: updatedReview.replyAt?.toISOString(),
     });
   } catch (error) {
-    console.error('Erreur réponse admin:', error);
+    logger.error('Erreur réponse admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

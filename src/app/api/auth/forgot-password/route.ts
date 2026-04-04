@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       _demoEmail: user.email,
     });
   } catch (error) {
-    console.error('Error in forgot password:', error);
+    logger.error('Error in forgot password:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

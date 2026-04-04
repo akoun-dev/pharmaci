@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = globalThis as unknown as {

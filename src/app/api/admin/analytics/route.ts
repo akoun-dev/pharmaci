@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -200,7 +201,7 @@ export async function GET(request: NextRequest) {
       orderStatusDistribution: statusMap,
     });
   } catch (error) {
-    console.error('Erreur analytics admin:', error);
+    logger.error('Erreur analytics admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
@@ -99,7 +100,7 @@ export async function GET(request: NextRequest) {
       ratingDistribution: ratingMap,
     });
   } catch (error) {
-    console.error('Erreur liste avis admin:', error);
+    logger.error('Erreur liste avis admin:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

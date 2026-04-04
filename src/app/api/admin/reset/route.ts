@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error resetting data:', error);
+    logger.error('Error resetting data:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

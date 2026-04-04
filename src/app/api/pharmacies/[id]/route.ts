@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -49,7 +50,7 @@ export async function GET(
       isFavorite,
     });
   } catch (error) {
-    console.error('Error fetching pharmacy:', error);
+    logger.error('Error fetching pharmacy:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
