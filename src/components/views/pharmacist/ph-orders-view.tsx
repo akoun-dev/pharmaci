@@ -11,9 +11,7 @@ import {
   RefreshCw,
   AlertCircle,
   Inbox,
-  CreditCard,
   ChevronRight,
-  Truck,
   Search,
   Calendar,
   X,
@@ -41,17 +39,14 @@ import {
 } from '@/components/ui/dialog';
 import { ViewHeader } from '@/components/view-header';
 import { useAppStore } from '@/store/app-store';
-import { PAYMENT_LABELS } from '@/lib/navigation';
 import { toast } from 'sonner';
 
 interface OrderData {
   id: string;
   status: string;
-  deliveryStatus: string;
   quantity: number;
   totalPrice: number;
   note?: string | null;
-  paymentMethod?: string | null;
   pickupTime?: string | null;
   verificationCode?: string | null;
   verifiedAt?: string | null;
@@ -90,29 +85,6 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   cancelled: {
     label: 'Annulée',
     className: 'bg-red-100 text-red-700 border-red-200',
-  },
-};
-
-const DELIVERY_STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  pickup: {
-    label: 'Retrait',
-    className: 'bg-gray-100 text-gray-600 border-gray-200',
-  },
-  preparing: {
-    label: 'En préparation',
-    className: 'bg-blue-100 text-blue-700 border-blue-200',
-  },
-  ready: {
-    label: 'Prêt',
-    className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  },
-  delivering: {
-    label: 'En livraison',
-    className: 'bg-amber-100 text-amber-700 border-amber-200',
-  },
-  delivered: {
-    label: 'Livré',
-    className: 'bg-green-100 text-green-700 border-green-200',
   },
 };
 
@@ -315,7 +287,7 @@ export function PharmacistOrdersView() {
       if (data.alreadyVerified) {
         toast.info('Cette commande a déjà été vérifiée');
       } else {
-        toast.success('Commande vérifiée avec succès ! 🎉');
+        toast.success('Commande vérifiée avec succès !');
       }
 
       // Redirect to the verified order detail page
@@ -533,7 +505,6 @@ export function PharmacistOrdersView() {
           <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }} className="space-y-3">
             {typeFiltered.map((order, index) => {
               const statusInfo = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
-              const deliveryInfo = DELIVERY_STATUS_CONFIG[order.deliveryStatus] || DELIVERY_STATUS_CONFIG.pickup;
               const isReservation = !!order.pickupTime;
               const isVerified = !!order.verifiedAt;
               return (
@@ -608,11 +579,6 @@ export function PharmacistOrdersView() {
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1"><Package className="h-3 w-3" />{order.quantity}</span>
                         <span className="font-semibold text-foreground text-sm">{formatPrice(order.totalPrice)}</span>
-                        {order.paymentMethod && (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-gray-200 text-muted-foreground">
-                            <CreditCard className="h-2.5 w-2.5 mr-0.5" />{PAYMENT_LABELS[order.paymentMethod] || order.paymentMethod}
-                          </Badge>
-                        )}
                       </div>
 
                       {/* Pickup time */}
@@ -621,14 +587,6 @@ export function PharmacistOrdersView() {
                           <Clock className="h-3 w-3" />
                           <span>Récupération prévue : {order.pickupTime}</span>
                         </div>
-                      )}
-
-                      {/* Delivery status badge */}
-                      {order.deliveryStatus !== 'pickup' && (
-                        <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${deliveryInfo.className}`}>
-                          {order.deliveryStatus === 'delivering' && <Truck className="h-2.5 w-2.5 mr-0.5" />}
-                          {deliveryInfo.label}
-                        </Badge>
                       )}
 
                       {/* Footer */}

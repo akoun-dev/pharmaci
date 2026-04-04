@@ -9,7 +9,6 @@ import {
   Pill,
   Package,
   Clock,
-  CreditCard,
   User,
   Calendar,
   MessageSquare,
@@ -17,10 +16,6 @@ import {
   Circle,
   XCircle,
   Loader2,
-  Truck,
-  CheckCircle,
-  QrCode,
-  ScanLine,
   ShieldCheck,
   Keyboard,
   Camera,
@@ -34,13 +29,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -49,17 +37,14 @@ import {
 } from '@/components/ui/dialog';
 import { ViewHeader } from '@/components/view-header';
 import { useAppStore } from '@/store/app-store';
-import { PAYMENT_LABELS } from '@/lib/navigation';
 import { toast } from 'sonner';
 
 interface OrderData {
   id: string;
   status: string;
-  deliveryStatus: string;
   quantity: number;
   totalPrice: number;
   note?: string | null;
-  paymentMethod?: string | null;
   pickupTime?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -111,22 +96,6 @@ const TIMELINE_STEPS = [
   { status: 'confirmed', label: 'Confirmée' },
   { status: 'ready', label: 'Prêtée' },
   { status: 'picked_up', label: 'Récupérée' },
-];
-
-const DELIVERY_STATUS_CONFIG: Record<string, { label: string; className: string; icon: string }> = {
-  pickup: { label: 'Retrait', className: 'bg-gray-100 text-gray-600 border-gray-200', icon: 'Package' },
-  preparing: { label: 'En préparation', className: 'bg-blue-100 text-blue-700 border-blue-200', icon: 'Loader2' },
-  ready: { label: 'Prêt', className: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: 'CheckCircle2' },
-  delivering: { label: 'En livraison', className: 'bg-amber-100 text-amber-700 border-amber-200', icon: 'Truck' },
-  delivered: { label: 'Livré', className: 'bg-green-100 text-green-700 border-green-200', icon: 'CheckCircle' },
-};
-
-const DELIVERY_STATUS_OPTIONS = [
-  { value: 'pickup', label: 'Retrait' },
-  { value: 'preparing', label: 'En préparation' },
-  { value: 'ready', label: 'Prêt' },
-  { value: 'delivering', label: 'En livraison' },
-  { value: 'delivered', label: 'Livré' },
 ];
 
 const STATUS_FLOW_ORDER = ['pending', 'confirmed', 'ready', 'picked_up'];
@@ -235,26 +204,6 @@ export function PharmacistOrderDetailView() {
       toast.success(`Commande ${label.toLowerCase()} avec succès`);
     } catch {
       toast.error("Impossible de mettre à jour la commande");
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const updateDeliveryStatus = async (newDeliveryStatus: string) => {
-    if (!selectedOrderId || updating) return;
-    try {
-      setUpdating(true);
-      const res = await fetch(`/api/pharmacist/orders/${selectedOrderId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ deliveryStatus: newDeliveryStatus }),
-      });
-      if (!res.ok) throw new Error('Erreur serveur');
-      const updated = await res.json();
-      setOrder(updated);
-      toast.success('Statut de livraison mis à jour');
-    } catch {
-      toast.error("Impossible de mettre à jour le statut de livraison");
     } finally {
       setUpdating(false);
     }
@@ -573,15 +522,6 @@ export function PharmacistOrderDetailView() {
 
             <Separator className="bg-emerald-100/80" />
 
-            {order.paymentMethod && (
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground flex items-center gap-1.5"><CreditCard className="h-3.5 w-3.5" />Paiement</span>
-                <Badge variant="outline" className="text-xs px-2 py-0.5 border-gray-200">
-                  {PAYMENT_LABELS[order.paymentMethod] || order.paymentMethod}
-                </Badge>
-              </div>
-            )}
-
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />Passée le</span>
               <span className="text-xs">{formatDate(order.createdAt)}</span>
@@ -597,59 +537,6 @@ export function PharmacistOrderDetailView() {
                   <p className="text-sm text-amber-800">{order.note}</p>
                 </div>
               </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* ── Delivery Status Card ── */}
-        <Card className="border-emerald-100">
-          <CardContent className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Statut de livraison</h3>
-              <Badge variant="outline" className={`text-[11px] px-2 py-0.5 ${DELIVERY_STATUS_CONFIG[order.deliveryStatus]?.className || DELIVERY_STATUS_CONFIG.pickup.className}`}>
-                {DELIVERY_STATUS_CONFIG[order.deliveryStatus]?.label || 'Retrait'}
-              </Badge>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                order.deliveryStatus === 'pickup' ? 'bg-gray-100' :
-                order.deliveryStatus === 'preparing' ? 'bg-blue-100' :
-                order.deliveryStatus === 'ready' ? 'bg-emerald-100' :
-                order.deliveryStatus === 'delivering' ? 'bg-amber-100' : 'bg-green-100'
-              }`}>
-                {order.deliveryStatus === 'pickup' && <Package className="h-5 w-5 text-gray-600" />}
-                {order.deliveryStatus === 'preparing' && <Loader2 className="h-5 w-5 text-blue-600" />}
-                {order.deliveryStatus === 'ready' && <CheckCircle2 className="h-5 w-5 text-emerald-600" />}
-                {order.deliveryStatus === 'delivering' && <Truck className="h-5 w-5 text-amber-600" />}
-                {order.deliveryStatus === 'delivered' && <CheckCircle className="h-5 w-5 text-green-600" />}
-              </div>
-              <div className="flex-1">
-                <p className="font-medium text-sm">{DELIVERY_STATUS_CONFIG[order.deliveryStatus]?.label || 'Retrait'}</p>
-                <p className="text-xs text-muted-foreground">
-                  {order.deliveryStatus === 'pickup' && 'Le patient viendra récupérer en pharmacie'}
-                  {order.deliveryStatus === 'preparing' && 'La commande est en cours de préparation'}
-                  {order.deliveryStatus === 'ready' && 'Prête à être récupérée ou livrée'}
-                  {order.deliveryStatus === 'delivering' && 'Le livreur est en route'}
-                  {order.deliveryStatus === 'delivered' && 'Commande livrée avec succès'}
-                </p>
-              </div>
-            </div>
-
-            {(order.status === 'confirmed' || order.status === 'ready') && (
-              <div className="space-y-2">
-                <Separator className="bg-emerald-100/80" />
-                <Select value={order.deliveryStatus} onValueChange={updateDeliveryStatus} disabled={updating}>
-                  <SelectTrigger className="h-10 border-emerald-200 text-sm">
-                    <SelectValue placeholder="Changer le statut de livraison" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DELIVERY_STATUS_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             )}
           </CardContent>
         </Card>
