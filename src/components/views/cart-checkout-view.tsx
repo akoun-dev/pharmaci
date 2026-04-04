@@ -97,7 +97,8 @@ export function CartCheckoutView() {
       let firstOrderId: string | null = null;
       let pharmacyCount = 1;
 
-      // Use batch API - creates one order per medication, grouped by pharmacy
+      // Use batch API - creates ONE order per pharmacy with ALL items from that pharmacy
+      // Each order has a SINGLE verification code for all its medications
       const batchRes = await fetch('/api/orders/batch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

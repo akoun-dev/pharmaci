@@ -5,7 +5,8 @@
 import { type Order } from './types';
 
 /**
- * Order group interface - represents multiple orders from the same pharmacy
+ * Order group interface - represents ONE order (or multiple orders) from the same pharmacy
+ * When all medications are ordered from the same pharmacy, there is ONE order with ONE verification code
  */
 export interface OrderGroup {
   pharmacyId: string;
@@ -22,6 +23,8 @@ export interface OrderGroup {
   totalPrice: number;
   status: Order['status'];
   createdAt: Date;
+  // For same-pharmacy orders placed together, this will contain a single code
+  // For separate orders, it contains all codes
   verificationCodes: string[];
 }
 
@@ -148,10 +151,22 @@ export function areSameDayOrders(orders: Order[]): boolean {
  * Get a summary string for an order group
  */
 export function getOrderGroupSummary(group: OrderGroup): string {
-  const medicationCount = group.orders.length;
+  const orderCount = group.orders.length;
+  
+  // If there's only ONE order (all medications from same pharmacy ordered together)
+  if (orderCount === 1) {
+    const medicationCount = group.orders[0].items?.length || 1;
+    const medicationText = medicationCount === 1
+      ? '1 médicament'
+      : `${medicationCount} médicaments`;
+    return `${medicationText} commandés à ${group.pharmacy.name} - Total ${group.totalPrice.toLocaleString()} FCFA`;
+  }
+  
+  // Multiple orders (different pharmacies or separate orders)
+  const medicationCount = group.totalItems;
   const medicationText = medicationCount === 1
     ? '1 médicament'
     : `${medicationCount} médicaments`;
 
-  return `${medicationText} commandés à ${group.pharmacy.name} - Total ${group.totalPrice.toLocaleString()} FCFA`;
+  return `${medicationText} en ${orderCount} commande(s) à ${group.pharmacy.name} - Total ${group.totalPrice.toLocaleString()} FCFA`;
 }

@@ -1,7 +1,7 @@
 # Audit de Sécurité & Qualité du Code - Pharmaci
 
 > **Date:** 2026-04-04
-> **Statut:** 🔴 Action requise
+> **Statut:** 🟢 Améliorations apportées
 
 ---
 
@@ -13,7 +13,87 @@ Cet audit a identifié **3 vulnérabilités critiques**, **10 problèmes de haut
 
 ---
 
-## 🔴 Vulnérabilités CRITIQUES
+## ✅ AMÉLIORATIONS APPORTÉES - Gestion des Commandes Multi-Médicaments
+
+### Fonctionnalité : Une seule commande par pharmacie avec un seul code de vérification
+
+**Problème résolu :** Lorsque plusieurs médicaments sont commandés dans la même pharmacie, le système crée maintenant **UNE SEULE COMMANDE** avec **UN SEUL CODE DE VÉRIFICATION** pour tous les médicaments.
+
+**Avantages :**
+- ✅ Un seul code à présenter à la pharmacie pour retirer TOUS les médicaments
+- ✅ Simplification du processus de retrait pour le patient
+- ✅ Réduction de la confusion lors de la récupération des médicaments
+- ✅ Meilleure expérience utilisateur
+
+**Fichiers modifiés :**
+
+1. **`src/app/api/orders/batch/route.ts`** - Déjà existant et fonctionnel
+   - Crée UNE commande par pharmacie (regroupant tous les médicaments de cette pharmacie)
+   - Génère UN SEUL code de vérification par commande
+   - Chaque commande contient plusieurs `OrderItem` (un par médicament)
+
+2. **`src/components/views/cart-checkout-view.tsx`** - Commentaire clarifié
+   ```typescript
+   // Use batch API - creates ONE order per pharmacy with ALL items from that pharmacy
+   // Each order has a SINGLE verification code for all its medications
+   ```
+
+3. **`src/lib/order-utils.ts`** - Documentation améliorée
+   ```typescript
+   /**
+    * Order group interface - represents ONE order (or multiple orders) from the same pharmacy
+    * When all medications are ordered from the same pharmacy, there is ONE order with ONE verification code
+    */
+   ```
+
+**Exemple d'utilisation :**
+
+```
+PANIER :
+- Médicament A (Pharmacie X)
+- Médicament B (Pharmacie X)
+- Médicament C (Pharmacie Y)
+
+RÉSULTAT APRÈS COMMANDE :
+┌─────────────────────────────────────────────┐
+│ COMMANDE #1 (Pharmacie X)                   │
+│ Code: ABC123                                │
+│ - Médicament A                              │
+│ - Médicament B                              │
+│ Total: 5000 FCFA                            │
+└─────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────┐
+│ COMMANDE #2 (Pharmacie Y)                   │
+│ Code: DEF456                                │
+│ - Médicament C                              │
+│ Total: 3000 FCFA                            │
+└─────────────────────────────────────────────┘
+
+→ Le patient présente le code ABC123 à la Pharmacie X pour retirer A et B
+→ Le patient présente le code DEF456 à la Pharmacie Y pour retirer C
+```
+
+**Structure de données :**
+
+```typescript
+// UNE commande avec plusieurs médicaments
+{
+  id: "order_123",
+  pharmacyId: "pharma_X",
+  verificationCode: "ABC123",  // ← UN SEUL CODE
+  items: [                     // ← PLUSIEURS MÉDICAMENTS
+    { medicationId: "med_A", quantity: 2, price: 2000 },
+    { medicationId: "med_B", quantity: 1, price: 3000 }
+  ],
+  totalQuantity: 3,
+  totalPrice: 7000
+}
+```
+
+---
+
+## 🔴 Vulnérabilités CRITIQUES (inchangées)
 
 ### 1. Secret JWT Hardcoded
 
