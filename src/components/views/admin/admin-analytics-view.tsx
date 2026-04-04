@@ -169,7 +169,7 @@ export function AdminAnalyticsView() {
   /* ================================================================ */
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-6">
       <motion.div
         variants={containerVariants}
         initial="hidden"

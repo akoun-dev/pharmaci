@@ -149,7 +149,7 @@ export function PharmacistNotificationsView() {
   // Loading state
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
         <div className="flex items-center justify-between">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-8 w-24" />
@@ -166,7 +166,7 @@ export function PharmacistNotificationsView() {
   // Error state
   if (error) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
         <ViewHeader
           title="Notifications"
           icon={<Bell className="h-5 w-5 text-emerald-600" />}
@@ -191,7 +191,7 @@ export function PharmacistNotificationsView() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
       {/* Header */}
       <ViewHeader
         title="Notifications"

@@ -394,7 +394,7 @@ export function PharmacistPromotionsView() {
 
   // ── Render ─────────────────────────────────────────────────
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 pb-24 space-y-5">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-24 space-y-5">
       <ViewHeader
         title="Promotions & Fidélisation"
         back

@@ -281,7 +281,7 @@ export function MedicationDetailView() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-32" />
         <Skeleton className="h-48 rounded-xl" />
         <Skeleton className="h-32 rounded-xl" />
@@ -292,7 +292,7 @@ export function MedicationDetailView() {
 
   if (!medication) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 text-center">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 text-center">
         <p className="text-muted-foreground">Médicament non trouvé</p>
       </div>
     );
@@ -300,7 +300,7 @@ export function MedicationDetailView() {
 
   return (
     <div className="pb-36">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <ViewHeader title={medication.name} back />
 
         {/* Header Card */}
@@ -763,7 +763,7 @@ export function MedicationDetailView() {
           transition={{ delay: 0.3 }}
           className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+0.5rem)] left-0 right-0 z-40 lg:bottom-6 lg:left-64 lg:right-0 px-4"
         >
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <Button
               className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-lg shadow-emerald-600/30 flex items-center justify-between px-4"
               onClick={() => openOrderDialog(cheapestPharmacy)}

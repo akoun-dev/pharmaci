@@ -188,7 +188,7 @@ export function OrderConfirmationView() {
   // Loading skeleton
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-40" />
         <div className="flex flex-col items-center py-8 space-y-3">
           <Skeleton className="h-20 w-20 rounded-full" />
@@ -207,7 +207,7 @@ export function OrderConfirmationView() {
   // Error state
   if (error || !order) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
         <ViewHeader
           title="Confirmation"
           back
@@ -235,7 +235,7 @@ export function OrderConfirmationView() {
 
   return (
     <div className="pb-4">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <ViewHeader
           title="Confirmation"
           back

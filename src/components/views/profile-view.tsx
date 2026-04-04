@@ -268,7 +268,7 @@ export function ProfileView() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-32" />
         <Skeleton className="h-32 rounded-xl" />
         <Skeleton className="h-24 rounded-xl" />
@@ -280,7 +280,7 @@ export function ProfileView() {
 
   return (
     <div className="pb-4">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <ViewHeader title="Mon Profil" icon={<User className="h-5 w-5 text-emerald-600" />} />
 
         {/* User card */}

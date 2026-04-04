@@ -361,7 +361,7 @@ export function PharmacistOrderDetailView() {
   // Loading
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-56" />
         <Skeleton className="h-32 rounded-xl" />
         <Skeleton className="h-40 rounded-xl" />
@@ -374,7 +374,7 @@ export function PharmacistOrderDetailView() {
   // Error
   if (error || !order) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
         <ViewHeader title="Détail de la commande" back onBack={goBack} />
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
@@ -399,7 +399,7 @@ export function PharmacistOrderDetailView() {
   const isPickedUp = order.status === 'picked_up';
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 pb-32">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-32">
       {/* Header */}
       <ViewHeader
         title="Détail de la commande"
@@ -696,7 +696,7 @@ export function PharmacistOrderDetailView() {
       {/* ── Fixed Action Buttons ── */}
       {order.status === 'pending' && (
         <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
-          <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <Card className="border-emerald-200 shadow-lg">
               <CardContent className="p-3 flex gap-2">
                 <Button className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm" onClick={() => updateStatus('confirmed', 'Confirmée')} disabled={updating}>
@@ -715,7 +715,7 @@ export function PharmacistOrderDetailView() {
 
       {order.status === 'confirmed' && (
         <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
-          <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <Card className="border-emerald-200 shadow-lg">
               <CardContent className="p-3">
                 <Button className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm" onClick={() => updateStatus('ready', 'Prêtée')} disabled={updating}>
@@ -730,7 +730,7 @@ export function PharmacistOrderDetailView() {
 
       {order.status === 'ready' && (
         <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
-          <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <Card className="border-emerald-200 shadow-lg">
               <CardContent className="p-3">
                 <Button className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm" onClick={() => updateStatus('picked_up', 'Récupérée')} disabled={updating}>

@@ -325,7 +325,7 @@ export function AdminPharmaciesView() {
 
   return (
     <div className="pb-4">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* ── Header ── */}
         <ViewHeader
           title="Pharmacies"

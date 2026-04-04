@@ -160,7 +160,7 @@ export function HomeView() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 text-white px-4 sm:px-6 pt-5 sm:pt-6 pb-7 sm:pb-8 rounded-b-3xl"
       >
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-3 mb-3 sm:mb-4">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
               <Heart className="h-5 w-5 text-white" />
@@ -310,7 +310,7 @@ export function HomeView() {
         </div>
       </motion.div>
 
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 space-y-5 sm:space-y-6 -mt-3">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-5 sm:space-y-6 -mt-3">
         {/* Stats */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}

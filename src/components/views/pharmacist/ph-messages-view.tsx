@@ -257,7 +257,7 @@ export function PharmacistMessagesView() {
   // Chat view
   if (selectedPatient) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 flex flex-col" style={{ height: 'calc(100dvh - 5rem - 2rem)' }}>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-col" style={{ height: 'calc(100dvh - 5rem - 2rem)' }}>
         {/* Chat header */}
         <div className="flex items-center gap-3 pb-3 border-b border-emerald-100 flex-shrink-0">
           <button
@@ -375,7 +375,7 @@ export function PharmacistMessagesView() {
   // Patient list view - Loading
   if (loadingPatients) {
     return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-48" />
         {[1, 2, 3, 4].map((i) => (
           <Skeleton key={i} className="h-16 rounded-xl" />
@@ -386,7 +386,7 @@ export function PharmacistMessagesView() {
 
   // Patient list view
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
       {/* Header */}
       <ViewHeader
         title="Messagerie"
