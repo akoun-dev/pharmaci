@@ -462,7 +462,7 @@ export function PharmacistSettingsView() {
           <div className="text-center py-2">
             <div className="flex items-center justify-center gap-1.5 mb-1">
               <Shield className="h-3.5 w-3.5 text-emerald-600" />
-              <span className="text-[10px] font-medium text-emerald-700">PharmApp CI</span>
+              <span className="text-[10px] font-medium text-emerald-700">Pharma CI</span>
             </div>
             <p className="text-[10px] text-muted-foreground">Version 1.0.0</p>
           </div>

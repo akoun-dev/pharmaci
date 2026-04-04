@@ -761,7 +761,7 @@ export function ProfileView() {
                 <h3 className="font-semibold text-sm">À propos</h3>
               </div>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                PharmApp CI est votre application de référence pour trouver des pharmacies et
+                Pharma CI est votre application de référence pour trouver des pharmacies et
                 médicaments en Côte d&apos;Ivoire. Recherchez, comparez les prix et trouvez les
                 pharmacies de garde près de chez vous.
               </p>

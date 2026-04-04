@@ -188,7 +188,7 @@ export function AdminSettingsView() {
               Paramètres
             </h1>
             <p className="text-sm text-violet-100 mt-1">
-              Configuration de la plateforme PharmApp CI
+              Configuration de la plateforme Pharma CI
             </p>
           </div>
         </motion.div>
@@ -205,7 +205,7 @@ export function AdminSettingsView() {
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-3">
-              <InfoRow icon={<Globe className="h-4 w-4 text-violet-500" />} label="Nom" value="PharmApp CI" />
+              <InfoRow icon={<Globe className="h-4 w-4 text-violet-500" />} label="Nom" value="Pharma CI" />
               <Separator />
               <InfoRow icon={<Server className="h-4 w-4 text-violet-500" />} label="Version" value="v1.0.0" />
               <Separator />
@@ -491,7 +491,7 @@ export function AdminSettingsView() {
         {/* ─── FOOTER ─── */}
         <motion.div variants={itemVariants}>
           <p className="text-center text-xs text-muted-foreground py-2">
-            PharmApp CI © 2025 — Tous droits réservés
+            Pharma CI © 2025 — Tous droits réservés
           </p>
         </motion.div>
       </motion.div>

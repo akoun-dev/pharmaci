@@ -307,7 +307,7 @@ export function AppShell() {
               <Shield className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-lg text-foreground">PharmApp CI</h1>
+              <h1 className="font-bold text-lg text-foreground">Pharma CI</h1>
               <p className="text-[10px] text-violet-600 font-medium">Administration</p>
             </div>
           </div>
@@ -366,7 +366,7 @@ export function AppShell() {
           {/* Footer */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-800">
             <p className="text-[10px] text-muted-foreground text-center">
-              PharmApp CI © 2025
+              Pharma CI © 2025
             </p>
           </div>
         </aside>
@@ -455,7 +455,7 @@ export function AppShell() {
               <Pill className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-lg text-foreground">PharmApp CI</h1>
+              <h1 className="font-bold text-lg text-foreground">Pharma CI</h1>
               <p className="text-[10px] text-muted-foreground">Espace Pharmacien</p>
             </div>
           </div>
@@ -532,7 +532,7 @@ export function AppShell() {
 
           <div className="p-4 border-t border-emerald-100 dark:border-emerald-900/50">
             <p className="text-[10px] text-muted-foreground text-center">
-              PharmApp CI © 2025
+              Pharma CI © 2025
             </p>
           </div>
         </aside>
@@ -589,7 +589,7 @@ export function AppShell() {
             <Pill className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-lg text-foreground">PharmApp CI</h1>
+            <h1 className="font-bold text-lg text-foreground">Pharma CI</h1>
             <p className="text-[10px] text-muted-foreground">Côte d&apos;Ivoire</p>
           </div>
         </div>
@@ -626,7 +626,7 @@ export function AppShell() {
 
         <div className="p-4 border-t border-emerald-100 dark:border-emerald-900/50">
           <p className="text-[10px] text-muted-foreground text-center">
-            PharmApp CI © 2025
+            Pharma CI © 2025
           </p>
         </div>
       </aside>

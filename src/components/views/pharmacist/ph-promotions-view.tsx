@@ -767,7 +767,7 @@ export function PharmacistPromotionsView() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-white text-sm">PharmApp Fidélité</h3>
+                      <h3 className="font-bold text-white text-sm">Pharma Fidélité</h3>
                       <Lock className="h-3.5 w-3.5 text-emerald-200" />
                     </div>
                     <p className="text-emerald-100 text-xs">Gagnez des points à chaque achat</p>

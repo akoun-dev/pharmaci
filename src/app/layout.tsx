@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "PharmApp CI - Trouvez vos médicaments en Côte d'Ivoire",
+  title: "Pharma CI - Trouvez vos médicaments en Côte d'Ivoire",
   description:
     "Application de recherche de pharmacies et médicaments en Côte d'Ivoire. Trouvez les pharmacies de garde, vérifiez la disponibilité des médicaments et comparez les prix.",
   keywords: [
@@ -34,12 +34,12 @@ export const metadata: Metadata = {
     "Bouaké",
     "San Pedro",
   ],
-  authors: [{ name: "PharmApp CI" }],
+  authors: [{ name: "Pharma CI" }],
   icons: {
     icon: "/logo.svg",
   },
   openGraph: {
-    title: "PharmApp CI",
+    title: "Pharma CI",
     description:
       "Trouvez vos médicaments et pharmacies en Côte d'Ivoire",
     type: "website",

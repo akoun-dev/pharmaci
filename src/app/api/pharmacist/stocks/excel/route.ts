@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     });
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'PharmApp CI';
+    workbook.creator = 'Pharma CI';
     workbook.created = new Date();
 
     const sheet = workbook.addWorksheet('Stock', {

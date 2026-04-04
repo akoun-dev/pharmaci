@@ -152,7 +152,7 @@ export function AuthView() {
           <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
             <Pill className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">PharmApp CI</h1>
+          <h1 className="text-2xl font-bold text-white">Pharma CI</h1>
           <p className="text-emerald-200 text-sm mt-1">
             {mode === 'login' ? 'Connectez-vous à votre compte' : 'Créez votre compte'}
           </p>
@@ -445,7 +445,7 @@ export function AuthView() {
 
         {/* Footer */}
         <p className="text-center text-emerald-200/60 text-[10px] mt-6">
-          PharmApp CI © 2025 — Côte d&apos;Ivoire
+          Pharma CI © 2025 — Côte d&apos;Ivoire
         </p>
       </motion.div>
     </div>

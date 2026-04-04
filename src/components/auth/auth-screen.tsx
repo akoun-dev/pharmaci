@@ -446,7 +446,7 @@ export function AuthScreen() {
           <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-4">
             <Pill className="h-9 w-9 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">PharmApp CI</h1>
+          <h1 className="text-2xl font-bold text-white">Pharma CI</h1>
           <p className="text-emerald-100 text-sm mt-1">Côte d&apos;Ivoire</p>
         </div>
       </div>
@@ -650,7 +650,7 @@ export function AuthScreen() {
 
           {/* Footer */}
           <p className="text-center text-[10px] text-muted-foreground mt-6 mb-6 pb-safe">
-            PharmApp CI © 2025 — Votre santé, notre priorité
+            Pharma CI © 2025 — Votre santé, notre priorité
           </p>
         </div>
       </div>

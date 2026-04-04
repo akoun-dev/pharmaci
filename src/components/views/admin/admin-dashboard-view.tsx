@@ -258,7 +258,7 @@ export function AdminDashboardView() {
                   Bonjour, {firstName} 👋
                 </h1>
                 <p className="text-sm text-violet-100 mt-1">
-                  Vue d&apos;ensemble de la plateforme PharmApp CI
+                  Vue d&apos;ensemble de la plateforme Pharma CI
                 </p>
               </div>
               <Button

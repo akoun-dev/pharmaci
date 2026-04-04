@@ -141,7 +141,7 @@ const FAQ_SECTIONS: FaqSection[] = [
     items: [
       {
         question: 'Quels moyens de paiement mobile money sont acceptés ?',
-        answer: 'PharmApp CI prend en charge MTN Mobile Money, Orange Money et Wave. Les paiements sont traités de manière sécurisée et la confirmation est instantanée. Vous pouvez aussi accepter les paiements en espèces et par carte.',
+        answer: 'Pharma CI prend en charge MTN Mobile Money, Orange Money et Wave. Les paiements sont traités de manière sécurisée et la confirmation est instantanée. Vous pouvez aussi accepter les paiements en espèces et par carte.',
       },
       {
         question: 'Comment fonctionne le paiement mobile money ?',

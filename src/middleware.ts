@@ -1,5 +1,5 @@
 /**
- * Next.js Middleware for PharmApp CI API route protection.
+ * Next.js Middleware for Pharma CI API route protection.
  * Uses jose (Edge-compatible) to verify JWT tokens stored in cookies.
  */
 import { NextResponse } from 'next/server';

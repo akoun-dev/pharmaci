@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'PharmApp CI';
+    workbook.creator = 'Pharma CI';
 
     const sheet = workbook.addWorksheet('Import', {
       properties: { defaultRowHeight: 24 },
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
     sheet.mergeCells('B1:J1');
     const titleCell = sheet.getCell('B1');
-    titleCell.value = 'Modèle d\'import PharmApp CI — Remplissez les colonnes B à J';
+    titleCell.value = 'Modèle d\'import Pharma CI — Remplissez les colonnes B à J';
     titleCell.font = { name: 'Calibri', size: 13, bold: true, color: { argb: 'FF047857' } };
     titleCell.alignment = { horizontal: 'left' };
 

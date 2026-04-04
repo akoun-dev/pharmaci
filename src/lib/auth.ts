@@ -1,5 +1,5 @@
 /**
- * JWT Authentication utility for PharmApp CI.
+ * JWT Authentication utility for Pharma CI.
  * Uses jose (Edge-compatible) with HS256 for session management.
  */
 import { SignJWT, jwtVerify } from 'jose';
