@@ -21,7 +21,9 @@ import {
   FlaskConical,
   BarChart3,
   Shield,
+  ShoppingCart,
 } from 'lucide-react';
+import { useCartStore } from '@/store/cart-store';
 import { useAppStore, View } from '@/store/app-store';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { HomeView } from '@/components/views/home-view';
@@ -32,6 +34,8 @@ import { MedicationDetailView } from '@/components/views/medication-detail-view'
 import { ProfileView } from '@/components/views/profile-view';
 import { FavoritesView } from '@/components/views/favorites-view';
 import { PharmacyDashboardView } from '@/components/views/pharmacy-dashboard-view';
+import { CartView } from '@/components/views/cart-view';
+import { CartCheckoutView } from '@/components/views/cart-checkout-view';
 import { OrderConfirmationView } from '@/components/views/order-confirmation-view';
 import { OrderHistoryView } from '@/components/views/order-history-view';
 import { PharmacistDashboardView } from '@/components/views/pharmacist/ph-dashboard-view';
@@ -97,6 +101,8 @@ const patientViewToTab: Partial<Record<View, PatientTabKey>> = {
   'pharmacy-dashboard': 'profile',
   'order-confirmation': 'order-history',
   'order-history': 'order-history',
+  cart: 'search',
+  'cart-checkout': 'search',
 };
 
 const pharmacistViewToTab: Partial<Record<View, PharmacistTabKey>> = {
@@ -140,6 +146,8 @@ function PatientViewRenderer() {
     'pharmacy-dashboard': <PharmacyDashboardView />,
     'order-confirmation': <OrderConfirmationView />,
     'order-history': <OrderHistoryView />,
+    cart: <CartView />,
+    'cart-checkout': <CartCheckoutView />,
   };
 
   return (
@@ -217,6 +225,52 @@ function AdminViewRenderer() {
         {views[currentView]}
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+function CartFloatingButton() {
+  const itemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0));
+  const setCurrentView = useAppStore((s) => s.setCurrentView);
+
+  if (itemCount === 0) return null;
+
+  return (
+    <button
+      onClick={() => setCurrentView('cart')}
+      className="fixed bottom-20 right-4 z-40 lg:hidden flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-4 py-3 shadow-lg shadow-emerald-600/30 transition-all duration-200 active:scale-95"
+    >
+      <ShoppingCart className="h-5 w-5" />
+      <span className="text-sm font-semibold">{itemCount}</span>
+    </button>
+  );
+}
+
+function CartSidebarButton() {
+  const itemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0));
+  const setCurrentView = useAppStore((s) => s.setCurrentView);
+
+  return (
+    <button
+      onClick={() => setCurrentView('cart')}
+      className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative ${
+        'text-muted-foreground hover:bg-emerald-50/50 hover:text-emerald-600'
+      }`}
+    >
+      <div className="relative">
+        <ShoppingCart className="h-5 w-5" />
+        {itemCount > 0 && (
+          <span className="absolute -top-2 -right-2 bg-emerald-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+            {itemCount > 9 ? '9+' : itemCount}
+          </span>
+        )}
+      </div>
+      Panier
+      {itemCount > 0 && (
+        <span className="ml-auto text-xs text-emerald-600 font-medium">
+          {itemCount} article{itemCount > 1 ? 's' : ''}
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -555,6 +609,9 @@ export function AppShell() {
         <PatientViewRenderer />
       </main>
 
+      {/* Cart floating button (mobile) */}
+      <CartFloatingButton />
+
       <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900/95 backdrop-blur-md border-t border-emerald-100 dark:border-emerald-900/50 lg:hidden pb-safe">
         <div className="flex items-center justify-around px-0.5 py-1 max-w-2xl mx-auto">
           {patientTabs.map((tab) => {
@@ -613,6 +670,9 @@ export function AppShell() {
               </button>
             );
           })}
+          <div className="pt-2 mt-2 border-t border-emerald-100 dark:border-emerald-900/50">
+            <CartSidebarButton />
+          </div>
         </nav>
 
         <div className="px-3 mb-2">

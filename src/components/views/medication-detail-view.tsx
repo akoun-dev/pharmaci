@@ -33,6 +33,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { ViewHeader } from '@/components/view-header';
 import { useAppStore } from '@/store/app-store';
+import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
 import { haversineDistance, formatDistance, openGoogleMaps, PAYMENT_LABELS, PAYMENT_ICONS } from '@/lib/navigation';
 
@@ -906,6 +907,34 @@ export function MedicationDetailView() {
                 )}
               </div>
             </div>
+            <Button
+              className="w-full h-10 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold text-sm mb-2"
+              onClick={() => {
+                if (!orderingPharmacy || !medication) return;
+                const cart = useCartStore.getState();
+                cart.addItem({
+                  pharmacyId: orderingPharmacy.id,
+                  pharmacyName: orderingPharmacy.name,
+                  pharmacyAddress: orderingPharmacy.address,
+                  pharmacyDistrict: orderingPharmacy.district || '',
+                  medicationId: medication.id,
+                  medicationName: medication.commercialName,
+                  medicationForm: medication.form || '',
+                  price: orderingPharmacy.price,
+                  quantity: orderQuantity,
+                  needsPrescription: orderingPharmacy.needsPrescription,
+                  stockId: orderingPharmacy.stockId,
+                  maxQuantity: orderingPharmacy.quantity,
+                });
+                toast.success(`${orderQuantity}x ${medication.commercialName} ajouté au panier`);
+                closeOrderDialog();
+              }}
+            >
+              <span className="flex items-center justify-center gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                Ajouter au panier
+              </span>
+            </Button>
             <Button
               className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm"
               onClick={handleSubmitOrder}

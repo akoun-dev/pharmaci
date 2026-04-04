@@ -2725,3 +2725,62 @@ Improve Admin Settings (password change) and Admin Reviews (global distribution 
    - Disabled states during submission, loading spinner
 
 All changes pass `npm run lint` with zero new errors. Dev server running cleanly.
+
+---
+## Task ID: cart-views - frontend-developer
+### Work Task
+Create two cart system view components: CartView (cart-view.tsx) and CartCheckoutView (cart-checkout-view.tsx) for the PharmApp CI pharmacy application.
+
+### Work Summary
+
+#### Files Created:
+
+1. **`src/components/views/cart-view.tsx`** — Full-featured shopping cart view:
+   - **Header**: "Mon Panier" with ShoppingBag icon, back button via ViewHeader, item count badge
+   - **Empty state**: Shopping bag icon, "Votre panier est vide" message, "Rechercher des médicaments" button navigating to search
+   - **Pharmacy-grouped cart items**: Each group shows pharmacy name/address/district with Store icon, list of medications with Pill icon, each item displaying name, form, unit price, quantity controls (−/+/Trash2), line total, prescription badge (Ordonnance)
+   - **Pharmacy subtotals**: Per-pharmacy cost summary
+   - **Order summary section**: Grand total, delivery type selector (Retrait/Livraison with Package/Truck icons), conditional delivery address input with MapPin icon, optional note textarea with MessageSquare icon, payment method grid (6 methods: Sur place, Espèces, Orange Money, Wave, MTN Money, Carte) with emoji icons, multi-pharmacy warning banner, "Valider la commande" button
+   - **Sticky mobile bottom bar**: Total + "Valider" button fixed above bottom nav
+   - **Validation**: Empty cart toast, delivery address required for delivery mode
+   - **CartItemRow sub-component**: Reusable item row with quantity controls, remove button, max quantity enforcement
+
+2. **`src/components/views/cart-checkout-view.tsx`** — Order confirmation & placement view:
+   - **Header**: "Récapitulatif" with ClipboardCheck icon, back button
+   - **Empty state**: Warning icon + "Panier vide" card with search button
+   - **Pharmacy groups**: Read-only item list grouped by pharmacy with subtotals as badges
+   - **Delivery info**: Package/Truck icon, pickup/delivery label, delivery address if applicable
+   - **Payment method**: Wallet icon + payment label (uses PAYMENT_LABELS from navigation lib)
+   - **Note display**: MessageSquare icon + note text (conditional)
+   - **Grand total**: Item count, pharmacy count, "Total à payer" in emerald bold
+   - **Confirm button**: "Confirmer et passer la commande" with ClipboardCheck icon, loading spinner (Loader2)
+   - **Order placement logic**: 
+     - Primary: POST to `/api/orders/batch` with full payload (items, deliveryType, deliveryAddress, note, paymentMethod)
+     - Fallback: Individual POST to `/api/orders` per pharmacy group if batch fails
+     - On success: clears cart, shows toast "Commande(s) passée(s) avec succès!", navigates to order-confirmation with first order ID
+     - On failure: error toast with descriptive message
+   - **Sticky mobile bottom bar**: Total + "Confirmer" button
+
+#### Files Modified:
+
+3. **`src/store/app-store.ts`** — Added `'cart' | 'cart-checkout'` to View type union
+
+4. **`src/components/app-shell.tsx`** — 
+   - Imported CartView and CartCheckoutView components
+   - Registered both views in PatientViewRenderer
+   - Added viewToTab mapping: cart → search, cart-checkout → search
+
+#### Design Details:
+- `max-w-5xl mx-auto` container (as specified for patient views)
+- `px-4 sm:px-6` responsive horizontal padding
+- Emerald green theme: `border-emerald-100` cards, `bg-emerald-50` pharmacy headers, `text-emerald-600` icons, `text-emerald-700` totals
+- Dark mode support: `dark:bg-emerald-950/30` headers, `dark:text-emerald-400` icons/text
+- Framer Motion staggered entrance animations on all sections
+- shadcn/ui: Card, CardContent, Badge, Button, Input, Textarea, Separator
+- Lucide icons: ShoppingBag, Trash2, Minus, Plus, Store, MapPin, Truck, Package, Wallet, MessageSquare, Pill, AlertCircle, Search, ClipboardCheck, Loader2
+- French locale throughout (all labels, toasts, button text)
+- Prices formatted with `toLocaleString('fr-FR')` + " FCFA"
+- Responsive `pb-40` / `pb-28` bottom padding to account for sticky mobile bar + bottom nav
+- Mobile sticky bottom bar with backdrop blur, above bottom tab navigation
+- Zero lint errors
+

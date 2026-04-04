@@ -17,6 +17,8 @@ export type View =
   | 'medication-detail'
   | 'profile'
   | 'pharmacy-dashboard'
+  | 'cart'
+  | 'cart-checkout'
   | 'favorites'
   | 'order-confirmation'
   | 'order-history'
