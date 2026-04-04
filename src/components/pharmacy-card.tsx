@@ -2,10 +2,11 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock, Star, Shield, Phone, Heart } from 'lucide-react';
+import { MapPin, Clock, Star, Shield, Heart } from 'lucide-react';
 import { RatingStars } from '@/components/rating-stars';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { toast } from 'sonner';
 
 interface PharmacyCardProps {
   pharmacy: {
@@ -25,7 +26,6 @@ interface PharmacyCardProps {
     isFavorite?: boolean;
   };
   onClick: (id: string) => void;
-  onToggleFavorite?: (id: string) => void;
   showServices?: boolean;
   compact?: boolean;
   distance?: number | null;
@@ -46,7 +46,6 @@ function isOpen(openTime?: string, closeTime?: string, is24h?: boolean): boolean
 export function PharmacyCard({
   pharmacy,
   onClick,
-  onToggleFavorite,
   showServices = true,
   compact = false,
   distance,
@@ -54,11 +53,30 @@ export function PharmacyCard({
   const [isFav, setIsFav] = useState(pharmacy.isFavorite || false);
   const open = isOpen(pharmacy.openTime, pharmacy.closeTime, pharmacy.isOpen24h);
 
-  const handleFavorite = (e: React.MouseEvent) => {
+  const handleFavorite = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFav(!isFav);
-    onToggleFavorite?.(pharmacy.id);
-  };
+    const prev = isFav;
+    setIsFav(!prev);
+
+    try {
+      const res = await fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pharmacyId: pharmacy.id }),
+      });
+      if (!res.ok) {
+        setIsFav(prev);
+        toast.error('Erreur lors de la mise à jour du favori');
+        return;
+      }
+      const data = await res.json();
+      setIsFav(data.isFavorite);
+      toast.success(data.isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris');
+    } catch {
+      setIsFav(prev);
+      toast.error('Erreur réseau');
+    }
+  }, [isFav, pharmacy.id]);
 
   return (
     <motion.div whileTap={{ scale: 0.98 }}>
@@ -116,7 +134,7 @@ export function PharmacyCard({
               aria-label="Favori"
             >
               <Heart
-                className={`h-5 w-5 ${isFav ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
+                className={`h-5 w-5 transition-colors duration-200 ${isFav ? 'fill-red-500 text-red-500' : 'text-muted-foreground hover:text-red-400'}`}
               />
             </button>
           </div>
