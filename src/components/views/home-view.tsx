@@ -23,7 +23,7 @@ import { useUserLocation } from '@/hooks/use-user-location';
 import { haversineDistance } from '@/lib/navigation';
 
 export function HomeView() {
-  const { setCurrentView, selectPharmacy, selectMedication, setSearchQuery } = useAppStore();
+  const { setCurrentView, selectPharmacy, selectMedication, setSearchQuery, currentUserId } = useAppStore();
   const { location, status, requestLocation } = useUserLocation();
   const [guardPharmacies, setGuardPharmacies] = useState<any[]>([]);
   const [allPharmacies, setAllPharmacies] = useState<any[]>([]);
@@ -48,7 +48,7 @@ export function HomeView() {
     try {
       const [medsRes, pharmaRes] = await Promise.all([
         fetch(`/api/medications?q=${encodeURIComponent(query)}&limit=4`),
-        fetch(`/api/pharmacies?q=${encodeURIComponent(query)}&limit=3`),
+        fetch(`/api/pharmacies?q=${encodeURIComponent(query)}&limit=3${currentUserId ? `&userId=${currentUserId}` : ''}`),
       ]);
       const medsData = await medsRes.json();
       const pharmaData = await pharmaRes.json();
@@ -58,12 +58,12 @@ export function HomeView() {
     } finally {
       setSearchLoading(false);
     }
-  }, []);
+  }, [currentUserId]);
 
   useEffect(() => {
     const timer = setTimeout(() => fetchInlineResults(searchText), 300);
     return () => clearTimeout(timer);
-  }, [searchText, fetchInlineResults]);
+  }, [searchText, fetchInlineResults, currentUserId]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -86,9 +86,10 @@ export function HomeView() {
   useEffect(() => {
     async function fetchData() {
       try {
+        const uidParam = currentUserId ? `&userId=${currentUserId}` : '';
         const [guardRes, allPharmaciesRes, medsCountRes] = await Promise.all([
-          fetch('/api/pharmacies?isGuard=true&limit=5'),
-          fetch('/api/pharmacies?limit=50'),
+          fetch(`/api/pharmacies?isGuard=true&limit=5${uidParam}`),
+          fetch(`/api/pharmacies?limit=50${uidParam}`),
           fetch('/api/medications?count=true'),
         ]);
         const guardData = await guardRes.json();
@@ -110,7 +111,7 @@ export function HomeView() {
       }
     }
     fetchData();
-  }, []);
+  }, [currentUserId]);
 
   // Compute nearest pharmacies
   const nearestPharmacies = useMemo(() => {

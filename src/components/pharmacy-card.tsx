@@ -29,6 +29,7 @@ interface PharmacyCardProps {
   showServices?: boolean;
   compact?: boolean;
   distance?: number | null;
+  onFavoriteChange?: (pharmacyId: string, isFavorite: boolean) => void;
 }
 
 function isOpen(openTime?: string, closeTime?: string, is24h?: boolean): boolean {
@@ -49,9 +50,17 @@ export function PharmacyCard({
   showServices = true,
   compact = false,
   distance,
+  onFavoriteChange,
 }: PharmacyCardProps) {
   const [isFav, setIsFav] = useState(pharmacy.isFavorite || false);
   const open = isOpen(pharmacy.openTime, pharmacy.closeTime, pharmacy.isOpen24h);
+
+  // Sync local state when prop changes (adjust during render per React docs)
+  const [prevFavProp, setPrevFavProp] = useState(pharmacy.isFavorite);
+  if (prevFavProp !== pharmacy.isFavorite) {
+    setPrevFavProp(pharmacy.isFavorite);
+    setIsFav(pharmacy.isFavorite || false);
+  }
 
   const handleFavorite = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -72,11 +81,13 @@ export function PharmacyCard({
       const data = await res.json();
       setIsFav(data.isFavorite);
       toast.success(data.isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris');
+      // Notify parent so it can refetch data if needed
+      onFavoriteChange?.(pharmacy.id, data.isFavorite);
     } catch {
       setIsFav(prev);
       toast.error('Erreur réseau');
     }
-  }, [isFav, pharmacy.id]);
+  }, [isFav, pharmacy.id, onFavoriteChange]);
 
   return (
     <motion.div whileTap={{ scale: 0.98 }}>

@@ -2784,3 +2784,26 @@ Create two cart system view components: CartView (cart-view.tsx) and CartCheckou
 - Mobile sticky bottom bar with backdrop blur, above bottom tab navigation
 - Zero lint errors
 
+---
+Task ID: favorites-fix
+Agent: Main Agent
+Task: Fix favorites system - favorites not working from pharmacy list
+
+Work Log:
+- Investigated root cause: home-view.tsx and search-view.tsx were fetching pharmacies WITHOUT passing userId parameter to the API
+- The /api/pharmacies API supports userId parameter and returns isFavorite when provided
+- Fixed home-view.tsx: added currentUserId from useAppStore, passed it to all 3 pharmacy API calls (guard, all, inline search)
+- Fixed search-view.tsx: added currentUserId from useAppStore, passed it to pharmacy search API calls
+- Updated PharmacyCard component:
+  - Added onFavoriteChange callback prop to notify parent of changes
+  - Added state sync mechanism using React 19's "adjust state during rendering" pattern (no useEffect)
+  - State automatically syncs when pharmacy.isFavorite prop changes after parent refetch
+  - Optimistic UI updates on toggle with toast feedback
+- All changes pass bun run lint with zero errors
+- Production build successful, server running on port 3000
+
+Stage Summary:
+- Favorites now work correctly from home page, search page, and all pharmacy lists
+- Heart icons show correct initial state (filled/unfilled) based on user's favorites
+- Toggling favorites updates the heart icon immediately with optimistic UI
+- Added onFavoriteChange callback for parent components to react to changes

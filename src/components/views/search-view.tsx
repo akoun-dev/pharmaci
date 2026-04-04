@@ -36,6 +36,7 @@ export function SearchView() {
     selectPharmacy,
     selectMedication,
     setCurrentView,
+    currentUserId,
   } = useAppStore();
 
   const { location, status, requestLocation } = useUserLocation();
@@ -63,6 +64,7 @@ export function SearchView() {
         if (searchQuery) params.set('q', searchQuery);
         if (selectedCity) params.set('city', selectedCity);
         if (isGuardOnly) params.set('isGuard', 'true');
+        if (currentUserId) params.set('userId', currentUserId);
         url = `/api/pharmacies?${params.toString()}`;
       }
 
@@ -74,7 +76,7 @@ export function SearchView() {
     } finally {
       setLoading(false);
     }
-  }, [tab, searchQuery, selectedCategory, selectedCity, isGuardOnly]);
+  }, [tab, searchQuery, selectedCategory, selectedCity, isGuardOnly, currentUserId]);
 
   useEffect(() => {
     const timer = setTimeout(fetchResults, 300);
