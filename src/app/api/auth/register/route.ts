@@ -76,7 +76,7 @@ export async function POST(request: Request) {
       });
 
       const token = await signToken({ userId: user.id, email: user.email, role: user.role, provider: 'email' });
-      const cookie = createSessionCookie(token);
+      const { sessionCookie, csrfCookie, csrfToken } = createSessionCookie(token, user.id);
 
       return NextResponse.json(
         {
@@ -97,8 +97,9 @@ export async function POST(request: Request) {
             name: newPharmacy.name,
           },
           token,
+          csrfToken,
         },
-        { headers: { 'Set-Cookie': cookie } }
+        { headers: { 'Set-Cookie': [sessionCookie, csrfCookie].filter(Boolean).join(', ') } }
       );
     }
 
@@ -136,15 +137,16 @@ export async function POST(request: Request) {
       });
 
       const token = await signToken({ userId: user.id, email: user.email, role: user.role, provider: 'email' });
-      const cookie = createSessionCookie(token);
+      const { sessionCookie, csrfCookie, csrfToken } = createSessionCookie(token, user.id);
 
       return NextResponse.json(
         {
           message: 'Inscription réussie',
           user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role, avatar: user.avatar, city: user.city, authProvider: user.authProvider },
           token,
+          csrfToken,
         },
-        { headers: { 'Set-Cookie': cookie } }
+        { headers: { 'Set-Cookie': [sessionCookie, csrfCookie].filter(Boolean).join(', ') } }
       );
     }
 
