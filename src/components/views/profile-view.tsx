@@ -29,6 +29,7 @@ import {
   Pencil,
   Check,
   X,
+  Star,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -487,16 +488,18 @@ export function ProfileView() {
                   <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                   <h3 className="font-semibold text-sm">Recherches récentes</h3>
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {recentSearches.slice(0, 8).map((s) => (
                     <button
                       key={s.id}
                       onClick={() => handleSearchClick(s.query)}
-                      className="flex items-center gap-2 w-full text-left text-sm hover:bg-emerald-50 p-2 rounded-lg transition-colors"
+                      className="flex items-center gap-3 w-full text-left text-sm hover:bg-emerald-50 dark:hover:bg-emerald-950/30 p-2 rounded-lg transition-colors"
                     >
-                      <Search className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                      <span className="truncate text-xs sm:text-sm">{s.query}</span>
-                      <Badge variant="outline" className="text-[10px] ml-auto flex-shrink-0 border-emerald-200 text-emerald-700">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
+                        <Search className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <span className="flex-1 truncate text-xs">{s.query}</span>
+                      <Badge variant="outline" className="text-[10px] flex-shrink-0 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400">
                         {s.searchType}
                       </Badge>
                     </button>
@@ -523,24 +526,29 @@ export function ProfileView() {
                 {[
                   { icon: ClipboardList, label: 'Mes commandes', view: 'order-history' as const },
                   { icon: Heart, label: 'Mes favoris', view: 'favorites' as const },
+                  { icon: Star, label: 'Mes avis', view: 'my-reviews' as const },
                 ].map((item) => (
                   <button
                     key={item.label}
                     onClick={() => setView(item.view)}
-                    className="flex items-center gap-2 sm:gap-3 w-full text-left text-sm hover:bg-emerald-50 dark:hover:bg-emerald-950/30 p-2 sm:p-2.5 rounded-lg transition-colors"
+                    className="flex items-center gap-3 w-full text-left text-sm hover:bg-emerald-50 dark:hover:bg-emerald-950/30 p-2.5 rounded-lg transition-colors"
                   >
-                    <item.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    <span className="flex-1">{item.label}</span>
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
+                      <item.icon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <span className="flex-1 text-xs font-medium">{item.label}</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </button>
                 ))}
                 {currentUser?.role === 'pharmacist' && (
                   <button
                     onClick={() => setView('pharmacy-dashboard')}
-                    className="flex items-center gap-2 sm:gap-3 w-full text-left text-sm hover:bg-emerald-50 dark:hover:bg-emerald-950/30 p-2 sm:p-2.5 rounded-lg transition-colors"
+                    className="flex items-center gap-3 w-full text-left text-sm hover:bg-emerald-50 dark:hover:bg-emerald-950/30 p-2.5 rounded-lg transition-colors"
                   >
-                    <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    <span className="flex-1">Gestion pharmacie</span>
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
+                      <Building2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <span className="flex-1 text-xs font-medium">Gestion pharmacie</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   </button>
                 )}
@@ -549,48 +557,6 @@ export function ProfileView() {
           </Card>
         </motion.div>
 
-        {/* Notification Preferences */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.14 }}
-          className="mt-4"
-        >
-          <Card className="border-emerald-100 dark:border-emerald-900/50">
-            <CardHeader className="pb-3 px-4 pt-4">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Bell className="h-4 w-4 text-emerald-600" />
-                Préférences de notification
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 pb-4 space-y-0">
-              {notifSettings.map((setting, index) => {
-                const Icon = setting.icon;
-                return (
-                  <div key={setting.id}>
-                    <div className="flex items-center justify-between py-3">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                          <Icon className="h-4 w-4 text-emerald-600" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-medium">{setting.label}</p>
-                          <p className="text-[10px] text-muted-foreground">{setting.description}</p>
-                        </div>
-                      </div>
-                      <Switch
-                        checked={setting.enabled}
-                        onCheckedChange={() => handleToggleNotif(setting.id)}
-                        className="flex-shrink-0"
-                      />
-                    </div>
-                    {index < notifSettings.length - 1 && <Separator />}
-                  </div>
-                );
-              })}
-            </CardContent>
-          </Card>
-        </motion.div>
 
         {/* Settings Section */}
         <motion.div
@@ -611,8 +577,8 @@ export function ProfileView() {
               <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
                 <DialogTrigger asChild>
                   <button className="flex items-center gap-3 w-full text-left p-2.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                      <Lock className="h-4 w-4 text-emerald-600" />
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
+                      <Lock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <span className="text-xs font-medium flex-1">Changer le mot de passe</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -688,8 +654,8 @@ export function ProfileView() {
               {/* Dark mode */}
               <div className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
-                    {darkMode ? <Moon className="h-4 w-4 text-purple-600" /> : <Sun className="h-4 w-4 text-amber-500" />}
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
+                    {darkMode ? <Moon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> : <Sun className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-medium">Mode sombre</p>
@@ -702,14 +668,13 @@ export function ProfileView() {
                   className="flex-shrink-0"
                 />
               </div>
-
               <Separator />
 
               {/* Language */}
               <div className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <Globe className="h-4 w-4 text-blue-600" />
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
+                    <Globe className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-medium">Langue</p>

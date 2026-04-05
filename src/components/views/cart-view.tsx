@@ -10,30 +10,21 @@ import {
   Plus,
   Store,
   MapPin,
-  Truck,
   Package,
-  Wallet,
   MessageSquare,
   Pill,
   AlertCircle,
   Search,
-  Banknote,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { ViewHeader } from '@/components/view-header';
 import { useCartStore, type CartItem } from '@/store/cart-store';
 import { useAppStore } from '@/store/app-store';
-import { PAYMENT_LABELS } from '@/lib/navigation';
 import { toast } from 'sonner';
-
-const PAYMENT_METHODS = [
-  { value: 'especes', label: 'Espèces', icon: Banknote },
-];
 
 function formatFCFA(amount: number): string {
   return amount.toLocaleString('fr-FR') + ' FCFA';
@@ -42,13 +33,9 @@ function formatFCFA(amount: number): string {
 export function CartView() {
   const {
     items,
-    deliveryType,
-    deliveryAddress,
     note,
     removeItem,
     updateQuantity,
-    setDeliveryType,
-    setDeliveryAddress,
     setNote,
     getItemCount,
     getSubtotal,
@@ -56,38 +43,16 @@ export function CartView() {
   } = useCartStore();
 
   const { setCurrentView } = useAppStore();
-  const [deliveryInput, setDeliveryInput] = useState(deliveryAddress);
 
   const itemCount = getItemCount();
   const subtotal = getSubtotal();
   const groups = getPharmacyGroups();
   const groupCount = groups.size;
 
-  const handleDeliveryTypeChange = (type: 'pickup' | 'delivery') => {
-    setDeliveryType(type);
-    if (type === 'pickup') {
-      setDeliveryAddress('');
-      setDeliveryInput('');
-    } else {
-      setDeliveryAddress(deliveryInput);
-    }
-  };
-
-  const handleDeliveryAddressBlur = () => {
-    setDeliveryAddress(deliveryInput);
-  };
-
   const handleProceedToCheckout = () => {
     if (items.length === 0) {
       toast.error('Votre panier est vide');
       return;
-    }
-    if (deliveryType === 'delivery' && !deliveryAddress.trim()) {
-      toast.error('Veuillez entrer une adresse de livraison');
-      return;
-    }
-    if (deliveryType === 'delivery') {
-      setDeliveryAddress(deliveryInput);
     }
     setCurrentView('cart-checkout');
   };
@@ -246,63 +211,6 @@ export function CartView() {
 
               <Separator className="bg-emerald-100" />
 
-              {/* Delivery type */}
-              <div>
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 block">
-                  Mode de réception
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => handleDeliveryTypeChange('pickup')}
-                    className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all duration-200 ${
-                      deliveryType === 'pickup'
-                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:border-emerald-600 dark:text-emerald-400'
-                        : 'border-gray-200 dark:border-gray-700 text-muted-foreground hover:border-emerald-300 dark:hover:border-emerald-800'
-                    }`}
-                  >
-                    <Package className="h-4 w-4" />
-                    Retrait
-                  </button>
-                  <button
-                    onClick={() => handleDeliveryTypeChange('delivery')}
-                    className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all duration-200 ${
-                      deliveryType === 'delivery'
-                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:border-emerald-600 dark:text-emerald-400'
-                        : 'border-gray-200 dark:border-gray-700 text-muted-foreground hover:border-emerald-300 dark:hover:border-emerald-800'
-                    }`}
-                  >
-                    <Truck className="h-4 w-4" />
-                    Livraison
-                  </button>
-                </div>
-              </div>
-
-              {/* Delivery address */}
-              {deliveryType === 'delivery' && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5 block">
-                    Adresse de livraison
-                  </label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      value={deliveryInput}
-                      onChange={(e) => setDeliveryInput(e.target.value)}
-                      onBlur={handleDeliveryAddressBlur}
-                      placeholder="Ex: Cocody Riviera Palmeraie, près de la station"
-                      className="pl-9 h-11 rounded-xl border-emerald-100 focus:border-emerald-400"
-                    />
-                  </div>
-                </motion.div>
-              )}
-
-              <Separator className="bg-emerald-100" />
-
               {/* Note */}
               <div>
                 <div className="flex items-center gap-1.5 mb-1.5">
@@ -317,26 +225,6 @@ export function CartView() {
                   placeholder="Instructions spéciales, préférences..."
                   className="min-h-[72px] rounded-xl border-emerald-100 focus:border-emerald-400 text-sm resize-none"
                 />
-              </div>
-
-              <Separator className="bg-emerald-100" />
-
-              {/* Payment method */}
-              <div>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Mode de paiement
-                  </label>
-                </div>
-                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl border border-emerald-100 dark:border-emerald-800">
-                  <div className="flex items-center gap-2">
-                    <Banknote className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
-                      Paiement en espèces à la récupération en pharmacie
-                    </p>
-                  </div>
-                </div>
               </div>
 
               <Separator className="bg-emerald-100" />

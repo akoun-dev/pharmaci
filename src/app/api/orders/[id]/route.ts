@@ -22,7 +22,7 @@ export async function GET(
         pharmacy: {
           select: {
             name: true, address: true, city: true, phone: true,
-            latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
+            latitude: true, longitude: true, parkingInfo: true,
           },
         },
         items: {
@@ -109,7 +109,7 @@ export async function DELETE(
         pharmacy: {
           select: {
             name: true, address: true, city: true, phone: true,
-            latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
+            latitude: true, longitude: true, parkingInfo: true,
           },
         },
         items: {

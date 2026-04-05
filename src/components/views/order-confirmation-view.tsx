@@ -9,8 +9,6 @@ import {
   Navigation,
   ClipboardList,
   Pill,
-  CreditCard,
-  Clock,
   MessageSquare,
   Package,
   Store,
@@ -28,7 +26,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { ViewHeader } from '@/components/view-header';
 import { useAppStore } from '@/store/app-store';
-import { openGoogleMaps, PAYMENT_LABELS } from '@/lib/navigation';
+import { openGoogleMaps } from '@/lib/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
 import { groupOrdersByPharmacy, type OrderGroup } from '@/lib/order-utils';
@@ -39,8 +37,6 @@ interface OrderData {
   totalQuantity: number;
   totalPrice: number;
   note?: string | null;
-  paymentMethod?: string | null;
-  pickupTime?: string | null;
   createdAt: string;
   pharmacyId: string;
   verificationCode?: string | null;
@@ -65,7 +61,6 @@ interface OrderData {
 interface PharmacyDetail {
   latitude: number;
   longitude: number;
-  paymentMethods: string;
   parkingInfo?: string;
 }
 
@@ -124,11 +119,10 @@ export function OrderConfirmationView() {
 
         // Pharmacy coordinates are already included in /api/orders/[id] response
         if (found.pharmacy && 'latitude' in found.pharmacy && 'longitude' in found.pharmacy) {
-          const pharm = found.pharmacy as unknown as { latitude: number; longitude: number; paymentMethods?: string; parkingInfo?: string };
+          const pharm = found.pharmacy as unknown as { latitude: number; longitude: number; parkingInfo?: string };
           setPharmacyDetail({
             latitude: pharm.latitude,
             longitude: pharm.longitude,
-            paymentMethods: pharm.paymentMethods || '[]',
             parkingInfo: pharm.parkingInfo,
           });
         } else {
@@ -139,7 +133,6 @@ export function OrderConfirmationView() {
             setPharmacyDetail({
               latitude: pharmData.latitude,
               longitude: pharmData.longitude,
-              paymentMethods: pharmData.paymentMethods || '[]',
               parkingInfo: pharmData.parkingInfo,
             });
           } catch {
@@ -441,30 +434,6 @@ export function OrderConfirmationView() {
                   </span>
                 </div>
               </div>
-
-              {/* Payment method */}
-              {order.paymentMethod && (
-                <div className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-                  <span className="text-xs text-muted-foreground">Paiement :</span>
-                  <Badge
-                    variant="secondary"
-                    className="text-xs bg-emerald-50 text-emerald-700"
-                  >
-                    {PAYMENT_LABELS[order.paymentMethod] || order.paymentMethod}
-                  </Badge>
-                </div>
-              )}
-
-              {/* Pickup time */}
-              {order.pickupTime && (
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-                  <span className="text-xs text-muted-foreground">
-                    Retrait prévu à {order.pickupTime}
-                  </span>
-                </div>
-              )}
 
               {/* Note */}
               {order.note && (

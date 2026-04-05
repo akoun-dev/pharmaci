@@ -14,7 +14,6 @@ import {
   ChevronRight,
   AlertCircle,
   Search,
-  Truck,
   QrCode,
   ShieldCheck,
   Copy,
@@ -52,12 +51,9 @@ import { toast } from 'sonner';
 interface OrderData {
   id: string;
   status: string;
-  deliveryStatus: string;
   totalQuantity: number;
   totalPrice: number;
   note?: string | null;
-  paymentMethod?: string | null;
-  pickupTime?: string | null;
   createdAt: string;
   pharmacyId: string;
   verificationCode?: string | null;
@@ -103,29 +99,6 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   cancelled: {
     label: 'Annulée',
     className: 'bg-red-100 text-red-700 border-red-200',
-  },
-};
-
-const DELIVERY_STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  pickup: {
-    label: 'Retrait',
-    className: 'bg-gray-100 text-gray-600 border-gray-200',
-  },
-  preparing: {
-    label: 'En préparation',
-    className: 'bg-blue-100 text-blue-700 border-blue-200',
-  },
-  ready: {
-    label: 'Prêt',
-    className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  },
-  delivering: {
-    label: 'En livraison',
-    className: 'bg-amber-100 text-amber-700 border-amber-200',
-  },
-  delivered: {
-    label: 'Livré',
-    className: 'bg-green-100 text-green-700 border-green-200',
   },
 };
 
@@ -344,8 +317,6 @@ export function OrderHistoryView() {
               {orders.map((order, index) => {
                 const statusInfo =
                   STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
-                const deliveryInfo =
-                  DELIVERY_STATUS_CONFIG[order.deliveryStatus] || DELIVERY_STATUS_CONFIG.pickup;
                 const isActive = ['pending', 'confirmed', 'ready'].includes(order.status);
                 return (
                   <motion.div
@@ -445,24 +416,6 @@ export function OrderHistoryView() {
                             {formatDate(order.createdAt)}
                           </span>
                         </div>
-
-                        {/* Delivery status badge */}
-                        {order.deliveryStatus && order.deliveryStatus !== 'pickup' && (
-                          <div className="flex items-center gap-2">
-                            <Badge
-                              variant="outline"
-                              className={`text-[10px] px-1.5 py-0 ${deliveryInfo.className}`}
-                            >
-                              {order.deliveryStatus === 'delivering' && <Truck className="h-2.5 w-2.5 mr-0.5" />}
-                              {deliveryInfo.label}
-                            </Badge>
-                            {(order.deliveryStatus === 'ready' || order.deliveryStatus === 'delivering') && (
-                              <span className="text-[11px] text-muted-foreground">
-                                Estimation : environ 30 min
-                              </span>
-                            )}
-                          </div>
-                        )}
 
                         {/* Separator */}
                         <div className="border-t border-emerald-100/80" />

@@ -79,7 +79,6 @@ export async function GET(request: NextRequest) {
       items: pharmacies.map((p) => ({
         ...p,
         services: JSON.parse(p.services || '[]'),
-        paymentMethods: JSON.parse(p.paymentMethods || '[]'),
         parkingInfo: p.parkingInfo,
         isFavorite: favorites.has(p.id),
       })),

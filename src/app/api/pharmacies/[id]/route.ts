@@ -45,7 +45,6 @@ export async function GET(
     return NextResponse.json({
       ...pharmacy,
       services: JSON.parse(pharmacy.services || '[]'),
-      paymentMethods: JSON.parse(pharmacy.paymentMethods || '[]'),
       parkingInfo: pharmacy.parkingInfo,
       isFavorite,
     });

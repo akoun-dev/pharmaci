@@ -22,6 +22,12 @@ export async function GET(
           },
           orderBy: { createdAt: 'desc' },
         },
+        reviews: {
+          include: {
+            pharmacy: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
         searchHistory: {
           orderBy: { createdAt: 'desc' },
           take: 20,

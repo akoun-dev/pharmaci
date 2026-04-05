@@ -60,3 +60,6 @@ htmlcov/
 prisma/migrations/
 prisma/schema.prisma.bak
 *.generated.ts
+prisma/db/custom.db
+prisma/db/custom.db
+prisma/db/custom.db

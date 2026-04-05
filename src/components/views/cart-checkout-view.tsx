@@ -8,13 +8,10 @@ import {
   Store,
   MapPin,
   Package,
-  Truck,
-  Wallet,
   MessageSquare,
   Pill,
   Loader2,
   AlertTriangle,
-  Banknote,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -38,8 +35,6 @@ interface OrderResult {
 export function CartCheckoutView() {
   const {
     items,
-    deliveryType,
-    deliveryAddress,
     note,
     clearCart,
     getSubtotal,
@@ -61,35 +56,22 @@ export function CartCheckoutView() {
       return;
     }
 
-    if (deliveryType === 'delivery' && !deliveryAddress.trim()) {
-      toast.error('Veuillez entrer une adresse de livraison');
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      // Build items payload - payment method is always 'especes' (cash on pickup)
+      // Build items payload
       const payloadItems = items.map((item) => ({
         pharmacyId: item.pharmacyId,
         medicationId: item.medicationId,
         quantity: item.quantity,
         stockId: item.stockId,
-        note: note || undefined,
-        paymentMethod: 'especes',
-        deliveryType,
-        deliveryAddress: deliveryType === 'delivery' ? deliveryAddress : undefined,
       }));
 
       const payload = {
         items: payloadItems,
-        deliveryType,
-        deliveryAddress: deliveryType === 'delivery' ? deliveryAddress : undefined,
         note: note || undefined,
-        paymentMethod: 'especes',
       };
 
-      let firstOrderId: string | null = null;
       let pharmacyCount = 1;
 
       // Use batch API - creates ONE order per pharmacy with ALL items from that pharmacy
@@ -103,7 +85,6 @@ export function CartCheckoutView() {
       if (batchRes.ok) {
         const batchData = await batchRes.json();
         if (batchData.orders && batchData.orders.length > 0) {
-          firstOrderId = batchData.orders[0].id;
           pharmacyCount = batchData.pharmacyCount || 1;
 
           // Show appropriate success message
@@ -150,8 +131,6 @@ export function CartCheckoutView() {
     }
   }, [
     items,
-    deliveryType,
-    deliveryAddress,
     note,
     groups,
     groupCount,
@@ -284,77 +263,30 @@ export function CartCheckoutView() {
           );
         })}
 
-        {/* ═══ Delivery & Payment Info ═══ */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: groups.size * 0.08 + 0.1, duration: 0.3 }}
-        >
-          <Card className="border-emerald-100 overflow-hidden">
-            <CardContent className="p-3.5 sm:p-4 space-y-3">
-              {/* Delivery info */}
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center flex-shrink-0">
-                  {deliveryType === 'pickup' ? (
-                    <Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  ) : (
-                    <Truck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-foreground">
-                    {deliveryType === 'pickup'
-                      ? 'Retrait en pharmacie'
-                      : 'Livraison'}
-                  </p>
-                  {deliveryType === 'delivery' && deliveryAddress && (
-                    <div className="flex items-start gap-1 mt-0.5">
-                      <MapPin className="h-3 w-3 text-muted-foreground flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-muted-foreground break-words">
-                        {deliveryAddress}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <Separator className="bg-emerald-100" />
-
-              {/* Payment method */}
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
-                  <Banknote className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-muted-foreground">
-                    Mode de paiement
-                  </p>
-                  <p className="text-sm font-semibold text-foreground">
-                    Espèces - Paiement à la récupération en pharmacie
-                  </p>
-                </div>
-              </div>
-
-              {/* Note */}
-              {note && (
-                <>
-                  <Separator className="bg-emerald-100" />
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
-                      <MessageSquare className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs text-muted-foreground mb-0.5">
-                        Note
-                      </p>
-                      <p className="text-sm text-foreground break-words">{note}</p>
-                    </div>
+        {/* ═══ Note ═══ */}
+        {(note) && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: groups.size * 0.08 + 0.1, duration: 0.3 }}
+          >
+            <Card className="border-emerald-100 overflow-hidden">
+              <CardContent className="p-3.5 sm:p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
+                    <MessageSquare className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                   </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-muted-foreground mb-0.5">
+                      Note
+                    </p>
+                    <p className="text-sm text-foreground break-words">{note}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* ═══ Grand Total + Confirm ═══ */}
         <motion.div

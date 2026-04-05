@@ -171,7 +171,7 @@ export function HomeView() {
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-3 mb-3 sm:mb-4">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-              <Heart className="h-5 w-5 text-white" />
+              <Pill className="h-5 w-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-bold">Pharma CI</h1>

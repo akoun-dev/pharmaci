@@ -23,6 +23,7 @@ export type View =
   | 'favorites'
   | 'order-confirmation'
   | 'order-history'
+  | 'my-reviews'
   // Pharmacist views
   | 'ph-dashboard'
   | 'ph-stock-list'

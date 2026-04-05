@@ -147,12 +147,9 @@ model Order {
   userId           String
   pharmacyId       String
   status           String    @default("pending")
-  deliveryStatus   String    @default("pickup")
   totalQuantity    Int       @default(0)
   totalPrice       Float     @default(0)
   note             String?
-  paymentMethod    String?
-  pickupTime       String?
   verificationCode String?   @unique
   verifiedAt       DateTime?
   createdAt        DateTime  @default(now())

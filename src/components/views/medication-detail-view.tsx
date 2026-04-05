@@ -250,8 +250,6 @@ export function MedicationDetailView() {
           medicationId: medication?.id,
           quantity: orderQuantity,
           note: orderNote,
-          paymentMethod: orderPayment || undefined,
-          pickupTime: orderPickupTime || undefined,
         }),
       });
       if (res.ok) {

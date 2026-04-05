@@ -20,18 +20,13 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
-  deliveryType: 'pickup' | 'delivery';
-  deliveryAddress: string;
   note: string;
   // Actions
   addItem: (item: Omit<CartItem, 'id'>) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  setDeliveryType: (type: 'pickup' | 'delivery') => void;
-  setDeliveryAddress: (address: string) => void;
   setNote: (note: string) => void;
-  setPaymentMethod: (method: string) => void;
   // Computed
   getItemCount: () => number;
   getSubtotal: () => number;
@@ -44,8 +39,6 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
-      deliveryType: 'pickup',
-      deliveryAddress: '',
       note: '',
 
       addItem: (item) =>
@@ -86,13 +79,9 @@ export const useCartStore = create<CartState>()(
       clearCart: () =>
         set(() => ({
           items: [],
-          deliveryType: 'pickup',
-          deliveryAddress: '',
           note: '',
         })),
 
-      setDeliveryType: (type) => set(() => ({ deliveryType: type })),
-      setDeliveryAddress: (address) => set(() => ({ deliveryAddress: address })),
       setNote: (note) => set(() => ({ note })),
 
       getItemCount: () => {

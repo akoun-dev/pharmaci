@@ -46,7 +46,6 @@ interface PharmacyDetail {
   reviewCount: number;
   description?: string;
   services: string[];
-  paymentMethods: string;
   parkingInfo?: string | null;
   latitude: number;
   longitude: number;
@@ -210,9 +209,6 @@ export function PharmacyDetailView() {
   const inStockMeds = pharmacy.stocks.filter((s) => s.inStock);
   const displayedMeds = showAllMedications ? pharmacy.stocks : pharmacy.stocks.slice(0, 5);
   const displayedReviews = showAllReviews ? pharmacy.reviews : pharmacy.reviews.slice(0, 3);
-  const paymentMethods: string[] = (() => {
-    try { return JSON.parse(pharmacy.paymentMethods || '[]'); } catch { return []; }
-  })();
 
   // Rating breakdown
   const ratingBreakdown = [5, 4, 3, 2, 1].map((r) => ({
@@ -325,8 +321,8 @@ export function PharmacyDetailView() {
           </Card>
         </motion.div>
 
-        {/* Practical Info: Payment methods + Parking */}
-        {(paymentMethods.length > 0 || pharmacy.parkingInfo) && (
+        {/* Practical Info: Parking */}
+        {pharmacy.parkingInfo && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -339,25 +335,6 @@ export function PharmacyDetailView() {
                   <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                   <h3 className="font-semibold text-sm">Infos pratiques</h3>
                 </div>
-
-                {/* Payment methods */}
-                {paymentMethods.length > 0 && (
-                  <div>
-                    <p className="text-[11px] sm:text-xs text-muted-foreground mb-1.5 sm:mb-2">Moyens de paiement acceptés</p>
-                    <div className="flex flex-wrap gap-1 sm:gap-1.5">
-                      {paymentMethods.map((pm: string) => (
-                        <Badge
-                          key={pm}
-                          variant="outline"
-                          className="text-[10px] sm:text-xs border-emerald-200 text-emerald-700 bg-emerald-50/50 px-1.5 sm:px-2 py-0.5 sm:py-1 gap-1"
-                        >
-                          <span>{PAYMENT_ICONS[pm] || '💳'}</span>
-                          {PAYMENT_LABELS[pm] || pm}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 {/* Parking info */}
                 {pharmacy.parkingInfo && (

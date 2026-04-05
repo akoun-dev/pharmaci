@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const userId = session.userId;
 
     const body = await request.json();
-    const { items, deliveryType, deliveryAddress, note, paymentMethod } = body;
+    const { items, note } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: 'Aucun article dans la commande' }, { status: 400 });
@@ -129,8 +129,6 @@ export async function POST(request: NextRequest) {
             totalQuantity,
             totalPrice,
             note: note?.trim() || null,
-            paymentMethod: paymentMethod || null,
-            deliveryStatus: deliveryType === 'delivery' ? 'preparing' : 'pickup',
             status: 'pending',
             verificationCode,
             items: {
@@ -150,7 +148,7 @@ export async function POST(request: NextRequest) {
             pharmacy: {
               select: {
                 name: true, address: true, city: true, phone: true,
-                latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
+                latitude: true, longitude: true, parkingInfo: true,
               },
             },
             items: {

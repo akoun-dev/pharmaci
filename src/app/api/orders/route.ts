@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     if (isMultiItemOrder) {
       // Multi-item order: create ONE order with multiple items (all from same pharmacy)
-      const { pharmacyId, items, note, paymentMethod, deliveryType, deliveryAddress } = body;
+      const { pharmacyId, items, note } = body;
 
       if (!pharmacyId || !items || items.length === 0) {
         return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
@@ -114,8 +114,6 @@ export async function POST(request: NextRequest) {
           totalQuantity,
           totalPrice,
           note: note?.trim() || null,
-          paymentMethod: paymentMethod || null,
-          deliveryStatus: deliveryType === 'delivery' ? 'preparing' : 'pickup',
           status: 'pending',
           verificationCode,
           items: {
@@ -134,7 +132,7 @@ export async function POST(request: NextRequest) {
           pharmacy: {
             select: {
               name: true, address: true, city: true, phone: true,
-              latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
+              latitude: true, longitude: true, parkingInfo: true,
             },
           },
           items: {
@@ -167,7 +165,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Legacy single-item order format
-    const { pharmacyId, medicationId, quantity, note, paymentMethod, pickupTime } = body;
+    const { pharmacyId, medicationId, quantity, note } = body;
 
     if (!pharmacyId || !medicationId) {
       return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
@@ -214,8 +212,6 @@ export async function POST(request: NextRequest) {
         totalQuantity: orderQuantity,
         totalPrice,
         note: note?.trim() || null,
-        paymentMethod: paymentMethod || null,
-        pickupTime: pickupTime || null,
         status: 'pending',
         verificationCode,
         items: {
@@ -231,7 +227,7 @@ export async function POST(request: NextRequest) {
         pharmacy: {
           select: {
             name: true, address: true, city: true, phone: true,
-            latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
+            latitude: true, longitude: true, parkingInfo: true,
           },
         },
         items: {
@@ -299,7 +295,7 @@ export async function GET(request: NextRequest) {
           pharmacy: {
             select: {
               name: true, address: true, city: true, phone: true,
-              latitude: true, longitude: true, parkingInfo: true, paymentMethods: true,
+              latitude: true, longitude: true, parkingInfo: true,
             },
           },
           items: {
