@@ -40,11 +40,15 @@ interface OrderData {
   createdAt: string;
   pharmacyId: string;
   verificationCode?: string | null;
+  verifiedAt?: string | null;
   pharmacy: {
     name: string;
     address: string;
     city: string;
     phone: string;
+    latitude?: number;
+    longitude?: number;
+    parkingInfo?: string | null;
   };
   items: {
     id: string;
