@@ -492,7 +492,10 @@ export function PharmacistDashboardView() {
                           >
                             <div className="min-w-0 flex-1 mr-3">
                               <p className="text-sm font-medium truncate">
-                                {order.medication.commercialName || order.medication.name}
+                                {order.items.length === 1
+                                  ? (order.items[0].medication.commercialName || order.items[0].medication.name)
+                                  : `${order.items.length} médicaments`
+                                }
                               </p>
                               <p className="text-xs text-muted-foreground mt-0.5 truncate">
                                 {order.user.name} · {formatRelativeTime(order.createdAt)}

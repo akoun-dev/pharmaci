@@ -546,9 +546,15 @@ export function PharmacistOrdersView() {
                       <div className="flex items-start gap-2">
                         <Pill className="h-4 w-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm truncate">{order.medication.commercialName || order.medication.name}</p>
-                          {order.medication.name !== order.medication.commercialName && (
-                            <p className="text-xs text-muted-foreground truncate">{order.medication.name}</p>
+                          {order.items.length === 1 ? (
+                            <>
+                              <p className="text-sm truncate">{order.items[0].medication.commercialName || order.items[0].medication.name}</p>
+                              {order.items[0].medication.name !== order.items[0].medication.commercialName && (
+                                <p className="text-xs text-muted-foreground truncate">{order.items[0].medication.name}</p>
+                              )}
+                            </>
+                          ) : (
+                            <p className="text-sm truncate">{order.items.length} médicaments</p>
                           )}
                         </div>
                       </div>

@@ -206,11 +206,13 @@ export function PharmacistReportsView() {
       // Find top medication
       if (dayOrders.length > 0) {
         const medMap: Record<string, { name: string; revenue: number; qty: number }> = {};
-        dayOrders.forEach((o: { medication: { name: string; commercialName: string }; quantity: number; totalPrice: number }) => {
-          const key = o.medication.commercialName || o.medication.name;
-          if (!medMap[key]) medMap[key] = { name: key, revenue: 0, qty: 0 };
-          medMap[key].revenue += o.totalPrice;
-          medMap[key].qty += o.quantity;
+        dayOrders.forEach((o: { items: Array<{ medication: { name: string; commercialName: string }; quantity: number; price: number }>; totalQuantity: number; totalPrice: number }) => {
+          o.items.forEach((item) => {
+            const key = item.medication.commercialName || item.medication.name;
+            if (!medMap[key]) medMap[key] = { name: key, revenue: 0, qty: 0 };
+            medMap[key].revenue += item.price * item.quantity;
+            medMap[key].qty += item.quantity;
+          });
         });
         const top = Object.values(medMap).sort((a, b) => b.revenue - a.revenue)[0];
         setTopMedication(top || null);
@@ -705,9 +707,12 @@ export function PharmacistReportsView() {
                       <div key={order.id} className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">
-                            {order.medication.commercialName || order.medication.name}
+                            {order.items.length === 1
+                              ? (order.items[0].medication.commercialName || order.items[0].medication.name)
+                              : `${order.items.length} médicaments`
+                            }
                           </p>
-                          <p className="text-xs text-muted-foreground">{order.user.name} · ×{order.quantity}</p>
+                          <p className="text-xs text-muted-foreground">{order.user.name} · ×{order.totalQuantity}</p>
                         </div>
                         <div className="text-right shrink-0 ml-3">
                           <p className="text-sm font-semibold text-emerald-700">{formatFCFA(order.totalPrice)}</p>

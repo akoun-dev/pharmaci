@@ -606,13 +606,19 @@ export function AdminOrdersView() {
                       <div className="flex items-start gap-2">
                         <Pill className="h-4 w-4 text-violet-500 flex-shrink-0 mt-0.5" />
                         <div className="min-w-0 flex-1 space-y-0.5">
-                          <p className="text-sm truncate">
-                            {order.medication.commercialName || order.medication.name}
-                          </p>
-                          {order.medication.name !== order.medication.commercialName && (
-                            <p className="text-xs text-muted-foreground truncate">
-                              {order.medication.name}
-                            </p>
+                          {order.items.length === 1 ? (
+                            <>
+                              <p className="text-sm truncate">
+                                {order.items[0].medication.commercialName || order.items[0].medication.name}
+                              </p>
+                              {order.items[0].medication.name !== order.items[0].medication.commercialName && (
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {order.items[0].medication.name}
+                                </p>
+                              )}
+                            </>
+                          ) : (
+                            <p className="text-sm truncate">{order.items.length} médicaments</p>
                           )}
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Building2 className="h-3 w-3" />
@@ -628,20 +634,11 @@ export function AdminOrdersView() {
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Package className="h-3 w-3" />
-                          Qté: {order.quantity}
+                          Qté: {order.totalQuantity}
                         </span>
                         <span className="font-semibold text-foreground text-sm">
                           {formatPrice(order.totalPrice)}
                         </span>
-                        {order.paymentMethod && (
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] px-1.5 py-0 border-gray-200 text-muted-foreground"
-                          >
-                            <CreditCard className="h-2.5 w-2.5 mr-0.5" />
-                            {PAYMENT_LABELS[order.paymentMethod] || order.paymentMethod}
-                          </Badge>
-                        )}
                       </div>
 
                       {/* Footer */}

@@ -127,8 +127,8 @@ function formatShortDate(dateStr: string): string {
   }
 }
 
-function getUnitPrice(totalPrice: number, quantity: number): number {
-  return quantity > 0 ? totalPrice / quantity : 0;
+function getUnitPrice(totalPrice: number, totalQuantity: number): number {
+  return totalQuantity > 0 ? totalPrice / totalQuantity : 0;
 }
 
 export function PharmacistOrderDetailView() {
@@ -342,7 +342,7 @@ export function PharmacistOrderDetailView() {
   }
 
   const statusInfo = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
-  const unitPrice = getUnitPrice(order.totalPrice, order.quantity);
+  const unitPrice = getUnitPrice(order.totalPrice, order.totalQuantity);
   const isCancelled = order.status === 'cancelled';
   const currentStepIndex = STATUS_FLOW_ORDER.indexOf(order.status);
   const isVerified = !!order.verifiedAt;
@@ -469,12 +469,6 @@ export function PharmacistOrderDetailView() {
                 )}
               </div>
             </div>
-            {order.pickupTime && (
-              <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 rounded-lg p-2.5">
-                <Clock className="h-3.5 w-3.5 shrink-0" />
-                <span>Heure de récupération : <strong>{order.pickupTime}</strong></span>
-              </div>
-            )}
           </CardContent>
         </Card>
 
@@ -488,16 +482,29 @@ export function PharmacistOrderDetailView() {
                 <Pill className="h-4 w-4 text-emerald-600" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-sm truncate">{order.medication.commercialName || order.medication.name}</p>
-                  {order.medication.needsPrescription && (
-                    <Badge className="bg-red-100 text-red-700 text-[10px] px-1.5 py-0 border-0 shrink-0">Ordonnance</Badge>
-                  )}
-                </div>
-                {order.medication.name !== order.medication.commercialName && (
-                  <p className="text-xs text-muted-foreground truncate">{order.medication.name}</p>
+                {order.items.length === 1 ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-sm truncate">{order.items[0].medication.commercialName || order.items[0].medication.name}</p>
+                      {order.items[0].medication.needsPrescription && (
+                        <Badge className="bg-red-100 text-red-700 text-[10px] px-1.5 py-0 border-0 shrink-0">Ordonnance</Badge>
+                      )}
+                    </div>
+                    {order.items[0].medication.name !== order.items[0].medication.commercialName && (
+                      <p className="text-xs text-muted-foreground truncate">{order.items[0].medication.name}</p>
+                    )}
+                    {order.items[0].medication.form && <p className="text-[11px] text-muted-foreground">{order.items[0].medication.form}</p>}
+                  </>
+                ) : (
+                  <div className="space-y-1">
+                    <p className="font-semibold text-sm">{order.items.length} médicaments</p>
+                    {order.items.map((item, idx) => (
+                      <p key={item.id || idx} className="text-xs text-muted-foreground">
+                        • {item.quantity}x {item.medication.commercialName || item.medication.name}
+                      </p>
+                    ))}
+                  </div>
                 )}
-                {order.medication.form && <p className="text-[11px] text-muted-foreground">{order.medication.form}</p>}
               </div>
             </div>
 
@@ -507,7 +514,7 @@ export function PharmacistOrderDetailView() {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Quantité</span>
                 <span className="font-medium flex items-center gap-1.5">
-                  <Package className="h-3.5 w-3.5 text-muted-foreground" />{order.quantity}
+                  <Package className="h-3.5 w-3.5 text-muted-foreground" />{order.totalQuantity}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
