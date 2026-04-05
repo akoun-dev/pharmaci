@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=production node .next/standalone/server.js",
-    "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/ && mkdir -p .next/standalone/db && cp -r db/* .next/standalone/db/",
+    "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/ && mkdir -p .next/standalone/db && cp -r db/* .next/standalone/db/ && mkdir -p .next/standalone/node_modules/@prisma && cp -r node_modules/@prisma/engines node_modules/@prisma/engines-version .next/standalone/node_modules/@prisma/",
     "start": "NODE_ENV=production node .next/standalone/server.js",
     "lint": "eslint .",
     "db:push": "prisma db push",
