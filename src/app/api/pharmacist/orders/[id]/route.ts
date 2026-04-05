@@ -34,8 +34,12 @@ export async function GET(
       where: { id, pharmacyId: user.linkedPharmacyId },
       include: {
         user: { select: { id: true, name: true, phone: true } },
-        medication: {
-          select: { id: true, name: true, commercialName: true, form: true, needsPrescription: true },
+        items: {
+          include: {
+            medication: {
+              select: { id: true, name: true, commercialName: true, form: true, needsPrescription: true },
+            },
+          },
         },
         pharmacy: {
           select: { name: true, address: true, city: true, phone: true },
@@ -50,18 +54,15 @@ export async function GET(
     return NextResponse.json({
       id: order.id,
       status: order.status,
-      deliveryStatus: order.deliveryStatus,
-      quantity: order.quantity,
+      totalQuantity: order.totalQuantity,
       totalPrice: order.totalPrice,
       note: order.note,
-      paymentMethod: order.paymentMethod,
-      pickupTime: order.pickupTime,
       verificationCode: order.verificationCode,
       verifiedAt: order.verifiedAt?.toISOString() || null,
       createdAt: order.createdAt.toISOString(),
       updatedAt: order.updatedAt.toISOString(),
       user: order.user,
-      medication: order.medication,
+      items: order.items,
       pharmacy: order.pharmacy,
     });
   } catch (error) {
@@ -95,9 +96,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { status, deliveryStatus } = body;
-
-    const ALLOWED_DELIVERY_STATUSES = ['pickup', 'preparing', 'ready', 'delivering', 'delivered'];
+    const { status } = body;
 
     if (status && !ALLOWED_STATUSES.includes(status)) {
       return NextResponse.json(
@@ -106,55 +105,63 @@ export async function PUT(
       );
     }
 
-    if (deliveryStatus && !ALLOWED_DELIVERY_STATUSES.includes(deliveryStatus)) {
-      return NextResponse.json(
-        { error: `Statut de livraison invalide. Valeurs autorisées : ${ALLOWED_DELIVERY_STATUSES.join(', ')}` },
-        { status: 400 }
-      );
-    }
-
-    // Check order belongs to this pharmacy
+    // Check order belongs to this pharmacy and get items for stock restoration
     const existing = await db.order.findUnique({
       where: { id },
+      include: {
+        items: {
+          select: {
+            medicationId: true,
+            quantity: true,
+          },
+        },
+      },
     });
 
     if (!existing || existing.pharmacyId !== user.linkedPharmacyId) {
       return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 });
     }
 
-    // If cancelling, restore stock
+    // If cancelling, restore stock for all items
     if (status === 'cancelled' && existing.status !== 'cancelled') {
-      await db.pharmacyMedication.update({
-        where: {
-          pharmacyId_medicationId: {
-            pharmacyId: user.linkedPharmacyId,
-            medicationId: existing.medicationId,
-          },
-        },
-        data: {
-          quantity: { increment: existing.quantity },
-          inStock: true,
-        },
-      });
+      await Promise.all(
+        existing.items.map((item) =>
+          db.pharmacyMedication.update({
+            where: {
+              pharmacyId_medicationId: {
+                pharmacyId: user.linkedPharmacyId,
+                medicationId: item.medicationId,
+              },
+            },
+            data: {
+              quantity: { increment: item.quantity },
+              inStock: true,
+            },
+          })
+        )
+      );
     }
 
     // Build update data
     const updateData: Record<string, string> = {};
     if (status) updateData.status = status;
-    if (deliveryStatus) updateData.deliveryStatus = deliveryStatus;
 
     const updated = await db.order.update({
       where: { id },
       data: updateData,
       include: {
         user: { select: { id: true, name: true, phone: true } },
-        medication: {
-          select: {
-            id: true,
-            name: true,
-            commercialName: true,
-            form: true,
-            needsPrescription: true,
+        items: {
+          include: {
+            medication: {
+              select: {
+                id: true,
+                name: true,
+                commercialName: true,
+                form: true,
+                needsPrescription: true,
+              },
+            },
           },
         },
         pharmacy: {
@@ -166,18 +173,15 @@ export async function PUT(
     return NextResponse.json({
       id: updated.id,
       status: updated.status,
-      deliveryStatus: updated.deliveryStatus,
-      quantity: updated.quantity,
+      totalQuantity: updated.totalQuantity,
       totalPrice: updated.totalPrice,
       note: updated.note,
-      paymentMethod: updated.paymentMethod,
-      pickupTime: updated.pickupTime,
       verificationCode: updated.verificationCode,
       verifiedAt: updated.verifiedAt?.toISOString() || null,
       createdAt: updated.createdAt.toISOString(),
       updatedAt: updated.updatedAt.toISOString(),
       user: updated.user,
-      medication: updated.medication,
+      items: updated.items,
       pharmacy: updated.pharmacy,
     });
   } catch (error) {

@@ -80,13 +80,17 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           user: { select: { id: true, name: true, phone: true } },
-          medication: {
-            select: {
-              id: true,
-              name: true,
-              commercialName: true,
-              form: true,
-              imageUrl: true,
+          items: {
+            include: {
+              medication: {
+                select: {
+                  id: true,
+                  name: true,
+                  commercialName: true,
+                  form: true,
+                  imageUrl: true,
+                },
+              },
             },
           },
         },
@@ -101,18 +105,15 @@ export async function GET(request: NextRequest) {
       orders: orders.map((o) => ({
         id: o.id,
         status: o.status,
-        deliveryStatus: o.deliveryStatus,
-        quantity: o.quantity,
+        totalQuantity: o.totalQuantity,
         totalPrice: o.totalPrice,
         note: o.note,
-        paymentMethod: o.paymentMethod,
-        pickupTime: o.pickupTime,
         verificationCode: o.verificationCode,
         verifiedAt: o.verifiedAt?.toISOString() || null,
         createdAt: o.createdAt.toISOString(),
         updatedAt: o.updatedAt.toISOString(),
         user: o.user,
-        medication: o.medication,
+        items: o.items,
       })),
       total,
       limit,

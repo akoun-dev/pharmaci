@@ -128,11 +128,15 @@ export async function GET(request: NextRequest) {
           createdAt: { gte: start, lte: end },
         },
         include: {
-          medication: {
-            select: {
-              id: true,
-              name: true,
-              commercialName: true,
+          items: {
+            include: {
+              medication: {
+                select: {
+                  id: true,
+                  name: true,
+                  commercialName: true,
+                },
+              },
             },
           },
         },
@@ -183,19 +187,21 @@ export async function GET(request: NextRequest) {
     // Top medications by revenue
     const medMap = new Map<string, { name: string; commercialName: string; quantity: number; revenue: number }>();
     for (const order of orders) {
-      const key = order.medicationId;
-      const existing = medMap.get(key);
-      const orderRevenue = order.totalPrice;
-      if (existing) {
-        existing.quantity += order.quantity;
-        existing.revenue += orderRevenue;
-      } else {
-        medMap.set(key, {
-          name: order.medication.name,
-          commercialName: order.medication.commercialName,
-          quantity: order.quantity,
-          revenue: orderRevenue,
-        });
+      for (const item of order.items) {
+        const key = item.medicationId;
+        const existing = medMap.get(key);
+        const itemRevenue = item.price * item.quantity;
+        if (existing) {
+          existing.quantity += item.quantity;
+          existing.revenue += itemRevenue;
+        } else {
+          medMap.set(key, {
+            name: item.medication.name,
+            commercialName: item.medication.commercialName,
+            quantity: item.quantity,
+            revenue: itemRevenue,
+          });
+        }
       }
     }
     const topMedications = Array.from(medMap.values())

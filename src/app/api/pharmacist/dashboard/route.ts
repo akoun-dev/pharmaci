@@ -98,7 +98,11 @@ export async function GET(request: NextRequest) {
         where: { pharmacyId },
         include: {
           user: { select: { name: true, phone: true } },
-          medication: { select: { name: true, commercialName: true, form: true } },
+          items: {
+            include: {
+              medication: { select: { name: true, commercialName: true, form: true } },
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
         take: 5,

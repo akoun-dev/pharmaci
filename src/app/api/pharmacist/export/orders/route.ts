@@ -44,14 +44,6 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: 'Annulée',
 };
 
-const PAYMENT_LABELS: Record<string, string> = {
-  cash: 'Espèces',
-  orange_money: 'Orange Money',
-  wave: 'Wave',
-  mtn_money: 'MTN Money',
-  card: 'Carte',
-};
-
 export async function GET(request: NextRequest) {
   try {
     const session = await getSessionFromCookie(request);
@@ -85,8 +77,12 @@ export async function GET(request: NextRequest) {
         user: {
           select: { name: true, phone: true },
         },
-        medication: {
-          select: { name: true, commercialName: true, form: true },
+        items: {
+          include: {
+            medication: {
+              select: { name: true, commercialName: true, form: true },
+            },
+          },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -96,28 +92,29 @@ export async function GET(request: NextRequest) {
     const headers = [
       'ID Commande',
       'Patient',
-      'Médicament',
-      'Quantité',
+      'Médicament(s)',
+      'Quantité totale',
       'Total',
       'Statut',
       'Date',
-      'Mode paiement',
     ];
 
-    const rows = orders.map((o) => [
-      o.id.slice(0, 8),
-      o.user.name,
-      o.medication.commercialName || o.medication.name,
-      String(o.quantity),
-      o.totalPrice.toLocaleString('fr-FR') + ' FCFA',
-      STATUS_LABELS[o.status] || o.status,
-      new Date(o.createdAt).toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }),
-      PAYMENT_LABELS[o.paymentMethod || ''] || o.paymentMethod || '',
-    ]);
+    const rows = orders.map((o) => {
+      const medications = o.items.map(i => i.medication.commercialName || i.medication.name).join(' | ');
+      return [
+        o.id.slice(0, 8),
+        o.user.name,
+        medications,
+        String(o.totalQuantity),
+        o.totalPrice.toLocaleString('fr-FR') + ' FCFA',
+        STATUS_LABELS[o.status] || o.status,
+        new Date(o.createdAt).toLocaleDateString('fr-FR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        }),
+      ];
+    });
 
     const csvLines = [
       headers.map(escapeCSV).join(','),

@@ -41,8 +41,12 @@ export async function POST(request: NextRequest) {
       },
       include: {
         user: { select: { id: true, name: true, phone: true } },
-        medication: {
-          select: { id: true, name: true, commercialName: true, form: true, needsPrescription: true },
+        items: {
+          include: {
+            medication: {
+              select: { id: true, name: true, commercialName: true, form: true, needsPrescription: true },
+            },
+          },
         },
         pharmacy: {
           select: { name: true, address: true, city: true, phone: true },
@@ -59,19 +63,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         id: order.id,
         status: order.status,
-        deliveryStatus: order.deliveryStatus,
-        quantity: order.quantity,
+        totalQuantity: order.totalQuantity,
         totalPrice: order.totalPrice,
         note: order.note,
-        paymentMethod: order.paymentMethod,
-        pickupTime: order.pickupTime,
         verificationCode: order.verificationCode,
         verifiedAt: order.verifiedAt.toISOString(),
         alreadyVerified: true,
         createdAt: order.createdAt.toISOString(),
         updatedAt: order.updatedAt.toISOString(),
         user: order.user,
-        medication: order.medication,
+        items: order.items,
         pharmacy: order.pharmacy,
       });
     }
@@ -86,8 +87,12 @@ export async function POST(request: NextRequest) {
       data: { verifiedAt: new Date() },
       include: {
         user: { select: { id: true, name: true, phone: true } },
-        medication: {
-          select: { id: true, name: true, commercialName: true, form: true, needsPrescription: true },
+        items: {
+          include: {
+            medication: {
+              select: { id: true, name: true, commercialName: true, form: true, needsPrescription: true },
+            },
+          },
         },
         pharmacy: {
           select: { name: true, address: true, city: true, phone: true },
@@ -98,19 +103,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       id: updated.id,
       status: updated.status,
-      deliveryStatus: updated.deliveryStatus,
-      quantity: updated.quantity,
+      totalQuantity: updated.totalQuantity,
       totalPrice: updated.totalPrice,
       note: updated.note,
-      paymentMethod: updated.paymentMethod,
-      pickupTime: updated.pickupTime,
       verificationCode: updated.verificationCode,
       verifiedAt: updated.verifiedAt.toISOString(),
       alreadyVerified: false,
       createdAt: updated.createdAt.toISOString(),
       updatedAt: updated.updatedAt.toISOString(),
       user: updated.user,
-      medication: updated.medication,
+      items: updated.items,
       pharmacy: updated.pharmacy,
     });
   } catch (error) {
