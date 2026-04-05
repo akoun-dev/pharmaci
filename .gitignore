@@ -24,7 +24,7 @@ venv/
 # Editors
 .vscode/
 .idea/
-
+.next
 # Coverage reports
 coverage/
 htmlcov/
@@ -34,3 +34,4 @@ htmlcov/
 .DS_Store
 Thumbs.db
 ```
+tsconfig.tsbuildinfo
