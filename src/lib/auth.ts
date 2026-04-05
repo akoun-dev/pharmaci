@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 import { SignJWT, jwtVerify } from 'jose';
 import { hash, compare } from 'bcryptjs';
 import { cookies } from 'next/headers';
+import { generateCSRFToken } from './csrf';
 
 function getJwtSecret(): Uint8Array {
   const secret = process.env.JWT_SECRET;
@@ -16,6 +17,7 @@ function getJwtSecret(): Uint8Array {
 }
 
 const COOKIE_NAME = 'pharmapp-session';
+const CSRF_COOKIE_NAME = 'pharmapp-csrf-token';
 
 export interface JwtPayload {
   userId: string;
@@ -61,18 +63,41 @@ export async function getSessionFromCookie(request: Request): Promise<JwtPayload
   return verifyToken(token);
 }
 
-/** Create a session cookie response header value */
-export function createSessionCookie(token: string): string {
+/** Create a session cookie response header value with CSRF token */
+export function createSessionCookie(token: string, userId?: string): {
+  sessionCookie: string;
+  csrfCookie: string;
+  csrfToken?: string;
+} {
   const isProduction = process.env.NODE_ENV === 'production';
   const maxAge = 7 * 24 * 60 * 60; // 7 days
-  return `${COOKIE_NAME}=${token}; Path=/; HttpOnly; ${
+  
+  const sessionCookie = `${COOKIE_NAME}=${token}; Path=/; HttpOnly; ${
     isProduction ? 'Secure; ' : ''
   }SameSite=Lax; Max-Age=${maxAge}`;
+  
+  // Generate and set CSRF token if userId is provided
+  let csrfToken: string | undefined;
+  let csrfCookie = '';
+  
+  if (userId) {
+    csrfToken = generateCSRFToken(userId);
+    csrfCookie = `${CSRF_COOKIE_NAME}=${csrfToken}; Path=/; ${
+      isProduction ? 'Secure; ' : ''
+    }SameSite=Lax; Max-Age=${maxAge}`;
+  }
+  
+  return { sessionCookie, csrfCookie, csrfToken };
 }
 
-/** Delete the session cookie */
+/** Delete the session cookie and CSRF cookie */
 export function deleteSessionCookie(): string {
   return `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0`;
+}
+
+/** Delete the CSRF cookie */
+export function deleteCSRFCookie(): string {
+  return `${CSRF_COOKIE_NAME}=; Path=/; Max-Age=0`;
 }
 
 /** Hash a password using bcryptjs */

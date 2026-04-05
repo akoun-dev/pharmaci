@@ -8,6 +8,7 @@ import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
 const COOKIE_NAME = 'pharmapp-session';
+const CSRF_COOKIE_NAME = 'pharmapp-csrf-token';
 
 function getJwtSecret(): Uint8Array {
   const secret = process.env.JWT_SECRET;
@@ -21,6 +22,13 @@ function getToken(request: NextRequest): string | null {
   return request.cookies.get(COOKIE_NAME)?.value ?? null;
 }
 
+function getCSRFToken(request: NextRequest): string | null {
+  // Check header first, then cookie
+  return request.headers.get('x-csrf-token') ||
+         request.headers.get('x-xsrf-token') ||
+         request.cookies.get(CSRF_COOKIE_NAME)?.value ?? null;
+}
+
 function unauthorized(message = 'Authentification requise') {
   return NextResponse.json({ error: message, code: 'UNAUTHORIZED' }, { status: 401 });
 }
@@ -29,11 +37,27 @@ function forbidden(message = 'Accès refusé') {
   return NextResponse.json({ error: message, code: 'FORBIDDEN' }, { status: 403 });
 }
 
+function csrfError(message = 'CSRF token invalide') {
+  return NextResponse.json({ error: message, code: 'CSRF_INVALID' }, { status: 403 });
+}
+
 function authenticatedNext(userId: string, userRole: string): NextResponse {
   const res = NextResponse.next();
   res.headers.set('X-User-Id', userId);
   res.headers.set('X-User-Role', userRole);
   return res;
+}
+
+// Routes that require CSRF validation (state-changing operations)
+function requiresCSRFValidation(pathname: string, method: string): boolean {
+  // Skip CSRF for safe methods
+  if (['GET', 'HEAD', 'OPTIONS'].includes(method)) return false;
+  
+  // Skip CSRF for auth routes (login/register handle their own security)
+  if (pathname.startsWith('/api/auth/')) return false;
+  
+  // All other state-changing operations require CSRF
+  return true;
 }
 
 export async function middleware(request: NextRequest) {

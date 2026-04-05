@@ -1,7 +1,11 @@
 import { randomBytes, createHash, timingSafeEqual } from 'crypto';
 
 const CSRF_TOKEN_LENGTH = 32;
-const CSRF_SECRET = process.env.CSRF_SECRET || 'csrf-secret-change-in-production';
+const CSRF_SECRET = process.env.CSRF_SECRET;
+
+if (!CSRF_SECRET) {
+  throw new Error('CSRF_SECRET environment variable is required but not set');
+}
 
 /**
  * Generate a CSRF token for state-changing operations
