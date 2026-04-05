@@ -24,7 +24,6 @@ import {
   TrendingDown,
   Package,
   Navigation,
-  CreditCard,
   Star,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -36,7 +35,7 @@ import { ViewHeader } from '@/components/view-header';
 import { useAppStore } from '@/store/app-store';
 import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
-import { haversineDistance, formatDistance, openGoogleMaps, PAYMENT_LABELS, PAYMENT_ICONS } from '@/lib/navigation';
+import { haversineDistance, formatDistance, openGoogleMaps } from '@/lib/navigation';
 
 interface MedicationDetail {
   id: string;
@@ -83,7 +82,6 @@ interface AvailablePharmacy {
 type SortMode = 'price-asc' | 'price-desc' | 'rating' | 'stock' | 'distance';
 type FilterCity = string | null;
 type FilterGuard = boolean | null;
-type PaymentMethod = 'especes' | 'orange_money' | 'wave' | 'mtn_money' | 'carte';
 
 const SORT_OPTIONS: { value: SortMode; label: string; shortLabel: string }[] = [
   { value: 'distance', label: 'Plus proches', shortLabel: 'Proche' },
@@ -91,15 +89,6 @@ const SORT_OPTIONS: { value: SortMode; label: string; shortLabel: string }[] = [
   { value: 'price-desc', label: 'Prix décroissant', shortLabel: 'Prix ↓' },
   { value: 'rating', label: 'Meilleures notes', shortLabel: 'Notes' },
   { value: 'stock', label: 'Plus de stock', shortLabel: 'Stock' },
-];
-
-const PAYMENT_OPTIONS: { value: PaymentMethod | ''; label: string; icon: string }[] = [
-  { value: '', label: 'Sur place', icon: '🏪' },
-  { value: 'especes', label: 'Espèces', icon: '💵' },
-  { value: 'orange_money', label: 'Orange Money', icon: '🟠' },
-  { value: 'wave', label: 'Wave', icon: '🌊' },
-  { value: 'mtn_money', label: 'MTN Money', icon: '🟡' },
-  { value: 'carte', label: 'Carte', icon: '💳' },
 ];
 
 // Default location: center of Abidjan for demo
@@ -134,8 +123,6 @@ export function MedicationDetailView() {
   const [orderQuantity, setOrderQuantity] = useState(1);
   const [orderNote, setOrderNote] = useState('');
   const [orderSubmitting, setOrderSubmitting] = useState(false);
-  const [orderPayment, setOrderPayment] = useState<PaymentMethod | ''>('');
-  const [orderPickupTime, setOrderPickupTime] = useState('');
 
   // Get user location
   useEffect(() => {
@@ -841,43 +828,6 @@ export function MedicationDetailView() {
               </div>
             </div>
 
-            {/* Payment method */}
-            <div className="mb-3">
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1">
-                <CreditCard className="h-3.5 w-3.5 text-emerald-600" />
-                Paiement
-              </label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {PAYMENT_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setOrderPayment(opt.value as PaymentMethod | '')}
-                    className={`flex items-center justify-center gap-1 px-2 py-2 rounded-lg text-[11px] font-medium transition-colors ${
-                      orderPayment === opt.value
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-emerald-50 text-emerald-700 active:bg-emerald-100 border border-emerald-200'
-                    }`}
-                  >
-                    <span className="text-sm">{opt.icon}</span>
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Pickup time */}
-            <div className="mb-3">
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                Heure de retrait <span className="font-normal">(optionnel)</span>
-              </label>
-              <input
-                type="time"
-                value={orderPickupTime}
-                onChange={(e) => setOrderPickupTime(e.target.value)}
-                className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-              />
-            </div>
-
             {/* Note */}
             <div className="mb-2">
               <label className="text-xs font-medium text-muted-foreground mb-1 block">
@@ -901,9 +851,6 @@ export function MedicationDetailView() {
                 <span className="text-lg font-bold text-emerald-700">
                   {orderingPharmacy ? (orderingPharmacy.price * orderQuantity).toLocaleString() : 0} FCFA
                 </span>
-                {orderPayment && (
-                  <p className="text-[11px] text-muted-foreground">{PAYMENT_LABELS[orderPayment] || orderPayment}</p>
-                )}
               </div>
             </div>
             <Button
