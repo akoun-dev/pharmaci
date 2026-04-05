@@ -216,8 +216,6 @@ export function MedicationDetailView() {
     setOrderingPharmacy(pharmacy);
     setOrderQuantity(1);
     setOrderNote('');
-    setOrderPayment('');
-    setOrderPickupTime('');
   };
 
   const closeOrderDialog = () => {
