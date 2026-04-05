@@ -24,9 +24,9 @@ function getToken(request: NextRequest): string | null {
 
 function getCSRFToken(request: NextRequest): string | null {
   // Check header first, then cookie
-  return request.headers.get('x-csrf-token') ||
-         request.headers.get('x-xsrf-token') ||
-         request.cookies.get(CSRF_COOKIE_NAME)?.value ?? null;
+  return (request.headers.get('x-csrf-token') ||
+          request.headers.get('x-xsrf-token') ||
+          request.cookies.get(CSRF_COOKIE_NAME)?.value) ?? null;
 }
 
 function unauthorized(message = 'Authentification requise') {
