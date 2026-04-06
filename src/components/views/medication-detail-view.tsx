@@ -10,7 +10,7 @@ import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
-  Shield,
+  ShieldCheck,
   Clock,
   Info,
   SlidersHorizontal,
@@ -591,7 +591,7 @@ export function MedicationDetailView() {
                               : 'border-amber-200 text-muted-foreground hover:bg-amber-50'
                           }`}
                         >
-                          <Shield className="h-3.5 w-3.5" />
+                          <ShieldCheck className="h-3.5 w-3.5" />
                           Pharmacies de garde uniquement
                         </button>
                       </div>
@@ -650,7 +650,7 @@ export function MedicationDetailView() {
                         )}
                         {pharmacy.isGuard && (
                           <Badge className="bg-amber-100 text-amber-700 text-[10px] px-1.5 h-4 flex-shrink-0">
-                            <Shield className="h-2.5 w-2.5 mr-0.5" />
+                            <ShieldCheck className="h-2.5 w-2.5 mr-0.5" />
                             Garde
                           </Badge>
                         )}

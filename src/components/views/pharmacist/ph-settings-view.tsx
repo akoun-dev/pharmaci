@@ -22,7 +22,7 @@ import {
   Headphones,
   LogOut,
   ChevronRight,
-  Shield,
+  ShieldCheck,
   Loader2,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -462,7 +462,7 @@ export function PharmacistSettingsView() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
           <div className="text-center py-2">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Shield className="h-3.5 w-3.5 text-amber-600" />
+              <ShieldCheck className="h-3.5 w-3.5 text-amber-600" />
               <span className="text-[10px] font-medium text-amber-700">Pharma CI</span>
             </div>
             <p className="text-[10px] text-muted-foreground">Version 1.0.0</p>

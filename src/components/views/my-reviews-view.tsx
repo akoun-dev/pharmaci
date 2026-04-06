@@ -7,7 +7,7 @@ import {
   Star,
   MapPin,
   Phone,
-  Shield,
+  ShieldCheck,
   Trash2,
   MessageSquare,
   Building2,
@@ -166,7 +166,7 @@ export function MyReviewsView() {
                             <h3 className="font-semibold text-sm">{review.pharmacy.name}</h3>
                             {review.pharmacy.isGuard && (
                               <Badge className="bg-amber-600 text-white text-[10px] px-1.5 h-4 flex-shrink-0">
-                                <Shield className="h-3 w-3" />
+                                <ShieldCheck className="h-3 w-3" />
                                 Garde
                               </Badge>
                             )}

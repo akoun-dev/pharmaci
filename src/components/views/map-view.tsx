@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import {
   Navigation,
   Clock,
-  Shield,
+  ShieldCheck,
   MapPin,
   LocateFixed,
   Crosshair,
@@ -299,7 +299,7 @@ export function MapView() {
                 'Toutes'
               ) : f === 'guard' ? (
                 <>
-                  <Shield className="h-3 w-3 mr-1" />
+                  <ShieldCheck className="h-3 w-3 mr-1" />
                   De garde
                 </>
               ) : (

@@ -22,7 +22,7 @@ import {
   Star,
   FlaskConical,
   BarChart3,
-  Shield,
+  ShieldCheck,
   ShoppingCart,
 } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';

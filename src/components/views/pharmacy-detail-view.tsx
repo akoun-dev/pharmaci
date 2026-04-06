@@ -7,7 +7,7 @@ import {
   Phone,
   MapPin,
   Clock,
-  Shield,
+  ShieldCheck,
   Star,
   Heart,
   MessageSquare,
@@ -238,7 +238,7 @@ export function PharmacyDetailView() {
                     <h1 className="text-base sm:text-lg font-bold text-white break-words">{pharmacy.name}</h1>
                     {pharmacy.isGuard && (
                       <Badge className="bg-amber-500 text-white text-[10px] h-5 flex items-center gap-0.5 flex-shrink-0">
-                        <Shield className="h-3 w-3" />
+                        <ShieldCheck className="h-3 w-3" />
                         Garde
                       </Badge>
                     )}

@@ -15,7 +15,7 @@ import {
   Clock,
   Info,
   ChevronRight,
-  Shield,
+  ShieldCheck,
   Heart,
   Building2,
   ClipboardList,
@@ -731,7 +731,7 @@ export function ProfileView() {
                 pharmacies de garde près de chez vous.
               </p>
               <div className="flex items-center gap-2 mt-3">
-                <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-600" />
+                <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-600" />
                 <span className="text-[10px] sm:text-xs text-muted-foreground">Version 1.0.0 • 2025</span>
               </div>
             </CardContent>

@@ -7,7 +7,7 @@ import {
   Users,
   Search,
   RefreshCw,
-  Shield,
+  ShieldCheck,
   MoreVertical,
   Loader2,
   AlertCircle,
@@ -408,7 +408,7 @@ export function AdminUsersView() {
               }`}
             >
               {tab.key === 'patient' && <Users className="h-3 w-3" />}
-              {tab.key === 'pharmacist' && <Shield className="h-3 w-3" />}
+              {tab.key === 'pharmacist' && <ShieldCheck className="h-3 w-3" />}
               {tab.key === 'admin' && <UserCog className="h-3 w-3" />}
               {tab.label}
               <span
@@ -675,7 +675,7 @@ export function AdminUsersView() {
                   </SelectItem>
                   <SelectItem value="pharmacist">
                     <span className="flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-blue-600" />
+                      <ShieldCheck className="h-4 w-4 text-blue-600" />
                       Pharmacien
                     </span>
                   </SelectItem>
@@ -722,7 +722,7 @@ export function AdminUsersView() {
                   </>
                 ) : (
                   <>
-                    <Shield className="h-4 w-4 mr-2" />
+                    <ShieldCheck className="h-4 w-4 mr-2" />
                     Enregistrer
                   </>
                 )}

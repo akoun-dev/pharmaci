@@ -3,7 +3,7 @@
 import { logger } from '@/lib/logger';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Pill, Building2, SlidersHorizontal, X, MapPin, LocateFixed, AlertTriangle } from 'lucide-react';
+import { Search, Pill, Building2, SlidersHorizontal, X, MapPin, LocateFixed, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -303,7 +303,7 @@ export function SearchView() {
                             : 'border-orange-200 text-muted-foreground hover:bg-orange-50'
                         }`}
                       >
-                        <Shield className="h-4 w-4" />
+                        <ShieldCheck className="h-4 w-4" />
                         Pharmacies de garde uniquement
                       </button>
                     </div>

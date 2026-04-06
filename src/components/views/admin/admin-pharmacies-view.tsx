@@ -7,7 +7,7 @@ import {
   Building2,
   Search,
   Star,
-  Shield,
+  ShieldCheck,
   MapPin,
   Phone,
   Clock,
@@ -562,7 +562,7 @@ export function AdminPharmaciesView() {
                           <div className="flex items-center gap-1 flex-wrap justify-end">
                             {pharmacy.isGuard && (
                               <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px] px-1.5 py-0">
-                                <Shield className="h-2.5 w-2.5 mr-0.5" />
+                                <ShieldCheck className="h-2.5 w-2.5 mr-0.5" />
                                 Garde
                               </Badge>
                             )}
@@ -696,7 +696,7 @@ export function AdminPharmaciesView() {
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {selectedPharmacy.isGuard && (
                       <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[11px] px-2 py-0.5">
-                        <Shield className="h-3 w-3 mr-1" />
+                        <ShieldCheck className="h-3 w-3 mr-1" />
                         Pharmacie de garde
                       </Badge>
                     )}

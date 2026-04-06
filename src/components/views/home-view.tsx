@@ -16,6 +16,7 @@ import {
   ArrowRight,
   Activity,
   ZoomIn,
+  ShieldCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -440,7 +441,7 @@ export function HomeView() {
           transition={{ delay: 0.2 }}
         >
           <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-            <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
+            <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
             <h3 className="font-semibold text-sm text-foreground">Pharmacies de garde</h3>
           </div>
           {loading ? (

@@ -29,7 +29,7 @@ import {
   Info,
   Database,
   User,
-  Shield,
+  ShieldCheck,
   Globe,
   Server,
   HardDrive,
@@ -275,13 +275,13 @@ export function AdminSettingsView() {
           <Card className="border-amber-100">
             <CardHeader className="flex flex-row items-center gap-3 pb-3 px-4 pt-4">
               <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-amber-100">
-                <Shield className="h-4.5 w-4.5 text-amber-600" />
+                <ShieldCheck className="h-4.5 w-4.5 text-amber-600" />
               </div>
               <CardTitle className="text-sm sm:text-base font-semibold">
                 Compte administrateur
               </CardTitle>
               <Badge className="ml-auto bg-amber-100 text-amber-700 border-0 text-xs">
-                <Shield className="h-3 w-3 mr-1" />
+                <ShieldCheck className="h-3 w-3 mr-1" />
                 Admin
               </Badge>
             </CardHeader>

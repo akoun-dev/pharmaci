@@ -8,7 +8,7 @@ import {
   MapPin,
   Phone,
   Clock,
-  Shield,
+  ShieldCheck,
   Trash2,
   MessageSquare,
   Pill,
@@ -153,7 +153,7 @@ export function FavoritesView() {
                             <h3 className="font-semibold text-sm">{fav.pharmacy.name}</h3>
                             {fav.pharmacy.isGuard && (
                               <Badge className="bg-orange-600 text-white text-[10px] px-1.5 h-4 flex-shrink-0">
-                                <Shield className="h-3 w-3" />
+                                <ShieldCheck className="h-3 w-3" />
                                 De garde
                               </Badge>
                             )}

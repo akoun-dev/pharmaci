@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock, Star, Shield, Heart } from 'lucide-react';
+import { MapPin, Clock, Star, ShieldCheck, Heart } from 'lucide-react';
 import { RatingStars } from '@/components/rating-stars';
 import { motion } from 'framer-motion';
 import { useState, useCallback, useEffect } from 'react';
@@ -103,7 +103,7 @@ export const PharmacyCard = React.memo(function PharmacyCard({
                 </h3>
                 {pharmacy.isGuard && (
                   <Badge variant="default" className="bg-orange-600 text-white text-[10px] px-1.5 py-0 h-5 flex items-center gap-0.5 flex-shrink-0">
-                    <Shield className="h-3 w-3" />
+                    <ShieldCheck className="h-3 w-3" />
                     De garde
                   </Badge>
                 )}
