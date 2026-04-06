@@ -107,18 +107,30 @@ export function OrderConfirmationView() {
       if (found) {
         setOrder(found);
 
-        // Fetch all orders to find related ones from the same pharmacy
-        const allOrdersRes = await fetch('/api/orders');
-        if (allOrdersRes.ok) {
-          const allOrders: OrderData[] = await allOrdersRes.json();
-          // Get orders from the same pharmacy created within the last hour
-          const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-          const related = allOrders.filter(
-            o => o.pharmacyId === found.pharmacyId &&
-            o.id !== found.id &&
-            new Date(o.createdAt) > oneHourAgo
-          );
-          setRelatedOrders(related);
+        // Related orders are informational only, so a failure here must not
+        // break the confirmation screen after a successful order creation.
+        try {
+          const allOrdersRes = await fetch('/api/orders');
+          if (allOrdersRes.ok) {
+            const allOrdersData = await allOrdersRes.json();
+            const allOrders: OrderData[] = Array.isArray(allOrdersData)
+              ? allOrdersData
+              : Array.isArray(allOrdersData.items)
+                ? allOrdersData.items
+                : [];
+
+            // Get orders from the same pharmacy created within the last hour
+            const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+            const related = allOrders.filter(
+              o => o.pharmacyId === found.pharmacyId &&
+              o.id !== found.id &&
+              new Date(o.createdAt) > oneHourAgo
+            );
+            setRelatedOrders(related);
+          }
+        } catch (relatedOrdersError) {
+          logger.warn('Unable to fetch related orders for confirmation view', relatedOrdersError);
+          setRelatedOrders([]);
         }
 
         // Pharmacy coordinates are already included in /api/orders/[id] response
@@ -170,7 +182,10 @@ export function OrderConfirmationView() {
     : '';
 
   const handleDownloadQR = () => {
-    const svg = document.getElementById('order-qr-code');
+    const container = document.getElementById('order-qr-code');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
     if (!svg) return;
 
     const svgData = new XMLSerializer().serializeToString(svg);
@@ -192,6 +207,10 @@ export function OrderConfirmationView() {
         link.click();
         toast.success('QR Code téléchargé');
       }
+    };
+
+    img.onerror = () => {
+      toast.error('Erreur lors de la génération du QR Code');
     };
 
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
@@ -296,15 +315,15 @@ export function OrderConfirmationView() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
           >
-            <Card className="border-amber-200 overflow-hidden">
-              <div className="bg-gradient-to-r from-amber-600 to-teal-600 px-4 py-3 text-center">
+            <Card className="border-green-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-green-600 to-teal-600 px-4 py-3 text-center">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <QrCode className="h-4 w-4 text-white/90" />
                   <p className="font-semibold text-sm text-white">
                     Code de vérification
                   </p>
                 </div>
-                <p className="text-xs text-amber-200">
+                <p className="text-xs text-white">
                   Présentez ce QR code à la pharmacie pour récupérer votre commande
                 </p>
               </div>

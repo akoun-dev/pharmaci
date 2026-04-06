@@ -1,4 +1,3 @@
-import { logger } from '@/lib/logger';
 import { PrismaClient } from '@prisma/client';
 import { join } from 'path';
 

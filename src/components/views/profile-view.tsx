@@ -301,7 +301,7 @@ export function ProfileView() {
                     <div className="flex items-center gap-1.5 sm:gap-2 mt-1 flex-wrap">
                       <Badge
                         variant="secondary"
-                        className="text-[10px] bg-amber-50 text-amber-700"
+                        className="text-[10px] bg-green-50 text-green-700"
                       >
                         {currentUser.role === 'pharmacist' ? 'Pharmacien' : 'Patient'}
                       </Badge>
@@ -328,7 +328,7 @@ export function ProfileView() {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8 border-amber-200 text-amber-700 hover:bg-amber-50"
+                      className="h-8 w-8 border-green-200 text-green-700 hover:bg-green-50"
                       onClick={() => {
                         setEditName(currentUser.name || '');
                         setEditPhone(currentUser.phone || '');
@@ -351,25 +351,25 @@ export function ProfileView() {
 
                 <div className="flex items-center gap-4 mt-3 pt-3 border-t border-amber-100">
                   <div className="text-center">
-                    <p className="text-base sm:text-lg font-bold text-amber-700">
+                    <p className="text-base sm:text-lg font-bold text-green-700">
                       {user?._count?.reviews || 0}
                     </p>
                     <p className="text-[10px] text-muted-foreground">Avis</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-base sm:text-lg font-bold text-amber-700">
+                    <p className="text-base sm:text-lg font-bold text-green-700">
                       {user?.favorites?.length || 0}
                     </p>
                     <p className="text-[10px] text-muted-foreground">Favoris</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-base sm:text-lg font-bold text-amber-700">
+                    <p className="text-base sm:text-lg font-bold text-green-700">
                       {user?._count?.orders || 0}
                     </p>
                     <p className="text-[10px] text-muted-foreground">Commandes</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-base sm:text-lg font-bold text-amber-700">
+                    <p className="text-base sm:text-lg font-bold text-green-700">
                       {recentSearches.length}
                     </p>
                     <p className="text-[10px] text-muted-foreground">Recherches</p>
@@ -523,6 +523,8 @@ export function ProfileView() {
               </div>
               <div className="space-y-1">
                 {[
+                  { icon: Search, label: 'Rechercher', view: 'search' as const },
+                  { icon: Globe, label: 'Carte', view: 'map' as const },
                   { icon: ClipboardList, label: 'Mes commandes', view: 'order-history' as const },
                   { icon: Heart, label: 'Mes favoris', view: 'favorites' as const },
                   { icon: Star, label: 'Mes avis', view: 'my-reviews' as const },

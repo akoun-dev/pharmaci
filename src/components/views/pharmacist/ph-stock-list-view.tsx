@@ -125,7 +125,7 @@ export function PharmacistStockListView() {
   const [stocks, setStocks] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<StatusFilter>('all');
   const [sortOption, setSortOption] = useState<SortOption>('name_asc');
@@ -309,6 +309,11 @@ export function PharmacistStockListView() {
     setImporting(false);
   };
 
+  const inStockCount = stocks.filter((stock) => stock.inStock && stock.quantity > 10).length;
+  const lowStockCount = stocks.filter((stock) => stock.inStock && stock.quantity > 0 && stock.quantity <= 10).length;
+  const expiringSoonCount = stocks.filter((stock) => getExpirationStatus(stock.expirationDate) === 'soon').length;
+  const currentFilterLabel = STATUS_TABS.find((tab) => tab.key === activeTab)?.label || 'Tous';
+
   return (
     <div className="pb-4">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
@@ -376,8 +381,8 @@ export function PharmacistStockListView() {
                         onClick={() => { setShowMoreMenu(false); setImportDialogOpen(true); setImportStep('select'); setImportFile(null); setImportResult(null); }}
                         className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-orange-50 transition-colors"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                          <Upload className="h-4 w-4 text-blue-600" />
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                          <Upload className="h-4 w-4 text-amber-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-foreground">Importer depuis Excel</p>
@@ -408,6 +413,75 @@ export function PharmacistStockListView() {
           }
         />
 
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="mb-4"
+        >
+          <Card className="border-amber-100 overflow-hidden shadow-sm">
+            <div className="bg-gradient-to-br from-white via-amber-50/50 to-amber-100/60">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <Badge className="bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100">
+                        {currentFilterLabel}
+                      </Badge>
+                      <Badge variant="outline" className="border-amber-200 text-amber-700">
+                        {total} référence{total > 1 ? 's' : ''}
+                      </Badge>
+                    </div>
+                    <h2 className="text-base sm:text-lg font-semibold text-foreground">
+                      Un stock plus lisible, plus proche de l’expérience patient
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+                      Repérez vite les ruptures, les produits sensibles et les références à mettre à jour sans perdre le contexte de votre pharmacie.
+                    </p>
+                  </div>
+                  <div className="flex gap-2 sm:flex-col sm:min-w-[170px]">
+                    <Button
+                      onClick={() => setCurrentView('ph-stock-add')}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Ajouter
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setImportDialogOpen(true);
+                        setImportStep('select');
+                        setImportFile(null);
+                        setImportResult(null);
+                      }}
+                      className="flex-1 border-green-200 text-green-700 hover:bg-green-50"
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Importer
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 mt-4">
+                  <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Disponibles</p>
+                    <p className="mt-1 text-lg font-bold text-amber-700">{inStockCount}</p>
+                  </div>
+                  <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Stock faible</p>
+                    <p className="mt-1 text-lg font-bold text-amber-700">{lowStockCount}</p>
+                  </div>
+                  <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Expire bientôt</p>
+                    <p className="mt-1 text-lg font-bold text-amber-700">{expiringSoonCount}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </div>
+          </Card>
+        </motion.div>
+
         {/* Click-away overlay for menu */}
             <AnimatePresence>
               {showMoreMenu && (
@@ -421,83 +495,87 @@ export function PharmacistStockListView() {
               )}
             </AnimatePresence>
 
-        {/* Search bar */}
-        <AnimatePresence>
-          {searchOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden mb-3"
-            >
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="stock-search-input"
-                  placeholder="Rechercher un médicament..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-11 border-orange-200 focus:border-orange-400 bg-orange-50/30"
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <Card className="border-amber-100 mb-4 overflow-hidden">
+          <CardContent className="p-3 sm:p-4">
+            {/* Search bar */}
+            <AnimatePresence initial={false}>
+              {searchOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden mb-3"
+                >
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-600" />
+                    <Input
+                      id="stock-search-input"
+                      placeholder="Rechercher un médicament, une catégorie..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9 h-11 border-amber-200 focus:border-amber-400 bg-amber-50/40"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-        {/* Sort dropdown */}
-        <AnimatePresence>
-          {showSort && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden mb-3"
-            >
-              <div className="flex flex-wrap gap-1.5 p-3 bg-orange-50/50 rounded-xl border border-orange-100">
-                {SORT_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.key}
-                    onClick={() => {
-                      setSortOption(opt.key);
-                      setShowSort(false);
-                    }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      sortOption === opt.key
-                        ? 'bg-orange-600 text-white'
-                        : 'bg-white text-orange-700 border border-orange-200 hover:bg-orange-100'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            {/* Sort dropdown */}
+            <AnimatePresence initial={false}>
+              {showSort && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden mb-3"
+                >
+                  <div className="flex flex-wrap gap-1.5 p-3 bg-amber-50/70 rounded-2xl border border-amber-100">
+                    {SORT_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.key}
+                        onClick={() => {
+                          setSortOption(opt.key);
+                          setShowSort(false);
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                          sortOption === opt.key
+                            ? 'bg-amber-600 text-white'
+                            : 'bg-white text-amber-700 border border-amber-200 hover:bg-amber-100'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-        {/* Filter tabs */}
-        <div className="flex items-center gap-1.5 mb-4 overflow-x-auto pb-1 -mx-1 px-1">
-          {STATUS_TABS.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-                activeTab === tab.key
-                  ? 'bg-orange-600 text-white'
-                  : 'bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-          {stocks.length > 0 && (
-            <Badge variant="secondary" className="text-[10px] px-2 py-0.5 ml-auto flex-shrink-0">
-              {total}
-            </Badge>
-          )}
-        </div>
+            {/* Filter tabs */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+              {STATUS_TABS.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`px-3 py-2 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                    activeTab === tab.key
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+              {stocks.length > 0 && (
+                <Badge variant="secondary" className="text-[10px] px-2 py-0.5 ml-auto flex-shrink-0 bg-amber-50 text-amber-700 border border-amber-200">
+                  {stocks.length} affiché{stocks.length > 1 ? 's' : ''}
+                </Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Error state */}
         {error && !loading && (
@@ -688,7 +766,7 @@ export function PharmacistStockListView() {
               variant="outline"
               onClick={() => fetchStocks(true)}
               disabled={loadingMore}
-              className="border-orange-200 text-orange-700 hover:bg-orange-50 px-6"
+              className="border-green-200 text-green-700 hover:bg-green-50 px-6"
             >
               {loadingMore ? (
                 <>
@@ -707,7 +785,7 @@ export function PharmacistStockListView() {
       <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+1rem)] right-4 sm:right-6 z-40">
         <Button
           onClick={() => setCurrentView('ph-stock-add')}
-          className="h-14 w-14 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-200"
+          className="h-14 w-14 rounded-2xl bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200"
           size="icon"
         >
           <Plus className="h-6 w-6" />
@@ -716,13 +794,13 @@ export function PharmacistStockListView() {
 
       {/* ── Import Dialog ── */}
       <Dialog open={importDialogOpen} onOpenChange={(open) => { if (!open) resetImportDialog(); }}>
-        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-orange-200">
-          <DialogHeader className="bg-gradient-to-r from-orange-600 to-teal-600 px-5 py-4 text-white shrink-0">
+        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200">
+          <DialogHeader className="bg-gradient-to-r from-amber-600 to-amber-800 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <Upload className="h-5 w-5" />
               {importStep === 'select' ? 'Importer un fichier Excel' : 'Résultat de l\'import'}
             </DialogTitle>
-            <DialogDescription className="text-orange-200 text-xs mt-1">
+            <DialogDescription className="text-amber-200 text-xs mt-1">
               {importStep === 'select'
                 ? 'Ajoutez ou mettez à jour votre stock en masse'
                 : 'Résumé du traitement de votre fichier'}
@@ -735,7 +813,7 @@ export function PharmacistStockListView() {
                 {/* Step 1: Download template */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    <span className="w-5 h-5 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center text-[10px] font-bold">1</span>
+                    <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[10px] font-bold">1</span>
                     Étape 1 : Télécharger le modèle
                   </div>
                   <Card className="border-amber-100 bg-amber-50/30">
@@ -753,7 +831,7 @@ export function PharmacistStockListView() {
                         variant="outline"
                         size="sm"
                         onClick={handleDownloadTemplate}
-                        className="mt-2.5 w-full border-amber-200 text-amber-700 hover:bg-amber-50 h-9 text-xs"
+                        className="mt-2.5 w-full border-green-200 text-green-700 hover:bg-green-50 h-9 text-xs"
                       >
                         <Download className="h-3.5 w-3.5 mr-1.5" />
                         Télécharger le modèle
@@ -765,7 +843,7 @@ export function PharmacistStockListView() {
                 {/* Step 2: Upload file */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">2</span>
+                    <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[10px] font-bold">2</span>
                     Étape 2 : Charger votre fichier
                   </div>
 
@@ -774,8 +852,8 @@ export function PharmacistStockListView() {
                     onClick={() => fileInputRef.current?.click()}
                     className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
                       importFile
-                        ? 'border-orange-300 bg-orange-50/50'
-                        : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50/30'
+                        ? 'border-amber-300 bg-amber-50/50'
+                        : 'border-gray-200 hover:border-amber-300 hover:bg-amber-50/30'
                     }`}
                   >
                     <input
@@ -790,10 +868,10 @@ export function PharmacistStockListView() {
                     />
                     {importFile ? (
                       <div className="space-y-2">
-                        <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mx-auto">
-                          <FileSpreadsheet className="h-6 w-6 text-orange-600" />
+                        <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mx-auto">
+                          <FileSpreadsheet className="h-6 w-6 text-amber-600" />
                         </div>
-                        <p className="text-sm font-medium text-orange-700 truncate">{importFile.name}</p>
+                        <p className="text-sm font-medium text-amber-700 truncate">{importFile.name}</p>
                         <p className="text-[11px] text-muted-foreground">
                           {(importFile.size / 1024).toFixed(1)} Ko
                         </p>
@@ -820,7 +898,7 @@ export function PharmacistStockListView() {
                 <Button
                   onClick={handleImportExcel}
                   disabled={!importFile || importing}
-                  className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white text-sm disabled:opacity-40"
+                  className="w-full h-11 bg-green-600 hover:bg-green-700 text-white text-sm disabled:opacity-40"
                 >
                   {importing ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Import en cours...</>
@@ -835,17 +913,17 @@ export function PharmacistStockListView() {
               <div className="space-y-4">
                 {/* Success summary */}
                 <div className="grid grid-cols-3 gap-2">
-                  <Card className="border-orange-200 bg-orange-50/50">
+                  <Card className="border-amber-200 bg-amber-50/50">
                     <CardContent className="p-3 text-center">
-                      <CheckCircle2 className="h-5 w-5 text-orange-600 mx-auto mb-1" />
-                      <p className="text-lg font-bold text-orange-700">{importResult.created}</p>
+                      <CheckCircle2 className="h-5 w-5 text-amber-600 mx-auto mb-1" />
+                      <p className="text-lg font-bold text-amber-700">{importResult.created}</p>
                       <p className="text-[10px] text-muted-foreground">Ajouté(s)</p>
                     </CardContent>
                   </Card>
-                  <Card className="border-blue-200 bg-blue-50/50">
+                  <Card className="border-amber-200 bg-amber-50/50">
                     <CardContent className="p-3 text-center">
-                      <Package className="h-5 w-5 text-blue-600 mx-auto mb-1" />
-                      <p className="text-lg font-bold text-blue-700">{importResult.updated}</p>
+                      <Package className="h-5 w-5 text-amber-600 mx-auto mb-1" />
+                      <p className="text-lg font-bold text-amber-700">{importResult.updated}</p>
                       <p className="text-[10px] text-muted-foreground">Mis à jour</p>
                     </CardContent>
                   </Card>
@@ -888,9 +966,9 @@ export function PharmacistStockListView() {
 
                 {/* Success message */}
                 {(importResult.created > 0 || importResult.updated > 0) && (
-                  <div className="flex items-start gap-2.5 bg-orange-50 border border-orange-200 rounded-xl p-3">
-                    <CheckCircle2 className="h-5 w-5 text-orange-600 shrink-0 mt-0.5" />
-                    <p className="text-xs text-orange-700 leading-relaxed">
+                  <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl p-3">
+                    <CheckCircle2 className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-700 leading-relaxed">
                       Votre stock a été mis à jour avec succès. Consultez la liste ci-dessous pour vérifier les modifications.
                     </p>
                   </div>
@@ -899,7 +977,7 @@ export function PharmacistStockListView() {
                 {/* Close button */}
                 <Button
                   onClick={resetImportDialog}
-                  className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white text-sm"
+                  className="w-full h-11 bg-green-600 hover:bg-green-700 text-white text-sm"
                 >
                   Fermer
                 </Button>

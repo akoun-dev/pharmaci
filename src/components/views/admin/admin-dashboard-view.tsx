@@ -19,11 +19,9 @@ import {
   ArrowRight,
   RefreshCw,
   AlertTriangle,
-  ShieldCheck,
   Clock,
   BarChart3,
   Trophy,
-  Hand,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -139,7 +137,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   },
   confirmed: {
     label: 'Confirmée',
-    className: 'bg-blue-100 text-blue-700 border-blue-200',
+    className: 'bg-green-100 text-green-700 border-green-200',
   },
   ready: {
     label: 'Prête',
@@ -265,37 +263,70 @@ export function AdminDashboardView() {
         animate="visible"
         className="space-y-6"
       >
-        {/* ─── HEADER ─── */}
-        <motion.div variants={itemVariants}>
-          <div className="rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 px-5 py-5 text-white">
-            <div className="flex items-center justify-between">
+        <motion.div variants={itemVariants} className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
+                <BarChart3 className="h-5 w-5" />
+              </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <Pill className="h-5 w-5 text-amber-200" />
-                  <p className="text-sm font-medium text-amber-100">
-                    Administration
-                  </p>
-                </div>
-                <h1 className="text-xl sm:text-2xl font-bold mt-1 flex items-center gap-2">
-                  Bonjour, {firstName}
-                  <Hand className="h-5 w-5" />
+                <h1 className="text-lg font-semibold text-foreground sm:text-xl">
+                  Tableau de bord admin
                 </h1>
-                <p className="text-sm text-amber-100 mt-1">
-                  Vue d&apos;ensemble de la plateforme Pharma CI
+                <p className="text-sm text-muted-foreground">
+                  Vue d&apos;ensemble de la plateforme, {firstName}.
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setCurrentView('admin-analytics')}
-                className="text-white hover:bg-white/10 h-9 px-3"
-              >
-                <BarChart3 className="h-4 w-4 mr-1.5" />
-                <span className="text-xs font-medium">Analyses</span>
-              </Button>
             </div>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentView('admin-analytics')}
+            className="h-10 rounded-2xl border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800"
+          >
+            <BarChart3 className="mr-1.5 h-4 w-4" />
+            Analyses
+          </Button>
         </motion.div>
+
+        {!loading && !error && data && (
+          <motion.div variants={itemVariants} className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <Card className="border-amber-100 bg-white/90 shadow-sm shadow-amber-100/40">
+              <CardContent className="flex items-center gap-3 p-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-50 text-green-700">
+                  <UserPlus className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Nouveaux utilisateurs</p>
+                  <p className="text-lg font-semibold">{data.newUsersThisMonth}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-amber-100 bg-white/90 shadow-sm shadow-amber-100/40">
+              <CardContent className="flex items-center gap-3 p-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
+                  <Clock className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Commandes aujourd&apos;hui</p>
+                  <p className="text-lg font-semibold">{data.newOrdersToday}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-amber-100 bg-white/90 shadow-sm shadow-amber-100/40">
+              <CardContent className="flex items-center gap-3 p-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-50 text-green-700">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Panier moyen</p>
+                  <p className="text-lg font-semibold">{formatFCFA(data.avgOrderValue)}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* ─── LOADING SKELETON ─── */}
         {loading && (
@@ -495,8 +526,8 @@ export function AdminDashboardView() {
               {/* Nouveaux utilisateurs */}
               <Card className="border-amber-100">
                 <CardContent className="p-3 sm:p-4">
-                  <div className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 mb-2">
-                    <UserPlus className="h-4 w-4 text-blue-600" />
+                  <div className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-100 mb-2">
+                    <UserPlus className="h-4 w-4 text-green-600" />
                   </div>
                   <p className="text-[11px] sm:text-xs text-muted-foreground leading-tight">
                     Nouveaux utilisateurs
@@ -522,7 +553,7 @@ export function AdminDashboardView() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 h-7 px-2"
+                    className="h-8 rounded-xl px-3 text-xs text-green-700 hover:bg-green-50 hover:text-green-800"
                     onClick={() => setCurrentView('admin-analytics')}
                   >
                     Détails
@@ -604,7 +635,7 @@ export function AdminDashboardView() {
                       {data.topPharmacies.map((pharma, idx) => (
                         <div
                           key={pharma.id}
-                          className="flex items-center justify-between py-2.5 px-2 rounded-lg hover:bg-amber-50 transition-colors"
+                          className="flex items-center justify-between rounded-xl px-2 py-2.5 transition-colors hover:bg-green-50/50"
                         >
                           <div className="flex items-center gap-3 min-w-0 flex-1 mr-3">
                             <span className="flex items-center justify-center h-6 w-6 rounded-full bg-amber-100 text-amber-700 text-xs font-bold shrink-0">
@@ -619,7 +650,7 @@ export function AdminDashboardView() {
                               </p>
                             </div>
                           </div>
-                          <span className="text-sm font-semibold text-amber-700 shrink-0">
+                          <span className="text-sm font-semibold text-green-700 shrink-0">
                             {formatFCFA(pharma.revenue)}
                           </span>
                         </div>
@@ -639,7 +670,7 @@ export function AdminDashboardView() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 h-7 px-2"
+                    className="h-8 rounded-xl px-3 text-xs text-green-700 hover:bg-green-50 hover:text-green-800"
                     onClick={() => setCurrentView('admin-medications')}
                   >
                     Voir tout
@@ -657,7 +688,7 @@ export function AdminDashboardView() {
                       {data.topMedications.map((med, idx) => (
                         <div
                           key={med.id}
-                          className="flex items-center justify-between py-2.5 px-2 rounded-lg hover:bg-amber-50 transition-colors"
+                          className="flex items-center justify-between rounded-xl px-2 py-2.5 transition-colors hover:bg-green-50/50"
                         >
                           <div className="flex items-center gap-3 min-w-0 flex-1 mr-3">
                             <span className="flex items-center justify-center h-6 w-6 rounded-full bg-amber-100 text-amber-700 text-xs font-bold shrink-0">
@@ -672,7 +703,7 @@ export function AdminDashboardView() {
                               </p>
                             </div>
                           </div>
-                          <span className="text-sm font-semibold text-amber-700 shrink-0">
+                          <span className="text-sm font-semibold text-green-700 shrink-0">
                             {med.orderCount} cmd
                           </span>
                         </div>
@@ -694,7 +725,7 @@ export function AdminDashboardView() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 h-7 px-2"
+                    className="h-8 rounded-xl px-3 text-xs text-green-700 hover:bg-green-50 hover:text-green-800"
                     onClick={() => setCurrentView('admin-orders')}
                   >
                     Voir tout
@@ -719,7 +750,7 @@ export function AdminDashboardView() {
                               selectOrder(order.id);
                               setCurrentView('admin-orders');
                             }}
-                            className="flex items-center justify-between w-full text-left py-2.5 px-2 rounded-lg hover:bg-amber-50 transition-colors"
+                            className="flex w-full items-center justify-between rounded-xl px-2 py-2.5 text-left transition-colors hover:bg-green-50/50"
                           >
                             <div className="min-w-0 flex-1 mr-3">
                               <p className="text-sm font-medium truncate">
@@ -734,7 +765,7 @@ export function AdminDashboardView() {
                               </p>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
-                              <span className="text-xs font-semibold text-amber-700 hidden sm:inline">
+                              <span className="hidden text-xs font-semibold text-green-700 sm:inline">
                                 {formatFCFA(order.totalPrice)}
                               </span>
                               <Badge
@@ -762,7 +793,7 @@ export function AdminDashboardView() {
                       <p className="text-xs text-muted-foreground">
                         Panier moyen
                       </p>
-                      <p className="text-sm font-bold text-amber-700 mt-0.5">
+                      <p className="mt-0.5 text-sm font-bold text-green-700">
                         {formatFCFA(data.avgOrderValue)}
                       </p>
                     </div>
@@ -770,7 +801,7 @@ export function AdminDashboardView() {
                       <p className="text-xs text-muted-foreground">
                         Commandes/jour
                       </p>
-                      <p className="text-sm font-bold text-amber-700 mt-0.5">
+                      <p className="mt-0.5 text-sm font-bold text-green-700">
                         {data.newOrdersToday}
                       </p>
                     </div>
@@ -778,7 +809,7 @@ export function AdminDashboardView() {
                       <p className="text-xs text-muted-foreground">
                         Pharmacies en garde
                       </p>
-                      <p className="text-sm font-bold text-amber-700 mt-0.5">
+                      <p className="mt-0.5 text-sm font-bold text-green-700">
                         {data.guardPharmaciesCount}
                       </p>
                     </div>
@@ -786,7 +817,7 @@ export function AdminDashboardView() {
                       <p className="text-xs text-muted-foreground">
                         Admins
                       </p>
-                      <p className="text-sm font-bold text-amber-700 mt-0.5">
+                      <p className="mt-0.5 text-sm font-bold text-green-700">
                         {data.usersByRole.admin}
                       </p>
                     </div>

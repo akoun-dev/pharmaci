@@ -44,7 +44,7 @@ import { toast } from 'sonner';
 interface OrderData {
   id: string;
   status: string;
-  quantity: number;
+  totalQuantity: number;
   totalPrice: number;
   note?: string | null;
   pickupTime?: string | null;
@@ -55,11 +55,15 @@ interface OrderData {
     name: string;
     phone: string | null;
   };
-  medication: {
-    name: string;
-    commercialName: string;
-    form?: string;
-  };
+  items: {
+    medication: {
+      name: string;
+      commercialName: string;
+      form?: string;
+    };
+    quantity: number;
+    price: number;
+  }[];
 }
 
 type FilterTab = 'all' | 'pending' | 'confirmed' | 'ready' | 'picked_up' | 'cancelled';
@@ -72,7 +76,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   },
   confirmed: {
     label: 'Confirmée',
-    className: 'bg-blue-100 text-blue-700 border-blue-200',
+    className: 'bg-amber-50 text-amber-700 border-amber-200',
   },
   ready: {
     label: 'Prêtée',
@@ -351,6 +355,17 @@ export function PharmacistOrdersView() {
   const hasMore = orders.length < total;
 
   const hasActiveFilters = searchQuery || dateFrom || dateTo;
+  const pendingCount = statusCounts.pending || 0;
+  const readyCount = statusCounts.ready || 0;
+  const verifiedCount = orders.filter((order) => !!order.verifiedAt).length;
+  const activeStatusLabel = FILTER_TABS.find((tab) => tab.key === activeTab)?.label || 'Toutes';
+  const openVerifyDialog = () => {
+    setVerifyCode('');
+    setVerifyError(null);
+    setScanMode(false);
+    setScanError(null);
+    setVerifyDialogOpen(true);
+  };
 
   // Loading skeletons
   if (loading) {
@@ -402,88 +417,146 @@ export function PharmacistOrdersView() {
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
-        }
+          }
       />
 
-      {/* Search + Date Filters */}
-      <div className="space-y-2 mb-3">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Rechercher par patient..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400" />
-          </div>
-          <Button variant="outline" size="icon" className={`h-10 w-10 shrink-0 ${showFilters || hasActiveFilters ? 'border-amber-300 bg-amber-50 text-amber-700' : 'border-amber-200'}`} onClick={() => setShowFilters(!showFilters)}>
-            <Calendar className="h-4 w-4" />
-          </Button>
-        </div>
-        {showFilters && (
-          <div className="flex gap-2 items-end">
-            <div className="flex-1 space-y-1">
-              <Label className="text-[11px] text-muted-foreground">Depuis</Label>
-              <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-9 text-xs" />
-            </div>
-            <div className="flex-1 space-y-1">
-              <Label className="text-[11px] text-muted-foreground">Jusqu&apos;au</Label>
-              <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="h-9 text-xs" />
-            </div>
-            <Button variant="ghost" size="sm" className="h-9 text-xs text-muted-foreground" onClick={clearFilters}>
-              <X className="h-3 w-3 mr-1" />Effacer
-            </Button>
-          </div>
-        )}
-        {hasActiveFilters && !showFilters && (
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {searchQuery && (
-              <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
-                &quot;{searchQuery}&quot;
-                <button onClick={() => setSearchQuery('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
-              </Badge>
-            )}
-            {dateFrom && (
-              <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
-                {dateFrom}
-                <button onClick={() => setDateFrom('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
-              </Badge>
-            )}
-            {dateTo && (
-              <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
-                → {dateTo}
-                <button onClick={() => setDateTo('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
-              </Badge>
-            )}
-          </div>
-        )}
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25 }}
+        className="mb-4"
+      >
+        <Card className="border-amber-100 overflow-hidden shadow-sm">
+          <div className="bg-gradient-to-br from-white via-amber-50/40 to-amber-100/60">
+            <CardContent className="p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <Badge className="bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100">
+                      {activeStatusLabel}
+                    </Badge>
+                    <Badge variant="outline" className="border-amber-200 text-amber-700">
+                      {total} commande{total > 1 ? 's' : ''}
+                    </Badge>
+                  </div>
+                  <h2 className="text-base sm:text-lg font-semibold text-foreground">
+                    Gérez les retraits dans un flux plus clair
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+                    Suivez les commandes actives, repérez celles à préparer et lancez la vérification client sans quitter votre page.
+                  </p>
+                </div>
+                <Button
+                  onClick={openVerifyDialog}
+                  className="bg-green-600 hover:bg-green-700 text-white sm:min-w-[190px]"
+                >
+                  <ShieldCheck className="h-4 w-4 mr-2" />
+                  Vérifier un code
+                </Button>
+              </div>
 
-      {/* Order type toggle */}
-      <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-none">
-        {ORDER_TYPE_TABS.map((tab) => {
-          const isActive = orderTypeTab === tab.key;
-          return (
-            <button key={tab.key} onClick={() => setOrderTypeTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100'}`}>
-              {tab.key === 'commande' && <Package className="h-3 w-3" />}
-              {tab.key === 'reservation' && <Clock className="h-3 w-3" />}
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+              <div className="grid grid-cols-3 gap-2 mt-4">
+                <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">En attente</p>
+                  <p className="mt-1 text-lg font-bold text-amber-700">{pendingCount}</p>
+                </div>
+                <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Prêtes</p>
+                  <p className="mt-1 text-lg font-bold text-amber-700">{readyCount}</p>
+                </div>
+                <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Vérifiées</p>
+                  <p className="mt-1 text-lg font-bold text-amber-700">{verifiedCount}</p>
+                </div>
+              </div>
+            </CardContent>
+          </div>
+        </Card>
+      </motion.div>
 
-      {/* Filter tabs — uses global statusCounts from API */}
-      <div className="flex gap-1.5 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-none">
-        {FILTER_TABS.map((tab) => {
-          const count = statusCounts[tab.key] || 0;
-          const isActive = activeTab === tab.key;
-          return (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100'}`}>
-              {tab.label}
-              <span className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-600'}`}>
-                {count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      <Card className="border-amber-100 mb-4 overflow-hidden">
+        <CardContent className="p-3 sm:p-4 space-y-3">
+          {/* Search + Date Filters */}
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-600" />
+                <Input placeholder="Rechercher par patient..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400 bg-amber-50/40" />
+              </div>
+              <Button variant="outline" size="icon" className={`h-10 w-10 shrink-0 ${showFilters || hasActiveFilters ? 'border-amber-300 bg-amber-50 text-amber-700' : 'border-amber-200'}`} onClick={() => setShowFilters(!showFilters)}>
+                <Calendar className="h-4 w-4" />
+              </Button>
+            </div>
+            {showFilters && (
+              <div className="flex gap-2 items-end">
+                <div className="flex-1 space-y-1">
+                  <Label className="text-[11px] text-muted-foreground">Depuis</Label>
+                  <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-9 text-xs" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <Label className="text-[11px] text-muted-foreground">Jusqu&apos;au</Label>
+                  <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="h-9 text-xs" />
+                </div>
+                <Button variant="ghost" size="sm" className="h-9 text-xs text-muted-foreground" onClick={clearFilters}>
+                  <X className="h-3 w-3 mr-1" />Effacer
+                </Button>
+              </div>
+            )}
+            {hasActiveFilters && !showFilters && (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {searchQuery && (
+                  <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
+                    &quot;{searchQuery}&quot;
+                    <button onClick={() => setSearchQuery('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
+                  </Badge>
+                )}
+                {dateFrom && (
+                  <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
+                    {dateFrom}
+                    <button onClick={() => setDateFrom('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
+                  </Badge>
+                )}
+                {dateTo && (
+                  <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
+                    → {dateTo}
+                    <button onClick={() => setDateTo('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
+                  </Badge>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Order type toggle */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
+            {ORDER_TYPE_TABS.map((tab) => {
+              const isActive = orderTypeTab === tab.key;
+              return (
+                <button key={tab.key} onClick={() => setOrderTypeTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'}`}>
+                  {tab.key === 'commande' && <Package className="h-3 w-3" />}
+                  {tab.key === 'reservation' && <Clock className="h-3 w-3" />}
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Filter tabs — uses global statusCounts from API */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
+            {FILTER_TABS.map((tab) => {
+              const count = statusCounts[tab.key] || 0;
+              const isActive = activeTab === tab.key;
+              return (
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'}`}>
+                  {tab.label}
+                  <span className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-600'}`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Orders list */}
       {typeFiltered.length === 0 ? (
@@ -515,7 +588,7 @@ export function PharmacistOrdersView() {
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span className="text-xs font-mono text-muted-foreground flex-shrink-0">#{order.id.slice(0, 8)}</span>
-                          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 flex-shrink-0 ${isReservation ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 flex-shrink-0 ${isReservation ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
                             {isReservation ? 'Réservation' : 'Commande'}
                           </Badge>
                         </div>
@@ -583,7 +656,7 @@ export function PharmacistOrdersView() {
 
                       {/* Details row */}
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1"><Package className="h-3 w-3" />{order.quantity}</span>
+                        <span className="flex items-center gap-1"><Package className="h-3 w-3" />{order.totalQuantity}</span>
                         <span className="font-semibold text-foreground text-sm">{formatPrice(order.totalPrice)}</span>
                       </div>
 
@@ -612,7 +685,7 @@ export function PharmacistOrdersView() {
       {/* Load more */}
       {typeFiltered.length > 0 && hasMore && (
         <div className="flex justify-center mt-4">
-          <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore} className="border-amber-200 text-amber-700 hover:bg-amber-50 px-6">
+          <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore} className="border-green-200 text-green-700 hover:bg-green-50 px-6">
             {loadingMore ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Chargement...</>) : (`Charger plus (${total - orders.length} restantes)`)}
           </Button>
         </div>
@@ -623,8 +696,8 @@ export function PharmacistOrdersView() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pointer-events-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <Button
-              onClick={() => { setVerifyCode(''); setVerifyError(null); setScanMode(false); setScanError(null); setVerifyDialogOpen(true); }}
-              className="w-full h-12 bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-lg shadow-amber-600/25 text-sm font-medium"
+              onClick={openVerifyDialog}
+              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg shadow-green-600/25 text-sm font-medium"
             >
               <ShieldCheck className="h-5 w-5 mr-2" />
               Vérifier une commande
@@ -639,7 +712,7 @@ export function PharmacistOrdersView() {
         setVerifyDialogOpen(open);
       }}>
         <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200">
-          <DialogHeader className="bg-gradient-to-r from-amber-600 to-teal-600 px-5 py-4 text-white shrink-0">
+          <DialogHeader className="bg-gradient-to-r from-amber-600 to-amber-800 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <ShieldCheck className="h-5 w-5" />
               Vérifier une commande
@@ -736,7 +809,7 @@ export function PharmacistOrdersView() {
               <Button
                 onClick={() => handleVerify(verifyCode)}
                 disabled={verifyCode.length !== 6 || verifying}
-                className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm disabled:opacity-40"
+                className="w-full h-11 bg-green-600 hover:bg-green-700 text-white text-sm disabled:opacity-40"
               >
                 {verifying ? (
                   <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Vérification...</>

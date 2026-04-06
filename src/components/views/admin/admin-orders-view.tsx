@@ -96,7 +96,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   },
   confirmed: {
     label: 'Confirmée',
-    className: 'bg-blue-100 text-blue-700 border-blue-200',
+    className: 'bg-green-100 text-green-700 border-green-200',
   },
   ready: {
     label: 'Prête',
@@ -375,154 +375,166 @@ export function AdminOrdersView() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 pb-28">
-      {/* ── Header ── */}
-      <ViewHeader
-        title="Gestion des commandes"
-        icon={<ClipboardList className="h-5 w-5 text-amber-600" />}
-        action={
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 pb-28 space-y-4">
+      <div className="rounded-[26px] border border-amber-100 bg-white/90 p-4 shadow-sm shadow-amber-100/40 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
+                <ClipboardList className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Gestion des commandes</p>
+                <p className="text-xs text-muted-foreground">Suivi plateforme, statuts et recherche rapide</p>
+              </div>
+            </div>
+          </div>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">
+            <Badge variant="secondary" className="border border-amber-200 bg-amber-50 text-xs text-amber-700">
               {total}
             </Badge>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-amber-600"
+              className="h-9 w-9 rounded-2xl text-green-700 hover:bg-green-50 hover:text-green-800"
               onClick={handleRefresh}
               disabled={refreshing}
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
-        }
-      />
-
-      {/* ── Search + Date Filters ── */}
-      <div className="space-y-2 mb-3">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Rechercher par patient, pharmacie..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400"
-            />
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className={`h-10 w-10 shrink-0 ${
-              showFilters
-                ? 'border-amber-300 bg-amber-50 text-amber-700'
-                : 'border-amber-200'
-            }`}
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Calendar className="h-4 w-4" />
-          </Button>
         </div>
-        <AnimatePresence>
-          {showFilters && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
-              <div className="flex gap-2 items-end">
-                <div className="flex-1 space-y-1">
-                  <Label className="text-[11px] text-muted-foreground">Depuis</Label>
-                  <Input
-                    type="date"
-                    value={dateFrom}
-                    onChange={(e) => setDateFrom(e.target.value)}
-                    className="h-9 text-xs border-amber-200"
-                  />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <Label className="text-[11px] text-muted-foreground">
-                    Jusqu&apos;au
-                  </Label>
-                  <Input
-                    type="date"
-                    value={dateTo}
-                    onChange={(e) => setDateTo(e.target.value)}
-                    className="h-9 text-xs border-amber-200"
-                  />
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-9 text-xs text-muted-foreground"
-                  onClick={clearFilters}
-                >
-                  <X className="h-3 w-3 mr-1" />
-                  Effacer
-                </Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
 
-      {/* ── Filter tabs ── */}
-      <div className="flex gap-1.5 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-none">
-        {FILTER_TABS.map((tab) => {
-          const count = statusCounts[tab.key] || 0;
-          const isActive = activeTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
-                isActive
-                  ? 'bg-amber-600 text-white shadow-sm'
-                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="rounded-2xl bg-amber-50/70 px-3 py-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80">Total</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">{total}</p>
+          </div>
+          <div className="rounded-2xl bg-green-50/70 px-3 py-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-green-700/80">Statut actif</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">{FILTER_TABS.find((tab) => tab.key === activeTab)?.label || 'Toutes'}</p>
+          </div>
+          <div className="rounded-2xl bg-amber-50/70 px-3 py-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80">Recherche</p>
+            <p className="mt-1 truncate text-sm font-medium text-foreground">{searchQuery.trim() || 'Toutes les commandes'}</p>
+          </div>
+          <div className="rounded-2xl bg-green-50/70 px-3 py-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-green-700/80">Période</p>
+            <p className="mt-1 truncate text-sm font-medium text-foreground">{dateFrom || dateTo ? `${dateFrom || '...'} → ${dateTo || '...'}` : 'Aucun filtre date'}</p>
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-2">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher par patient, pharmacie..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-11 rounded-2xl border-amber-200 bg-amber-50/40 pl-9 text-sm focus:border-green-400"
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              className={`h-11 w-11 shrink-0 rounded-2xl ${
+                showFilters
+                  ? 'border-green-300 bg-green-50 text-green-700'
+                  : 'border-amber-200 text-amber-700'
               }`}
+              onClick={() => setShowFilters(!showFilters)}
             >
-              {tab.label}
-              <span
-                className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${
+              <Calendar className="h-4 w-4" />
+            </Button>
+          </div>
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="grid items-end gap-2 rounded-2xl border border-amber-100 bg-amber-50/40 p-3 sm:grid-cols-[1fr_1fr_auto]">
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">Depuis</Label>
+                    <Input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                      className="h-10 rounded-xl border-amber-200 bg-white text-xs focus:border-green-400"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">Jusqu&apos;au</Label>
+                    <Input
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                      className="h-10 rounded-xl border-amber-200 bg-white text-xs focus:border-green-400"
+                    />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-10 rounded-xl text-green-700 hover:bg-green-50 hover:text-green-800"
+                    onClick={clearFilters}
+                  >
+                    <X className="mr-1 h-3 w-3" />
+                    Effacer
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <div className="mt-4 flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {FILTER_TABS.map((tab) => {
+            const count = statusCounts[tab.key] || 0;
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex flex-shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium whitespace-nowrap transition-all duration-200 ${
                   isActive
-                    ? 'bg-white/20 text-white'
-                    : 'bg-amber-100 text-amber-600'
+                    ? 'bg-green-600 text-white shadow-sm'
+                    : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
                 }`}
               >
-                {count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+                {tab.label}
+                <span
+                  className={`flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] ${
+                    isActive
+                      ? 'bg-white/20 text-white'
+                      : 'bg-amber-100 text-amber-600'
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-      {/* ── Stats summary ── */}
-      <Card className="border-amber-100 mb-4">
-        <CardContent className="p-3 sm:p-4">
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
-            {Object.entries(STATUS_CONFIG)
-              .filter(([key]) => key !== 'picked_up')
-              .map(([key, cfg]) => {
-                const stat = orderStats[key];
-                return (
-                  <div key={key} className="text-center space-y-0.5">
-                    <p className="text-[10px] sm:text-xs text-muted-foreground">
-                      {cfg.label}
-                    </p>
-                    <p className="text-sm sm:text-base font-bold text-foreground">
-                      {stat?.count || 0}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {stat?.total ? formatPrice(stat.total) : '0 FCFA'}
-                    </p>
-                  </div>
-                );
-              })}
-          </div>
-        </CardContent>
-      </Card>
+        <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5">
+          {Object.entries(STATUS_CONFIG)
+            .filter(([key]) => key !== 'picked_up')
+            .map(([key, cfg]) => {
+              const stat = orderStats[key];
+              return (
+                <div key={key} className="rounded-2xl border border-amber-100 bg-white px-3 py-3 text-center">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">{cfg.label}</p>
+                  <p className="text-sm sm:text-base font-bold text-foreground">{stat?.count || 0}</p>
+                  <p className="text-[10px] text-muted-foreground">{stat?.total ? formatPrice(stat.total) : '0 FCFA'}</p>
+                </div>
+              );
+            })}
+        </div>
+      </div>
 
       {/* ── Orders list ── */}
       {orders.length === 0 ? (
@@ -561,7 +573,7 @@ export function AdminOrdersView() {
                   transition={{ delay: index * 0.03 }}
                 >
                   <Card
-                    className="border-amber-100 overflow-hidden cursor-pointer hover:border-amber-300 transition-colors active:scale-[0.99] duration-150"
+                    className="cursor-pointer overflow-hidden border-amber-100 bg-white/90 shadow-sm shadow-amber-100/30 transition-colors duration-150 hover:border-amber-300 active:scale-[0.99]"
                     onClick={() => handleOrderClick(order)}
                   >
                     <CardContent className="p-4 space-y-2.5">
@@ -636,7 +648,7 @@ export function AdminOrdersView() {
                           <Package className="h-3 w-3" />
                           Qté: {order.totalQuantity}
                         </span>
-                        <span className="font-semibold text-foreground text-sm">
+                        <span className="text-sm font-semibold text-green-700">
                           {formatPrice(order.totalPrice)}
                         </span>
                       </div>
@@ -646,7 +658,7 @@ export function AdminOrdersView() {
                         <span className="text-[11px] text-muted-foreground pt-2">
                           {formatRelativeTime(order.createdAt)}
                         </span>
-                        <ChevronRight className="h-4 w-4 text-amber-400 pt-2" />
+                        <ChevronRight className="h-4 w-4 text-green-500 pt-2" />
                       </div>
                     </CardContent>
                   </Card>
@@ -670,9 +682,9 @@ export function AdminOrdersView() {
       {/* ── Order Detail Dialog ── */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         {selectedOrder && (
-          <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 max-h-[90dvh] flex flex-col">
-            {/* Dialog header */}
-            <DialogHeader className="bg-gradient-to-r from-amber-600 to-purple-600 px-5 py-4 text-white shrink-0">
+            <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 max-h-[90dvh] flex flex-col">
+              {/* Dialog header */}
+              <DialogHeader className="bg-gradient-to-r from-amber-600 to-amber-800 px-5 py-4 text-white shrink-0">
               <DialogTitle className="text-base flex items-center gap-2">
                 <ClipboardList className="h-5 w-5" />
                 Commande #{selectedOrder.id.slice(0, 8)}

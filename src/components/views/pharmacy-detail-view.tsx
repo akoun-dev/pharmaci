@@ -287,7 +287,7 @@ export function PharmacyDetailView() {
                     variant="outline"
                     className={`text-[10px] ${
                       open
-                        ? 'border-amber-300 text-amber-700 bg-amber-50'
+                        ? 'border-amber-300 text-green-700 bg-amber-50'
                         : 'border-red-300 text-red-700 bg-red-50'
                     }`}
                   >
@@ -303,7 +303,7 @@ export function PharmacyDetailView() {
                     <Badge
                       key={s}
                       variant="secondary"
-                      className="text-[10px] bg-amber-50 text-amber-700 capitalize"
+                      className="text-[10px] bg-amber-50 text-green-700 capitalize"
                     >
                       {s}
                     </Badge>

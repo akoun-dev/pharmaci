@@ -50,18 +50,18 @@ export const MedicationCard = React.memo(function MedicationCard({ medication, o
             {medication.category && (
               <Badge
                 variant="secondary"
-                className="text-[10px] px-1.5 py-0 bg-orange-50 text-orange-700"
+                className="text-[10px] px-1.5 py-0 bg-green-50 text-green-700"
               >
                 {medication.category}
               </Badge>
             )}
             {medication.form && (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-orange-200 text-orange-700">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-green-200 text-green-700">
                 {medication.form}
               </Badge>
             )}
             {medication.needsPrescription && (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-200 text-amber-700">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-green-200 text-green-700">
                 <FileText className="h-3 w-3 mr-0.5" />
                 Ordonnance
               </Badge>

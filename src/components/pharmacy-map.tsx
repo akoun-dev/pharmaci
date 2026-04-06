@@ -181,7 +181,7 @@ export function PharmacyMap({ pharmacies, onPharmacyClick, onReady }: PharmacyMa
                       justifyContent: 'center',
                       gap: 4,
                       padding: '6px 8px',
-                      background: '#2563eb',
+                      background: '#FF8200',
                       color: 'white',
                       borderRadius: 8,
                       fontSize: 11,

@@ -81,21 +81,21 @@ type RoleTab = 'all' | 'patient' | 'pharmacist' | 'admin';
 const ROLE_CONFIG: Record<string, { label: string; className: string; avatarBg: string; avatarText: string }> = {
   patient: {
     label: 'Patient',
-    className: 'bg-orange-100 text-orange-700 border-orange-200',
-    avatarBg: 'bg-orange-100',
-    avatarText: 'text-orange-700',
-  },
-  pharmacist: {
-    label: 'Pharmacien',
-    className: 'bg-blue-100 text-blue-700 border-blue-200',
-    avatarBg: 'bg-blue-100',
-    avatarText: 'text-blue-700',
-  },
-  admin: {
-    label: 'Admin',
     className: 'bg-amber-100 text-amber-700 border-amber-200',
     avatarBg: 'bg-amber-100',
     avatarText: 'text-amber-700',
+  },
+  pharmacist: {
+    label: 'Pharmacien',
+    className: 'bg-green-100 text-green-700 border-green-200',
+    avatarBg: 'bg-green-100',
+    avatarText: 'text-green-700',
+  },
+  admin: {
+    label: 'Admin',
+    className: 'bg-amber-200 text-amber-800 border-amber-300',
+    avatarBg: 'bg-amber-200',
+    avatarText: 'text-amber-800',
   },
 };
 
@@ -108,11 +108,11 @@ const ROLE_TABS: { key: RoleTab; label: string }[] = [
 
 const AVATAR_COLORS = [
   { bg: 'bg-amber-100', text: 'text-amber-700' },
-  { bg: 'bg-purple-100', text: 'text-purple-700' },
-  { bg: 'bg-fuchsia-100', text: 'text-fuchsia-700' },
-  { bg: 'bg-pink-100', text: 'text-pink-700' },
-  { bg: 'bg-rose-100', text: 'text-rose-700' },
-  { bg: 'bg-indigo-100', text: 'text-indigo-700' },
+  { bg: 'bg-green-100', text: 'text-green-700' },
+  { bg: 'bg-lime-100', text: 'text-lime-700' },
+  { bg: 'bg-yellow-100', text: 'text-yellow-700' },
+  { bg: 'bg-orange-100', text: 'text-orange-700' },
+  { bg: 'bg-emerald-100', text: 'text-emerald-700' },
 ];
 
 function getAvatarColor(name: string) {
@@ -341,11 +341,11 @@ export function AdminUsersView() {
             <AlertCircle className="h-10 w-10 text-red-400 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">Erreur de chargement</h3>
             <p className="text-sm text-muted-foreground mb-4">{error}</p>
-            <Button
-              onClick={handleRefresh}
-              variant="outline"
-              className="border-amber-200 text-amber-700 hover:bg-amber-50"
-            >
+              <Button
+                onClick={handleRefresh}
+                variant="outline"
+                className="border-green-200 text-green-700 hover:bg-green-50"
+              >
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
             </Button>
@@ -356,71 +356,92 @@ export function AdminUsersView() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 pb-28">
-      {/* Header */}
-      <ViewHeader
-        title="Utilisateurs"
-        icon={<Users className="h-5 w-5 text-amber-600" />}
-        action={
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 pb-28 space-y-4">
+      <div className="rounded-[26px] border border-amber-100 bg-white/90 p-4 shadow-sm shadow-amber-100/40 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
+                <Users className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Utilisateurs</p>
+                <p className="text-xs text-muted-foreground">Patients, pharmaciens et administrateurs</p>
+              </div>
+            </div>
+          </div>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="border border-amber-200 bg-amber-50 text-xs text-amber-700">
               {total}
             </Badge>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-amber-600"
+              className="h-9 w-9 rounded-2xl text-green-700 hover:bg-green-50 hover:text-green-800"
               onClick={handleRefresh}
               disabled={refreshing}
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
-        }
-      />
-
-      {/* Search */}
-      <div className="mb-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher par nom ou email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400"
-          />
         </div>
-      </div>
 
-      {/* Role filter tabs */}
-      <div className="flex gap-1.5 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-none">
-        {ROLE_TABS.map((tab) => {
-          const count = roleCounts[tab.key] || 0;
-          const isActive = activeTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
-                isActive
-                  ? 'bg-amber-600 text-white shadow-sm'
-                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-              }`}
-            >
-              {tab.key === 'patient' && <Users className="h-3 w-3" />}
-              {tab.key === 'pharmacist' && <ShieldCheck className="h-3 w-3" />}
-              {tab.key === 'admin' && <UserCog className="h-3 w-3" />}
-              {tab.label}
-              <span
-                className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-600'
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="rounded-2xl bg-amber-50/70 px-3 py-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80">Volume</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">{total}</p>
+          </div>
+          <div className="rounded-2xl bg-green-50/70 px-3 py-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-green-700/80">Vue active</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">{ROLE_CONFIG[activeTab]?.label || 'Tous'}</p>
+          </div>
+          <div className="rounded-2xl bg-amber-50/70 px-3 py-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80">Recherche</p>
+            <p className="mt-1 truncate text-sm font-medium text-foreground">{searchQuery.trim() || 'Aucune recherche active'}</p>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Rechercher par nom ou email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-11 rounded-2xl border-amber-200 bg-amber-50/40 pl-9 text-sm focus:border-green-400"
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {ROLE_TABS.map((tab) => {
+            const count = roleCounts[tab.key] || 0;
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex flex-shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium whitespace-nowrap transition-all duration-200 ${
+                  isActive
+                    ? 'bg-green-600 text-white shadow-sm'
+                    : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
                 }`}
               >
-                {count}
-              </span>
-            </button>
-          );
-        })}
+                {tab.key === 'patient' && <Users className="h-3 w-3" />}
+                {tab.key === 'pharmacist' && <ShieldCheck className="h-3 w-3" />}
+                {tab.key === 'admin' && <UserCog className="h-3 w-3" />}
+                {tab.label}
+                <span
+                  className={`flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] ${
+                    isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-600'
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Users list */}
@@ -467,7 +488,7 @@ export function AdminUsersView() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.03 }}
                 >
-                  <Card className="border-amber-100 hover:border-amber-300 transition-colors overflow-hidden">
+                  <Card className="overflow-hidden border-amber-100 bg-white/90 shadow-sm shadow-amber-100/30 transition-colors hover:border-amber-300">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
                         {/* Avatar */}
@@ -544,7 +565,7 @@ export function AdminUsersView() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 text-muted-foreground hover:text-amber-600 hover:bg-amber-50"
+                                className="h-8 w-8 rounded-2xl text-muted-foreground hover:bg-green-50 hover:text-green-700"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
@@ -589,7 +610,7 @@ export function AdminUsersView() {
             variant="outline"
             onClick={handleLoadMore}
             disabled={loadingMore}
-            className="border-amber-200 text-amber-700 hover:bg-amber-50 px-6"
+            className="border-green-200 text-green-700 hover:bg-green-50 px-6"
           >
             {loadingMore ? (
               <>
@@ -615,7 +636,7 @@ export function AdminUsersView() {
         }}
       >
         <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200">
-          <DialogHeader className="bg-gradient-to-r from-amber-600 to-purple-600 px-5 py-4 text-white shrink-0">
+          <DialogHeader className="bg-gradient-to-r from-amber-600 to-amber-800 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <UserCog className="h-5 w-5" />
               Modifier le rôle
@@ -663,19 +684,19 @@ export function AdminUsersView() {
                 Nouveau rôle
               </label>
               <Select value={newRole} onValueChange={setNewRole}>
-                <SelectTrigger className="h-11 border-amber-200 focus:border-amber-400">
+                  <SelectTrigger className="h-11 border-amber-200 focus:border-green-400">
                   <SelectValue placeholder="Sélectionner un rôle" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="patient">
                     <span className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-orange-600" />
+                      <Users className="h-4 w-4 text-amber-600" />
                       Patient
                     </span>
                   </SelectItem>
                   <SelectItem value="pharmacist">
                     <span className="flex items-center gap-2">
-                      <ShieldCheck className="h-4 w-4 text-blue-600" />
+                      <ShieldCheck className="h-4 w-4 text-green-600" />
                       Pharmacien
                     </span>
                   </SelectItem>
@@ -713,7 +734,7 @@ export function AdminUsersView() {
               <Button
                 onClick={handleSaveRole}
                 disabled={saving || !newRole || newRole === editUser?.role}
-                className="flex-1 h-11 bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-40"
+                className="flex-1 h-11 bg-green-600 hover:bg-green-700 text-white disabled:opacity-40"
               >
                 {saving ? (
                   <>

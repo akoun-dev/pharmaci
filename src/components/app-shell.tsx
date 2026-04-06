@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/logger';
 import { fetcher } from '@/lib/fetcher';
-import { useEffect, useSyncExternalStore, useCallback } from 'react';
+import { useEffect, useSyncExternalStore, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home,
@@ -24,9 +24,13 @@ import {
   BarChart3,
   ShieldCheck,
   ShoppingCart,
+  Globe,
+  LogOut,
+  Menu,
 } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
 import { useAppStore, View } from '@/store/app-store';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { HomeView } from '@/components/views/home-view';
 import { SearchView } from '@/components/views/search-view';
@@ -63,16 +67,16 @@ import { AdminReviewsView } from '@/components/views/admin/admin-reviews-view';
 import { AdminAnalyticsView } from '@/components/views/admin/admin-analytics-view';
 import { AdminSettingsView } from '@/components/views/admin/admin-settings-view';
 
-type PatientTabKey = 'home' | 'search' | 'favorites' | 'order-history' | 'profile';
+type PatientTabKey = 'home' | 'search' | 'map' | 'favorites' | 'order-history' | 'profile';
 type PharmacistTabKey = 'ph-dashboard' | 'ph-stock-list' | 'ph-orders' | 'ph-notifications' | 'ph-profile';
 type AdminTabKey = 'admin-dashboard' | 'admin-users' | 'admin-pharmacies' | 'admin-orders' | 'admin-medications' | 'admin-reviews' | 'admin-analytics';
 
 const patientTabs: { key: PatientTabKey; label: string; icon: typeof Home }[] = [
   { key: 'home', label: 'Accueil', icon: Home },
   { key: 'search', label: 'Recherche', icon: Search },
-  { key: 'favorites', label: 'Favoris', icon: Heart },
-  { key: 'order-history', label: 'Commandes', icon: ClipboardList },
-  { key: 'profile', label: 'Profil', icon: User },
+  { key: 'order-history', label: 'Mes commandes', icon: ClipboardList },
+  { key: 'map', label: 'Ma carte', icon: Globe },
+  { key: 'profile', label: 'Mon profil', icon: User },
 ];
 
 const pharmacistTabs: { key: PharmacistTabKey; label: string; icon: typeof Home }[] = [
@@ -96,7 +100,7 @@ const adminTabs: { key: AdminTabKey; label: string; icon: typeof Home }[] = [
 const patientViewToTab: Partial<Record<View, PatientTabKey>> = {
   home: 'home',
   search: 'search',
-  map: 'home',
+  map: 'map',
   favorites: 'favorites',
   profile: 'profile',
   'pharmacy-detail': 'home',
@@ -133,6 +137,129 @@ const adminViewToTab: Partial<Record<View, AdminTabKey>> = {
   'admin-reviews': 'admin-reviews',
   'admin-analytics': 'admin-analytics',
   'admin-settings': 'admin-dashboard',
+};
+
+const pharmacistSecondaryTabs = [
+  { key: 'ph-messages' as const, label: 'Messagerie', icon: MessageCircle },
+  { key: 'ph-promotions' as const, label: 'Promotions', icon: Tag },
+  { key: 'ph-settings' as const, label: 'Paramètres', icon: Settings },
+];
+
+const adminSecondaryTabs = [
+  { key: 'admin-medications' as const, label: 'Médicaments', icon: FlaskConical },
+  { key: 'admin-reviews' as const, label: 'Avis', icon: Star },
+  { key: 'admin-settings' as const, label: 'Paramètres', icon: Settings },
+];
+
+const pharmacistViewMeta: Partial<Record<View, { title: string; description: string; badge: string }>> = {
+  'ph-dashboard': {
+    title: 'Pilotez votre pharmacie',
+    description: 'Suivez vos commandes, vos alertes et vos performances depuis un espace plus fluide et plus proche de l’expérience patient.',
+    badge: 'Vue d’ensemble',
+  },
+  'ph-stock-list': {
+    title: 'Gardez le stock sous contrôle',
+    description: 'Retrouvez rapidement les produits disponibles, les ruptures et les alertes d’expiration avec une lecture plus directe.',
+    badge: 'Stocks',
+  },
+  'ph-stock-detail': {
+    title: 'Consultez un produit en détail',
+    description: 'Vérifiez les quantités, les prix et l’historique de mise à jour sans quitter votre repère visuel principal.',
+    badge: 'Fiche stock',
+  },
+  'ph-stock-add': {
+    title: 'Ajoutez une nouvelle entrée',
+    description: 'Enregistrez un médicament ou mettez à jour une référence dans un cadre cohérent avec le reste de l’espace pharmacien.',
+    badge: 'Ajout stock',
+  },
+  'ph-orders': {
+    title: 'Traitez les commandes plus vite',
+    description: 'Gardez les commandes en attente, les vérifications et les retraits à portée de main dans une interface plus accueillante.',
+    badge: 'Commandes',
+  },
+  'ph-order-detail': {
+    title: 'Suivi de commande',
+    description: 'Consultez les informations client et les détails de préparation dans un écran plus lisible.',
+    badge: 'Détail commande',
+  },
+  'ph-notifications': {
+    title: 'Restez à jour',
+    description: 'Centralisez les alertes de commande, de stock et d’avis avec la même logique visuelle que côté patient.',
+    badge: 'Notifications',
+  },
+  'ph-profile': {
+    title: 'Présentez votre pharmacie',
+    description: 'Mettez à jour les informations visibles par les patients tout en gardant une expérience cohérente.',
+    badge: 'Profil',
+  },
+  'ph-messages': {
+    title: 'Échangez avec vos clients',
+    description: 'Retrouvez vos conversations, réponses et suivis depuis un espace mieux intégré au reste de l’application.',
+    badge: 'Messages',
+  },
+  'ph-promotions': {
+    title: 'Mettez vos offres en avant',
+    description: 'Gérez les promotions avec une présentation plus proche de l’expérience publique du produit.',
+    badge: 'Promotions',
+  },
+  'ph-settings': {
+    title: 'Ajustez votre espace',
+    description: 'Gérez vos préférences et vos réglages dans un habillage aligné avec la partie patient.',
+    badge: 'Réglages',
+  },
+  'ph-reports': {
+    title: 'Analysez votre activité',
+    description: 'Consultez vos rapports et exports dans un environnement plus doux et plus lisible.',
+    badge: 'Rapports',
+  },
+  'ph-faq': {
+    title: 'Accédez à l’aide',
+    description: 'Retrouvez les réponses utiles et les informations pratiques sans rupture visuelle.',
+    badge: 'Aide',
+  },
+};
+
+const adminViewMeta: Partial<Record<View, { title: string; description: string; badge: string }>> = {
+  'admin-dashboard': {
+    title: 'Pilotez toute la plateforme',
+    description: 'Gardez les utilisateurs, les pharmacies, les commandes et les tendances de Pharma CI dans un espace plus fluide et plus proche du langage visuel patient.',
+    badge: 'Vue d’ensemble',
+  },
+  'admin-users': {
+    title: 'Supervisez les comptes',
+    description: 'Retrouvez rapidement les patients, pharmaciens et administrateurs dans une interface plus claire, plus chaleureuse et plus simple à parcourir.',
+    badge: 'Utilisateurs',
+  },
+  'admin-pharmacies': {
+    title: 'Suivez le réseau de pharmacies',
+    description: 'Consultez les établissements, leur activité et leurs statuts clés avec des cartes et filtres plus cohérents avec le reste du produit.',
+    badge: 'Pharmacies',
+  },
+  'admin-orders': {
+    title: 'Gardez les commandes sous contrôle',
+    description: 'Filtrez, vérifiez et analysez les commandes de la plateforme avec une lecture plus directe et des actions plus visibles.',
+    badge: 'Commandes',
+  },
+  'admin-medications': {
+    title: 'Administrez le catalogue',
+    description: 'Centralisez les médicaments de la plateforme dans un espace unifié avec les mêmes codes visuels que l’interface patient.',
+    badge: 'Catalogue',
+  },
+  'admin-reviews': {
+    title: 'Surveillez la confiance',
+    description: 'Suivez les avis laissés sur la plateforme et intervenez plus vite grâce à des états plus lisibles.',
+    badge: 'Avis',
+  },
+  'admin-analytics': {
+    title: 'Lisez les signaux importants',
+    description: 'Consultez les performances et les tendances de la plateforme dans une présentation plus engageante.',
+    badge: 'Analyses',
+  },
+  'admin-settings': {
+    title: 'Réglez l’espace d’administration',
+    description: 'Ajustez les paramètres globaux sans quitter la même expérience visuelle que le reste du back-office.',
+    badge: 'Paramètres',
+  },
 };
 
 function PatientViewRenderer() {
@@ -278,6 +405,142 @@ function CartSidebarButton() {
   );
 }
 
+type MobileNavItem = {
+  key: string;
+  label: string;
+  icon: typeof Home;
+};
+
+function MobileSidebarMenu({
+  sectionLabel,
+  currentLabel,
+  userName,
+  userEmail,
+  activeKey,
+  primaryItems,
+  secondaryItems = [],
+  onSelect,
+  onLogout,
+}: {
+  sectionLabel: string;
+  currentLabel: string;
+  userName?: string;
+  userEmail?: string;
+  activeKey: string;
+  primaryItems: MobileNavItem[];
+  secondaryItems?: MobileNavItem[];
+  onSelect: (key: string) => void;
+  onLogout: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const handleSelect = (key: string) => {
+    setOpen(false);
+    onSelect(key);
+  };
+
+  return (
+    <>
+      <div className="fixed inset-x-0 top-0 z-40 border-b border-amber-100 bg-white/95 backdrop-blur-md lg:hidden">
+        <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
+          <button
+            onClick={() => setOpen(true)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-700 transition-colors hover:bg-amber-100"
+            aria-label={`Ouvrir le menu ${sectionLabel.toLowerCase()}`}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium text-muted-foreground">{sectionLabel}</p>
+            <p className="truncate text-sm font-semibold text-foreground">{currentLabel}</p>
+          </div>
+        </div>
+      </div>
+
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent
+          side="left"
+          className="w-[86vw] max-w-xs gap-0 border-r border-amber-100 bg-white p-0 dark:bg-gray-950"
+        >
+          <SheetHeader className="border-b border-amber-100 p-5 text-left">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-600">
+                <Pill className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <SheetTitle className="text-base">Pharma CI</SheetTitle>
+                <SheetDescription className="text-[11px]">{sectionLabel}</SheetDescription>
+              </div>
+            </div>
+          </SheetHeader>
+
+          <div className="mx-4 mt-4 rounded-xl bg-amber-50 p-3">
+            <p className="truncate text-sm font-semibold text-amber-800">{userName}</p>
+            <p className="truncate text-[11px] text-amber-600">{userEmail}</p>
+          </div>
+
+          <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            {primaryItems.map((tab) => {
+              const isActive = activeKey === tab.key;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => handleSelect(tab.key)}
+                  className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-amber-50 text-amber-700'
+                      : 'text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600'
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  {tab.label}
+                </button>
+              );
+            })}
+
+            {secondaryItems.length > 0 && (
+              <div className="mt-2 border-t border-amber-100 pt-2">
+                {secondaryItems.map((tab) => {
+                  const isActive = activeKey === tab.key;
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => handleSelect(tab.key)}
+                      className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                        isActive
+                          ? 'bg-amber-50 text-amber-700'
+                          : 'text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </nav>
+
+          <div className="border-t border-amber-100 p-3">
+            <button
+              onClick={() => {
+                setOpen(false);
+                onLogout();
+              }}
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-red-50 hover:text-red-600"
+            >
+              <LogOut className="h-5 w-5" />
+              Se déconnecter
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+}
+
 export function AppShell() {
   const { currentView, setCurrentView, isAuthenticated, currentUser, setCurrentUser, logout } = useAppStore();
   const mounted = useSyncExternalStore(
@@ -350,16 +613,41 @@ export function AppShell() {
   // ═══════════════════════════════════════════
   if (isAdmin) {
     const activeTab = adminViewToTab[currentView] || 'admin-dashboard';
+    const adminMobileItems: MobileNavItem[] = [
+      ...adminTabs,
+      { key: 'admin-settings', label: 'Paramètres', icon: Settings },
+    ];
+    const adminCurrentLabel =
+      adminMobileItems.find((item) => item.key === currentView)?.label ||
+      adminTabs.find((item) => item.key === activeTab)?.label ||
+      'Administration';
+    const adminActiveKey = currentView === 'admin-settings' ? 'admin-settings' : activeTab;
 
     const handleTabClick = (key: AdminTabKey) => {
       setCurrentView(key);
     };
 
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
-        {/* Sidebar */}
+      <div className="min-h-screen bg-[linear-gradient(180deg,_#fffaf2_0%,_#ffffff_18rem)] dark:bg-gray-950 flex flex-col">
+        <MobileSidebarMenu
+          sectionLabel="Espace admin"
+          currentLabel={adminCurrentLabel}
+          userName={currentUser?.name}
+          userEmail={currentUser?.email}
+          activeKey={adminActiveKey}
+          primaryItems={adminTabs}
+          secondaryItems={[{ key: 'admin-settings', label: 'Paramètres', icon: Settings }]}
+          onSelect={(key) => setCurrentView(key as View)}
+          onLogout={handleLogout}
+        />
+
+        <main className="flex-1 overflow-y-auto pb-6 pt-16 lg:pb-0 lg:pt-0 lg:pl-64">
+          <div className="pt-4 sm:pt-5">
+            <AdminViewRenderer />
+          </div>
+        </main>
+
         <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-col z-50">
-          {/* Logo */}
           <div className="p-5 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-purple-600 flex items-center justify-center">
               <Pill className="h-6 w-6 text-white" />
@@ -370,13 +658,11 @@ export function AppShell() {
             </div>
           </div>
 
-          {/* User info */}
           <div className="mx-4 mb-4 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl">
             <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">{currentUser?.name}</p>
             <p className="text-[11px] text-amber-600 dark:text-amber-400">{currentUser?.email}</p>
           </div>
 
-          {/* Nav items */}
           <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
             {adminTabs.map((tab) => {
               const isActive = activeTab === tab.key;
@@ -411,52 +697,21 @@ export function AppShell() {
             </div>
           </nav>
 
-          {/* Logout */}
           <div className="px-3 mb-2">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-all duration-200"
+              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-all duration-200"
             >
               Se déconnecter
             </button>
           </div>
 
-          {/* Footer */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-800">
             <p className="text-[10px] text-muted-foreground text-center">
               Pharma CI © 2025
             </p>
           </div>
         </aside>
-
-        {/* Main content */}
-        <main className="flex-1 lg:pl-64">
-          <AdminViewRenderer />
-        </main>
-
-        {/* Mobile bottom nav */}
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 lg:hidden pb-safe">
-          <div className="flex items-center justify-around px-1 py-1">
-            {adminTabs.slice(0, 5).map((tab) => {
-              const isActive = activeTab === tab.key;
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => handleTabClick(tab.key)}
-                  className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-xl transition-all duration-200 min-w-0 flex-1 ${
-                    isActive
-                      ? 'text-amber-700 bg-amber-50'
-                      : 'text-muted-foreground hover:text-amber-600'
-                  }`}
-                >
-                  <Icon className="h-[18px] w-[18px]" />
-                  <span className="text-[9px] font-medium leading-tight truncate max-w-full">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </nav>
       </div>
     );
   }
@@ -466,45 +721,36 @@ export function AppShell() {
   // ═══════════════════════════════════════════
   if (isPharmacist) {
     const activeTab = pharmacistViewToTab[currentView] || 'ph-dashboard';
+    const pharmacistCurrentLabel =
+      [...pharmacistTabs, ...pharmacistSecondaryTabs].find((item) => item.key === currentView)?.label ||
+      pharmacistTabs.find((item) => item.key === activeTab)?.label ||
+      'Espace pharmacien';
+    const pharmacistActiveKey =
+      pharmacistSecondaryTabs.find((item) => item.key === currentView)?.key || activeTab;
 
     const handleTabClick = (key: PharmacistTabKey) => {
       setCurrentView(key);
     };
 
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <main className="flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 pt-0 lg:pl-64">
-          <PharmacistViewRenderer />
-        </main>
+      <div className="min-h-screen bg-[linear-gradient(180deg,_#fffaf2_0%,_#ffffff_18rem)] dark:bg-gray-950 flex flex-col">
+        <MobileSidebarMenu
+          sectionLabel="Espace pharmacien"
+          currentLabel={pharmacistCurrentLabel}
+          userName={currentUser?.name}
+          userEmail={currentUser?.email}
+          activeKey={pharmacistActiveKey}
+          primaryItems={pharmacistTabs}
+          secondaryItems={pharmacistSecondaryTabs}
+          onSelect={(key) => setCurrentView(key as View)}
+          onLogout={handleLogout}
+        />
 
-        {/* Bottom navigation (mobile) */}
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900/95 backdrop-blur-md border-t border-amber-100 dark:border-amber-900/50 lg:hidden pb-safe">
-          <div className="flex items-center justify-around px-0.5 py-1 max-w-2xl mx-auto">
-            {pharmacistTabs.map((tab) => {
-              const isActive = activeTab === tab.key;
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => handleTabClick(tab.key)}
-                  className={`flex flex-col items-center justify-center gap-0.5 px-0.5 sm:px-1 py-1.5 rounded-xl transition-all duration-200 min-w-0 flex-1 ${
-                    isActive
-                      ? 'text-amber-700 bg-amber-50'
-                      : 'text-muted-foreground hover:text-amber-600'
-                  }`}
-                >
-                  <Icon
-                    className={`h-[18px] sm:h-5 w-[18px] sm:w-5 transition-colors ${isActive ? 'text-amber-700' : ''}`}
-                  />
-                  <span className="text-[9px] sm:text-[10px] font-medium leading-tight truncate max-w-full">{tab.label}</span>
-                  {isActive && (
-                    <div className="w-1 h-1 rounded-full bg-amber-600 -mt-0.5" />
-                  )}
-                </button>
-              );
-            })}
+        <main className="flex-1 overflow-y-auto pb-6 pt-16 lg:pb-0 lg:pt-0 lg:pl-64">
+          <div className="pt-4 sm:pt-5">
+            <PharmacistViewRenderer />
           </div>
-        </nav>
+        </main>
 
         {/* Sidebar navigation (desktop) */}
         <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-950 border-r border-amber-100 dark:border-amber-900/50 flex-col z-50">

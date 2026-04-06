@@ -91,7 +91,7 @@ export const PharmacyCard = React.memo(function PharmacyCard({
   return (
     <motion.div whileTap={{ scale: 0.98 }}>
       <Card
-        className="overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 border-orange-100 hover:border-orange-300"
+        className="overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 border-amber-100 hover:border-amber-300"
         onClick={() => onClick(pharmacy.id)}
       >
         <CardContent className={compact ? 'p-3' : 'p-3 sm:p-4'}>
@@ -102,13 +102,13 @@ export const PharmacyCard = React.memo(function PharmacyCard({
                   {pharmacy.name}
                 </h3>
                 {pharmacy.isGuard && (
-                  <Badge variant="default" className="bg-orange-600 text-white text-[10px] px-1.5 py-0 h-5 flex items-center gap-0.5 flex-shrink-0">
+                  <Badge variant="default" className="bg-amber-600 text-white text-[10px] px-1.5 py-0 h-5 flex items-center gap-0.5 flex-shrink-0">
                     <ShieldCheck className="h-3 w-3" />
                     De garde
                   </Badge>
                 )}
                 {pharmacy.isOpen24h && (
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 flex items-center gap-0.5 bg-amber-100 text-amber-700 border-amber-200 flex-shrink-0">
+                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 flex items-center gap-0.5 bg-amber-100 text-green-700 border-green-200 flex-shrink-0">
                     <Clock className="h-3 w-3" />
                     24h/24
                   </Badge>
@@ -127,11 +127,11 @@ export const PharmacyCard = React.memo(function PharmacyCard({
                 <span className="text-[11px] text-muted-foreground">
                   ({pharmacy.reviewCount})
                 </span>
-                <span className={`text-[11px] font-medium ${open ? 'text-orange-600' : 'text-red-500'}`}>
+                <span className={`text-[11px] font-medium ${open ? 'text-green-600' : 'text-green-500'}`}>
                   {open ? 'Ouvert' : 'Fermé'}
                 </span>
                 {distance != null && (
-                  <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-full ml-auto flex-shrink-0">
+                  <span className="text-[11px] font-semibold text-green-600 bg-indigo-50 px-1.5 py-0.5 rounded-full ml-auto flex-shrink-0">
                     {distance < 1 ? `${Math.round(distance * 1000)} m` : `${distance.toFixed(1)} km`}
                   </span>
                 )}
@@ -144,7 +144,7 @@ export const PharmacyCard = React.memo(function PharmacyCard({
               aria-label="Favori"
             >
               <Heart
-                className={`h-5 w-5 transition-colors duration-200 ${isFav ? 'fill-red-500 text-red-500' : 'text-muted-foreground hover:text-red-400'}`}
+                className={`h-5 w-5 transition-colors duration-200 ${isFav ? 'fill-green-500 text-green-500' : 'text-muted-foreground hover:text-red-400'}`}
               />
             </button>
           </div>
@@ -155,7 +155,7 @@ export const PharmacyCard = React.memo(function PharmacyCard({
                 <Badge
                   key={service}
                   variant="outline"
-                  className="text-[10px] px-1.5 py-0 border-orange-200 text-orange-700 capitalize"
+                  className="text-[10px] px-1.5 py-0 border-amber-200 text-amber-700 capitalize"
                 >
                   {service}
                 </Badge>

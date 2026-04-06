@@ -428,7 +428,7 @@ export function PharmacistOrderDetailView() {
                       onClick={() => { setVerifyCode(''); setVerifyError(null); setScanError(null); setScanMode(true); setVerifyDialogOpen(true); }}
                       className="flex-1 h-10 border-amber-200 text-amber-700 hover:bg-amber-50 text-xs"
                     >
-                      <ScanLine className="h-4 w-4 mr-1.5" />
+                      <SearchCode className="h-4 w-4 mr-1.5" />
                       Scanner QR
                     </Button>
                   </div>

@@ -129,7 +129,7 @@ export function SearchView() {
   return (
     <div className="pb-4">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <ViewHeader title="Recherche" icon={<Search className="h-5 w-5 text-orange-600" />} />
+        <ViewHeader title="Recherche" icon={<Search className="h-5 w-5 text-amber-600" />} />
 
         {/* Search */}
         <SearchBar
@@ -151,8 +151,8 @@ export function SearchView() {
             onClick={() => setTab('medications')}
             className={
               tab === 'medications'
-                ? 'bg-orange-600 hover:bg-orange-700 text-white text-xs'
-                : 'border-orange-200 text-orange-700 text-xs'
+                ? 'bg-amber-600 hover:bg-amber-700 text-white text-xs'
+                : 'border-amber-200 text-amber-700 text-xs'
             }
           >
             <Pill className="h-3.5 w-3.5 mr-1" />
@@ -164,8 +164,8 @@ export function SearchView() {
             onClick={() => setTab('pharmacies')}
             className={
               tab === 'pharmacies'
-                ? 'bg-orange-600 hover:bg-orange-700 text-white text-xs'
-                : 'border-orange-200 text-orange-700 text-xs'
+                ? 'bg-amber-600 hover:bg-amber-700 text-white text-xs'
+                : 'border-amber-200 text-amber-700 text-xs'
             }
           >
             <Building2 className="h-3.5 w-3.5 mr-1" />
@@ -180,8 +180,8 @@ export function SearchView() {
               onClick={toggleNearMe}
               className={
                 nearMe
-                  ? 'bg-indigo-600 hover:bg-indigo-700 text-white text-xs'
-                  : 'border-indigo-200 text-indigo-700 text-xs'
+                  ? 'bg-green-600 hover:bg-amber-700 text-white text-xs'
+                  : 'border-indigo-200 text-green-600 text-xs'
               }
             >
               <LocateFixed className="h-3.5 w-3.5 mr-1" />
@@ -193,7 +193,7 @@ export function SearchView() {
             variant="outline"
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className="border-orange-200 text-orange-700 text-xs ml-auto"
+            className="border-amber-200 text-green-700 text-xs ml-auto"
           >
             <SlidersHorizontal className="h-3.5 w-3.5 mr-1" />
             Filtres
@@ -203,8 +203,8 @@ export function SearchView() {
         {/* Near me status indicator */}
         {nearMe && tab === 'pharmacies' && (
           <div className="flex items-center gap-2 mb-3 bg-indigo-50 rounded-xl px-3 py-2">
-            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${status === 'granted' ? 'bg-indigo-500' : 'bg-amber-500'}`} />
-            <span className="text-xs text-indigo-700 font-medium flex items-center gap-1.5">
+            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${status === 'granted' ? 'bg-amber-500' : 'bg-amber-500'}`} />
+            <span className="text-xs text-amber-700 font-medium flex items-center gap-1.5">
               {status === 'granted' ? (
                 <>
                   <MapPin className="w-3.5 h-3.5" />
@@ -234,13 +234,13 @@ export function SearchView() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className="bg-white rounded-xl border border-orange-100 p-3 sm:p-4 mb-3 sm:mb-4 space-y-3">
+              <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-4 mb-3 sm:mb-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Filtres</span>
                   {hasActiveFilters && (
                     <button
                       onClick={clearFilters}
-                      className="text-xs text-orange-600 hover:underline"
+                      className="text-xs text-amber-600 hover:underline"
                     >
                       Effacer tout
                     </button>
@@ -257,8 +257,8 @@ export function SearchView() {
                           variant={selectedCategory === cat ? 'default' : 'outline'}
                           className={
                             selectedCategory === cat
-                              ? 'bg-orange-600 text-white cursor-pointer'
-                              : 'cursor-pointer border-orange-200 text-orange-700 hover:bg-orange-50'
+                              ? 'bg-amber-600 text-white cursor-pointer'
+                              : 'cursor-pointer border-amber-200 text-green-700 hover:bg-amber-50'
                           }
                           onClick={() =>
                             setSelectedCategory(selectedCategory === cat ? '' : cat)
@@ -282,8 +282,8 @@ export function SearchView() {
                             variant={selectedCity === city ? 'default' : 'outline'}
                             className={
                               selectedCity === city
-                                ? 'bg-orange-600 text-white cursor-pointer'
-                                : 'cursor-pointer border-orange-200 text-orange-700 hover:bg-orange-50'
+                                ? 'bg-green-600 text-white cursor-pointer'
+                                : 'cursor-pointer border-amber-200 text-green-700 hover:bg-amber-50'
                             }
                             onClick={() =>
                               setSelectedCity(selectedCity === city ? '' : city)
@@ -299,8 +299,8 @@ export function SearchView() {
                         onClick={() => setIsGuardOnly(!isGuardOnly)}
                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs border transition-colors ${
                           isGuardOnly
-                            ? 'bg-orange-50 border-orange-300 text-orange-700'
-                            : 'border-orange-200 text-muted-foreground hover:bg-orange-50'
+                            ? 'bg-amber-50 border-amber-300 text-amber-700'
+                            : 'border-amber-200 text-muted-foreground hover:bg-amber-50'
                         }`}
                       >
                         <ShieldCheck className="h-4 w-4" />
@@ -318,25 +318,25 @@ export function SearchView() {
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-1.5 mb-3">
             {selectedCategory && (
-              <Badge className="bg-orange-100 text-orange-700 gap-1 text-xs">
+              <Badge className="bg-amber-100 text-green-700 gap-1 text-xs">
                 {selectedCategory}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedCategory('')} />
               </Badge>
             )}
             {selectedCity && (
-              <Badge className="bg-orange-100 text-orange-700 gap-1 text-xs">
+              <Badge className="bg-amber-100 text-green-700 gap-1 text-xs">
                 {selectedCity}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedCity('')} />
               </Badge>
             )}
             {isGuardOnly && (
-              <Badge className="bg-orange-100 text-orange-700 gap-1 text-xs">
+              <Badge className="bg-amber-100 text-green-700 gap-1 text-xs">
                 Garde
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setIsGuardOnly(false)} />
               </Badge>
             )}
             {nearMe && (
-              <Badge className="bg-indigo-100 text-indigo-700 gap-1 text-xs">
+              <Badge className="bg-indigo-100 text-amber-700 gap-1 text-xs">
                 <MapPin className="h-3 w-3" />
                 Près de moi
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setNearMe(false)} />
@@ -351,9 +351,9 @@ export function SearchView() {
             <div className="text-center py-12">
               <div className="text-4xl mb-3 flex justify-center">
                 {tab === 'medications' ? (
-                  <Pill className="w-12 h-12 text-orange-600" />
+                  <Pill className="w-12 h-12 text-amber-600" />
                 ) : (
-                  <Building2 className="w-12 h-12 text-orange-600" />
+                  <Building2 className="w-12 h-12 text-amber-600" />
                 )}
               </div>
               <p className="text-sm text-muted-foreground">

@@ -485,7 +485,7 @@ export function MedicationDetailView() {
               variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className={`border-amber-200 text-amber-700 text-xs h-8 px-2.5 ${showFilters ? 'bg-amber-50' : ''}`}
+              className={`border-green-200 text-green-700 text-xs h-8 px-2.5 ${showFilters ? 'bg-green-50' : ''}`}
             >
               <SlidersHorizontal className="h-3.5 w-3.5 mr-1" />
               Filtres
@@ -702,7 +702,7 @@ export function MedicationDetailView() {
                         </div>
                         <Button
                           size="sm"
-                          className="bg-amber-600 hover:bg-amber-700 text-white text-xs h-9 px-4 flex-shrink-0"
+                          className="bg-green-600 hover:bg-green-700 text-white text-xs h-9 px-4 flex-shrink-0"
                           onClick={(e) => {
                             e.stopPropagation();
                             openOrderDialog(pharmacy);
@@ -718,7 +718,7 @@ export function MedicationDetailView() {
                         <a
                           href={`tel:${pharmacy.phone}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="flex items-center justify-center gap-1.5 flex-1 h-8 rounded-lg border border-amber-200 text-amber-700 hover:bg-amber-50 active:bg-amber-100 transition-colors text-xs font-medium"
+                          className="flex items-center justify-center gap-1.5 flex-1 h-8 rounded-lg border border-green-200 text-green-700 hover:bg-green-50 active:bg-green-100 transition-colors text-xs font-medium"
                         >
                           <Phone className="h-3.5 w-3.5" />
                           Appeler
@@ -728,7 +728,7 @@ export function MedicationDetailView() {
                             e.stopPropagation();
                             openGoogleMaps(pharmacy.latitude, pharmacy.longitude, pharmacy.name);
                           }}
-                          className="flex items-center justify-center gap-1.5 flex-1 h-8 rounded-lg border border-blue-200 text-blue-600 hover:bg-blue-50 active:bg-blue-100 transition-colors text-xs font-medium"
+                          className="flex items-center justify-center gap-1.5 flex-1 h-8 rounded-lg border border-amber-200 text-amber-600 hover:bg-amber-50 active:bg-amber-100 transition-colors text-xs font-medium"
                         >
                           <Navigation className="h-3.5 w-3.5" />
                           Y aller
@@ -883,7 +883,7 @@ export function MedicationDetailView() {
               </span>
             </Button>
             <Button
-              className="w-full h-12 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-semibold text-sm"
+              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-sm"
               onClick={handleSubmitOrder}
               disabled={orderSubmitting}
             >
@@ -896,6 +896,7 @@ export function MedicationDetailView() {
                 <span className="flex items-center justify-center gap-2">
                   <Check className="h-4 w-4" />
                   Confirmer la commande
+                  
                 </span>
               )}
             </Button>

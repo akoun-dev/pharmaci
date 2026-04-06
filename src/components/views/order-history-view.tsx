@@ -175,7 +175,10 @@ export function OrderHistoryView() {
 
   const handleDownloadQR = () => {
     if (!selectedOrder?.verificationCode) return;
-    const svg = document.getElementById('order-qr-dialog-code');
+    const container = document.getElementById('order-qr-dialog-code');
+    if (!container) return;
+
+    const svg = container.querySelector('svg');
     if (!svg) return;
 
     const svgData = new XMLSerializer().serializeToString(svg);
@@ -197,6 +200,10 @@ export function OrderHistoryView() {
         link.click();
         toast.success('QR Code téléchargé');
       }
+    };
+
+    img.onerror = () => {
+      toast.error('Erreur lors de la génération du QR Code');
     };
 
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
@@ -380,7 +387,7 @@ export function OrderHistoryView() {
                         {/* Pharmacy (clickable) */}
                         <button
                           onClick={() => handlePharmacyClick(order.pharmacyId)}
-                          className="flex items-center gap-1.5 text-xs text-amber-700 hover:underline w-full text-left"
+                          className="flex items-center gap-1.5 text-xs text-green-700 hover:underline w-full text-left"
                         >
                           <MapPin className="h-3 w-3 flex-shrink-0" />
                           <span className="truncate">
@@ -394,7 +401,7 @@ export function OrderHistoryView() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={(e) => openQrDialog(order, e)}
-                              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 rounded-lg text-xs text-amber-700 transition-colors flex-1 justify-center"
+                              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-green-50 hover:bg-green-100 rounded-lg text-xs text-green-700 transition-colors flex-1 justify-center"
                             >
                               <QrCode className="h-3.5 w-3.5" />
                               <span className="font-mono font-bold tracking-wider">{order.verificationCode}</span>
@@ -481,7 +488,7 @@ export function OrderHistoryView() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-9 px-3 border-amber-200 text-amber-700 hover:bg-amber-50 text-xs"
+                              className="h-9 px-3 border-green-200 text-green-700 hover:bg-amber-50 text-xs"
                             >
                               <Phone className="h-3.5 w-3.5 mr-1.5" />
                               Appeler
@@ -509,13 +516,13 @@ export function OrderHistoryView() {
 
         {/* QR Code Dialog */}
         <Dialog open={qrDialogOpen} onOpenChange={setQrDialogOpen}>
-          <DialogContent className="sm:max-w-sm mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200">
-            <DialogHeader className="bg-gradient-to-r from-amber-600 to-teal-600 px-5 py-4 text-white">
+          <DialogContent className="sm:max-w-sm mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-green-200">
+            <DialogHeader className="bg-gradient-to-r from-green-600 to-teal-600 px-5 py-4 text-white">
               <DialogTitle className="text-base flex items-center gap-2">
                 <QrCode className="h-5 w-5" />
                 Code de vérification
               </DialogTitle>
-              <DialogDescription className="text-amber-200 text-xs mt-1">
+              <DialogDescription className="text-white text-xs mt-1">
                 Présentez ce QR code à la pharmacie
               </DialogDescription>
             </DialogHeader>
@@ -602,7 +609,7 @@ export function OrderHistoryView() {
                   <Button
                     variant="outline"
                     onClick={handleDownloadQR}
-                    className="flex-1 h-10 border-amber-200 text-amber-700 hover:bg-amber-50 text-sm"
+                    className="flex-1 h-10 border-green-200 text-green-700 hover:bg-green-50 text-sm"
                   >
                     <Download className="h-4 w-4 mr-1.5" />
                     Télécharger

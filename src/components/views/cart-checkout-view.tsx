@@ -73,6 +73,11 @@ export function CartCheckoutView() {
       };
 
       let pharmacyCount = 1;
+      let batchData: {
+        orders?: Array<{ id: string }>;
+        pharmacyCount?: number;
+        errors?: unknown[];
+      } | null = null;
 
       // Use batch API - creates ONE order per pharmacy with ALL items from that pharmacy
       // Each order has a SINGLE verification code for all its medications
@@ -83,7 +88,7 @@ export function CartCheckoutView() {
       });
 
       if (batchRes.ok) {
-        const batchData = await batchRes.json();
+        batchData = await batchRes.json();
         if (batchData.orders && batchData.orders.length > 0) {
           pharmacyCount = batchData.pharmacyCount || 1;
 
@@ -109,15 +114,20 @@ export function CartCheckoutView() {
       // Success — clear cart and navigate
       clearCart();
 
+      // Set the first order ID and navigate to confirmation view
+      if (batchData?.orders && batchData.orders.length > 0) {
+        const firstOrder = batchData.orders[0];
+        selectOrder(firstOrder.id);
+      }
+
       // Always redirect to order history after successful order creation
       // This is better when multiple orders are created
       if (pharmacyCount > 1) {
         // For multiple pharmacies, show order history with grouped view
         setCurrentView('order-history');
       } else {
-        // For single pharmacy, we could show confirmation, but history is more reliable
-        // since it shows all orders including newly created ones
-        setCurrentView('order-history');
+        // For single pharmacy, show confirmation view
+        setCurrentView('order-confirmation');
       }
     } catch (error) {
       logger.error('Order submission error:', error);

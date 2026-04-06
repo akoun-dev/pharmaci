@@ -188,10 +188,10 @@ export function HomeView() {
           </div>
 
           <h2 className="text-xl sm:text-2xl font-bold mb-1 leading-tight">
-            Trouvez vos médicaments
+            Trouvez, commandez, recevez : c’est aussi simple que ça !
           </h2>
           <p className="text-amber-200 text-xs sm:text-sm mb-4 sm:mb-5">
-            Pharmacies de garde, disponibilités et prix en temps réel
+            Disponibilités, prix et pharmacies de garde en temps réel.
           </p>
 
           {/* Search Input */}
@@ -334,7 +334,7 @@ export function HomeView() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-sm border border-amber-100 p-3 sm:p-4 grid grid-cols-3 gap-2 sm:gap-3"
+          className="bg-white rounded-2xl shadow-sm border border-amber-100 p-3 sm:p-4 grid grid-cols-2 gap-2 sm:gap-3"
         >
           {loading ? (
             <div className="space-y-2">
@@ -351,19 +351,12 @@ export function HomeView() {
                 <p className="text-xl font-bold text-amber-700">{stats.pharmacies}</p>
                 <p className="text-[11px] text-muted-foreground">Pharmacies</p>
               </div>
-              <div className="text-center border-x border-amber-100">
+              <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Pill className="h-5 w-5 text-amber-600" />
                 </div>
                 <p className="text-xl font-bold text-amber-700">{stats.medications}</p>
                 <p className="text-[11px] text-muted-foreground">Médicaments</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <MapPin className="h-5 w-5 text-amber-600" />
-                </div>
-                <p className="text-xl font-bold text-amber-700">{stats.cities}</p>
-                <p className="text-[11px] text-muted-foreground">Villes</p>
               </div>
             </>
           )}
@@ -377,15 +370,15 @@ export function HomeView() {
         >
           <div className="flex items-center justify-between mb-2 sm:mb-3">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <LocateFixed className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
-              <h3 className="font-semibold text-sm text-foreground">Pharmacies proches</h3>
+              <LocateFixed className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
+              <h3 className="font-semibold text-sm  text-amber-600">Pharmacies proches</h3>
             </div>
             <button
               onClick={() => {
                 requestLocation();
                 setCurrentView('map');
               }}
-              className="text-xs text-amber-500 flex items-center gap-0.5 hover:underline"
+              className="text-xs text-green-700 flex items-center gap-0.5 hover:underline"
             >
               Voir la carte <ChevronRight className="h-3 w-3" />
             </button>
@@ -423,7 +416,7 @@ export function HomeView() {
                     onClick={() => {
                       requestLocation();
                     }}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                    className="bg-amber-600 hover:bg-amber-700 text-white"
                   >
                     <LocateFixed className="h-4 w-4 mr-1" />
                     Activer la localisation

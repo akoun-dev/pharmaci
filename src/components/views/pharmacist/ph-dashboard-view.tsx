@@ -125,7 +125,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   },
   confirmed: {
     label: 'Confirmée',
-    className: 'bg-blue-100 text-blue-700 border-blue-200',
+    className: 'bg-amber-50 text-amber-700 border-amber-200',
   },
   ready: {
     label: 'Prête',
