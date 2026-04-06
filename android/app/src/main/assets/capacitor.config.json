@@ -1,0 +1,6 @@
+{
+	"appId": "ci.pharmaci.app",
+	"appName": "Pharma CI",
+	"webDir": "public",
+	"bundledWebRuntime": false
+}

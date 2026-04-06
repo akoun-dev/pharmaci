@@ -363,6 +363,22 @@ npx prisma studio
 npx tsx prisma/seed.ts
 ```
 
+### Mobile avec Capacitor
+
+```bash
+# Synchroniser Capacitor
+npm run cap:sync
+
+# Ajouter Android (une seule fois)
+npm run cap:add:android
+
+# Synchroniser puis ouvrir Android Studio
+npm run cap:android
+```
+
+Capacitor est configuré pour charger une instance web servie via `CAPACITOR_SERVER_URL`.
+Cette application étant basée sur Next.js avec API routes et authentification serveur, elle ne peut pas être embarquée telle quelle comme un export statique complet.
+
 ## Déploiement
 
 ### Build de production
