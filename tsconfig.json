@@ -27,7 +27,11 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    // Optimisation TypeScript
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "removeComments": true
   },
   "include": [
     "next-env.d.ts",
