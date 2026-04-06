@@ -93,23 +93,23 @@ type FilterTab = 'all' | 'pending' | 'confirmed' | 'ready' | 'picked_up' | 'canc
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   pending: {
     label: 'En attente',
-    className: 'bg-amber-100 text-amber-700 border-amber-200',
+    className: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900/50',
   },
   confirmed: {
     label: 'Confirmée',
-    className: 'bg-green-100 text-green-700 border-green-200',
+    className: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-300 dark:border-green-900/50',
   },
   ready: {
     label: 'Prête',
-    className: 'bg-amber-100 text-amber-700 border-amber-200',
+    className: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900/50',
   },
   picked_up: {
     label: 'Récupérée',
-    className: 'bg-gray-100 text-gray-600 border-gray-200',
+    className: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
   },
   cancelled: {
     label: 'Annulée',
-    className: 'bg-red-100 text-red-700 border-red-200',
+    className: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-900/50',
   },
 };
 
@@ -364,7 +364,7 @@ export function AdminOrdersView() {
             <Button
               onClick={handleRefresh}
               variant="outline"
-              className="border-amber-200 text-amber-700 hover:bg-amber-50"
+              className="border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-300 dark:hover:bg-amber-950/30"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
@@ -399,22 +399,22 @@ export function AdminOrdersView() {
         }
       />
 
-      <div className="rounded-[26px] border border-amber-100 bg-white/90 p-4 shadow-sm shadow-amber-100/40 sm:p-5">
+      <div className="rounded-[26px] border border-amber-100 bg-white/90 p-4 shadow-sm shadow-amber-100/40 dark:border-amber-900/50 dark:bg-gray-900/90 dark:shadow-none sm:p-5">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <div className="rounded-2xl bg-amber-50/70 px-3 py-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80">Total</p>
+          <div className="rounded-2xl bg-amber-50/70 px-3 py-3 dark:bg-amber-950/30">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80 dark:text-amber-300/80">Total</p>
             <p className="mt-1 text-lg font-semibold text-foreground">{total}</p>
           </div>
-          <div className="rounded-2xl bg-green-50/70 px-3 py-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-green-700/80">Statut actif</p>
+          <div className="rounded-2xl bg-green-50/70 px-3 py-3 dark:bg-green-950/30">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-green-700/80 dark:text-green-300/80">Statut actif</p>
             <p className="mt-1 text-lg font-semibold text-foreground">{FILTER_TABS.find((tab) => tab.key === activeTab)?.label || 'Toutes'}</p>
           </div>
-          <div className="rounded-2xl bg-amber-50/70 px-3 py-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80">Recherche</p>
+          <div className="rounded-2xl bg-amber-50/70 px-3 py-3 dark:bg-amber-950/30">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80 dark:text-amber-300/80">Recherche</p>
             <p className="mt-1 truncate text-sm font-medium text-foreground">{searchQuery.trim() || 'Toutes les commandes'}</p>
           </div>
-          <div className="rounded-2xl bg-green-50/70 px-3 py-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-green-700/80">Période</p>
+          <div className="rounded-2xl bg-green-50/70 px-3 py-3 dark:bg-green-950/30">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-green-700/80 dark:text-green-300/80">Période</p>
             <p className="mt-1 truncate text-sm font-medium text-foreground">{dateFrom || dateTo ? `${dateFrom || '...'} → ${dateTo || '...'}` : 'Aucun filtre date'}</p>
           </div>
         </div>
@@ -427,7 +427,7 @@ export function AdminOrdersView() {
                 placeholder="Rechercher par patient, pharmacie..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-11 rounded-2xl border-amber-200 bg-amber-50/40 pl-9 text-sm focus:border-green-400"
+                className="h-11 rounded-2xl border-amber-200 bg-amber-50/40 pl-9 text-sm focus:border-green-400 dark:border-amber-900/50 dark:bg-amber-950/20"
               />
             </div>
             <Button
@@ -435,8 +435,8 @@ export function AdminOrdersView() {
               size="icon"
               className={`h-11 w-11 shrink-0 rounded-2xl ${
                 showFilters
-                  ? 'border-green-300 bg-green-50 text-green-700'
-                  : 'border-amber-200 text-amber-700'
+                  ? 'border-green-300 bg-green-50 text-green-700 dark:border-green-900/50 dark:bg-green-950/30 dark:text-green-300'
+                  : 'border-amber-200 text-amber-700 dark:border-amber-900/50 dark:text-amber-300'
               }`}
               onClick={() => setShowFilters(!showFilters)}
             >
@@ -452,14 +452,14 @@ export function AdminOrdersView() {
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="grid items-end gap-2 rounded-2xl border border-amber-100 bg-amber-50/40 p-3 sm:grid-cols-[1fr_1fr_auto]">
+                <div className="grid items-end gap-2 rounded-2xl border border-amber-100 bg-amber-50/40 p-3 dark:border-amber-900/50 dark:bg-amber-950/20 sm:grid-cols-[1fr_1fr_auto]">
                   <div className="space-y-1">
                     <Label className="text-[11px] text-muted-foreground">Depuis</Label>
                     <Input
                       type="date"
                       value={dateFrom}
                       onChange={(e) => setDateFrom(e.target.value)}
-                      className="h-10 rounded-xl border-amber-200 bg-white text-xs focus:border-green-400"
+                      className="h-10 rounded-xl border-amber-200 bg-white text-xs focus:border-green-400 dark:border-amber-900/50 dark:bg-gray-900"
                     />
                   </div>
                   <div className="space-y-1">
@@ -468,7 +468,7 @@ export function AdminOrdersView() {
                       type="date"
                       value={dateTo}
                       onChange={(e) => setDateTo(e.target.value)}
-                      className="h-10 rounded-xl border-amber-200 bg-white text-xs focus:border-green-400"
+                      className="h-10 rounded-xl border-amber-200 bg-white text-xs focus:border-green-400 dark:border-amber-900/50 dark:bg-gray-900"
                     />
                   </div>
                   <Button
@@ -497,7 +497,7 @@ export function AdminOrdersView() {
                 className={`flex flex-shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium whitespace-nowrap transition-all duration-200 ${
                   isActive
                     ? 'bg-green-600 text-white shadow-sm'
-                    : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                    : 'bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-300 dark:hover:bg-amber-950/50'
                 }`}
               >
                 {tab.label}
@@ -505,7 +505,7 @@ export function AdminOrdersView() {
                   className={`flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] ${
                     isActive
                       ? 'bg-white/20 text-white'
-                      : 'bg-amber-100 text-amber-600'
+                      : 'bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-300'
                   }`}
                 >
                   {count}
@@ -521,7 +521,7 @@ export function AdminOrdersView() {
             .map(([key, cfg]) => {
               const stat = orderStats[key];
               return (
-                <div key={key} className="rounded-2xl border border-amber-100 bg-white px-3 py-3 text-center">
+                <div key={key} className="rounded-2xl border border-amber-100 bg-white px-3 py-3 text-center dark:border-amber-900/50 dark:bg-gray-900">
                   <p className="text-[10px] sm:text-xs text-muted-foreground">{cfg.label}</p>
                   <p className="text-sm sm:text-base font-bold text-foreground">{stat?.count || 0}</p>
                   <p className="text-[10px] text-muted-foreground">{stat?.total ? formatPrice(stat.total) : '0 FCFA'}</p>
@@ -568,7 +568,7 @@ export function AdminOrdersView() {
                   transition={{ delay: index * 0.03 }}
                 >
                   <Card
-                    className="cursor-pointer overflow-hidden border-amber-100 bg-white/90 shadow-sm shadow-amber-100/30 transition-colors duration-150 hover:border-amber-300 active:scale-[0.99]"
+                    className="cursor-pointer overflow-hidden border-amber-100 bg-white/90 shadow-sm shadow-amber-100/30 transition-colors duration-150 hover:border-amber-300 active:scale-[0.99] dark:border-amber-900/50 dark:bg-gray-900/90 dark:shadow-none dark:hover:border-amber-700/50"
                     onClick={() => handleOrderClick(order)}
                   >
                     <CardContent className="p-4 space-y-2.5">
@@ -589,8 +589,8 @@ export function AdminOrdersView() {
 
                       {/* Patient info */}
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-semibold text-amber-700">
+                        <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 dark:bg-amber-950/40">
+                          <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">
                             {order.user.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -649,7 +649,7 @@ export function AdminOrdersView() {
                       </div>
 
                       {/* Footer */}
-                      <div className="border-t border-amber-100/80 flex items-center justify-between">
+                      <div className="border-t border-amber-100/80 flex items-center justify-between dark:border-amber-900/50">
                         <span className="text-[11px] text-muted-foreground pt-2">
                           {formatRelativeTime(order.createdAt)}
                         </span>
@@ -677,7 +677,7 @@ export function AdminOrdersView() {
       {/* ── Order Detail Dialog ── */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         {selectedOrder && (
-            <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 max-h-[90dvh] flex flex-col">
+            <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 dark:border-amber-900/50 dark:bg-gray-950 max-h-[90dvh] flex flex-col">
               {/* Dialog header */}
               <DialogHeader className="bg-gradient-to-r from-amber-600 to-amber-800 px-5 py-4 text-white shrink-0">
               <DialogTitle className="text-base flex items-center gap-2">
@@ -714,7 +714,7 @@ export function AdminOrdersView() {
                   <User className="h-3.5 w-3.5" />
                   Patient
                 </h4>
-                <div className="bg-gray-50 rounded-lg p-3 space-y-1.5">
+                <div className="bg-gray-50 rounded-lg p-3 space-y-1.5 dark:bg-gray-900">
                   <p className="text-sm font-semibold">{selectedOrder.user.name}</p>
                   {selectedOrder.user.phone && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -742,7 +742,7 @@ export function AdminOrdersView() {
                   <Building2 className="h-3.5 w-3.5" />
                   Pharmacie
                 </h4>
-                <div className="bg-gray-50 rounded-lg p-3 space-y-1.5">
+                <div className="bg-gray-50 rounded-lg p-3 space-y-1.5 dark:bg-gray-900">
                   <p className="text-sm font-semibold">{selectedOrder.pharmacy.name}</p>
                   {selectedOrder.pharmacy.address && (
                     <p className="text-xs text-muted-foreground">
@@ -762,7 +762,7 @@ export function AdminOrdersView() {
                   <Pill className="h-3.5 w-3.5" />
                   Médicament
                 </h4>
-                <div className="bg-gray-50 rounded-lg p-3 space-y-1.5">
+                <div className="bg-gray-50 rounded-lg p-3 space-y-1.5 dark:bg-gray-900">
                   <p className="text-sm font-semibold">
                     {selectedOrder.medication.commercialName ||
                       selectedOrder.medication.name}
@@ -791,7 +791,7 @@ export function AdminOrdersView() {
                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Détails de la commande
                 </h4>
-                <div className="bg-gray-50 rounded-lg p-3">
+                <div className="bg-gray-50 rounded-lg p-3 dark:bg-gray-900">
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <p className="text-[11px] text-muted-foreground">Quantité</p>
@@ -802,7 +802,7 @@ export function AdminOrdersView() {
                     </div>
                     <div>
                       <p className="text-[11px] text-muted-foreground">Total</p>
-                      <p className="text-sm font-bold text-amber-700">
+                      <p className="text-sm font-bold text-amber-700 dark:text-amber-300">
                         {formatPrice(selectedOrder.totalPrice)}
                       </p>
                     </div>
@@ -829,11 +829,11 @@ export function AdminOrdersView() {
                   </div>
 
                   {selectedOrder.pickupTime && (
-                    <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-800">
                       <p className="text-[11px] text-muted-foreground">
                         Heure de récupération
                       </p>
-                      <p className="text-sm font-medium flex items-center gap-1 text-amber-700">
+                      <p className="text-sm font-medium flex items-center gap-1 text-amber-700 dark:text-amber-300">
                         <Clock className="h-3.5 w-3.5" />
                         {selectedOrder.pickupTime}
                       </p>
@@ -841,7 +841,7 @@ export function AdminOrdersView() {
                   )}
 
                   {selectedOrder.note && (
-                    <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-800">
                       <p className="text-[11px] text-muted-foreground">Note</p>
                       <p className="text-sm">{selectedOrder.note}</p>
                     </div>
@@ -858,8 +858,8 @@ export function AdminOrdersView() {
                   <div
                     className={`rounded-lg p-3 flex items-center gap-3 ${
                       selectedOrder.verifiedAt
-                        ? 'bg-amber-50 border border-amber-200'
-                        : 'bg-amber-50 border border-amber-200'
+                        ? 'bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/50'
+                        : 'bg-amber-50 border border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/50'
                     }`}
                   >
                     <span className="text-lg font-bold tracking-[0.3em] font-mono">
@@ -868,8 +868,8 @@ export function AdminOrdersView() {
                     <Badge
                       className={`text-[10px] px-1.5 py-0 border-0 ${
                         selectedOrder.verifiedAt
-                          ? 'bg-amber-200 text-amber-800'
-                          : 'bg-amber-200 text-amber-800'
+                          ? 'bg-amber-200 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200'
+                          : 'bg-amber-200 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200'
                       }`}
                     >
                       {selectedOrder.verifiedAt ? 'Vérifié' : 'Non vérifié'}
@@ -880,7 +880,7 @@ export function AdminOrdersView() {
             </div>
 
             {/* Dialog footer - status actions */}
-            <DialogFooter className="px-5 py-4 border-t border-amber-100 shrink-0 space-y-3">
+            <DialogFooter className="px-5 py-4 border-t border-amber-100 dark:border-amber-900/50 shrink-0 space-y-3">
               {STATUS_TRANSITIONS[selectedOrder.status]?.length > 0 ? (
                 <div className="space-y-2 w-full">
                   <p className="text-[11px] text-muted-foreground font-medium">

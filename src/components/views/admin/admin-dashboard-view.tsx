@@ -274,7 +274,7 @@ export function AdminDashboardView() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setCurrentView('admin-analytics')}
-                className="h-10 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
+                className="h-10 rounded-2xl bg-white/12 px-4 text-white hover:bg-white/18"
               >
                 <BarChart3 className="mr-1.5 h-4 w-4" />
                 Analyses
@@ -285,9 +285,9 @@ export function AdminDashboardView() {
 
         {!loading && !error && data && (
           <motion.div variants={itemVariants} className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <Card className="border-amber-100 bg-white/90 shadow-sm shadow-amber-100/40">
+            <Card className="border-amber-100 bg-white/90 shadow-sm shadow-amber-100/40 dark:border-amber-900/50 dark:bg-gray-900/90 dark:shadow-none">
               <CardContent className="flex items-center gap-3 p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-50 text-green-700">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300">
                   <UserPlus className="h-4 w-4" />
                 </div>
                 <div>
@@ -296,9 +296,9 @@ export function AdminDashboardView() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="border-amber-100 bg-white/90 shadow-sm shadow-amber-100/40">
+            <Card className="border-amber-100 bg-white/90 shadow-sm shadow-amber-100/40 dark:border-amber-900/50 dark:bg-gray-900/90 dark:shadow-none">
               <CardContent className="flex items-center gap-3 p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
                   <Clock className="h-4 w-4" />
                 </div>
                 <div>
@@ -307,9 +307,9 @@ export function AdminDashboardView() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="border-amber-100 bg-white/90 shadow-sm shadow-amber-100/40">
+            <Card className="border-amber-100 bg-white/90 shadow-sm shadow-amber-100/40 dark:border-amber-900/50 dark:bg-gray-900/90 dark:shadow-none">
               <CardContent className="flex items-center gap-3 p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-50 text-green-700">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300">
                   <TrendingUp className="h-4 w-4" />
                 </div>
                 <div>

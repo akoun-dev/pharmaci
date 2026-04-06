@@ -88,17 +88,17 @@ const SORT_OPTIONS: { key: SortOption; label: string }[] = [
 ];
 
 function getQuantityColor(qty: number, inStock: boolean): string {
-  if (!inStock || qty === 0) return 'text-red-600 bg-red-50';
-  if (qty < 10) return 'text-orange-600 bg-orange-50';
-  if (qty <= 20) return 'text-amber-600 bg-amber-50';
-  return 'text-orange-600 bg-orange-50';
+  if (!inStock || qty === 0) return 'text-red-600 bg-red-50 dark:text-red-300 dark:bg-red-950/30';
+  if (qty < 10) return 'text-orange-600 bg-orange-50 dark:text-orange-300 dark:bg-orange-950/30';
+  if (qty <= 20) return 'text-amber-600 bg-amber-50 dark:text-amber-300 dark:bg-amber-950/30';
+  return 'text-orange-600 bg-orange-50 dark:text-orange-300 dark:bg-orange-950/30';
 }
 
 function getQuantityBorderColor(qty: number, inStock: boolean): string {
-  if (!inStock || qty === 0) return 'border-red-200';
-  if (qty < 10) return 'border-orange-200';
-  if (qty <= 20) return 'border-amber-200';
-  return 'border-orange-200';
+  if (!inStock || qty === 0) return 'border-red-200 dark:border-red-900/50';
+  if (qty < 10) return 'border-orange-200 dark:border-orange-900/50';
+  if (qty <= 20) return 'border-amber-200 dark:border-amber-900/50';
+  return 'border-orange-200 dark:border-orange-900/50';
 }
 
 function getExpirationStatus(expirationDate: string | null): 'expired' | 'soon' | 'ok' | null {
@@ -336,7 +336,7 @@ export function PharmacistStockListView() {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`h-10 w-10 rounded-2xl ${showSort ? 'bg-white text-amber-700' : 'bg-white/12 text-white hover:bg-white/18 hover:text-white'}`}
+                className={`h-10 w-10 rounded-2xl ${showSort ? 'bg-white text-amber-700 dark:bg-white/15 dark:text-white' : 'bg-white/12 text-white hover:bg-white/18 hover:text-white'}`}
                 onClick={() => setShowSort(!showSort)}
               >
                 <SlidersHorizontal className="h-5 w-5" />
@@ -358,15 +358,15 @@ export function PharmacistStockListView() {
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -4 }}
                       transition={{ duration: 0.12 }}
-                      className="absolute right-0 top-10 z-50 w-56 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
+                      className="absolute right-0 top-10 z-50 w-56 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden dark:bg-gray-950 dark:border-gray-800"
                     >
                       <button
                         onClick={handleExportExcel}
                         disabled={exporting}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-orange-50 transition-colors disabled:opacity-50"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-orange-50 transition-colors disabled:opacity-50 dark:hover:bg-orange-950/20"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
-                          <Download className="h-4 w-4 text-orange-600" />
+                        <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center dark:bg-orange-950/30">
+                          <Download className="h-4 w-4 text-orange-600 dark:text-orange-300" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-foreground">Exporter en Excel</p>
@@ -375,14 +375,14 @@ export function PharmacistStockListView() {
                         {exporting && <Loader2 className="h-4 w-4 text-muted-foreground animate-spin" />}
                       </button>
 
-                      <Separator className="bg-gray-100" />
+                      <Separator className="bg-gray-100 dark:bg-gray-800" />
 
                       <button
                         onClick={() => { setShowMoreMenu(false); setImportDialogOpen(true); setImportStep('select'); setImportFile(null); setImportResult(null); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-orange-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-orange-50 transition-colors dark:hover:bg-orange-950/20"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-                          <Upload className="h-4 w-4 text-amber-600" />
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center dark:bg-amber-950/30">
+                          <Upload className="h-4 w-4 text-amber-600 dark:text-amber-300" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-foreground">Importer depuis Excel</p>
@@ -390,14 +390,14 @@ export function PharmacistStockListView() {
                         </div>
                       </button>
 
-                      <Separator className="bg-gray-100" />
+                      <Separator className="bg-gray-100 dark:bg-gray-800" />
 
                       <button
                         onClick={handleDownloadTemplate}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-orange-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-orange-50 transition-colors dark:hover:bg-orange-950/20"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-                          <FileSpreadsheet className="h-4 w-4 text-amber-600" />
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center dark:bg-amber-950/30">
+                          <FileSpreadsheet className="h-4 w-4 text-amber-600 dark:text-amber-300" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-foreground">Modèle d&apos;import</p>
@@ -419,16 +419,16 @@ export function PharmacistStockListView() {
           transition={{ duration: 0.25 }}
           className="mb-4"
         >
-          <Card className="border-amber-100 overflow-hidden shadow-sm">
-            <div className="bg-gradient-to-br from-white via-amber-50/50 to-amber-100/60">
+          <Card className="border-amber-100 overflow-hidden shadow-sm dark:border-amber-900/50 dark:shadow-none">
+            <div className="bg-gradient-to-br from-white via-amber-50/50 to-amber-100/60 dark:from-gray-900 dark:via-amber-950/20 dark:to-amber-950/35">
               <CardContent className="p-4 sm:p-5">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <Badge className="bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100">
+                      <Badge className="bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900/50">
                         {currentFilterLabel}
                       </Badge>
-                      <Badge variant="outline" className="border-amber-200 text-amber-700">
+                      <Badge variant="outline" className="border-amber-200 text-amber-700 dark:border-amber-900/50 dark:text-amber-300">
                         {total} référence{total > 1 ? 's' : ''}
                       </Badge>
                     </div>
@@ -464,17 +464,17 @@ export function PharmacistStockListView() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 mt-4">
-                  <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                  <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3 dark:border-amber-900/50 dark:bg-gray-900/90">
                     <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Disponibles</p>
-                    <p className="mt-1 text-lg font-bold text-amber-700">{inStockCount}</p>
+                    <p className="mt-1 text-lg font-bold text-amber-700 dark:text-amber-300">{inStockCount}</p>
                   </div>
-                  <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                  <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3 dark:border-amber-900/50 dark:bg-gray-900/90">
                     <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Stock faible</p>
-                    <p className="mt-1 text-lg font-bold text-amber-700">{lowStockCount}</p>
+                    <p className="mt-1 text-lg font-bold text-amber-700 dark:text-amber-300">{lowStockCount}</p>
                   </div>
-                  <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                  <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3 dark:border-amber-900/50 dark:bg-gray-900/90">
                     <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Expire bientôt</p>
-                    <p className="mt-1 text-lg font-bold text-amber-700">{expiringSoonCount}</p>
+                    <p className="mt-1 text-lg font-bold text-amber-700 dark:text-amber-300">{expiringSoonCount}</p>
                   </div>
                 </div>
               </CardContent>
@@ -495,7 +495,7 @@ export function PharmacistStockListView() {
               )}
             </AnimatePresence>
 
-        <Card className="border-amber-100 mb-4 overflow-hidden">
+        <Card className="border-amber-100 mb-4 overflow-hidden dark:border-amber-900/50">
           <CardContent className="p-3 sm:p-4">
             {/* Search bar */}
             <AnimatePresence initial={false}>
@@ -514,7 +514,7 @@ export function PharmacistStockListView() {
                       placeholder="Rechercher un médicament, une catégorie..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9 h-11 border-amber-200 focus:border-amber-400 bg-amber-50/40"
+                      className="pl-9 h-11 border-amber-200 focus:border-amber-400 bg-amber-50/40 dark:border-amber-900/50 dark:bg-amber-950/20"
                     />
                   </div>
                 </motion.div>
@@ -531,7 +531,7 @@ export function PharmacistStockListView() {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden mb-3"
                 >
-                  <div className="flex flex-wrap gap-1.5 p-3 bg-amber-50/70 rounded-2xl border border-amber-100">
+                  <div className="flex flex-wrap gap-1.5 p-3 bg-amber-50/70 rounded-2xl border border-amber-100 dark:bg-amber-950/20 dark:border-amber-900/50">
                     {SORT_OPTIONS.map((opt) => (
                       <button
                         key={opt.key}
@@ -542,7 +542,7 @@ export function PharmacistStockListView() {
                         className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                           sortOption === opt.key
                             ? 'bg-amber-600 text-white'
-                            : 'bg-white text-amber-700 border border-amber-200 hover:bg-amber-100'
+                            : 'bg-white text-amber-700 border border-amber-200 hover:bg-amber-100 dark:bg-gray-900 dark:text-amber-300 dark:border-amber-900/50 dark:hover:bg-amber-950/30'
                         }`}
                       >
                         {opt.label}
@@ -562,14 +562,14 @@ export function PharmacistStockListView() {
                   className={`px-3 py-2 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                     activeTab === tab.key
                       ? 'bg-amber-600 text-white'
-                      : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
+                      : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50 dark:hover:bg-amber-950/50'
                   }`}
                 >
                   {tab.label}
                 </button>
               ))}
               {stocks.length > 0 && (
-                <Badge variant="secondary" className="text-[10px] px-2 py-0.5 ml-auto flex-shrink-0 bg-amber-50 text-amber-700 border border-amber-200">
+                <Badge variant="secondary" className="text-[10px] px-2 py-0.5 ml-auto flex-shrink-0 bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50">
                   {stocks.length} affiché{stocks.length > 1 ? 's' : ''}
                 </Badge>
               )}
@@ -607,10 +607,10 @@ export function PharmacistStockListView() {
 
         {/* Empty state */}
         {!loading && !error && stocks.length === 0 && (
-          <Card className="border-orange-100">
+          <Card className="border-orange-100 dark:border-orange-900/50">
             <CardContent className="p-8 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mx-auto mb-3">
-                <Package className="h-7 w-7 text-orange-400" />
+              <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mx-auto mb-3 dark:bg-orange-950/30">
+                <Package className="h-7 w-7 text-orange-400 dark:text-orange-300" />
               </div>
               <h3 className="font-semibold text-sm mb-1">
                 {searchQuery ? 'Aucun résultat' : 'Aucun médicament en stock'}
@@ -632,7 +632,7 @@ export function PharmacistStockListView() {
                   <Button
                     variant="outline"
                     onClick={() => { setImportDialogOpen(true); setImportStep('select'); setImportFile(null); setImportResult(null); }}
-                    className="border-orange-200 text-orange-700 hover:bg-orange-50"
+                    className="border-orange-200 text-orange-700 hover:bg-orange-50 dark:border-orange-900/50 dark:text-orange-300 dark:hover:bg-orange-950/30"
                   >
                     <Upload className="h-4 w-4 mr-2" />
                     Importer Excel
@@ -661,14 +661,14 @@ export function PharmacistStockListView() {
                     transition={{ delay: index * 0.03 }}
                   >
                     <Card
-                      className="border-orange-100 hover:border-orange-300 hover:shadow-md transition-all cursor-pointer active:scale-[0.99]"
+                      className="border-orange-100 hover:border-orange-300 hover:shadow-md transition-all cursor-pointer active:scale-[0.99] dark:border-orange-900/50 dark:bg-gray-900/90 dark:hover:border-orange-700/50 dark:hover:shadow-none"
                       onClick={() => handleCardClick(stock.id)}
                     >
                       <CardContent className="p-3 sm:p-4">
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                            <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Pill className="h-4 w-4 text-orange-600" />
+                            <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0 mt-0.5 dark:bg-orange-950/30">
+                              <Pill className="h-4 w-4 text-orange-600 dark:text-orange-300" />
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="font-semibold text-sm truncate leading-tight">{medName}</p>
@@ -692,7 +692,7 @@ export function PharmacistStockListView() {
                           <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                             <div className="flex items-center gap-1.5">
                               {stock.needsPrescription && (
-                                <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px] px-1.5 py-0">
+                                <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px] px-1.5 py-0 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900/50">
                                   <FileText className="h-2.5 w-2.5 mr-0.5" />
                                   Ordonnance
                                 </Badge>
@@ -701,8 +701,8 @@ export function PharmacistStockListView() {
                                 variant="outline"
                                 className={`text-[10px] px-1.5 py-0 ${
                                   stock.inStock
-                                    ? 'border-orange-200 text-orange-700'
-                                    : 'border-red-200 text-red-700'
+                                    ? 'border-orange-200 text-orange-700 dark:border-orange-900/50 dark:text-orange-300'
+                                    : 'border-red-200 text-red-700 dark:border-red-900/50 dark:text-red-300'
                                 }`}
                               >
                                 {stock.inStock ? 'En stock' : 'Rupture'}
@@ -730,7 +730,7 @@ export function PharmacistStockListView() {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between gap-2 mt-1 pt-2 border-t border-orange-50">
+                        <div className="flex items-center justify-between gap-2 mt-1 pt-2 border-t border-orange-50 dark:border-orange-900/30">
                           <div className="flex items-center gap-2 min-w-0 flex-1">
                             <p className="text-sm font-bold text-foreground">
                               {stock.price.toLocaleString('fr-FR')}{' '}
@@ -766,7 +766,7 @@ export function PharmacistStockListView() {
               variant="outline"
               onClick={() => fetchStocks(true)}
               disabled={loadingMore}
-              className="border-green-200 text-green-700 hover:bg-green-50 px-6"
+              className="border-green-200 text-green-700 hover:bg-green-50 px-6 dark:border-green-900/50 dark:text-green-300 dark:hover:bg-green-950/30"
             >
               {loadingMore ? (
                 <>
@@ -785,7 +785,7 @@ export function PharmacistStockListView() {
       <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+1rem)] right-4 sm:right-6 z-40">
         <Button
           onClick={() => setCurrentView('ph-stock-add')}
-          className="h-14 w-14 rounded-2xl bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200"
+          className="h-14 w-14 rounded-2xl bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200 dark:shadow-green-950/40"
           size="icon"
         >
           <Plus className="h-6 w-6" />
@@ -794,7 +794,7 @@ export function PharmacistStockListView() {
 
       {/* ── Import Dialog ── */}
       <Dialog open={importDialogOpen} onOpenChange={(open) => { if (!open) resetImportDialog(); }}>
-        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200">
+        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 dark:border-amber-900/50 dark:bg-gray-950">
           <DialogHeader className="bg-gradient-to-r from-amber-600 to-amber-800 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <Upload className="h-5 w-5" />
@@ -813,13 +813,13 @@ export function PharmacistStockListView() {
                 {/* Step 1: Download template */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[10px] font-bold">1</span>
+                    <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[10px] font-bold dark:bg-amber-950/50 dark:text-amber-300">1</span>
                     Étape 1 : Télécharger le modèle
                   </div>
-                  <Card className="border-amber-100 bg-amber-50/30">
+                  <Card className="border-amber-100 bg-amber-50/30 dark:border-amber-900/50 dark:bg-amber-950/20">
                     <CardContent className="p-3">
                       <div className="flex items-start gap-2.5">
-                        <FileSpreadsheet className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                        <FileSpreadsheet className="h-5 w-5 text-amber-600 shrink-0 mt-0.5 dark:text-amber-300" />
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium">Téléchargez le modèle Excel et remplissez-le avec vos données</p>
                           <p className="text-[11px] text-muted-foreground mt-0.5">
@@ -843,7 +843,7 @@ export function PharmacistStockListView() {
                 {/* Step 2: Upload file */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[10px] font-bold">2</span>
+                    <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[10px] font-bold dark:bg-amber-950/50 dark:text-amber-300">2</span>
                     Étape 2 : Charger votre fichier
                   </div>
 
@@ -852,8 +852,8 @@ export function PharmacistStockListView() {
                     onClick={() => fileInputRef.current?.click()}
                     className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
                       importFile
-                        ? 'border-amber-300 bg-amber-50/50'
-                        : 'border-gray-200 hover:border-amber-300 hover:bg-amber-50/30'
+                        ? 'border-amber-300 bg-amber-50/50 dark:border-amber-900/50 dark:bg-amber-950/30'
+                        : 'border-gray-200 hover:border-amber-300 hover:bg-amber-50/30 dark:border-gray-800 dark:hover:border-amber-900/50 dark:hover:bg-amber-950/20'
                     }`}
                   >
                     <input
@@ -868,10 +868,10 @@ export function PharmacistStockListView() {
                     />
                     {importFile ? (
                       <div className="space-y-2">
-                        <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mx-auto">
-                          <FileSpreadsheet className="h-6 w-6 text-amber-600" />
+                        <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mx-auto dark:bg-amber-950/40">
+                          <FileSpreadsheet className="h-6 w-6 text-amber-600 dark:text-amber-300" />
                         </div>
-                        <p className="text-sm font-medium text-amber-700 truncate">{importFile.name}</p>
+                        <p className="text-sm font-medium text-amber-700 truncate dark:text-amber-300">{importFile.name}</p>
                         <p className="text-[11px] text-muted-foreground">
                           {(importFile.size / 1024).toFixed(1)} Ko
                         </p>
@@ -884,7 +884,7 @@ export function PharmacistStockListView() {
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto">
+                        <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto dark:bg-gray-900">
                           <Upload className="h-6 w-6 text-gray-400" />
                         </div>
                         <p className="text-sm font-medium">Cliquez pour sélectionner un fichier</p>
@@ -913,21 +913,21 @@ export function PharmacistStockListView() {
               <div className="space-y-4">
                 {/* Success summary */}
                 <div className="grid grid-cols-3 gap-2">
-                  <Card className="border-amber-200 bg-amber-50/50">
+                  <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900/50 dark:bg-amber-950/20">
                     <CardContent className="p-3 text-center">
-                      <CheckCircle2 className="h-5 w-5 text-amber-600 mx-auto mb-1" />
-                      <p className="text-lg font-bold text-amber-700">{importResult.created}</p>
+                      <CheckCircle2 className="h-5 w-5 text-amber-600 mx-auto mb-1 dark:text-amber-300" />
+                      <p className="text-lg font-bold text-amber-700 dark:text-amber-300">{importResult.created}</p>
                       <p className="text-[10px] text-muted-foreground">Ajouté(s)</p>
                     </CardContent>
                   </Card>
-                  <Card className="border-amber-200 bg-amber-50/50">
+                  <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900/50 dark:bg-amber-950/20">
                     <CardContent className="p-3 text-center">
-                      <Package className="h-5 w-5 text-amber-600 mx-auto mb-1" />
-                      <p className="text-lg font-bold text-amber-700">{importResult.updated}</p>
+                      <Package className="h-5 w-5 text-amber-600 mx-auto mb-1 dark:text-amber-300" />
+                      <p className="text-lg font-bold text-amber-700 dark:text-amber-300">{importResult.updated}</p>
                       <p className="text-[10px] text-muted-foreground">Mis à jour</p>
                     </CardContent>
                   </Card>
-                  <Card className="border-gray-200 bg-gray-50/50">
+                  <Card className="border-gray-200 bg-gray-50/50 dark:border-gray-800 dark:bg-gray-900">
                     <CardContent className="p-3 text-center">
                       <AlertCircle className="h-5 w-5 text-gray-500 mx-auto mb-1" />
                       <p className="text-lg font-bold text-gray-600">{importResult.total}</p>
@@ -939,18 +939,18 @@ export function PharmacistStockListView() {
                 {/* Errors */}
                 {importResult.errors && importResult.errors.length > 0 && (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
                       <AlertTriangle className="h-3.5 w-3.5" />
                       {importResult.errors.length} avertissement(s)
                     </div>
-                    <div className="max-h-40 overflow-y-auto rounded-lg border border-amber-200 divide-y divide-amber-100">
+                    <div className="max-h-40 overflow-y-auto rounded-lg border border-amber-200 divide-y divide-amber-100 dark:border-amber-900/50 dark:divide-amber-900/40">
                       {importResult.errors.slice(0, 10).map((err, i) => (
                         <div key={i} className="px-3 py-2 flex items-start gap-2">
-                          <span className="text-[10px] font-mono text-muted-foreground bg-gray-100 rounded px-1.5 py-0.5 shrink-0">
+                          <span className="text-[10px] font-mono text-muted-foreground bg-gray-100 rounded px-1.5 py-0.5 shrink-0 dark:bg-gray-900">
                             L{err.row}
                           </span>
                           <div className="min-w-0">
-                            <p className="text-xs font-medium text-amber-700">{err.field}</p>
+                            <p className="text-xs font-medium text-amber-700 dark:text-amber-300">{err.field}</p>
                             <p className="text-[11px] text-muted-foreground">{err.message}</p>
                           </div>
                         </div>
@@ -966,9 +966,9 @@ export function PharmacistStockListView() {
 
                 {/* Success message */}
                 {(importResult.created > 0 || importResult.updated > 0) && (
-                  <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl p-3">
-                    <CheckCircle2 className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                    <p className="text-xs text-amber-700 leading-relaxed">
+                  <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl p-3 dark:bg-amber-950/30 dark:border-amber-900/50">
+                    <CheckCircle2 className="h-5 w-5 text-amber-600 shrink-0 mt-0.5 dark:text-amber-300" />
+                    <p className="text-xs text-amber-700 leading-relaxed dark:text-amber-300">
                       Votre stock a été mis à jour avec succès. Consultez la liste ci-dessous pour vérifier les modifications.
                     </p>
                   </div>

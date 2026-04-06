@@ -121,6 +121,27 @@
   }
 }
 
+.app-view-background {
+  background-color: #f7f1e8;
+  background-image:
+    radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.5) 30%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(90deg, rgba(248, 201, 160, 0.88) 0%, rgba(246, 223, 201, 0.72) 20%, rgba(243, 236, 226, 0.52) 46%, rgba(214, 239, 231, 0.68) 74%, rgba(162, 220, 208, 0.76) 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.34) 0 1px, rgba(255, 255, 255, 0) 1px 80px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0.26) 100%);
+  background-repeat: no-repeat, no-repeat, repeat, no-repeat;
+  background-size: 100% 100%, 100% 100%, 80px 100%, 100% 100%;
+  background-position: center, center, center, center;
+}
+
+.dark .app-view-background {
+  background-color: #111918;
+  background-image:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 24%, rgba(255, 255, 255, 0) 56%),
+    linear-gradient(90deg, rgba(120, 78, 50, 0.42) 0%, rgba(96, 89, 74, 0.26) 24%, rgba(28, 35, 34, 0.12) 48%, rgba(37, 72, 66, 0.34) 76%, rgba(63, 113, 102, 0.38) 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, rgba(255, 255, 255, 0) 1px 80px),
+    linear-gradient(180deg, rgba(7, 10, 10, 0.14) 0%, rgba(7, 10, 10, 0) 42%, rgba(7, 10, 10, 0.2) 100%);
+}
+
 /* Custom scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;

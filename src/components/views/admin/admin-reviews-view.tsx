@@ -130,11 +130,11 @@ function RatingDistributionBar({ distribution }: { distribution: RatingDistribut
   const avg = totalRatings > 0 ? (sumRating / totalRatings).toFixed(1) : '0.0';
 
   return (
-    <Card className="border-amber-100 mb-4">
+    <Card className="border-amber-100 mb-4 dark:border-amber-900/50">
       <CardContent className="p-3 sm:p-4">
         <div className="flex items-center gap-4 mb-3">
           <div className="text-center">
-            <p className="text-2xl font-bold text-amber-700">{avg}</p>
+            <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">{avg}</p>
             <StarRating rating={Math.round(Number(avg))} size="md" />
             <p className="text-[11px] text-muted-foreground mt-0.5">{totalRatings} avis</p>
           </div>
@@ -146,7 +146,7 @@ function RatingDistributionBar({ distribution }: { distribution: RatingDistribut
                 <div key={star} className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground w-3 text-right">{star}</span>
                   <Star className="h-3 w-3 fill-amber-400 text-amber-400 flex-shrink-0" />
-                  <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden dark:bg-gray-800">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${pct}%` }}
@@ -403,7 +403,7 @@ export function AdminReviewsView() {
             <Button
               onClick={handleRefresh}
               variant="outline"
-              className="border-amber-200 text-amber-700 hover:bg-amber-50"
+              className="border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-300 dark:hover:bg-amber-950/30"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
@@ -450,7 +450,7 @@ export function AdminReviewsView() {
               placeholder="Rechercher par patient, pharmacie..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400"
+              className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400 dark:border-amber-900/50 dark:bg-gray-900"
             />
           </div>
           <Button
@@ -458,8 +458,8 @@ export function AdminReviewsView() {
             size="icon"
             className={`h-10 w-10 shrink-0 ${
               showFilters
-                ? 'border-amber-300 bg-amber-50 text-amber-700'
-                : 'border-amber-200'
+                ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300'
+                : 'border-amber-200 dark:border-amber-900/50'
             }`}
             onClick={() => setShowFilters(!showFilters)}
           >
@@ -490,7 +490,7 @@ export function AdminReviewsView() {
                         className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 ${
                           isActive
                             ? 'bg-amber-600 text-white shadow-sm'
-                            : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                            : 'bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-300 dark:hover:bg-amber-950/50'
                         }`}
                       >
                         {opt.label}
@@ -527,7 +527,7 @@ export function AdminReviewsView() {
               className={`flex items-center gap-1 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                 isActive
                   ? 'bg-amber-600 text-white shadow-sm'
-                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-300 dark:hover:bg-amber-950/50'
               }`}
             >
               {tab.label}
@@ -568,13 +568,13 @@ export function AdminReviewsView() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.03 }}
               >
-                <Card className="border-amber-100 overflow-hidden hover:border-amber-300 transition-colors duration-150">
+                <Card className="border-amber-100 overflow-hidden hover:border-amber-300 transition-colors duration-150 dark:border-amber-900/50 dark:hover:border-amber-700/50">
                   <CardContent className="p-4 space-y-2.5">
                     {/* Top row: User + Rating + Actions */}
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-semibold text-amber-700">
+                        <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 dark:bg-amber-950/40">
+                          <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">
                             {review.user.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -603,7 +603,7 @@ export function AdminReviewsView() {
 
                     {/* Reply (if any) */}
                     {review.reply && (
-                      <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 space-y-1.5">
+                      <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 space-y-1.5 dark:bg-amber-950/30 dark:border-amber-900/50">
                         <div className="flex items-center gap-1.5">
                           <Reply className="h-3.5 w-3.5 text-amber-600" />
                           <span className="text-xs font-semibold text-amber-700">
@@ -624,7 +624,7 @@ export function AdminReviewsView() {
                     )}
 
                     {/* Footer */}
-                    <div className="border-t border-amber-100/80 flex items-center justify-between">
+                    <div className="border-t border-amber-100/80 flex items-center justify-between dark:border-amber-900/50">
                       <span className="text-[11px] text-muted-foreground pt-2">
                         {formatRelativeTime(review.createdAt)}
                       </span>
@@ -633,7 +633,7 @@ export function AdminReviewsView() {
                         {review.reply ? (
                           <Badge
                             variant="outline"
-                            className="text-[10px] px-2 py-0 border-orange-200 bg-orange-50 text-orange-700"
+                            className="text-[10px] px-2 py-0 border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/30 dark:text-orange-300"
                           >
                             <Reply className="h-2.5 w-2.5 mr-1" />
                             Répondu
@@ -641,7 +641,7 @@ export function AdminReviewsView() {
                         ) : (
                           <Badge
                             variant="outline"
-                            className="text-[10px] px-2 py-0 border-amber-200 bg-amber-50 text-amber-700"
+                            className="text-[10px] px-2 py-0 border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300"
                           >
                             <MessageSquare className="h-2.5 w-2.5 mr-1" />
                             Sans réponse
@@ -652,7 +652,7 @@ export function AdminReviewsView() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-amber-600 hover:bg-amber-50"
+                          className="h-8 w-8 text-muted-foreground hover:text-amber-600 hover:bg-amber-50 dark:hover:text-amber-300 dark:hover:bg-amber-950/30"
                           onClick={() => openDetail(review)}
                           aria-label="Voir / Répondre"
                         >
@@ -697,10 +697,10 @@ export function AdminReviewsView() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         {deleteTarget && (
           <>
-            <AlertDialogContent className="sm:max-w-md rounded-2xl border-amber-200">
+            <AlertDialogContent className="sm:max-w-md rounded-2xl border-amber-200 dark:border-amber-900/50 dark:bg-gray-950">
               <AlertDialogHeader>
                 <div className="flex items-center gap-3 mb-1">
-                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0 dark:bg-red-950/30">
                     <Trash2 className="h-5 w-5 text-red-500" />
                   </div>
                   <div>
@@ -714,10 +714,10 @@ export function AdminReviewsView() {
                 </div>
               </AlertDialogHeader>
 
-              <div className="bg-gray-50 rounded-lg p-3 my-2 space-y-2">
+              <div className="bg-gray-50 rounded-lg p-3 my-2 space-y-2 dark:bg-gray-900">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center">
-                    <span className="text-[10px] font-semibold text-amber-700">
+                  <div className="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center dark:bg-amber-950/40">
+                    <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-300">
                       {deleteTarget.user.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -735,7 +735,7 @@ export function AdminReviewsView() {
 
               <AlertDialogFooter className="flex-row gap-2 sm:justify-end">
                 <AlertDialogCancel
-                  className="flex-1 sm:flex-none border-amber-200 text-amber-700 hover:bg-amber-50 mt-0"
+                  className="flex-1 sm:flex-none border-amber-200 text-amber-700 hover:bg-amber-50 mt-0 dark:border-amber-900/50 dark:text-amber-300 dark:hover:bg-amber-950/30"
                   disabled={deleting}
                 >
                   Annuler
@@ -766,7 +766,7 @@ export function AdminReviewsView() {
       {/* ── Detail / Reply Dialog ── */}
       <Dialog open={!!detailReview} onOpenChange={(open) => !open && setDetailReview(null)}>
         {detailReview && (
-          <DialogContent className="sm:max-w-lg rounded-2xl border-amber-200 max-h-[85dvh] overflow-y-auto">
+          <DialogContent className="sm:max-w-lg rounded-2xl border-amber-200 dark:border-amber-900/50 dark:bg-gray-950 max-h-[85dvh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-base">
                 <Eye className="h-4.5 w-4.5 text-amber-600" />
@@ -781,8 +781,8 @@ export function AdminReviewsView() {
               {/* Review author & pharmacy */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-semibold text-amber-700">
+                  <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 dark:bg-amber-950/40">
+                    <span className="text-sm font-semibold text-amber-700 dark:text-amber-300">
                       {detailReview.user.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -809,10 +809,10 @@ export function AdminReviewsView() {
                   variant="outline"
                   className={`text-[10px] px-2 py-0 ${
                     detailReview.rating >= 4
-                      ? 'border-orange-200 bg-orange-50 text-orange-700'
+                      ? 'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900/50 dark:bg-orange-950/30 dark:text-orange-300'
                       : detailReview.rating === 3
-                        ? 'border-amber-200 bg-amber-50 text-amber-700'
-                        : 'border-red-200 bg-red-50 text-red-700'
+                        ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300'
+                        : 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300'
                   }`}
                 >
                   {detailReview.rating}/5
@@ -820,13 +820,13 @@ export function AdminReviewsView() {
               </div>
 
               {/* Comment */}
-              <div className="bg-gray-50 rounded-lg p-3">
+              <div className="bg-gray-50 rounded-lg p-3 dark:bg-gray-900">
                 <p className="text-sm leading-relaxed">{detailReview.comment}</p>
               </div>
 
               {/* Existing reply */}
               {detailReview.reply && (
-                <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 space-y-1.5">
+                <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 space-y-1.5 dark:bg-amber-950/30 dark:border-amber-900/50">
                   <div className="flex items-center gap-1.5">
                     <Reply className="h-3.5 w-3.5 text-amber-600" />
                     <span className="text-xs font-semibold text-amber-700">
@@ -851,7 +851,7 @@ export function AdminReviewsView() {
                   placeholder="Votre réponse..."
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-                  className="min-h-[80px] text-sm border-amber-200 focus:border-amber-400 resize-none"
+                  className="min-h-[80px] text-sm border-amber-200 focus:border-amber-400 resize-none dark:border-amber-900/50 dark:bg-gray-900"
                   disabled={replySending}
                 />
                 <div className="flex justify-end gap-2">
@@ -859,7 +859,7 @@ export function AdminReviewsView() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-amber-200 text-amber-700 hover:bg-amber-50 text-xs"
+                      className="border-amber-200 text-amber-700 hover:bg-amber-50 text-xs dark:border-amber-900/50 dark:text-amber-300 dark:hover:bg-amber-950/30"
                       onClick={() => setReplyText(detailReview.reply || '')}
                       disabled={replySending}
                     >

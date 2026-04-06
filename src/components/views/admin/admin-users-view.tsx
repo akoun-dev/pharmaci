@@ -82,21 +82,21 @@ type RoleTab = 'all' | 'patient' | 'pharmacist' | 'admin';
 const ROLE_CONFIG: Record<string, { label: string; className: string; avatarBg: string; avatarText: string }> = {
   patient: {
     label: 'Patient',
-    className: 'bg-amber-100 text-amber-700 border-amber-200',
-    avatarBg: 'bg-amber-100',
-    avatarText: 'text-amber-700',
+    className: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900/50',
+    avatarBg: 'bg-amber-100 dark:bg-amber-950/40',
+    avatarText: 'text-amber-700 dark:text-amber-300',
   },
   pharmacist: {
     label: 'Pharmacien',
-    className: 'bg-green-100 text-green-700 border-green-200',
-    avatarBg: 'bg-green-100',
-    avatarText: 'text-green-700',
+    className: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-300 dark:border-green-900/50',
+    avatarBg: 'bg-green-100 dark:bg-green-950/40',
+    avatarText: 'text-green-700 dark:text-green-300',
   },
   admin: {
     label: 'Admin',
-    className: 'bg-amber-200 text-amber-800 border-amber-300',
-    avatarBg: 'bg-amber-200',
-    avatarText: 'text-amber-800',
+    className: 'bg-amber-200 text-amber-800 border-amber-300 dark:bg-amber-900/60 dark:text-amber-200 dark:border-amber-800/60',
+    avatarBg: 'bg-amber-200 dark:bg-amber-900/60',
+    avatarText: 'text-amber-800 dark:text-amber-200',
   },
 };
 
@@ -108,12 +108,12 @@ const ROLE_TABS: { key: RoleTab; label: string }[] = [
 ];
 
 const AVATAR_COLORS = [
-  { bg: 'bg-amber-100', text: 'text-amber-700' },
-  { bg: 'bg-green-100', text: 'text-green-700' },
-  { bg: 'bg-lime-100', text: 'text-lime-700' },
-  { bg: 'bg-yellow-100', text: 'text-yellow-700' },
-  { bg: 'bg-orange-100', text: 'text-orange-700' },
-  { bg: 'bg-emerald-100', text: 'text-emerald-700' },
+  { bg: 'bg-amber-100 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-300' },
+  { bg: 'bg-green-100 dark:bg-green-950/40', text: 'text-green-700 dark:text-green-300' },
+  { bg: 'bg-lime-100 dark:bg-lime-950/40', text: 'text-lime-700 dark:text-lime-300' },
+  { bg: 'bg-yellow-100 dark:bg-yellow-950/40', text: 'text-yellow-700 dark:text-yellow-300' },
+  { bg: 'bg-orange-100 dark:bg-orange-950/40', text: 'text-orange-700 dark:text-orange-300' },
+  { bg: 'bg-emerald-100 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-300' },
 ];
 
 function getAvatarColor(name: string) {
@@ -345,7 +345,7 @@ export function AdminUsersView() {
               <Button
                 onClick={handleRefresh}
                 variant="outline"
-                className="border-green-200 text-green-700 hover:bg-green-50"
+                className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-900/50 dark:text-green-300 dark:hover:bg-green-950/30"
               >
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
@@ -380,18 +380,18 @@ export function AdminUsersView() {
         }
       />
 
-      <div className="rounded-[26px] border border-amber-100 bg-white/90 p-4 shadow-sm shadow-amber-100/40 sm:p-5">
+      <div className="rounded-[26px] border border-amber-100 bg-white/90 p-4 shadow-sm shadow-amber-100/40 dark:border-amber-900/50 dark:bg-gray-900/90 dark:shadow-none sm:p-5">
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-          <div className="rounded-2xl bg-amber-50/70 px-3 py-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80">Volume</p>
+          <div className="rounded-2xl bg-amber-50/70 px-3 py-3 dark:bg-amber-950/30">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80 dark:text-amber-300/80">Volume</p>
             <p className="mt-1 text-lg font-semibold text-foreground">{total}</p>
           </div>
-          <div className="rounded-2xl bg-green-50/70 px-3 py-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-green-700/80">Vue active</p>
+          <div className="rounded-2xl bg-green-50/70 px-3 py-3 dark:bg-green-950/30">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-green-700/80 dark:text-green-300/80">Vue active</p>
             <p className="mt-1 text-lg font-semibold text-foreground">{ROLE_CONFIG[activeTab]?.label || 'Tous'}</p>
           </div>
-          <div className="rounded-2xl bg-amber-50/70 px-3 py-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80">Recherche</p>
+          <div className="rounded-2xl bg-amber-50/70 px-3 py-3 dark:bg-amber-950/30">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80 dark:text-amber-300/80">Recherche</p>
             <p className="mt-1 truncate text-sm font-medium text-foreground">{searchQuery.trim() || 'Aucune recherche active'}</p>
           </div>
         </div>
@@ -403,7 +403,7 @@ export function AdminUsersView() {
               placeholder="Rechercher par nom ou email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-11 rounded-2xl border-amber-200 bg-amber-50/40 pl-9 text-sm focus:border-green-400"
+              className="h-11 rounded-2xl border-amber-200 bg-amber-50/40 pl-9 text-sm focus:border-green-400 dark:border-amber-900/50 dark:bg-amber-950/20"
             />
           </div>
         </div>
@@ -419,7 +419,7 @@ export function AdminUsersView() {
                 className={`flex flex-shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium whitespace-nowrap transition-all duration-200 ${
                   isActive
                     ? 'bg-green-600 text-white shadow-sm'
-                    : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                    : 'bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-300 dark:hover:bg-amber-950/50'
                 }`}
               >
                 {tab.key === 'patient' && <Users className="h-3 w-3" />}
@@ -428,7 +428,7 @@ export function AdminUsersView() {
                 {tab.label}
                 <span
                   className={`flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-600'
+                    isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-300'
                   }`}
                 >
                   {count}
@@ -483,7 +483,7 @@ export function AdminUsersView() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.03 }}
                 >
-                  <Card className="overflow-hidden border-amber-100 bg-white/90 shadow-sm shadow-amber-100/30 transition-colors hover:border-amber-300">
+                  <Card className="overflow-hidden border-amber-100 bg-white/90 shadow-sm shadow-amber-100/30 transition-colors hover:border-amber-300 dark:border-amber-900/50 dark:bg-gray-900/90 dark:shadow-none dark:hover:border-amber-700/50">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
                         {/* Avatar */}
@@ -560,7 +560,7 @@ export function AdminUsersView() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 rounded-2xl text-muted-foreground hover:bg-green-50 hover:text-green-700"
+                                className="h-8 w-8 rounded-2xl text-muted-foreground hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-950/30 dark:hover:text-green-300"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
@@ -630,7 +630,7 @@ export function AdminUsersView() {
           setEditDialogOpen(open);
         }}
       >
-        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200">
+        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 dark:border-amber-900/50 dark:bg-gray-950">
           <DialogHeader className="bg-gradient-to-r from-amber-600 to-amber-800 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <UserCog className="h-5 w-5" />
@@ -646,7 +646,7 @@ export function AdminUsersView() {
           <div className="p-5 space-y-4">
             {/* User info */}
             {editUser && (
-              <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
+              <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg dark:bg-amber-950/30">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarColor(editUser.name).bg}`}
                 >
@@ -679,7 +679,7 @@ export function AdminUsersView() {
                 Nouveau rôle
               </label>
               <Select value={newRole} onValueChange={setNewRole}>
-                  <SelectTrigger className="h-11 border-amber-200 focus:border-green-400">
+                  <SelectTrigger className="h-11 border-amber-200 focus:border-green-400 dark:border-amber-900/50 dark:bg-gray-900">
                   <SelectValue placeholder="Sélectionner un rôle" />
                 </SelectTrigger>
                 <SelectContent>
@@ -707,9 +707,9 @@ export function AdminUsersView() {
 
             {/* Warning for admin role */}
             {newRole === 'admin' && editUser?.role !== 'admin' && (
-              <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3 dark:bg-amber-950/30 dark:border-amber-900/50">
                 <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-amber-700">
+                <p className="text-xs text-amber-700 dark:text-amber-300">
                   Le rôle administrateur donne un accès complet à la plateforme. Soyez sûr
                   de vouloir attribuer ce rôle.
                 </p>
@@ -722,7 +722,7 @@ export function AdminUsersView() {
                 variant="outline"
                 onClick={() => setEditDialogOpen(false)}
                 disabled={saving}
-                className="flex-1 h-11 border-amber-200 text-amber-700 hover:bg-amber-50"
+                className="flex-1 h-11 border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-300 dark:hover:bg-amber-950/30"
               >
                 Annuler
               </Button>

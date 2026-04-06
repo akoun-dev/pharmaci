@@ -441,11 +441,11 @@ function MobileSidebarMenu({
 
   return (
     <>
-      <div className="fixed inset-x-0 top-0 z-40 border-b border-amber-100 bg-white/95 backdrop-blur-md lg:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 border-b border-amber-100 bg-white/95 backdrop-blur-md dark:border-amber-900/50 dark:bg-gray-950/95 lg:hidden">
         <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
           <button
             onClick={() => setOpen(true)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-700 transition-colors hover:bg-amber-100"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-900/60 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-950/80"
             aria-label={`Ouvrir le menu ${sectionLabel.toLowerCase()}`}
           >
             <Menu className="h-5 w-5" />
@@ -460,9 +460,9 @@ function MobileSidebarMenu({
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
           side="left"
-          className="w-[86vw] max-w-xs gap-0 border-r border-amber-100 bg-white p-0 dark:bg-gray-950"
+          className="w-[86vw] max-w-xs gap-0 border-r border-amber-100 bg-white p-0 dark:border-amber-900/50 dark:bg-gray-950"
         >
-          <SheetHeader className="border-b border-amber-100 p-5 text-left">
+          <SheetHeader className="border-b border-amber-100 p-5 text-left dark:border-amber-900/50">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-600">
                 <Pill className="h-6 w-6 text-white" />
@@ -474,9 +474,9 @@ function MobileSidebarMenu({
             </div>
           </SheetHeader>
 
-          <div className="mx-4 mt-4 rounded-xl bg-amber-50 p-3">
-            <p className="truncate text-sm font-semibold text-amber-800">{userName}</p>
-            <p className="truncate text-[11px] text-amber-600">{userEmail}</p>
+          <div className="mx-4 mt-4 rounded-xl bg-amber-50 p-3 dark:bg-amber-950/40">
+            <p className="truncate text-sm font-semibold text-amber-800 dark:text-amber-300">{userName}</p>
+            <p className="truncate text-[11px] text-amber-600 dark:text-amber-400">{userEmail}</p>
           </div>
 
           <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
@@ -489,8 +489,8 @@ function MobileSidebarMenu({
                   onClick={() => handleSelect(tab.key)}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-amber-50 text-amber-700'
-                      : 'text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600'
+                      ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300'
+                      : 'text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600 dark:hover:bg-amber-950/40 dark:hover:text-amber-300'
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -500,7 +500,7 @@ function MobileSidebarMenu({
             })}
 
             {secondaryItems.length > 0 && (
-              <div className="mt-2 border-t border-amber-100 pt-2">
+              <div className="mt-2 border-t border-amber-100 pt-2 dark:border-amber-900/50">
                 {secondaryItems.map((tab) => {
                   const isActive = activeKey === tab.key;
                   const Icon = tab.icon;
@@ -510,8 +510,8 @@ function MobileSidebarMenu({
                       onClick={() => handleSelect(tab.key)}
                       className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
                         isActive
-                          ? 'bg-amber-50 text-amber-700'
-                          : 'text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600'
+                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300'
+                          : 'text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600 dark:hover:bg-amber-950/40 dark:hover:text-amber-300'
                       }`}
                     >
                       <Icon className="h-5 w-5" />
@@ -523,13 +523,13 @@ function MobileSidebarMenu({
             )}
           </nav>
 
-          <div className="border-t border-amber-100 p-3">
+          <div className="border-t border-amber-100 p-3 dark:border-amber-900/50">
             <button
               onClick={() => {
                 setOpen(false);
                 onLogout();
               }}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-red-50 hover:text-red-600"
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
             >
               <LogOut className="h-5 w-5" />
               Se déconnecter
@@ -628,7 +628,7 @@ export function AppShell() {
     };
 
     return (
-      <div className="min-h-screen bg-[linear-gradient(180deg,_#fffaf2_0%,_#ffffff_18rem)] dark:bg-gray-950 flex flex-col">
+      <div className="app-view-background min-h-screen flex flex-col">
         <MobileSidebarMenu
           sectionLabel="Espace admin"
           currentLabel={adminCurrentLabel}
@@ -733,7 +733,7 @@ export function AppShell() {
     };
 
     return (
-      <div className="min-h-screen bg-[linear-gradient(180deg,_#fffaf2_0%,_#ffffff_18rem)] dark:bg-gray-950 flex flex-col">
+      <div className="app-view-background min-h-screen flex flex-col">
         <MobileSidebarMenu
           sectionLabel="Espace pharmacien"
           currentLabel={pharmacistCurrentLabel}
@@ -854,7 +854,7 @@ export function AppShell() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="app-view-background min-h-screen flex flex-col">
       <main className="flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 pt-0 lg:pl-64">
         <PatientViewRenderer />
       </main>

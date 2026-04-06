@@ -73,23 +73,23 @@ type OrderTypeTab = 'all' | 'commande' | 'reservation';
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   pending: {
     label: 'En attente',
-    className: 'bg-amber-100 text-amber-700 border-amber-200',
+    className: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900/50',
   },
   confirmed: {
     label: 'Confirmée',
-    className: 'bg-amber-50 text-amber-700 border-amber-200',
+    className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50',
   },
   ready: {
     label: 'Prêtée',
-    className: 'bg-amber-100 text-amber-700 border-amber-200',
+    className: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900/50',
   },
   picked_up: {
     label: 'Récupérée',
-    className: 'bg-gray-100 text-gray-600 border-gray-200',
+    className: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
   },
   cancelled: {
     label: 'Annulée',
-    className: 'bg-red-100 text-red-700 border-red-200',
+    className: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-900/50',
   },
 };
 
@@ -395,7 +395,7 @@ export function PharmacistOrdersView() {
             <AlertCircle className="h-10 w-10 text-red-400 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">Erreur de chargement</h3>
             <p className="text-sm text-muted-foreground mb-4">{error}</p>
-            <Button onClick={handleRefresh} variant="outline" className="border-amber-200 text-amber-700 hover:bg-amber-50">
+            <Button onClick={handleRefresh} variant="outline" className="border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-300 dark:hover:bg-amber-950/30">
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
             </Button>
@@ -436,16 +436,16 @@ export function PharmacistOrdersView() {
         transition={{ duration: 0.25 }}
         className="mb-4"
       >
-        <Card className="border-amber-100 overflow-hidden shadow-sm">
-          <div className="bg-gradient-to-br from-white via-amber-50/40 to-amber-100/60">
+        <Card className="border-amber-100 overflow-hidden shadow-sm dark:border-amber-900/50 dark:shadow-none">
+          <div className="bg-gradient-to-br from-white via-amber-50/40 to-amber-100/60 dark:from-gray-900 dark:via-amber-950/20 dark:to-amber-950/35">
             <CardContent className="p-4 sm:p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <Badge className="bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100">
+                    <Badge className="bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900/50">
                       {activeStatusLabel}
                     </Badge>
-                    <Badge variant="outline" className="border-amber-200 text-amber-700">
+                    <Badge variant="outline" className="border-amber-200 text-amber-700 dark:border-amber-900/50 dark:text-amber-300">
                       {total} commande{total > 1 ? 's' : ''}
                     </Badge>
                   </div>
@@ -466,17 +466,17 @@ export function PharmacistOrdersView() {
               </div>
 
               <div className="grid grid-cols-3 gap-2 mt-4">
-                <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3 dark:border-amber-900/50 dark:bg-gray-900/90">
                   <p className="text-[11px] uppercase tracking-wide text-muted-foreground">En attente</p>
-                  <p className="mt-1 text-lg font-bold text-amber-700">{pendingCount}</p>
+                  <p className="mt-1 text-lg font-bold text-amber-700 dark:text-amber-300">{pendingCount}</p>
                 </div>
-                <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3 dark:border-amber-900/50 dark:bg-gray-900/90">
                   <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Prêtes</p>
-                  <p className="mt-1 text-lg font-bold text-amber-700">{readyCount}</p>
+                  <p className="mt-1 text-lg font-bold text-amber-700 dark:text-amber-300">{readyCount}</p>
                 </div>
-                <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3">
+                <div className="rounded-2xl border border-amber-100 bg-white/90 px-3 py-3 dark:border-amber-900/50 dark:bg-gray-900/90">
                   <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Vérifiées</p>
-                  <p className="mt-1 text-lg font-bold text-amber-700">{verifiedCount}</p>
+                  <p className="mt-1 text-lg font-bold text-amber-700 dark:text-amber-300">{verifiedCount}</p>
                 </div>
               </div>
             </CardContent>
@@ -484,16 +484,16 @@ export function PharmacistOrdersView() {
         </Card>
       </motion.div>
 
-      <Card className="border-amber-100 mb-4 overflow-hidden">
+      <Card className="border-amber-100 mb-4 overflow-hidden dark:border-amber-900/50">
         <CardContent className="p-3 sm:p-4 space-y-3">
           {/* Search + Date Filters */}
           <div className="space-y-2">
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-600" />
-                <Input placeholder="Rechercher par patient..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400 bg-amber-50/40" />
+                <Input placeholder="Rechercher par patient..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400 bg-amber-50/40 dark:border-amber-900/50 dark:bg-amber-950/20" />
               </div>
-              <Button variant="outline" size="icon" className={`h-10 w-10 shrink-0 ${showFilters || hasActiveFilters ? 'border-amber-300 bg-amber-50 text-amber-700' : 'border-amber-200'}`} onClick={() => setShowFilters(!showFilters)}>
+              <Button variant="outline" size="icon" className={`h-10 w-10 shrink-0 ${showFilters || hasActiveFilters ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-300' : 'border-amber-200 dark:border-amber-900/50'}`} onClick={() => setShowFilters(!showFilters)}>
                 <Calendar className="h-4 w-4" />
               </Button>
             </div>
@@ -515,19 +515,19 @@ export function PharmacistOrdersView() {
             {hasActiveFilters && !showFilters && (
               <div className="flex items-center gap-1.5 flex-wrap">
                 {searchQuery && (
-                  <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
+                  <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50">
                     &quot;{searchQuery}&quot;
                     <button onClick={() => setSearchQuery('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
                   </Badge>
                 )}
                 {dateFrom && (
-                  <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
+                  <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50">
                     {dateFrom}
                     <button onClick={() => setDateFrom('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
                   </Badge>
                 )}
                 {dateTo && (
-                  <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
+                  <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50">
                     → {dateTo}
                     <button onClick={() => setDateTo('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
                   </Badge>
@@ -541,7 +541,7 @@ export function PharmacistOrdersView() {
             {ORDER_TYPE_TABS.map((tab) => {
               const isActive = orderTypeTab === tab.key;
               return (
-                <button key={tab.key} onClick={() => setOrderTypeTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'}`}>
+                <button key={tab.key} onClick={() => setOrderTypeTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50 dark:hover:bg-amber-950/50'}`}>
                   {tab.key === 'commande' && <Package className="h-3 w-3" />}
                   {tab.key === 'reservation' && <Clock className="h-3 w-3" />}
                   {tab.label}
@@ -556,9 +556,9 @@ export function PharmacistOrdersView() {
               const count = statusCounts[tab.key] || 0;
               const isActive = activeTab === tab.key;
               return (
-                <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'}`}>
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50 dark:hover:bg-amber-950/50'}`}>
                   {tab.label}
-                  <span className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-600'}`}>
+                  <span className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-300'}`}>
                     {count}
                   </span>
                 </button>
@@ -592,19 +592,19 @@ export function PharmacistOrdersView() {
               const isVerified = !!order.verifiedAt;
               return (
                 <motion.div key={order.id} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.04 }}>
-                  <Card className={`${isVerified ? 'border-amber-300 bg-amber-50/20' : 'border-amber-100'} overflow-hidden cursor-pointer hover:border-amber-300 transition-colors active:scale-[0.99] duration-150`} onClick={() => handleOrderClick(order.id)}>
+                  <Card className={`${isVerified ? 'border-amber-300 bg-amber-50/20 dark:bg-amber-950/20 dark:border-amber-700/50' : 'border-amber-100 dark:border-amber-900/50 dark:bg-gray-900/90'} overflow-hidden cursor-pointer hover:border-amber-300 transition-colors active:scale-[0.99] duration-150 dark:hover:border-amber-700/50`} onClick={() => handleOrderClick(order.id)}>
                     <CardContent className="p-4 space-y-2.5">
                       {/* Top row */}
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span className="text-xs font-mono text-muted-foreground flex-shrink-0">#{order.id.slice(0, 8)}</span>
-                          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 flex-shrink-0 ${isReservation ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+                          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 flex-shrink-0 ${isReservation ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50' : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50'}`}>
                             {isReservation ? 'Réservation' : 'Commande'}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-1.5 flex-shrink-0">
                           {isVerified && (
-                            <Badge className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0 border-0">
+                            <Badge className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0 border-0 dark:bg-amber-900/60 dark:text-amber-200">
                               <ShieldCheck className="h-3 w-3 mr-0.5" />
                             </Badge>
                           )}
@@ -616,8 +616,8 @@ export function PharmacistOrdersView() {
 
                       {/* Patient info */}
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-semibold text-amber-700">{order.user.name.charAt(0).toUpperCase()}</span>
+                        <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 dark:bg-amber-950/40">
+                          <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">{order.user.name.charAt(0).toUpperCase()}</span>
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-semibold text-sm truncate">{order.user.name}</p>
@@ -644,7 +644,7 @@ export function PharmacistOrdersView() {
 
                       {/* Verification code */}
                       {order.verificationCode && (
-                        <div className={`flex items-center gap-2 px-2.5 py-2 rounded-lg ${isVerified ? 'bg-amber-100 border border-amber-200' : 'bg-amber-50 border border-amber-200'}`}>
+                        <div className={`flex items-center gap-2 px-2.5 py-2 rounded-lg ${isVerified ? 'bg-amber-100 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-900/50' : 'bg-amber-50 border border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/50'}`}>
                           {isVerified ? (
                             <ShieldCheck className="h-4 w-4 text-amber-600 shrink-0" />
                           ) : (
@@ -653,11 +653,11 @@ export function PharmacistOrdersView() {
                           <span className="text-[11px] font-medium text-muted-foreground shrink-0">Code :</span>
                           <span className="text-sm font-bold tracking-[0.25em] font-mono flex-1">{order.verificationCode}</span>
                           {isVerified ? (
-                            <Badge className="bg-amber-200 text-amber-800 text-[9px] px-1.5 py-0 border-0 shrink-0 font-medium">
+                            <Badge className="bg-amber-200 text-amber-800 text-[9px] px-1.5 py-0 border-0 shrink-0 font-medium dark:bg-amber-900/60 dark:text-amber-200">
                               <ShieldCheck className="h-2.5 w-2.5 mr-0.5" />Vérifié
                             </Badge>
                           ) : (
-                            <Badge className="bg-amber-200 text-amber-800 text-[9px] px-1.5 py-0 border-0 shrink-0 font-medium">
+                            <Badge className="bg-amber-200 text-amber-800 text-[9px] px-1.5 py-0 border-0 shrink-0 font-medium dark:bg-amber-900/60 dark:text-amber-200">
                               <SearchCode className="h-2.5 w-2.5 mr-0.5" />Non vérifié
                             </Badge>
                           )}
@@ -672,14 +672,14 @@ export function PharmacistOrdersView() {
 
                       {/* Pickup time */}
                       {order.pickupTime && (
-                        <div className="flex items-center gap-1.5 text-xs text-amber-600">
+                        <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-300">
                           <Clock className="h-3 w-3" />
                           <span>Récupération prévue : {order.pickupTime}</span>
                         </div>
                       )}
 
                       {/* Footer */}
-                      <div className="border-t border-amber-100/80 flex items-center justify-between">
+                      <div className="border-t border-amber-100/80 flex items-center justify-between dark:border-amber-900/50">
                         <span className="text-[11px] text-muted-foreground pt-2">{formatRelativeTime(order.createdAt)}</span>
                         <ChevronRight className="h-4 w-4 text-amber-400 pt-2" />
                       </div>
@@ -695,7 +695,7 @@ export function PharmacistOrdersView() {
       {/* Load more */}
       {typeFiltered.length > 0 && hasMore && (
         <div className="flex justify-center mt-4">
-          <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore} className="border-green-200 text-green-700 hover:bg-green-50 px-6">
+          <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore} className="border-green-200 text-green-700 hover:bg-green-50 px-6 dark:border-green-900/50 dark:text-green-300 dark:hover:bg-green-950/30">
             {loadingMore ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Chargement...</>) : (`Charger plus (${total - orders.length} restantes)`)}
           </Button>
         </div>
@@ -721,7 +721,7 @@ export function PharmacistOrdersView() {
         if (!open) { cleanupScanner(); setScanMode(false); setVerifyCode(''); setVerifyError(null); setScanError(null); }
         setVerifyDialogOpen(open);
       }}>
-        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200">
+        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 dark:border-amber-900/50 dark:bg-gray-950">
           <DialogHeader className="bg-gradient-to-r from-amber-600 to-amber-800 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <ShieldCheck className="h-5 w-5" />
@@ -737,14 +737,14 @@ export function PharmacistOrdersView() {
             <div className="flex gap-2">
               <button
                 onClick={() => { cleanupScanner(); setScanMode(false); setScanError(null); }}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${!scanMode ? 'bg-amber-100 text-amber-700 border-2 border-amber-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${!scanMode ? 'bg-amber-100 text-amber-700 border-2 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/50' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800'}`}
               >
                 <Keyboard className="h-4 w-4" />
                 Saisie manuelle
               </button>
               <button
                 onClick={() => { setScanError(null); startCameraScan(); }}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${scanMode ? 'bg-amber-100 text-amber-700 border-2 border-amber-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${scanMode ? 'bg-amber-100 text-amber-700 border-2 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/50' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800'}`}
               >
                 <Camera className="h-4 w-4" />
                 Scanner QR
@@ -811,7 +811,7 @@ export function PharmacistOrdersView() {
                   setVerifyError(null);
                 }}
                 placeholder="Ex: A3K9X2"
-                className="h-12 text-center text-2xl font-mono tracking-[0.4em] font-bold border-amber-200 focus:border-amber-400"
+                className="h-12 text-center text-2xl font-mono tracking-[0.4em] font-bold border-amber-200 focus:border-amber-400 dark:border-amber-900/50 dark:bg-gray-900"
                 maxLength={6}
                 disabled={verifying}
                 autoFocus={!scanMode}
