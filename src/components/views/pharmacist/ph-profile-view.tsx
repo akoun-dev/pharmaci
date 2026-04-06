@@ -13,12 +13,6 @@ import {
   Phone,
   Mail,
   Clock,
-  Truck,
-  Car,
-  HeadsetIcon,
-  FileText,
-  Pill,
-  AlertTriangle,
   ParkingCircle,
   ShieldCheck,
   Loader2,
@@ -63,8 +57,6 @@ interface ProfileData {
   openTime: string;
   closeTime: string;
   description: string;
-  services: string;
-  paymentMethods: string;
   parkingInfo: string;
   isGuard: boolean;
   isOpen24h: boolean;
@@ -92,23 +84,6 @@ interface Review {
 }
 
 // ── Constants ────────────────────────────────────────────────────────
-
-const SERVICES_LIST = [
-  { key: 'livraison', label: 'Livraison', icon: Truck },
-  { key: 'drive', label: 'Drive', icon: Car },
-  { key: 'conseil', label: 'Conseil', icon: HeadsetIcon },
-  { key: 'ordonnance', label: 'Ordonnance', icon: FileText },
-  { key: 'parapharmacie', label: 'Parapharmacie', icon: Pill },
-  { key: 'urgence', label: 'Urgence', icon: AlertTriangle },
-];
-
-const PAYMENT_LIST = [
-  { key: 'especes', label: 'Espèces' },
-  { key: 'orange_money', label: 'Orange Money' },
-  { key: 'wave', label: 'Wave' },
-  { key: 'mtn_money', label: 'MTN Money' },
-  { key: 'carte', label: 'Carte' },
-];
 
 function safeParseJSON(str: string | null | undefined): string[] {
   if (!str) return [];
@@ -226,8 +201,6 @@ export function PharmacistProfileView() {
   const [geoLoading, setGeoLoading] = useState(false);
   const [isGuard, setIsGuard] = useState(false);
   const [isOpen24h, setIsOpen24h] = useState(false);
-  const [services, setServices] = useState<string[]>([]);
-  const [paymentMethods, setPaymentMethods] = useState<string[]>([]);
 
   // Stats
   const [rating, setRating] = useState(0);
@@ -274,8 +247,6 @@ export function PharmacistProfileView() {
       setLongitude(data.longitude != null ? String(data.longitude) : '');
       setIsGuard(data.isGuard ?? false);
       setIsOpen24h(data.isOpen24h ?? false);
-      setServices(safeParseJSON(data.services));
-      setPaymentMethods(safeParseJSON(data.paymentMethods));
       setRating(data.rating || 0);
       setReviewCount(data.reviewCount || 0);
       setPhotoPreview(data.imageUrl || null);
@@ -443,20 +414,6 @@ export function PharmacistProfileView() {
     );
   };
 
-  // ── Service / Payment toggles ────────────────────────────────────
-
-  const toggleService = (key: string) => {
-    setServices((prev) =>
-      prev.includes(key) ? prev.filter((s) => s !== key) : [...prev, key]
-    );
-  };
-
-  const togglePayment = (key: string) => {
-    setPaymentMethods((prev) =>
-      prev.includes(key) ? prev.filter((p) => p !== key) : [...prev, key]
-    );
-  };
-
   // ── Save ─────────────────────────────────────────────────────────
 
   const handleSave = async () => {
@@ -496,8 +453,6 @@ export function PharmacistProfileView() {
           openTime,
           closeTime,
           description: description.trim(),
-          services: JSON.stringify(services),
-          paymentMethods: JSON.stringify(paymentMethods),
           parkingInfo: parkingInfo.trim(),
           isGuard,
           isOpen24h,
@@ -819,59 +774,6 @@ export function PharmacistProfileView() {
                     rows={3}
                     className="text-sm resize-none"
                   />
-                </div>
-
-                <Separator className="bg-orange-100/60" />
-
-                {/* Services */}
-                <div className="space-y-2.5">
-                  <Label className="text-xs font-medium text-muted-foreground">Services</Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {SERVICES_LIST.map(({ key, label, icon: Icon }) => (
-                      <label
-                        key={key}
-                        className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors text-sm ${
-                          services.includes(key)
-                            ? 'border-orange-300 bg-orange-50 text-orange-700'
-                            : 'border-gray-200 hover:border-orange-200 text-muted-foreground'
-                        }`}
-                      >
-                        <Checkbox
-                          checked={services.includes(key)}
-                          onCheckedChange={() => toggleService(key)}
-                          className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
-                        />
-                        <Icon className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="text-xs font-medium truncate">{label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <Separator className="bg-orange-100/60" />
-
-                {/* Payment Methods */}
-                <div className="space-y-2.5">
-                  <Label className="text-xs font-medium text-muted-foreground">Moyens de paiement</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {PAYMENT_LIST.map(({ key, label }) => (
-                      <label
-                        key={key}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors text-xs font-medium ${
-                          paymentMethods.includes(key)
-                            ? 'border-orange-300 bg-orange-50 text-orange-700'
-                            : 'border-gray-200 hover:border-orange-200 text-muted-foreground'
-                        }`}
-                      >
-                        <Checkbox
-                          checked={paymentMethods.includes(key)}
-                          onCheckedChange={() => togglePayment(key)}
-                          className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
-                        />
-                        {label}
-                      </label>
-                    ))}
-                  </div>
                 </div>
 
                 <Separator className="bg-orange-100/60" />
