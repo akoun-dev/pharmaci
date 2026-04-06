@@ -202,9 +202,9 @@ export function SearchView() {
 
         {/* Near me status indicator */}
         {nearMe && tab === 'pharmacies' && (
-          <div className="flex items-center gap-2 mb-3 bg-indigo-50 rounded-xl px-3 py-2">
+          <div className="mb-3 flex items-center gap-2 rounded-xl bg-indigo-50 px-3 py-2 dark:bg-indigo-950/40 dark:ring-1 dark:ring-indigo-900/60">
             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${status === 'granted' ? 'bg-amber-500' : 'bg-amber-500'}`} />
-            <span className="text-xs text-amber-700 font-medium flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-300">
               {status === 'granted' ? (
                 <>
                   <MapPin className="w-3.5 h-3.5" />
@@ -234,7 +234,7 @@ export function SearchView() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className="bg-white rounded-xl border border-amber-100 p-3 sm:p-4 mb-3 sm:mb-4 space-y-3">
+              <div className="mb-3 space-y-3 rounded-xl border border-amber-100 bg-white p-3 dark:border-amber-900/50 dark:bg-gray-950/80 sm:mb-4 sm:p-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Filtres</span>
                   {hasActiveFilters && (
@@ -257,8 +257,8 @@ export function SearchView() {
                           variant={selectedCategory === cat ? 'default' : 'outline'}
                           className={
                             selectedCategory === cat
-                              ? 'bg-amber-600 text-white cursor-pointer'
-                              : 'cursor-pointer border-amber-200 text-green-700 hover:bg-amber-50'
+                              ? 'cursor-pointer bg-amber-600 text-white dark:bg-amber-500 dark:text-amber-950'
+                              : 'cursor-pointer border-amber-200 text-green-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-300 dark:hover:bg-white/5'
                           }
                           onClick={() =>
                             setSelectedCategory(selectedCategory === cat ? '' : cat)
@@ -282,8 +282,8 @@ export function SearchView() {
                             variant={selectedCity === city ? 'default' : 'outline'}
                             className={
                               selectedCity === city
-                                ? 'bg-green-600 text-white cursor-pointer'
-                                : 'cursor-pointer border-amber-200 text-green-700 hover:bg-amber-50'
+                                ? 'cursor-pointer bg-green-600 text-white dark:bg-green-500 dark:text-green-950'
+                                : 'cursor-pointer border-amber-200 text-green-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-300 dark:hover:bg-white/5'
                             }
                             onClick={() =>
                               setSelectedCity(selectedCity === city ? '' : city)
@@ -299,8 +299,8 @@ export function SearchView() {
                         onClick={() => setIsGuardOnly(!isGuardOnly)}
                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs border transition-colors ${
                           isGuardOnly
-                            ? 'bg-amber-50 border-amber-300 text-amber-700'
-                            : 'border-amber-200 text-muted-foreground hover:bg-amber-50'
+                            ? 'bg-amber-50 border-amber-300 text-amber-700 dark:bg-amber-950/40 dark:border-amber-800 dark:text-amber-300'
+                            : 'border-amber-200 text-muted-foreground hover:bg-amber-50 dark:border-amber-900/50 dark:hover:bg-white/5'
                         }`}
                       >
                         <ShieldCheck className="h-4 w-4" />
@@ -318,25 +318,25 @@ export function SearchView() {
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-1.5 mb-3">
             {selectedCategory && (
-              <Badge className="bg-amber-100 text-green-700 gap-1 text-xs">
+              <Badge className="gap-1 bg-amber-100 text-xs text-green-700 dark:bg-amber-950/40 dark:text-amber-200">
                 {selectedCategory}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedCategory('')} />
               </Badge>
             )}
             {selectedCity && (
-              <Badge className="bg-amber-100 text-green-700 gap-1 text-xs">
+              <Badge className="gap-1 bg-amber-100 text-xs text-green-700 dark:bg-amber-950/40 dark:text-amber-200">
                 {selectedCity}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedCity('')} />
               </Badge>
             )}
             {isGuardOnly && (
-              <Badge className="bg-amber-100 text-green-700 gap-1 text-xs">
+              <Badge className="gap-1 bg-amber-100 text-xs text-green-700 dark:bg-amber-950/40 dark:text-amber-200">
                 Garde
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setIsGuardOnly(false)} />
               </Badge>
             )}
             {nearMe && (
-              <Badge className="bg-indigo-100 text-amber-700 gap-1 text-xs">
+              <Badge className="gap-1 bg-indigo-100 text-xs text-amber-700 dark:bg-indigo-950/40 dark:text-amber-200">
                 <MapPin className="h-3 w-3" />
                 Près de moi
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setNearMe(false)} />

@@ -96,7 +96,7 @@ export function FavoritesView() {
         } />
 
         {!currentUserId ? (
-          <Card className="border-amber-100">
+          <Card className="border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70">
             <CardContent className="p-6 sm:p-8 text-center">
               <div className="flex justify-center mb-3">
                 <Lock className="w-12 h-12 text-amber-600" />
@@ -114,7 +114,7 @@ export function FavoritesView() {
             </CardContent>
           </Card>
         ) : favorites.length === 0 ? (
-          <Card className="border-amber-100">
+          <Card className="border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70">
             <CardContent className="p-6 sm:p-8 text-center">
               <div className="text-4xl mb-3 flex justify-center">
                 <Pill className="w-12 h-12 text-amber-600" />
@@ -143,7 +143,7 @@ export function FavoritesView() {
                   transition={{ delay: index * 0.05 }}
                 >
                   <Card
-                    className="border-amber-100 cursor-pointer hover:border-amber-300 transition-colors"
+                    className="cursor-pointer border-amber-100 transition-colors hover:border-amber-300 dark:border-amber-900/50 dark:bg-gray-950/70 dark:hover:border-amber-700"
                     onClick={() => handlePharmacyClick(fav.pharmacyId)}
                   >
                     <CardContent className="p-3 sm:p-4">
@@ -177,7 +177,7 @@ export function FavoritesView() {
                             e.stopPropagation();
                             handleRemoveFavorite(fav.pharmacyId);
                           }}
-                          className="p-2 rounded-full hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0"
+                          className="flex-shrink-0 rounded-full p-2 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/40 dark:hover:text-red-300"
                           aria-label="Supprimer"
                         >
                           <Trash2 className="h-4 w-4" />

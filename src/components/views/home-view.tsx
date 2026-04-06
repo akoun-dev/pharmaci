@@ -174,7 +174,7 @@ export function HomeView() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 text-white px-4 sm:px-6 pt-5 sm:pt-6 pb-7 sm:pb-8 rounded-b-3xl"
+        className="bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 text-white px-4 sm:px-6 pt-5 sm:pt-6 pb-7 sm:pb-8 rounded-b-3xl dark:from-amber-950 dark:via-amber-900 dark:to-slate-950"
       >
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-3 mb-3 sm:mb-4">
@@ -196,7 +196,7 @@ export function HomeView() {
 
           {/* Search Input */}
           <div className="relative">
-            <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 rounded-xl bg-white px-4 py-3 shadow-sm dark:bg-gray-950/80 dark:ring-1 dark:ring-white/10">
               <Search className="h-4 w-4 text-amber-600 flex-shrink-0" />
               <input
                 ref={searchInputRef}
@@ -213,7 +213,7 @@ export function HomeView() {
                   if (e.key === 'Enter') goToFullSearch();
                 }}
                 placeholder="Rechercher un médicament, pharmacie..."
-                className="flex-1 bg-transparent text-gray-700 text-sm placeholder:text-gray-400 outline-none"
+                className="flex-1 bg-transparent text-sm text-gray-700 placeholder:text-gray-400 outline-none dark:text-gray-100 dark:placeholder:text-gray-500"
               />
               {searchText && (
                 <button
@@ -221,7 +221,7 @@ export function HomeView() {
                     setSearchText('');
                     setShowDropdown(false);
                   }}
-                  className="text-gray-400 hover:text-gray-600 flex-shrink-0"
+                  className="text-gray-400 hover:text-gray-600 flex-shrink-0 dark:text-gray-500 dark:hover:text-gray-300"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -237,7 +237,7 @@ export function HomeView() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.97 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-amber-100 z-50 overflow-hidden"
+                  className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-xl dark:border-amber-900/50 dark:bg-gray-950"
                 >
                   {searchLoading ? (
                     <div className="p-4 space-y-3">
@@ -250,7 +250,7 @@ export function HomeView() {
                     <div className="max-h-72 overflow-y-auto">
                       {/* Medications */}
                       {searchResults.medications.length > 0 && (
-                        <div className="border-b border-amber-50">
+                        <div className="border-b border-amber-50 dark:border-white/5">
                           <div className="px-4 pt-3 pb-1.5">
                             <span className="text-[11px] font-semibold text-amber-600 uppercase tracking-wide flex items-center gap-1">
                               <Pill className="h-3 w-3" /> Médicaments
@@ -260,16 +260,16 @@ export function HomeView() {
                             <button
                               key={med.id}
                               onClick={() => handleMedicationClick(med.id)}
-                              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-amber-50 transition-colors text-left"
+                              className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-amber-50 dark:hover:bg-white/5"
                             >
-                              <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-                                <Pill className="h-4 w-4 text-amber-600" />
+                              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-950/60">
+                                <Pill className="h-4 w-4 text-amber-600 dark:text-amber-300" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-800 truncate">{med.commercialName || med.name}</p>
-                                <p className="text-[11px] text-gray-400 truncate">{med.activePrinciple || med.category}</p>
+                                <p className="truncate text-sm font-medium text-gray-800 dark:text-gray-100">{med.commercialName || med.name}</p>
+                                <p className="truncate text-[11px] text-gray-400 dark:text-gray-500">{med.activePrinciple || med.category}</p>
                               </div>
-                              <ChevronRight className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" />
+                              <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 text-gray-300 dark:text-gray-600" />
                             </button>
                           ))}
                         </div>
@@ -287,26 +287,26 @@ export function HomeView() {
                             <button
                               key={pharma.id}
                               onClick={() => handlePharmacyClick(pharma.id)}
-                              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-amber-50 transition-colors text-left"
+                              className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-amber-50 dark:hover:bg-white/5"
                             >
-                              <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                                <Building2 className="h-4 w-4 text-indigo-600" />
+                              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-950/60">
+                                <Building2 className="h-4 w-4 text-indigo-600 dark:text-indigo-300" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-800 truncate">{pharma.name}</p>
-                                <p className="text-[11px] text-gray-400 truncate">{pharma.city}{pharma.district ? ` — ${pharma.district}` : ''}</p>
+                                <p className="truncate text-sm font-medium text-gray-800 dark:text-gray-100">{pharma.name}</p>
+                                <p className="truncate text-[11px] text-gray-400 dark:text-gray-500">{pharma.city}{pharma.district ? ` — ${pharma.district}` : ''}</p>
                               </div>
-                              <ChevronRight className="h-3.5 w-3.5 text-gray-300 flex-shrink-0" />
+                              <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 text-gray-300 dark:text-gray-600" />
                             </button>
                           ))}
                         </div>
                       )}
 
                       {/* See all results link */}
-                      <div className="border-t border-amber-100">
+                      <div className="border-t border-amber-100 dark:border-amber-900/50">
                         <button
                           onClick={goToFullSearch}
-                          className="w-full flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-medium text-amber-600 hover:bg-amber-50 transition-colors"
+                          className="w-full flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-medium text-amber-600 transition-colors hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-white/5"
                         >
                           Voir tous les résultats
                           <ArrowRight className="h-3 w-3" />
@@ -315,10 +315,10 @@ export function HomeView() {
                     </div>
                   ) : (
                     <div className="p-6 text-center">
-                      <div className="flex justify-center mb-1.5">
-                        <ZoomIn className="w-8 h-8 text-gray-400" />
+                      <div className="mb-1.5 flex justify-center">
+                        <ZoomIn className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                       </div>
-                      <p className="text-xs text-gray-400">Aucun résultat pour « {searchText} »</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">Aucun résultat pour « {searchText} »</p>
                     </div>
                   )}
                 </motion.div>
@@ -334,7 +334,7 @@ export function HomeView() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-sm border border-amber-100 p-3 sm:p-4 grid grid-cols-2 gap-2 sm:gap-3"
+          className="grid grid-cols-2 gap-2 rounded-2xl border border-amber-100 bg-white p-3 shadow-sm dark:border-amber-900/50 dark:bg-gray-950/80 sm:gap-3 sm:p-4"
         >
           {loading ? (
             <div className="space-y-2">
@@ -348,14 +348,14 @@ export function HomeView() {
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Building2 className="h-5 w-5 text-amber-600" />
                 </div>
-                <p className="text-xl font-bold text-amber-700">{stats.pharmacies}</p>
+                <p className="text-xl font-bold text-amber-700 dark:text-amber-300">{stats.pharmacies}</p>
                 <p className="text-[11px] text-muted-foreground">Pharmacies</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Pill className="h-5 w-5 text-amber-600" />
                 </div>
-                <p className="text-xl font-bold text-amber-700">{stats.medications}</p>
+                <p className="text-xl font-bold text-amber-700 dark:text-amber-300">{stats.medications}</p>
                 <p className="text-[11px] text-muted-foreground">Médicaments</p>
               </div>
             </>
@@ -397,7 +397,7 @@ export function HomeView() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-amber-100 p-4 text-center">
+            <div className="rounded-xl border border-amber-100 bg-white p-4 text-center dark:border-amber-900/50 dark:bg-gray-950/80">
               {loading ? (
                 <div className="space-y-2">
                   <Skeleton className="h-16 w-full rounded-lg" />

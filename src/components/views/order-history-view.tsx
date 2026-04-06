@@ -83,23 +83,23 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   pending: {
     label: 'En attente',
     className:
-      'bg-amber-100 text-amber-700 border-amber-200',
+      'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:border-amber-800',
   },
   confirmed: {
     label: 'Confirmée',
-    className: 'bg-blue-100 text-blue-700 border-blue-200',
+    className: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-200 dark:border-blue-800',
   },
   ready: {
     label: 'Prête',
-    className: 'bg-amber-100 text-amber-700 border-amber-200',
+    className: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:border-amber-800',
   },
   picked_up: {
     label: 'Récupérée',
-    className: 'bg-green-100 text-green-700 border-green-200',
+    className: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-200 dark:border-green-800',
   },
   cancelled: {
     label: 'Annulée',
-    className: 'bg-red-100 text-red-700 border-red-200',
+    className: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-200 dark:border-red-800',
   },
 };
 
@@ -282,7 +282,7 @@ export function OrderHistoryView() {
         />
 
         {!currentUserId ? (
-          <Card className="border-amber-100">
+          <Card className="border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70">
             <CardContent className="p-8 text-center">
               <div className="flex justify-center mb-3">
                 <Lock className="w-12 h-12 text-amber-600" />
@@ -300,7 +300,7 @@ export function OrderHistoryView() {
             </CardContent>
           </Card>
         ) : orders.length === 0 ? (
-          <Card className="border-amber-100">
+          <Card className="border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70">
             <CardContent className="p-8 text-center">
               <div className="text-4xl mb-3 flex justify-center">
                 <FileText className="w-12 h-12 text-amber-600" />
@@ -336,13 +336,13 @@ export function OrderHistoryView() {
                     exit={{ opacity: 0, x: 20 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <Card className="border-amber-100 overflow-hidden">
+                    <Card className="overflow-hidden border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70">
                       <CardContent className="p-4 space-y-2.5">
                         {/* Top row: medications + status badge */}
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-start gap-2 min-w-0 flex-1">
-                            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Pill className="h-4 w-4 text-amber-600" />
+                            <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/30">
+                              <Pill className="h-4 w-4 text-amber-600 dark:text-amber-300" />
                             </div>
                             <div className="min-w-0 flex-1">
                               {order.items.length === 1 ? (
@@ -387,7 +387,7 @@ export function OrderHistoryView() {
                         {/* Pharmacy (clickable) */}
                         <button
                           onClick={() => handlePharmacyClick(order.pharmacyId)}
-                          className="flex items-center gap-1.5 text-xs text-green-700 hover:underline w-full text-left"
+                          className="flex w-full items-center gap-1.5 text-left text-xs text-green-700 hover:underline dark:text-green-300"
                         >
                           <MapPin className="h-3 w-3 flex-shrink-0" />
                           <span className="truncate">
@@ -401,7 +401,7 @@ export function OrderHistoryView() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={(e) => openQrDialog(order, e)}
-                              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-green-50 hover:bg-green-100 rounded-lg text-xs text-green-700 transition-colors flex-1 justify-center"
+                              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-green-50 px-2.5 py-1.5 text-xs text-green-700 transition-colors hover:bg-green-100 dark:bg-green-950/30 dark:text-green-200 dark:hover:bg-green-950/50"
                             >
                               <QrCode className="h-3.5 w-3.5" />
                               <span className="font-mono font-bold tracking-wider">{order.verificationCode}</span>
@@ -428,7 +428,7 @@ export function OrderHistoryView() {
                         </div>
 
                         {/* Separator */}
-                        <div className="border-t border-amber-100/80" />
+                        <div className="border-t border-amber-100/80 dark:border-amber-900/40" />
 
                         {/* Action row */}
                         <div className="flex items-center gap-2">
@@ -437,7 +437,7 @@ export function OrderHistoryView() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 px-3 border-red-200 text-red-600 hover:bg-red-50 text-xs"
+                                className="h-9 border-red-200 px-3 text-xs text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-300 dark:hover:bg-red-950/40"
                                 onClick={(e) => openCancelDialog(order, e)}
                                 disabled={cancelling}
                               >
@@ -473,7 +473,7 @@ export function OrderHistoryView() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-9 px-3 border-amber-200 text-amber-700 hover:bg-amber-50 text-xs"
+                              className="h-9 border-amber-200 px-3 text-xs text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-200 dark:hover:bg-amber-950/40"
                               onClick={(e) => openQrDialog(order, e)}
                             >
                               <QrCode className="h-3.5 w-3.5 mr-1.5" />
@@ -488,7 +488,7 @@ export function OrderHistoryView() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-9 px-3 border-green-200 text-green-700 hover:bg-amber-50 text-xs"
+                              className="h-9 border-green-200 px-3 text-xs text-green-700 hover:bg-amber-50 dark:border-green-900/50 dark:text-green-200 dark:hover:bg-green-950/30"
                             >
                               <Phone className="h-3.5 w-3.5 mr-1.5" />
                               Appeler
@@ -497,7 +497,7 @@ export function OrderHistoryView() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-9 px-3 border-amber-200 text-amber-700 hover:bg-amber-50 text-xs"
+                            className="h-9 border-amber-200 px-3 text-xs text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-200 dark:hover:bg-amber-950/40"
                             onClick={() => handleNavigate(order)}
                             disabled={!order.pharmacy.latitude || !order.pharmacy.longitude}
                           >
@@ -516,7 +516,7 @@ export function OrderHistoryView() {
 
         {/* QR Code Dialog */}
         <Dialog open={qrDialogOpen} onOpenChange={setQrDialogOpen}>
-          <DialogContent className="sm:max-w-sm mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-green-200">
+          <DialogContent className="mx-auto gap-0 overflow-hidden rounded-2xl border-green-200 p-0 dark:border-green-900/50 dark:bg-gray-950 sm:max-w-sm">
             <DialogHeader className="bg-gradient-to-r from-green-600 to-teal-600 px-5 py-4 text-white">
               <DialogTitle className="text-base flex items-center gap-2">
                 <QrCode className="h-5 w-5" />
@@ -531,7 +531,7 @@ export function OrderHistoryView() {
               <div className="p-5 space-y-4">
                 {/* QR Code */}
                 <div className="flex justify-center">
-                  <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+                  <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm dark:border-white/10 dark:bg-gray-900">
                     <div id="order-qr-dialog-code">
                       <QRCodeSVG
                         value={qrValue}
@@ -550,19 +550,19 @@ export function OrderHistoryView() {
                     <ShieldCheck className="h-4 w-4 text-amber-600" />
                     <span className="text-sm font-medium text-muted-foreground">Code :</span>
                     {selectedOrder.verifiedAt && (
-                      <Badge className="bg-amber-100 text-amber-700 text-[10px] px-1.5">
+                      <Badge className="bg-amber-100 px-1.5 text-[10px] text-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
                         <ShieldCheck className="h-3 w-3 mr-0.5" />
                         Vérifié
                       </Badge>
                     )}
                   </div>
                   <div className="flex items-center justify-center gap-2">
-                    <span className="text-2xl font-bold tracking-[0.3em] text-amber-700 font-mono">
+                    <span className="font-mono text-2xl font-bold tracking-[0.3em] text-amber-700 dark:text-amber-200">
                       {selectedOrder.verificationCode}
                     </span>
                     <button
                       onClick={handleCopyCode}
-                      className="p-1.5 rounded-lg hover:bg-amber-50 text-muted-foreground hover:text-amber-600 transition-colors"
+                      className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-950/30 dark:hover:text-amber-200"
                     >
                       <Copy className="h-4 w-4" />
                     </button>
@@ -570,7 +570,7 @@ export function OrderHistoryView() {
                 </div>
 
                 {/* Order info */}
-                <div className="bg-gray-50 rounded-lg p-3 space-y-1.5">
+                <div className="space-y-1.5 rounded-lg bg-gray-50 p-3 dark:bg-gray-900/70">
                   {selectedOrder.items.length === 1 ? (
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground">Médicament</span>
@@ -598,7 +598,7 @@ export function OrderHistoryView() {
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Total</span>
-                    <span className="font-semibold text-amber-700">
+                    <span className="font-semibold text-amber-700 dark:text-amber-200">
                       {selectedOrder.totalPrice.toLocaleString()} FCFA
                     </span>
                   </div>
@@ -609,7 +609,7 @@ export function OrderHistoryView() {
                   <Button
                     variant="outline"
                     onClick={handleDownloadQR}
-                    className="flex-1 h-10 border-green-200 text-green-700 hover:bg-green-50 text-sm"
+                    className="flex-1 h-10 border-green-200 text-sm text-green-700 hover:bg-green-50 dark:border-green-900/50 dark:text-green-200 dark:hover:bg-green-950/30"
                   >
                     <Download className="h-4 w-4 mr-1.5" />
                     Télécharger

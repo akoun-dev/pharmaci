@@ -230,8 +230,8 @@ export function PharmacyDetailView() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="overflow-hidden border-amber-100">
-            <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-3 sm:px-4 py-3 sm:py-4">
+          <Card className="overflow-hidden border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70">
+            <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-3 py-3 sm:px-4 sm:py-4 dark:from-amber-950 dark:to-slate-950">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
@@ -272,7 +272,7 @@ export function PharmacyDetailView() {
                 </div>
                 <div className="flex items-center gap-2 text-xs sm:text-sm">
                   <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <a href={`tel:${pharmacy.phone}`} className="text-amber-600 hover:underline">
+                  <a href={`tel:${pharmacy.phone}`} className="text-amber-600 hover:underline dark:text-amber-300">
                     {pharmacy.phone}
                   </a>
                 </div>
@@ -287,8 +287,8 @@ export function PharmacyDetailView() {
                     variant="outline"
                     className={`text-[10px] ${
                       open
-                        ? 'border-amber-300 text-green-700 bg-amber-50'
-                        : 'border-red-300 text-red-700 bg-red-50'
+                        ? 'border-amber-300 text-green-700 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200'
+                        : 'border-red-300 text-red-700 bg-red-50 dark:border-red-800 dark:bg-red-950/30 dark:text-red-200'
                     }`}
                   >
                     {open ? 'Ouvert' : 'Fermé'}
@@ -303,7 +303,7 @@ export function PharmacyDetailView() {
                     <Badge
                       key={s}
                       variant="secondary"
-                      className="text-[10px] bg-amber-50 text-green-700 capitalize"
+                      className="bg-amber-50 text-[10px] capitalize text-green-700 dark:bg-amber-950/30 dark:text-amber-200"
                     >
                       {s}
                     </Badge>
@@ -329,7 +329,7 @@ export function PharmacyDetailView() {
             transition={{ delay: 0.08 }}
             className="mt-3 sm:mt-4"
           >
-            <Card className="border-amber-100">
+            <Card className="border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70">
               <CardContent className="p-3 sm:p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
@@ -338,11 +338,11 @@ export function PharmacyDetailView() {
 
                 {/* Parking info */}
                 {pharmacy.parkingInfo && (
-                  <div className="flex items-start gap-2 bg-amber-50 rounded-lg p-2.5 sm:p-3">
+                  <div className="flex items-start gap-2 rounded-lg bg-amber-50 p-2.5 dark:bg-amber-950/30 sm:p-3">
                     <ParkingCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-[11px] sm:text-xs font-medium text-amber-800">Parking</p>
-                      <p className="text-[11px] sm:text-xs text-amber-700 mt-0.5 break-words">{pharmacy.parkingInfo}</p>
+                      <p className="text-[11px] font-medium text-amber-800 dark:text-amber-200 sm:text-xs">Parking</p>
+                      <p className="mt-0.5 break-words text-[11px] text-amber-700 dark:text-amber-300 sm:text-xs">{pharmacy.parkingInfo}</p>
                     </div>
                   </div>
                 )}
@@ -350,7 +350,7 @@ export function PharmacyDetailView() {
                 {/* Waze alternative */}
                 <button
                   onClick={handleWaze}
-                  className="w-full flex items-center justify-center gap-2 text-xs text-sky-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg py-2 transition-colors"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-xs text-sky-600 transition-colors hover:bg-sky-50 hover:text-sky-700 dark:text-sky-300 dark:hover:bg-sky-950/30 dark:hover:text-sky-200"
                 >
                   <Car className="h-3.5 w-3.5" />
                   Ouvrir avec Waze
@@ -381,7 +381,7 @@ export function PharmacyDetailView() {
             {displayedMeds.map((stock) => (
               <Card
                 key={stock.id}
-                className="overflow-hidden border-amber-100 cursor-pointer hover:border-amber-300 transition-colors"
+              className="cursor-pointer overflow-hidden border-amber-100 transition-colors hover:border-amber-300 dark:border-amber-900/50 dark:bg-gray-950/70 dark:hover:border-amber-700"
                 onClick={() => handleMedicationClick(stock.medication.id)}
               >
                 <CardContent className="p-3">
@@ -390,11 +390,11 @@ export function PharmacyDetailView() {
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-medium text-sm">{stock.medication.name}</span>
                         {stock.inStock ? (
-                          <Badge className="bg-amber-100 text-amber-700 text-[10px] px-1.5 h-4">
+                          <Badge className="h-4 bg-amber-100 px-1.5 text-[10px] text-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
                             En stock
                           </Badge>
                         ) : (
-                          <Badge className="bg-red-100 text-red-700 text-[10px] px-1.5 h-4">
+                          <Badge className="h-4 bg-red-100 px-1.5 text-[10px] text-red-700 dark:bg-red-950/40 dark:text-red-200">
                             Rupture
                           </Badge>
                         )}
@@ -404,7 +404,7 @@ export function PharmacyDetailView() {
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="font-semibold text-sm text-amber-700">
+                      <p className="text-sm font-semibold text-amber-700 dark:text-amber-200">
                         {stock.price.toLocaleString()} FCFA
                       </p>
                       {stock.inStock && (
@@ -453,7 +453,7 @@ export function PharmacyDetailView() {
             <Button
               variant="outline"
               size="sm"
-              className="text-xs border-amber-200 text-amber-700"
+              className="border-amber-200 text-xs text-amber-700 dark:border-amber-900/50 dark:text-amber-200"
               onClick={() => setShowReviewForm(!showReviewForm)}
             >
               Écrire un avis
@@ -462,7 +462,7 @@ export function PharmacyDetailView() {
 
           {/* Review Form */}
           {showReviewForm && (
-            <Card className="mb-2 sm:mb-3 border-amber-100">
+            <Card className="mb-2 border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70 sm:mb-3">
               <CardContent className="p-3 sm:p-4 space-y-3">
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">Votre note</label>
@@ -510,7 +510,7 @@ export function PharmacyDetailView() {
 
           {/* Rating breakdown */}
           {pharmacy.reviews.length > 0 && (
-            <Card className="mb-2 sm:mb-3 border-amber-100">
+            <Card className="mb-2 border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70 sm:mb-3">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="text-center flex-shrink-0">
@@ -543,7 +543,7 @@ export function PharmacyDetailView() {
           {/* Review list */}
           <div className="space-y-2">
             {displayedReviews.map((review) => (
-              <Card key={review.id} className="border-amber-100">
+              <Card key={review.id} className="border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between mb-1 gap-2">
                     <span className="font-medium text-sm truncate">{review.user.name}</span>

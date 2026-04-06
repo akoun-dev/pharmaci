@@ -318,8 +318,8 @@ export function MapView() {
             onClick={() => setSortMode(sortMode === 'distance' ? 'rating' : 'distance')}
             className={
               sortMode === 'distance'
-                ? 'bg-green-50 border-green-300 text-green-700 text-xs'
-                : 'border-amber-200 text-amber-700 text-xs'
+                ? 'bg-green-50 border-green-300 text-green-700 text-xs dark:bg-green-950/40 dark:border-green-900/50 dark:text-green-200'
+                : 'border-amber-200 text-amber-700 text-xs dark:border-amber-900/50 dark:text-amber-200'
             }
           >
             <ArrowUpDown className="h-3 w-3 mr-1" />
@@ -328,7 +328,7 @@ export function MapView() {
 
           {selectedCity && (
             <Badge
-              className="bg-amber-100 text-amber-700 self-center ml-auto gap-1 cursor-pointer text-xs"
+              className="ml-auto cursor-pointer self-center gap-1 bg-amber-100 text-xs text-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
               onClick={() => setSelectedCity(null)}
             >
               {selectedCity} ✕
@@ -340,20 +340,20 @@ export function MapView() {
         <div className="relative mb-3 sm:mb-4">
           {!mapReady && (
             <div
-              className="rounded-2xl border border-amber-200 mb-3 sm:mb-4 animate-pulse bg-amber-50"
+              className="mb-3 animate-pulse rounded-2xl border border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20 sm:mb-4"
               style={{ height: MAP_HEIGHT }}
             />
           )}
           <div
             ref={mapContainerRef}
-            className="rounded-2xl overflow-hidden border border-amber-200"
+            className="overflow-hidden rounded-2xl border border-amber-200 dark:border-amber-900/50"
             style={{ height: MAP_HEIGHT, width: '100%' }}
           />
 
           {/* Floating "Ma position" button */}
           <button
             onClick={handleLocateMe}
-            className="absolute bottom-3 left-3 z-[1000] bg-white border border-amber-200 shadow-lg rounded-full w-11 h-11 flex items-center justify-center hover:bg-amber-50 transition-colors"
+            className="absolute bottom-3 left-3 z-[1000] flex h-11 w-11 items-center justify-center rounded-full border border-amber-200 bg-white shadow-lg transition-colors hover:bg-amber-50 dark:border-amber-900/50 dark:bg-gray-950/90 dark:hover:bg-gray-900"
             title="Ma position"
           >
             {locating ? (
@@ -365,15 +365,15 @@ export function MapView() {
 
           {/* Location status badge */}
           {status === 'granted' && location && (
-            <div className="absolute top-3 left-3 z-[1000] bg-white/90 backdrop-blur-sm border border-green-200 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
+            <div className="absolute top-3 left-3 z-[1000] flex items-center gap-1.5 rounded-full border border-green-200 bg-white/90 px-2.5 py-1 shadow-sm backdrop-blur-sm dark:border-green-900/50 dark:bg-gray-950/85">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
-              <span className="text-[11px] font-medium text-green-700">Position GPS</span>
+              <span className="text-[11px] font-medium text-green-700 dark:text-green-200">Position GPS</span>
             </div>
           )}
           {status === 'denied' && (
-            <div className="absolute top-3 left-3 z-[1000] bg-white/90 backdrop-blur-sm border border-amber-200 rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
+            <div className="absolute top-3 left-3 z-[1000] flex items-center gap-1.5 rounded-full border border-amber-200 bg-white/90 px-2.5 py-1 shadow-sm backdrop-blur-sm dark:border-amber-900/50 dark:bg-gray-950/85">
               <div className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
-              <span className="text-[11px] font-medium text-amber-700">Position estimée</span>
+              <span className="text-[11px] font-medium text-amber-700 dark:text-amber-200">Position estimée</span>
             </div>
           )}
         </div>
