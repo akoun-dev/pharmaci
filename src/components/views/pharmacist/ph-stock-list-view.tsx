@@ -90,14 +90,14 @@ function getQuantityColor(qty: number, inStock: boolean): string {
   if (!inStock || qty === 0) return 'text-red-600 bg-red-50';
   if (qty < 10) return 'text-orange-600 bg-orange-50';
   if (qty <= 20) return 'text-amber-600 bg-amber-50';
-  return 'text-emerald-600 bg-emerald-50';
+  return 'text-orange-600 bg-orange-50';
 }
 
 function getQuantityBorderColor(qty: number, inStock: boolean): string {
   if (!inStock || qty === 0) return 'border-red-200';
   if (qty < 10) return 'border-orange-200';
   if (qty <= 20) return 'border-amber-200';
-  return 'border-emerald-200';
+  return 'border-orange-200';
 }
 
 function getExpirationStatus(expirationDate: string | null): 'expired' | 'soon' | 'ok' | null {
@@ -315,14 +315,14 @@ export function PharmacistStockListView() {
         {/* Header */}
         <ViewHeader
           title="Gestion des Stocks"
-          icon={<Package className="h-5 w-5 text-emerald-600" />}
+          icon={<Package className="h-5 w-5 text-orange-600" />}
           back={false}
           action={
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-emerald-600 hover:bg-emerald-50"
+                className="h-9 w-9 text-orange-600 hover:bg-orange-50"
                 onClick={handleSearchToggle}
               >
                 {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
@@ -330,7 +330,7 @@ export function PharmacistStockListView() {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`h-9 w-9 ${showSort ? 'text-emerald-600 bg-emerald-50' : 'text-emerald-600 hover:bg-emerald-50'}`}
+                className={`h-9 w-9 ${showSort ? 'text-orange-600 bg-orange-50' : 'text-orange-600 hover:bg-orange-50'}`}
                 onClick={() => setShowSort(!showSort)}
               >
                 <SlidersHorizontal className="h-5 w-5" />
@@ -340,7 +340,7 @@ export function PharmacistStockListView() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 text-emerald-600 hover:bg-emerald-50"
+                  className="h-9 w-9 text-orange-600 hover:bg-orange-50"
                   onClick={() => setShowMoreMenu(!showMoreMenu)}
                 >
                   <MoreVertical className="h-5 w-5" />
@@ -358,10 +358,10 @@ export function PharmacistStockListView() {
                       <button
                         onClick={handleExportExcel}
                         disabled={exporting}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-emerald-50 transition-colors disabled:opacity-50"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-orange-50 transition-colors disabled:opacity-50"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                          <Download className="h-4 w-4 text-emerald-600" />
+                        <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+                          <Download className="h-4 w-4 text-orange-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-foreground">Exporter en Excel</p>
@@ -374,7 +374,7 @@ export function PharmacistStockListView() {
 
                       <button
                         onClick={() => { setShowMoreMenu(false); setImportDialogOpen(true); setImportStep('select'); setImportFile(null); setImportResult(null); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-emerald-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-orange-50 transition-colors"
                       >
                         <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
                           <Upload className="h-4 w-4 text-blue-600" />
@@ -389,7 +389,7 @@ export function PharmacistStockListView() {
 
                       <button
                         onClick={handleDownloadTemplate}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-emerald-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-orange-50 transition-colors"
                       >
                         <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
                           <FileSpreadsheet className="h-4 w-4 text-amber-600" />
@@ -438,7 +438,7 @@ export function PharmacistStockListView() {
                   placeholder="Rechercher un médicament..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-11 border-emerald-200 focus:border-emerald-400 bg-emerald-50/30"
+                  className="pl-9 h-11 border-orange-200 focus:border-orange-400 bg-orange-50/30"
                 />
               </div>
             </motion.div>
@@ -455,7 +455,7 @@ export function PharmacistStockListView() {
               transition={{ duration: 0.2 }}
               className="overflow-hidden mb-3"
             >
-              <div className="flex flex-wrap gap-1.5 p-3 bg-emerald-50/50 rounded-xl border border-emerald-100">
+              <div className="flex flex-wrap gap-1.5 p-3 bg-orange-50/50 rounded-xl border border-orange-100">
                 {SORT_OPTIONS.map((opt) => (
                   <button
                     key={opt.key}
@@ -465,8 +465,8 @@ export function PharmacistStockListView() {
                     }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       sortOption === opt.key
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-white text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                        ? 'bg-orange-600 text-white'
+                        : 'bg-white text-orange-700 border border-orange-200 hover:bg-orange-100'
                     }`}
                   >
                     {opt.label}
@@ -485,8 +485,8 @@ export function PharmacistStockListView() {
               onClick={() => setActiveTab(tab.key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeTab === tab.key
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                  ? 'bg-orange-600 text-white'
+                  : 'bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200'
               }`}
             >
               {tab.label}
@@ -529,10 +529,10 @@ export function PharmacistStockListView() {
 
         {/* Empty state */}
         {!loading && !error && stocks.length === 0 && (
-          <Card className="border-emerald-100">
+          <Card className="border-orange-100">
             <CardContent className="p-8 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-3">
-                <Package className="h-7 w-7 text-emerald-400" />
+              <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mx-auto mb-3">
+                <Package className="h-7 w-7 text-orange-400" />
               </div>
               <h3 className="font-semibold text-sm mb-1">
                 {searchQuery ? 'Aucun résultat' : 'Aucun médicament en stock'}
@@ -546,7 +546,7 @@ export function PharmacistStockListView() {
                 <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
                   <Button
                     onClick={() => setCurrentView('ph-stock-add')}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Ajouter un médicament
@@ -554,7 +554,7 @@ export function PharmacistStockListView() {
                   <Button
                     variant="outline"
                     onClick={() => { setImportDialogOpen(true); setImportStep('select'); setImportFile(null); setImportResult(null); }}
-                    className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                    className="border-orange-200 text-orange-700 hover:bg-orange-50"
                   >
                     <Upload className="h-4 w-4 mr-2" />
                     Importer Excel
@@ -583,14 +583,14 @@ export function PharmacistStockListView() {
                     transition={{ delay: index * 0.03 }}
                   >
                     <Card
-                      className="border-emerald-100 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer active:scale-[0.99]"
+                      className="border-orange-100 hover:border-orange-300 hover:shadow-md transition-all cursor-pointer active:scale-[0.99]"
                       onClick={() => handleCardClick(stock.id)}
                     >
                       <CardContent className="p-3 sm:p-4">
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                            <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Pill className="h-4 w-4 text-emerald-600" />
+                            <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <Pill className="h-4 w-4 text-orange-600" />
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="font-semibold text-sm truncate leading-tight">{medName}</p>
@@ -623,7 +623,7 @@ export function PharmacistStockListView() {
                                 variant="outline"
                                 className={`text-[10px] px-1.5 py-0 ${
                                   stock.inStock
-                                    ? 'border-emerald-200 text-emerald-700'
+                                    ? 'border-orange-200 text-orange-700'
                                     : 'border-red-200 text-red-700'
                                 }`}
                               >
@@ -652,7 +652,7 @@ export function PharmacistStockListView() {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between gap-2 mt-1 pt-2 border-t border-emerald-50">
+                        <div className="flex items-center justify-between gap-2 mt-1 pt-2 border-t border-orange-50">
                           <div className="flex items-center gap-2 min-w-0 flex-1">
                             <p className="text-sm font-bold text-foreground">
                               {stock.price.toLocaleString('fr-FR')}{' '}
@@ -688,7 +688,7 @@ export function PharmacistStockListView() {
               variant="outline"
               onClick={() => fetchStocks(true)}
               disabled={loadingMore}
-              className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 px-6"
+              className="border-orange-200 text-orange-700 hover:bg-orange-50 px-6"
             >
               {loadingMore ? (
                 <>
@@ -707,7 +707,7 @@ export function PharmacistStockListView() {
       <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+1rem)] right-4 sm:right-6 z-40">
         <Button
           onClick={() => setCurrentView('ph-stock-add')}
-          className="h-14 w-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200"
+          className="h-14 w-14 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-200"
           size="icon"
         >
           <Plus className="h-6 w-6" />
@@ -716,13 +716,13 @@ export function PharmacistStockListView() {
 
       {/* ── Import Dialog ── */}
       <Dialog open={importDialogOpen} onOpenChange={(open) => { if (!open) resetImportDialog(); }}>
-        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-emerald-200">
-          <DialogHeader className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-4 text-white shrink-0">
+        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-orange-200">
+          <DialogHeader className="bg-gradient-to-r from-orange-600 to-teal-600 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <Upload className="h-5 w-5" />
               {importStep === 'select' ? 'Importer un fichier Excel' : 'Résultat de l\'import'}
             </DialogTitle>
-            <DialogDescription className="text-emerald-200 text-xs mt-1">
+            <DialogDescription className="text-orange-200 text-xs mt-1">
               {importStep === 'select'
                 ? 'Ajoutez ou mettez à jour votre stock en masse'
                 : 'Résumé du traitement de votre fichier'}
@@ -735,7 +735,7 @@ export function PharmacistStockListView() {
                 {/* Step 1: Download template */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold">1</span>
+                    <span className="w-5 h-5 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center text-[10px] font-bold">1</span>
                     Étape 1 : Télécharger le modèle
                   </div>
                   <Card className="border-amber-100 bg-amber-50/30">
@@ -774,8 +774,8 @@ export function PharmacistStockListView() {
                     onClick={() => fileInputRef.current?.click()}
                     className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
                       importFile
-                        ? 'border-emerald-300 bg-emerald-50/50'
-                        : 'border-gray-200 hover:border-emerald-300 hover:bg-emerald-50/30'
+                        ? 'border-orange-300 bg-orange-50/50'
+                        : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50/30'
                     }`}
                   >
                     <input
@@ -790,10 +790,10 @@ export function PharmacistStockListView() {
                     />
                     {importFile ? (
                       <div className="space-y-2">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mx-auto">
-                          <FileSpreadsheet className="h-6 w-6 text-emerald-600" />
+                        <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mx-auto">
+                          <FileSpreadsheet className="h-6 w-6 text-orange-600" />
                         </div>
-                        <p className="text-sm font-medium text-emerald-700 truncate">{importFile.name}</p>
+                        <p className="text-sm font-medium text-orange-700 truncate">{importFile.name}</p>
                         <p className="text-[11px] text-muted-foreground">
                           {(importFile.size / 1024).toFixed(1)} Ko
                         </p>
@@ -820,7 +820,7 @@ export function PharmacistStockListView() {
                 <Button
                   onClick={handleImportExcel}
                   disabled={!importFile || importing}
-                  className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm disabled:opacity-40"
+                  className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white text-sm disabled:opacity-40"
                 >
                   {importing ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Import en cours...</>
@@ -835,10 +835,10 @@ export function PharmacistStockListView() {
               <div className="space-y-4">
                 {/* Success summary */}
                 <div className="grid grid-cols-3 gap-2">
-                  <Card className="border-emerald-200 bg-emerald-50/50">
+                  <Card className="border-orange-200 bg-orange-50/50">
                     <CardContent className="p-3 text-center">
-                      <CheckCircle2 className="h-5 w-5 text-emerald-600 mx-auto mb-1" />
-                      <p className="text-lg font-bold text-emerald-700">{importResult.created}</p>
+                      <CheckCircle2 className="h-5 w-5 text-orange-600 mx-auto mb-1" />
+                      <p className="text-lg font-bold text-orange-700">{importResult.created}</p>
                       <p className="text-[10px] text-muted-foreground">Ajouté(s)</p>
                     </CardContent>
                   </Card>
@@ -888,9 +888,9 @@ export function PharmacistStockListView() {
 
                 {/* Success message */}
                 {(importResult.created > 0 || importResult.updated > 0) && (
-                  <div className="flex items-start gap-2.5 bg-emerald-50 border border-emerald-200 rounded-xl p-3">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                    <p className="text-xs text-emerald-700 leading-relaxed">
+                  <div className="flex items-start gap-2.5 bg-orange-50 border border-orange-200 rounded-xl p-3">
+                    <CheckCircle2 className="h-5 w-5 text-orange-600 shrink-0 mt-0.5" />
+                    <p className="text-xs text-orange-700 leading-relaxed">
                       Votre stock a été mis à jour avec succès. Consultez la liste ci-dessous pour vérifier les modifications.
                     </p>
                   </div>
@@ -899,7 +899,7 @@ export function PharmacistStockListView() {
                 {/* Close button */}
                 <Button
                   onClick={resetImportDialog}
-                  className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm"
+                  className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white text-sm"
                 >
                   Fermer
                 </Button>

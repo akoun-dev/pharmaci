@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       const token = await signToken({ userId: user.id, email: user.email, role: user.role, provider: 'email' });
       const { sessionCookie, csrfCookie, csrfToken } = createSessionCookie(token, user.id);
 
-      return NextResponse.json(
+      const response = NextResponse.json(
         {
           message: 'Inscription pharmacien réussie',
           user: {
@@ -98,9 +98,13 @@ export async function POST(request: Request) {
           },
           token,
           csrfToken,
-        },
-        { headers: { 'Set-Cookie': [sessionCookie, csrfCookie].filter(Boolean).join(', ') } }
+        }
       );
+      response.headers.append('Set-Cookie', sessionCookie);
+      if (csrfCookie) {
+        response.headers.append('Set-Cookie', csrfCookie);
+      }
+      return response;
     }
 
     // --- Patient registration (email) ---
@@ -139,15 +143,19 @@ export async function POST(request: Request) {
       const token = await signToken({ userId: user.id, email: user.email, role: user.role, provider: 'email' });
       const { sessionCookie, csrfCookie, csrfToken } = createSessionCookie(token, user.id);
 
-      return NextResponse.json(
+      const response = NextResponse.json(
         {
           message: 'Inscription réussie',
           user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role, avatar: user.avatar, city: user.city, authProvider: user.authProvider },
           token,
           csrfToken,
-        },
-        { headers: { 'Set-Cookie': [sessionCookie, csrfCookie].filter(Boolean).join(', ') } }
+        }
       );
+      response.headers.append('Set-Cookie', sessionCookie);
+      if (csrfCookie) {
+        response.headers.append('Set-Cookie', csrfCookie);
+      }
+      return response;
     }
 
     // --- Phone registration (patient only) ---

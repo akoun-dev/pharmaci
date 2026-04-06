@@ -100,7 +100,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   },
   ready: {
     label: 'Prête',
-    className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    className: 'bg-amber-100 text-amber-700 border-amber-200',
   },
   picked_up: {
     label: 'Récupérée',
@@ -353,7 +353,7 @@ export function AdminOrdersView() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
         <ViewHeader
           title="Gestion des commandes"
-          icon={<ClipboardList className="h-5 w-5 text-violet-600" />}
+          icon={<ClipboardList className="h-5 w-5 text-amber-600" />}
         />
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
@@ -363,7 +363,7 @@ export function AdminOrdersView() {
             <Button
               onClick={handleRefresh}
               variant="outline"
-              className="border-violet-200 text-violet-700 hover:bg-violet-50"
+              className="border-amber-200 text-amber-700 hover:bg-amber-50"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
@@ -379,16 +379,16 @@ export function AdminOrdersView() {
       {/* ── Header ── */}
       <ViewHeader
         title="Gestion des commandes"
-        icon={<ClipboardList className="h-5 w-5 text-violet-600" />}
+        icon={<ClipboardList className="h-5 w-5 text-amber-600" />}
         action={
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs bg-violet-100 text-violet-700">
+            <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">
               {total}
             </Badge>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-violet-600"
+              className="h-8 w-8 text-muted-foreground hover:text-amber-600"
               onClick={handleRefresh}
               disabled={refreshing}
             >
@@ -407,7 +407,7 @@ export function AdminOrdersView() {
               placeholder="Rechercher par patient, pharmacie..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-10 text-sm border-violet-200 focus:border-violet-400"
+              className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400"
             />
           </div>
           <Button
@@ -415,8 +415,8 @@ export function AdminOrdersView() {
             size="icon"
             className={`h-10 w-10 shrink-0 ${
               showFilters
-                ? 'border-violet-300 bg-violet-50 text-violet-700'
-                : 'border-violet-200'
+                ? 'border-amber-300 bg-amber-50 text-amber-700'
+                : 'border-amber-200'
             }`}
             onClick={() => setShowFilters(!showFilters)}
           >
@@ -439,7 +439,7 @@ export function AdminOrdersView() {
                     type="date"
                     value={dateFrom}
                     onChange={(e) => setDateFrom(e.target.value)}
-                    className="h-9 text-xs border-violet-200"
+                    className="h-9 text-xs border-amber-200"
                   />
                 </div>
                 <div className="flex-1 space-y-1">
@@ -450,7 +450,7 @@ export function AdminOrdersView() {
                     type="date"
                     value={dateTo}
                     onChange={(e) => setDateTo(e.target.value)}
-                    className="h-9 text-xs border-violet-200"
+                    className="h-9 text-xs border-amber-200"
                   />
                 </div>
                 <Button
@@ -479,8 +479,8 @@ export function AdminOrdersView() {
               onClick={() => setActiveTab(tab.key)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                 isActive
-                  ? 'bg-violet-600 text-white shadow-sm'
-                  : 'bg-violet-50 text-violet-700 hover:bg-violet-100'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
               }`}
             >
               {tab.label}
@@ -488,7 +488,7 @@ export function AdminOrdersView() {
                 className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${
                   isActive
                     ? 'bg-white/20 text-white'
-                    : 'bg-violet-100 text-violet-600'
+                    : 'bg-amber-100 text-amber-600'
                 }`}
               >
                 {count}
@@ -499,7 +499,7 @@ export function AdminOrdersView() {
       </div>
 
       {/* ── Stats summary ── */}
-      <Card className="border-violet-100 mb-4">
+      <Card className="border-amber-100 mb-4">
         <CardContent className="p-3 sm:p-4">
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
             {Object.entries(STATUS_CONFIG)
@@ -526,9 +526,9 @@ export function AdminOrdersView() {
 
       {/* ── Orders list ── */}
       {orders.length === 0 ? (
-        <Card className="border-violet-100">
+        <Card className="border-amber-100">
           <CardContent className="p-8 text-center">
-            <Inbox className="h-10 w-10 text-violet-300 mx-auto mb-3" />
+            <Inbox className="h-10 w-10 text-amber-300 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">
               {activeTab === 'all'
                 ? 'Aucune commande'
@@ -561,7 +561,7 @@ export function AdminOrdersView() {
                   transition={{ delay: index * 0.03 }}
                 >
                   <Card
-                    className="border-violet-100 overflow-hidden cursor-pointer hover:border-violet-300 transition-colors active:scale-[0.99] duration-150"
+                    className="border-amber-100 overflow-hidden cursor-pointer hover:border-amber-300 transition-colors active:scale-[0.99] duration-150"
                     onClick={() => handleOrderClick(order)}
                   >
                     <CardContent className="p-4 space-y-2.5">
@@ -582,8 +582,8 @@ export function AdminOrdersView() {
 
                       {/* Patient info */}
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-semibold text-violet-700">
+                        <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs font-semibold text-amber-700">
                             {order.user.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -604,7 +604,7 @@ export function AdminOrdersView() {
 
                       {/* Medication + Pharmacy info */}
                       <div className="flex items-start gap-2">
-                        <Pill className="h-4 w-4 text-violet-500 flex-shrink-0 mt-0.5" />
+                        <Pill className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                         <div className="min-w-0 flex-1 space-y-0.5">
                           {order.items.length === 1 ? (
                             <>
@@ -642,11 +642,11 @@ export function AdminOrdersView() {
                       </div>
 
                       {/* Footer */}
-                      <div className="border-t border-violet-100/80 flex items-center justify-between">
+                      <div className="border-t border-amber-100/80 flex items-center justify-between">
                         <span className="text-[11px] text-muted-foreground pt-2">
                           {formatRelativeTime(order.createdAt)}
                         </span>
-                        <ChevronRight className="h-4 w-4 text-violet-400 pt-2" />
+                        <ChevronRight className="h-4 w-4 text-amber-400 pt-2" />
                       </div>
                     </CardContent>
                   </Card>
@@ -664,20 +664,20 @@ export function AdminOrdersView() {
         onPageChange={goToPage}
         total={total}
         pageSize={PAGE_SIZE}
-        theme="violet"
+        theme="amber"
       />
 
       {/* ── Order Detail Dialog ── */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         {selectedOrder && (
-          <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-violet-200 max-h-[90dvh] flex flex-col">
+          <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 max-h-[90dvh] flex flex-col">
             {/* Dialog header */}
-            <DialogHeader className="bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-4 text-white shrink-0">
+            <DialogHeader className="bg-gradient-to-r from-amber-600 to-purple-600 px-5 py-4 text-white shrink-0">
               <DialogTitle className="text-base flex items-center gap-2">
                 <ClipboardList className="h-5 w-5" />
                 Commande #{selectedOrder.id.slice(0, 8)}
               </DialogTitle>
-              <DialogDescription className="text-violet-200 text-xs mt-1">
+              <DialogDescription className="text-amber-200 text-xs mt-1">
                 Détails et gestion de la commande
               </DialogDescription>
             </DialogHeader>
@@ -789,13 +789,13 @@ export function AdminOrdersView() {
                     <div>
                       <p className="text-[11px] text-muted-foreground">Quantité</p>
                       <p className="text-sm font-semibold flex items-center gap-1">
-                        <Package className="h-3.5 w-3.5 text-violet-500" />
+                        <Package className="h-3.5 w-3.5 text-amber-500" />
                         {selectedOrder.quantity}
                       </p>
                     </div>
                     <div>
                       <p className="text-[11px] text-muted-foreground">Total</p>
-                      <p className="text-sm font-bold text-violet-700">
+                      <p className="text-sm font-bold text-amber-700">
                         {formatPrice(selectedOrder.totalPrice)}
                       </p>
                     </div>
@@ -826,7 +826,7 @@ export function AdminOrdersView() {
                       <p className="text-[11px] text-muted-foreground">
                         Heure de récupération
                       </p>
-                      <p className="text-sm font-medium flex items-center gap-1 text-violet-700">
+                      <p className="text-sm font-medium flex items-center gap-1 text-amber-700">
                         <Clock className="h-3.5 w-3.5" />
                         {selectedOrder.pickupTime}
                       </p>
@@ -851,7 +851,7 @@ export function AdminOrdersView() {
                   <div
                     className={`rounded-lg p-3 flex items-center gap-3 ${
                       selectedOrder.verifiedAt
-                        ? 'bg-emerald-50 border border-emerald-200'
+                        ? 'bg-amber-50 border border-amber-200'
                         : 'bg-amber-50 border border-amber-200'
                     }`}
                   >
@@ -861,7 +861,7 @@ export function AdminOrdersView() {
                     <Badge
                       className={`text-[10px] px-1.5 py-0 border-0 ${
                         selectedOrder.verifiedAt
-                          ? 'bg-emerald-200 text-emerald-800'
+                          ? 'bg-amber-200 text-amber-800'
                           : 'bg-amber-200 text-amber-800'
                       }`}
                     >
@@ -873,7 +873,7 @@ export function AdminOrdersView() {
             </div>
 
             {/* Dialog footer - status actions */}
-            <DialogFooter className="px-5 py-4 border-t border-violet-100 shrink-0 space-y-3">
+            <DialogFooter className="px-5 py-4 border-t border-amber-100 shrink-0 space-y-3">
               {STATUS_TRANSITIONS[selectedOrder.status]?.length > 0 ? (
                 <div className="space-y-2 w-full">
                   <p className="text-[11px] text-muted-foreground font-medium">

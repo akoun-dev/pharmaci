@@ -79,7 +79,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   },
   ready: {
     label: 'Prêtée',
-    className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    className: 'bg-amber-100 text-amber-700 border-amber-200',
   },
   picked_up: {
     label: 'Récupérée',
@@ -331,7 +331,7 @@ export function PharmacistOrderDetailView() {
             <XCircle className="h-10 w-10 text-red-400 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">Erreur</h3>
             <p className="text-sm text-muted-foreground mb-4">{error || 'Commande non trouvée'}</p>
-            <Button onClick={goBack} variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+            <Button onClick={goBack} variant="outline" className="border-amber-200 text-amber-700 hover:bg-amber-50">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour
             </Button>
@@ -358,7 +358,7 @@ export function PharmacistOrderDetailView() {
         action={
           <div className="flex items-center gap-1.5">
             {isVerified && (
-              <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 border-0">
+              <Badge className="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 border-0">
                 <ShieldCheck className="h-3 w-3 mr-0.5" />
                 Vérifié
               </Badge>
@@ -383,14 +383,14 @@ export function PharmacistOrderDetailView() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className={`overflow-hidden transition-colors ${isVerified ? 'border-emerald-300 bg-emerald-50/40' : 'border-amber-200 bg-amber-50/30'}`}>
+            <Card className={`overflow-hidden transition-colors ${isVerified ? 'border-amber-300 bg-amber-50/40' : 'border-amber-200 bg-amber-50/30'}`}>
               <CardContent className="p-4 space-y-3">
                 {/* Top: icon + label + code */}
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5 min-w-0">
                     {isVerified ? (
-                      <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                        <ShieldCheck className="h-5 w-5 text-emerald-600" />
+                      <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                        <ShieldCheck className="h-5 w-5 text-amber-600" />
                       </div>
                     ) : (
                       <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
@@ -408,7 +408,7 @@ export function PharmacistOrderDetailView() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-xl font-bold tracking-[0.25em] text-emerald-700 font-mono shrink-0">
+                  <span className="text-xl font-bold tracking-[0.25em] text-amber-700 font-mono shrink-0">
                     {order.verificationCode}
                   </span>
                 </div>
@@ -418,7 +418,7 @@ export function PharmacistOrderDetailView() {
                   <div className="flex gap-2">
                     <Button
                       onClick={() => { setVerifyCode(''); setVerifyError(null); setScanMode(false); setVerifyDialogOpen(true); }}
-                      className="flex-1 h-10 bg-emerald-600 hover:bg-emerald-700 text-white text-xs"
+                      className="flex-1 h-10 bg-amber-600 hover:bg-amber-700 text-white text-xs"
                     >
                       <Keyboard className="h-4 w-4 mr-1.5" />
                       Saisir le code
@@ -426,7 +426,7 @@ export function PharmacistOrderDetailView() {
                     <Button
                       variant="outline"
                       onClick={() => { setVerifyCode(''); setVerifyError(null); setScanError(null); setScanMode(true); setVerifyDialogOpen(true); }}
-                      className="flex-1 h-10 border-emerald-200 text-emerald-700 hover:bg-emerald-50 text-xs"
+                      className="flex-1 h-10 border-amber-200 text-amber-700 hover:bg-amber-50 text-xs"
                     >
                       <ScanLine className="h-4 w-4 mr-1.5" />
                       Scanner QR
@@ -436,7 +436,7 @@ export function PharmacistOrderDetailView() {
 
                 {/* Verified message */}
                 {isVerified && (
-                  <div className="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-100/80 rounded-lg p-2.5">
+                  <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-100/80 rounded-lg p-2.5">
                     <CheckCircle2 className="h-4 w-4 shrink-0" />
                     <span>
                       Le patient a présenté son code.
@@ -450,17 +450,17 @@ export function PharmacistOrderDetailView() {
         )}
 
         {/* ── Patient Info Card ── */}
-        <Card className="border-emerald-100">
+        <Card className="border-amber-100">
           <CardContent className="p-4 space-y-3">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Patient</h3>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                <User className="h-5 w-5 text-emerald-600" />
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                <User className="h-5 w-5 text-amber-600" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-sm">{order.user.name}</p>
                 {order.user.phone ? (
-                  <a href={`tel:${order.user.phone}`} className="flex items-center gap-1.5 text-xs text-emerald-600 hover:underline mt-0.5" onClick={(e) => e.stopPropagation()}>
+                  <a href={`tel:${order.user.phone}`} className="flex items-center gap-1.5 text-xs text-amber-600 hover:underline mt-0.5" onClick={(e) => e.stopPropagation()}>
                     <Phone className="h-3 w-3" />
                     {order.user.phone}
                   </a>
@@ -473,13 +473,13 @@ export function PharmacistOrderDetailView() {
         </Card>
 
         {/* ── Order Info Card ── */}
-        <Card className="border-emerald-100">
+        <Card className="border-amber-100">
           <CardContent className="p-4 space-y-3">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Détails de la commande</h3>
 
             <div className="flex items-start gap-2.5">
-              <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-                <Pill className="h-4 w-4 text-emerald-600" />
+              <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                <Pill className="h-4 w-4 text-amber-600" />
               </div>
               <div className="min-w-0 flex-1">
                 {order.items.length === 1 ? (
@@ -508,7 +508,7 @@ export function PharmacistOrderDetailView() {
               </div>
             </div>
 
-            <Separator className="bg-emerald-100/80" />
+            <Separator className="bg-amber-100/80" />
 
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
@@ -521,13 +521,13 @@ export function PharmacistOrderDetailView() {
                 <span className="text-muted-foreground">Prix unitaire</span>
                 <span className="font-medium">{formatPrice(unitPrice)}</span>
               </div>
-              <div className="flex items-center justify-between text-sm font-semibold pt-1 border-t border-emerald-100/80">
+              <div className="flex items-center justify-between text-sm font-semibold pt-1 border-t border-amber-100/80">
                 <span>Total</span>
-                <span className="text-emerald-700">{formatPrice(order.totalPrice)}</span>
+                <span className="text-amber-700">{formatPrice(order.totalPrice)}</span>
               </div>
             </div>
 
-            <Separator className="bg-emerald-100/80" />
+            <Separator className="bg-amber-100/80" />
 
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />Passée le</span>
@@ -536,7 +536,7 @@ export function PharmacistOrderDetailView() {
 
             {order.note && (
               <>
-                <Separator className="bg-emerald-100/80" />
+                <Separator className="bg-amber-100/80" />
                 <div className="bg-amber-50 rounded-lg p-3">
                   <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 mb-1">
                     <MessageSquare className="h-3.5 w-3.5" />Note du patient
@@ -549,7 +549,7 @@ export function PharmacistOrderDetailView() {
         </Card>
 
         {/* ── Timeline ── */}
-        <Card className="border-emerald-100">
+        <Card className="border-amber-100">
           <CardContent className="p-4 space-y-4">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Suivi de la commande</h3>
 
@@ -570,14 +570,14 @@ export function PharmacistOrderDetailView() {
                   return (
                     <div key={step.status} className="flex gap-3">
                       <div className="flex flex-col items-center">
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-colors ${isCompleted ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-colors ${isCompleted ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
                           {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
                         </div>
-                        {!isLast && <div className={`w-0.5 h-10 transition-colors ${isCompleted && index < currentStepIndex ? 'bg-emerald-500' : 'bg-gray-200'}`} />}
+                        {!isLast && <div className={`w-0.5 h-10 transition-colors ${isCompleted && index < currentStepIndex ? 'bg-amber-500' : 'bg-gray-200'}`} />}
                       </div>
                       <div className="pt-1 pb-6">
-                        <p className={`text-sm font-medium ${isCompleted ? (isCurrent ? 'text-emerald-700' : 'text-emerald-600') : 'text-muted-foreground'}`}>{step.label}</p>
-                        {isCurrent && <p className="text-[11px] text-emerald-500 mt-0.5">Étape en cours</p>}
+                        <p className={`text-sm font-medium ${isCompleted ? (isCurrent ? 'text-amber-700' : 'text-amber-600') : 'text-muted-foreground'}`}>{step.label}</p>
+                        {isCurrent && <p className="text-[11px] text-amber-500 mt-0.5">Étape en cours</p>}
                       </div>
                     </div>
                   );
@@ -592,9 +592,9 @@ export function PharmacistOrderDetailView() {
       {order.status === 'pending' && (
         <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <Card className="border-emerald-200 shadow-lg">
+            <Card className="border-amber-200 shadow-lg">
               <CardContent className="p-3 flex gap-2">
-                <Button className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm" onClick={() => updateStatus('confirmed', 'Confirmée')} disabled={updating}>
+                <Button className="flex-1 h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm" onClick={() => updateStatus('confirmed', 'Confirmée')} disabled={updating}>
                   {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
                   Confirmer
                 </Button>
@@ -611,9 +611,9 @@ export function PharmacistOrderDetailView() {
       {order.status === 'confirmed' && (
         <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <Card className="border-emerald-200 shadow-lg">
+            <Card className="border-amber-200 shadow-lg">
               <CardContent className="p-3">
-                <Button className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm" onClick={() => updateStatus('ready', 'Prêtée')} disabled={updating}>
+                <Button className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm" onClick={() => updateStatus('ready', 'Prêtée')} disabled={updating}>
                   {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
                   Préparer la commande
                 </Button>
@@ -626,9 +626,9 @@ export function PharmacistOrderDetailView() {
       {order.status === 'ready' && (
         <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <Card className="border-emerald-200 shadow-lg">
+            <Card className="border-amber-200 shadow-lg">
               <CardContent className="p-3">
-                <Button className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm" onClick={() => updateStatus('picked_up', 'Récupérée')} disabled={updating}>
+                <Button className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm" onClick={() => updateStatus('picked_up', 'Récupérée')} disabled={updating}>
                   {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
                   Marquer comme récupérée
                 </Button>
@@ -643,13 +643,13 @@ export function PharmacistOrderDetailView() {
         if (!open) { cleanupScanner(); setScanMode(false); setVerifyCode(''); setVerifyError(null); setScanError(null); }
         setVerifyDialogOpen(open);
       }}>
-        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-emerald-200">
-          <DialogHeader className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-4 text-white shrink-0">
+        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200">
+          <DialogHeader className="bg-gradient-to-r from-amber-600 to-teal-600 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <ShieldCheck className="h-5 w-5" />
               Vérifier une commande
             </DialogTitle>
-            <DialogDescription className="text-emerald-200 text-xs mt-1">
+            <DialogDescription className="text-amber-200 text-xs mt-1">
               Saisissez le code du patient ou scannez le QR code
             </DialogDescription>
           </DialogHeader>
@@ -659,14 +659,14 @@ export function PharmacistOrderDetailView() {
             <div className="flex gap-2">
               <button
                 onClick={() => { cleanupScanner(); setScanMode(false); setScanError(null); }}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${!scanMode ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${!scanMode ? 'bg-amber-100 text-amber-700 border-2 border-amber-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
               >
                 <Keyboard className="h-4 w-4" />
                 Saisie manuelle
               </button>
               <button
                 onClick={() => { setScanError(null); startCameraScan(); }}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${scanMode ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${scanMode ? 'bg-amber-100 text-amber-700 border-2 border-amber-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
               >
                 <Camera className="h-4 w-4" />
                 Scanner QR
@@ -693,10 +693,10 @@ export function PharmacistOrderDetailView() {
                 {streamRef.current && !verifying && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-48 h-48 border-2 border-white/50 rounded-2xl">
-                      <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-emerald-400 rounded-tl-xl -translate-x-[1px] -translate-y-[1px]" />
-                      <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-emerald-400 rounded-tr-xl translate-x-[1px] -translate-y-[1px]" />
-                      <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-emerald-400 rounded-bl-xl -translate-x-[1px] translate-y-[1px]" />
-                      <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-emerald-400 rounded-br-xl translate-x-[1px] translate-y-[1px]" />
+                      <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-amber-400 rounded-tl-xl -translate-x-[1px] -translate-y-[1px]" />
+                      <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-amber-400 rounded-tr-xl translate-x-[1px] -translate-y-[1px]" />
+                      <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-amber-400 rounded-bl-xl -translate-x-[1px] translate-y-[1px]" />
+                      <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-amber-400 rounded-br-xl translate-x-[1px] translate-y-[1px]" />
                     </div>
                   </div>
                 )}
@@ -737,7 +737,7 @@ export function PharmacistOrderDetailView() {
                   setVerifyError(null);
                 }}
                 placeholder="Ex: A3K9X2"
-                className="h-12 text-center text-2xl font-mono tracking-[0.4em] font-bold border-emerald-200 focus:border-emerald-400"
+                className="h-12 text-center text-2xl font-mono tracking-[0.4em] font-bold border-amber-200 focus:border-amber-400"
                 maxLength={6}
                 disabled={verifying}
                 autoFocus={!scanMode}
@@ -745,7 +745,7 @@ export function PharmacistOrderDetailView() {
               <Button
                 onClick={() => handleVerify(verifyCode)}
                 disabled={verifyCode.length !== 6 || verifying}
-                className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm disabled:opacity-40"
+                className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm disabled:opacity-40"
               >
                 {verifying ? (
                   <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Vérification...</>

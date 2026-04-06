@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     });
     const { sessionCookie, csrfCookie, csrfToken } = createSessionCookie(token, updatedUser.id);
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: 'Numéro vérifié avec succès',
         token,
@@ -66,9 +66,13 @@ export async function POST(request: Request) {
           phoneVerified: !!updatedUser.phoneVerified,
           linkedPharmacyId: updatedUser.linkedPharmacyId,
         },
-      },
-      { headers: { 'Set-Cookie': [sessionCookie, csrfCookie].filter(Boolean).join(', ') } }
+      }
     );
+    response.headers.append('Set-Cookie', sessionCookie);
+    if (csrfCookie) {
+      response.headers.append('Set-Cookie', csrfCookie);
+    }
+    return response;
   } catch (error) {
     logger.error('Phone verify error:', error);
     return NextResponse.json({ error: 'Erreur lors de la vérification' }, { status: 500 });

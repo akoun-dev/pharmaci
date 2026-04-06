@@ -17,23 +17,23 @@ interface SmartPaginationProps {
   pageSize?: number;
   /** Classe CSS personnalisée */
   className?: string;
-  /** Couleur theme (violet par défaut pour admin, peut être overridé) */
-  theme?: 'violet' | 'emerald' | 'indigo' | 'gray';
+  /** Couleur theme (amber par défaut pour admin, peut être overridé) */
+  theme?: 'amber' | 'orange' | 'indigo' | 'gray';
 }
 
 const THEME_CLASSES = {
-  violet: {
-    border: 'border-violet-200',
-    text: 'text-violet-700',
-    hover: 'hover:bg-violet-50',
-    bg: 'bg-violet-600',
+  amber: {
+    border: 'border-amber-200',
+    text: 'text-amber-700',
+    hover: 'hover:bg-amber-50',
+    bg: 'bg-amber-600',
     bgDisabled: 'disabled:opacity-40',
   },
-  emerald: {
-    border: 'border-emerald-200',
-    text: 'text-emerald-700',
-    hover: 'hover:bg-emerald-50',
-    bg: 'bg-emerald-600',
+  orange: {
+    border: 'border-orange-200',
+    text: 'text-orange-700',
+    hover: 'hover:bg-orange-50',
+    bg: 'bg-orange-600',
     bgDisabled: 'disabled:opacity-40',
   },
   indigo: {
@@ -59,7 +59,7 @@ export function SmartPagination({
   total,
   pageSize,
   className,
-  theme = 'violet',
+  theme = 'amber',
 }: SmartPaginationProps) {
   const classes = THEME_CLASSES[theme];
 

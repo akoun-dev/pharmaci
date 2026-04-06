@@ -58,8 +58,8 @@ export async function GET(request: NextRequest) {
         { user: { name: { contains: q } } },
         { user: { email: { contains: q } } },
         { pharmacy: { name: { contains: q } } },
-        { medication: { name: { contains: q } } },
-        { medication: { commercialName: { contains: q } } },
+        { items: { medication: { name: { contains: q } } } },
+        { items: { medication: { commercialName: { contains: q } } } },
       ];
     }
 
@@ -69,14 +69,18 @@ export async function GET(request: NextRequest) {
         include: {
           user: { select: { id: true, name: true, email: true, phone: true, city: true } },
           pharmacy: { select: { id: true, name: true, city: true, address: true } },
-          medication: {
-            select: {
-              id: true,
-              name: true,
-              commercialName: true,
-              form: true,
-              imageUrl: true,
-              category: true,
+          items: {
+            include: {
+              medication: {
+                select: {
+                  id: true,
+                  name: true,
+                  commercialName: true,
+                  form: true,
+                  imageUrl: true,
+                  category: true,
+                },
+              },
             },
           },
         },
@@ -105,21 +109,17 @@ export async function GET(request: NextRequest) {
         id: o.id,
         userId: o.userId,
         pharmacyId: o.pharmacyId,
-        medicationId: o.medicationId,
         status: o.status,
-        deliveryStatus: o.deliveryStatus,
-        quantity: o.quantity,
+        totalQuantity: o.totalQuantity,
         totalPrice: o.totalPrice,
         note: o.note,
-        paymentMethod: o.paymentMethod,
-        pickupTime: o.pickupTime,
         verificationCode: o.verificationCode,
         verifiedAt: o.verifiedAt?.toISOString() || null,
         createdAt: o.createdAt.toISOString(),
         updatedAt: o.updatedAt.toISOString(),
         user: o.user,
         pharmacy: o.pharmacy,
-        medication: o.medication,
+        items: o.items,
       })),
       total,
       limit,

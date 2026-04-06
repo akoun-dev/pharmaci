@@ -9,7 +9,7 @@ export const ORDER_STATUS = {
   pending: { label: 'En attente', color: 'yellow', icon: 'Clock' },
   confirmed: { label: 'Confirmée', color: 'blue', icon: 'CheckCircle' },
   ready: { label: 'Prête', color: 'green', icon: 'Package' },
-  picked_up: { label: 'Récupérée', color: 'emerald', icon: 'PackageCheck' },
+  picked_up: { label: 'Récupérée', color: 'orange', icon: 'PackageCheck' },
   cancelled: { label: 'Annulée', color: 'red', icon: 'XCircle' },
   delivered: { label: 'Livrée', color: 'green', icon: 'Truck' },
 } as const;

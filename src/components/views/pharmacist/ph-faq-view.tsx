@@ -62,7 +62,7 @@ const FAQ_SECTIONS: FaqSection[] = [
   {
     id: 'stocks',
     title: 'Gestion des stocks',
-    icon: <Package className="h-4 w-4 text-emerald-600" />,
+    icon: <Package className="h-4 w-4 text-orange-600" />,
     items: [
       {
         question: 'Comment ajouter un nouveau médicament au stock ?',
@@ -85,7 +85,7 @@ const FAQ_SECTIONS: FaqSection[] = [
   {
     id: 'orders',
     title: 'Commandes',
-    icon: <ClipboardList className="h-4 w-4 text-emerald-600" />,
+    icon: <ClipboardList className="h-4 w-4 text-orange-600" />,
     items: [
       {
         question: 'Comment confirmer une commande ?',
@@ -104,7 +104,7 @@ const FAQ_SECTIONS: FaqSection[] = [
   {
     id: 'account',
     title: 'Mon compte',
-    icon: <User className="h-4 w-4 text-emerald-600" />,
+    icon: <User className="h-4 w-4 text-orange-600" />,
     items: [
       {
         question: 'Comment modifier les informations de ma pharmacie ?',
@@ -123,7 +123,7 @@ const FAQ_SECTIONS: FaqSection[] = [
   {
     id: 'promotions',
     title: 'Promotions',
-    icon: <Tag className="h-4 w-4 text-emerald-600" />,
+    icon: <Tag className="h-4 w-4 text-orange-600" />,
     items: [
       {
         question: 'Comment créer une promotion ?',
@@ -138,7 +138,7 @@ const FAQ_SECTIONS: FaqSection[] = [
   {
     id: 'payments',
     title: 'Paiements mobile money',
-    icon: <Wallet className="h-4 w-4 text-emerald-600" />,
+    icon: <Wallet className="h-4 w-4 text-orange-600" />,
     items: [
       {
         question: 'Quels moyens de paiement mobile money sont acceptés ?',
@@ -153,7 +153,7 @@ const FAQ_SECTIONS: FaqSection[] = [
   {
     id: 'urgent',
     title: 'Commandes urgentes',
-    icon: <AlertTriangle className="h-4 w-4 text-emerald-600" />,
+    icon: <AlertTriangle className="h-4 w-4 text-orange-600" />,
     items: [
       {
         question: 'Comment gérer les commandes urgentes ?',
@@ -168,7 +168,7 @@ const FAQ_SECTIONS: FaqSection[] = [
   {
     id: 'pricing',
     title: 'Tarification',
-    icon: <DollarSign className="h-4 w-4 text-emerald-600" />,
+    icon: <DollarSign className="h-4 w-4 text-orange-600" />,
     items: [
       {
         question: 'Comment mettre à jour les prix des médicaments ?',
@@ -183,7 +183,7 @@ const FAQ_SECTIONS: FaqSection[] = [
   {
     id: 'delivery',
     title: 'Livraison & Suivi',
-    icon: <Truck className="h-4 w-4 text-emerald-600" />,
+    icon: <Truck className="h-4 w-4 text-orange-600" />,
     items: [
       {
         question: 'Comment fonctionne le suivi de livraison ?',
@@ -276,7 +276,7 @@ export function PharmacistFaqView() {
         <motion.div variants={itemVariants}>
           <ViewHeader
             title="Aide & Support"
-            icon={<HelpCircle className="h-5 w-5 text-emerald-600" />}
+            icon={<HelpCircle className="h-5 w-5 text-orange-600" />}
             back
           />
         </motion.div>
@@ -290,7 +290,7 @@ export function PharmacistFaqView() {
               placeholder="Rechercher dans l'aide..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-11 bg-emerald-50 border-emerald-100 focus-visible:ring-emerald-200 text-sm"
+              className="pl-9 h-11 bg-orange-50 border-orange-100 focus-visible:ring-orange-200 text-sm"
             />
             {searchQuery && (
               <button
@@ -311,7 +311,7 @@ export function PharmacistFaqView() {
         {/* ─── FAQ ACCORDION ─── */}
         <motion.div variants={itemVariants}>
           {filteredSections.length === 0 ? (
-            <Card className="border-emerald-100">
+            <Card className="border-orange-100">
               <CardContent className="flex flex-col items-center gap-3 py-10">
                 <HelpCircle className="h-10 w-10 text-muted-foreground/40" />
                 <p className="text-sm text-muted-foreground text-center px-4">
@@ -320,7 +320,7 @@ export function PharmacistFaqView() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                  className="border-orange-200 text-orange-600 hover:bg-orange-50"
                   onClick={() => setSearchQuery('')}
                 >
                   Effacer la recherche
@@ -333,13 +333,13 @@ export function PharmacistFaqView() {
                 <AccordionItem
                   key={section.id}
                   value={section.id}
-                  className="border border-emerald-100 rounded-xl px-4 bg-white data-[state=open]:shadow-sm"
+                  className="border border-orange-100 rounded-xl px-4 bg-white data-[state=open]:shadow-sm"
                 >
                   <AccordionTrigger className="py-3.5 hover:no-underline">
                     <div className="flex items-center gap-2">
                       {section.icon}
                       <span className="text-sm font-semibold text-foreground">{section.title}</span>
-                      <span className="text-[11px] text-muted-foreground bg-emerald-50 px-1.5 py-0.5 rounded-full">
+                      <span className="text-[11px] text-muted-foreground bg-orange-50 px-1.5 py-0.5 rounded-full">
                         {section.items.length}
                       </span>
                     </div>
@@ -349,9 +349,9 @@ export function PharmacistFaqView() {
                       {section.items.map((item, idx) => (
                         <div
                           key={idx}
-                          className="rounded-lg hover:bg-emerald-50 transition-colors"
+                          className="rounded-lg hover:bg-orange-50 transition-colors"
                         >
-                          <div className="px-3 py-2.5 border-b border-emerald-50 last:border-b-0">
+                          <div className="px-3 py-2.5 border-b border-orange-50 last:border-b-0">
                             <p className="text-sm font-medium text-foreground">
                               {item.question}
                             </p>
@@ -371,23 +371,23 @@ export function PharmacistFaqView() {
 
         {/* ─── CONTACT SUPPORT ─── */}
         <motion.div variants={itemVariants}>
-          <Card className="border-emerald-100 bg-gradient-to-br from-emerald-50 to-white">
+          <Card className="border-orange-100 bg-gradient-to-br from-orange-50 to-white">
             <CardHeader className="pb-2 px-4 pt-4">
               <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                <HelpCircle className="h-4 w-4 text-emerald-600" />
+                <HelpCircle className="h-4 w-4 text-orange-600" />
                 Contacter le support
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-3">
               <div className="flex items-center gap-3 py-2">
-                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-emerald-100 shrink-0">
-                  <Phone className="h-4 w-4 text-emerald-600" />
+                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-orange-100 shrink-0">
+                  <Phone className="h-4 w-4 text-orange-600" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs text-muted-foreground">Téléphone</p>
                   <a
                     href="tel:+2250102030405"
-                    className="text-sm font-medium text-emerald-700 hover:text-emerald-800"
+                    className="text-sm font-medium text-orange-700 hover:text-orange-800"
                   >
                     +225 01 02 03 04 05
                   </a>
@@ -395,14 +395,14 @@ export function PharmacistFaqView() {
               </div>
 
               <div className="flex items-center gap-3 py-2">
-                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-emerald-100 shrink-0">
-                  <Mail className="h-4 w-4 text-emerald-600" />
+                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-orange-100 shrink-0">
+                  <Mail className="h-4 w-4 text-orange-600" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs text-muted-foreground">Email</p>
                   <a
                     href="mailto:support@pharmapp.ci"
-                    className="text-sm font-medium text-emerald-700 hover:text-emerald-800"
+                    className="text-sm font-medium text-orange-700 hover:text-orange-800"
                   >
                     support@pharmapp.ci
                   </a>
@@ -422,10 +422,10 @@ export function PharmacistFaqView() {
 
         {/* ─── CONTACT FORM ─── */}
         <motion.div variants={itemVariants}>
-          <Card className="border-emerald-100">
+          <Card className="border-orange-100">
             <CardHeader className="pb-2 px-4 pt-4">
               <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                <Send className="h-4 w-4 text-emerald-600" />
+                <Send className="h-4 w-4 text-orange-600" />
                 Envoyer un message au support
               </CardTitle>
             </CardHeader>

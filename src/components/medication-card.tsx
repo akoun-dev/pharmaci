@@ -24,15 +24,15 @@ export const MedicationCard = React.memo(function MedicationCard({ medication, o
   return (
     <motion.div whileTap={{ scale: 0.98 }}>
       <Card
-        className="overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 border-emerald-100 hover:border-emerald-300"
+        className="overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 border-orange-100 hover:border-orange-300"
         onClick={() => onClick(medication.id)}
       >
         <CardContent className="p-3 sm:p-4">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-                  <Pill className="h-5 w-5 text-emerald-600" />
+                <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center">
+                  <Pill className="h-5 w-5 text-orange-600" />
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-semibold text-sm text-foreground truncate">
@@ -50,13 +50,13 @@ export const MedicationCard = React.memo(function MedicationCard({ medication, o
             {medication.category && (
               <Badge
                 variant="secondary"
-                className="text-[10px] px-1.5 py-0 bg-emerald-50 text-emerald-700"
+                className="text-[10px] px-1.5 py-0 bg-orange-50 text-orange-700"
               >
                 {medication.category}
               </Badge>
             )}
             {medication.form && (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-emerald-200 text-emerald-700">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-orange-200 text-orange-700">
                 {medication.form}
               </Badge>
             )}

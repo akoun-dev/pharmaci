@@ -111,22 +111,25 @@ export async function GET(request: NextRequest) {
         });
       }),
 
-      // Top 5 medications by order count
-      db.order.groupBy({
+      // Top 5 medications by order count (using OrderItem)
+      db.orderItem.groupBy({
         by: ['medicationId'],
         _count: true,
         _sum: { quantity: true },
-        orderBy: { _count: { id: 'desc' } },
-        take: 5,
       }).then(async (groups) => {
-        const medIds = groups.map((g) => g.medicationId);
+        // Sort by count descending and take top 5
+        const sortedGroups = groups
+          .sort((a, b) => b._count - a._count)
+          .slice(0, 5);
+
+        const medIds = sortedGroups.map((g) => g.medicationId);
         const meds = medIds.length > 0
           ? await db.medication.findMany({
               where: { id: { in: medIds } },
               select: { id: true, name: true, commercialName: true, category: true, form: true },
             })
           : [];
-        return groups.map((g) => {
+        return sortedGroups.map((g) => {
           const med = meds.find((m) => m.id === g.medicationId);
           return {
             medicationId: g.medicationId,
@@ -134,7 +137,7 @@ export async function GET(request: NextRequest) {
             commercialName: med?.commercialName || '',
             category: med?.category || '',
             form: med?.form || '',
-            orderCount: g._count.id,
+            orderCount: g._count,
             totalQuantity: g._sum.quantity || 0,
           };
         });
@@ -145,7 +148,13 @@ export async function GET(request: NextRequest) {
         include: {
           user: { select: { id: true, name: true, phone: true } },
           pharmacy: { select: { id: true, name: true, city: true } },
-          medication: { select: { id: true, name: true, commercialName: true, form: true } },
+          items: {
+            include: {
+              medication: {
+                select: { id: true, name: true, commercialName: true, form: true },
+              },
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
         take: 10,
@@ -243,14 +252,16 @@ export async function GET(request: NextRequest) {
       recentOrders: recentOrders.map((o) => ({
         id: o.id,
         status: o.status,
-        quantity: o.quantity,
+        totalQuantity: o.totalQuantity,
         totalPrice: o.totalPrice,
-        paymentMethod: o.paymentMethod,
+        note: o.note,
+        verificationCode: o.verificationCode,
+        verifiedAt: o.verifiedAt?.toISOString() || null,
         createdAt: o.createdAt.toISOString(),
         updatedAt: o.updatedAt.toISOString(),
         user: o.user,
         pharmacy: o.pharmacy,
-        medication: o.medication,
+        items: o.items,
       })),
     });
   } catch (error) {

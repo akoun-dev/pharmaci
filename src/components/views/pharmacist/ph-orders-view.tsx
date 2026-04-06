@@ -76,7 +76,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   },
   ready: {
     label: 'Prêtée',
-    className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    className: 'bg-amber-100 text-amber-700 border-amber-200',
   },
   picked_up: {
     label: 'Récupérée',
@@ -373,13 +373,13 @@ export function PharmacistOrdersView() {
   if (error) {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
-        <ViewHeader title="Commandes" icon={<ClipboardList className="h-5 w-5 text-emerald-600" />} />
+        <ViewHeader title="Commandes" icon={<ClipboardList className="h-5 w-5 text-amber-600" />} />
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-10 w-10 text-red-400 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">Erreur de chargement</h3>
             <p className="text-sm text-muted-foreground mb-4">{error}</p>
-            <Button onClick={handleRefresh} variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+            <Button onClick={handleRefresh} variant="outline" className="border-amber-200 text-amber-700 hover:bg-amber-50">
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
             </Button>
@@ -394,11 +394,11 @@ export function PharmacistOrdersView() {
       {/* Header */}
       <ViewHeader
         title="Commandes"
-        icon={<ClipboardList className="h-5 w-5 text-emerald-600" />}
+        icon={<ClipboardList className="h-5 w-5 text-amber-600" />}
         action={
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">{total}</Badge>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-emerald-600" onClick={handleRefresh} disabled={refreshing}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-amber-600" onClick={handleRefresh} disabled={refreshing}>
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
@@ -410,9 +410,9 @@ export function PharmacistOrdersView() {
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Rechercher par patient..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm border-emerald-200 focus:border-emerald-400" />
+            <Input placeholder="Rechercher par patient..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400" />
           </div>
-          <Button variant="outline" size="icon" className={`h-10 w-10 shrink-0 ${showFilters || hasActiveFilters ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-emerald-200'}`} onClick={() => setShowFilters(!showFilters)}>
+          <Button variant="outline" size="icon" className={`h-10 w-10 shrink-0 ${showFilters || hasActiveFilters ? 'border-amber-300 bg-amber-50 text-amber-700' : 'border-amber-200'}`} onClick={() => setShowFilters(!showFilters)}>
             <Calendar className="h-4 w-4" />
           </Button>
         </div>
@@ -434,19 +434,19 @@ export function PharmacistOrdersView() {
         {hasActiveFilters && !showFilters && (
           <div className="flex items-center gap-1.5 flex-wrap">
             {searchQuery && (
-              <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 gap-1">
+              <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
                 &quot;{searchQuery}&quot;
                 <button onClick={() => setSearchQuery('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
               </Badge>
             )}
             {dateFrom && (
-              <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 gap-1">
+              <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
                 {dateFrom}
                 <button onClick={() => setDateFrom('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
               </Badge>
             )}
             {dateTo && (
-              <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 gap-1">
+              <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 gap-1">
                 → {dateTo}
                 <button onClick={() => setDateTo('')} className="hover:text-red-600"><X className="h-2.5 w-2.5" /></button>
               </Badge>
@@ -460,7 +460,7 @@ export function PharmacistOrdersView() {
         {ORDER_TYPE_TABS.map((tab) => {
           const isActive = orderTypeTab === tab.key;
           return (
-            <button key={tab.key} onClick={() => setOrderTypeTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-emerald-600 text-white shadow-sm' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}`}>
+            <button key={tab.key} onClick={() => setOrderTypeTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100'}`}>
               {tab.key === 'commande' && <Package className="h-3 w-3" />}
               {tab.key === 'reservation' && <Clock className="h-3 w-3" />}
               {tab.label}
@@ -475,9 +475,9 @@ export function PharmacistOrdersView() {
           const count = statusCounts[tab.key] || 0;
           const isActive = activeTab === tab.key;
           return (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-emerald-600 text-white shadow-sm' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}`}>
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${isActive ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100'}`}>
               {tab.label}
-              <span className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${isActive ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-600'}`}>
+              <span className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-600'}`}>
                 {count}
               </span>
             </button>
@@ -487,13 +487,13 @@ export function PharmacistOrdersView() {
 
       {/* Orders list */}
       {typeFiltered.length === 0 ? (
-        <Card className="border-emerald-100">
+        <Card className="border-amber-100">
           <CardContent className="p-8 text-center">
-            <Inbox className="h-10 w-10 text-emerald-300 mx-auto mb-3" />
+            <Inbox className="h-10 w-10 text-amber-300 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">{activeTab === 'all' ? 'Aucune commande' : `Aucune commande ${STATUS_CONFIG[activeTab]?.label?.toLowerCase() || ''}`}</h3>
             <p className="text-sm text-muted-foreground">{hasActiveFilters ? 'Aucune commande ne correspond à vos filtres' : activeTab === 'all' ? 'Les nouvelles commandes apparaîtront ici' : `Aucune commande avec le statut "${STATUS_CONFIG[activeTab]?.label || ''}"`}</p>
             {hasActiveFilters && (
-              <Button variant="outline" className="mt-3 border-emerald-200 text-emerald-700 hover:bg-emerald-50" onClick={clearFilters}>
+              <Button variant="outline" className="mt-3 border-amber-200 text-amber-700 hover:bg-amber-50" onClick={clearFilters}>
                 <X className="h-3 w-3 mr-1" />
                 Effacer les filtres
               </Button>
@@ -509,7 +509,7 @@ export function PharmacistOrdersView() {
               const isVerified = !!order.verifiedAt;
               return (
                 <motion.div key={order.id} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.04 }}>
-                  <Card className={`${isVerified ? 'border-emerald-300 bg-emerald-50/20' : 'border-emerald-100'} overflow-hidden cursor-pointer hover:border-emerald-300 transition-colors active:scale-[0.99] duration-150`} onClick={() => handleOrderClick(order.id)}>
+                  <Card className={`${isVerified ? 'border-amber-300 bg-amber-50/20' : 'border-amber-100'} overflow-hidden cursor-pointer hover:border-amber-300 transition-colors active:scale-[0.99] duration-150`} onClick={() => handleOrderClick(order.id)}>
                     <CardContent className="p-4 space-y-2.5">
                       {/* Top row */}
                       <div className="flex items-center justify-between gap-2">
@@ -521,7 +521,7 @@ export function PharmacistOrdersView() {
                         </div>
                         <div className="flex items-center gap-1.5 flex-shrink-0">
                           {isVerified && (
-                            <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0 border-0">
+                            <Badge className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0 border-0">
                               <ShieldCheck className="h-3 w-3 mr-0.5" />
                             </Badge>
                           )}
@@ -533,8 +533,8 @@ export function PharmacistOrdersView() {
 
                       {/* Patient info */}
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-semibold text-emerald-700">{order.user.name.charAt(0).toUpperCase()}</span>
+                        <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs font-semibold text-amber-700">{order.user.name.charAt(0).toUpperCase()}</span>
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-semibold text-sm truncate">{order.user.name}</p>
@@ -544,7 +544,7 @@ export function PharmacistOrdersView() {
 
                       {/* Medication info */}
                       <div className="flex items-start gap-2">
-                        <Pill className="h-4 w-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                        <Pill className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                         <div className="min-w-0 flex-1">
                           {order.items.length === 1 ? (
                             <>
@@ -561,16 +561,16 @@ export function PharmacistOrdersView() {
 
                       {/* Verification code */}
                       {order.verificationCode && (
-                        <div className={`flex items-center gap-2 px-2.5 py-2 rounded-lg ${isVerified ? 'bg-emerald-100 border border-emerald-200' : 'bg-amber-50 border border-amber-200'}`}>
+                        <div className={`flex items-center gap-2 px-2.5 py-2 rounded-lg ${isVerified ? 'bg-amber-100 border border-amber-200' : 'bg-amber-50 border border-amber-200'}`}>
                           {isVerified ? (
-                            <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
+                            <ShieldCheck className="h-4 w-4 text-amber-600 shrink-0" />
                           ) : (
                             <SearchCode className="h-4 w-4 text-amber-600 shrink-0" />
                           )}
                           <span className="text-[11px] font-medium text-muted-foreground shrink-0">Code :</span>
                           <span className="text-sm font-bold tracking-[0.25em] font-mono flex-1">{order.verificationCode}</span>
                           {isVerified ? (
-                            <Badge className="bg-emerald-200 text-emerald-800 text-[9px] px-1.5 py-0 border-0 shrink-0 font-medium">
+                            <Badge className="bg-amber-200 text-amber-800 text-[9px] px-1.5 py-0 border-0 shrink-0 font-medium">
                               <ShieldCheck className="h-2.5 w-2.5 mr-0.5" />Vérifié
                             </Badge>
                           ) : (
@@ -589,16 +589,16 @@ export function PharmacistOrdersView() {
 
                       {/* Pickup time */}
                       {order.pickupTime && (
-                        <div className="flex items-center gap-1.5 text-xs text-emerald-600">
+                        <div className="flex items-center gap-1.5 text-xs text-amber-600">
                           <Clock className="h-3 w-3" />
                           <span>Récupération prévue : {order.pickupTime}</span>
                         </div>
                       )}
 
                       {/* Footer */}
-                      <div className="border-t border-emerald-100/80 flex items-center justify-between">
+                      <div className="border-t border-amber-100/80 flex items-center justify-between">
                         <span className="text-[11px] text-muted-foreground pt-2">{formatRelativeTime(order.createdAt)}</span>
-                        <ChevronRight className="h-4 w-4 text-emerald-400 pt-2" />
+                        <ChevronRight className="h-4 w-4 text-amber-400 pt-2" />
                       </div>
                     </CardContent>
                   </Card>
@@ -612,7 +612,7 @@ export function PharmacistOrdersView() {
       {/* Load more */}
       {typeFiltered.length > 0 && hasMore && (
         <div className="flex justify-center mt-4">
-          <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore} className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 px-6">
+          <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore} className="border-amber-200 text-amber-700 hover:bg-amber-50 px-6">
             {loadingMore ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Chargement...</>) : (`Charger plus (${total - orders.length} restantes)`)}
           </Button>
         </div>
@@ -624,7 +624,7 @@ export function PharmacistOrdersView() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <Button
               onClick={() => { setVerifyCode(''); setVerifyError(null); setScanMode(false); setScanError(null); setVerifyDialogOpen(true); }}
-              className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-600/25 text-sm font-medium"
+              className="w-full h-12 bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-lg shadow-amber-600/25 text-sm font-medium"
             >
               <ShieldCheck className="h-5 w-5 mr-2" />
               Vérifier une commande
@@ -638,13 +638,13 @@ export function PharmacistOrdersView() {
         if (!open) { cleanupScanner(); setScanMode(false); setVerifyCode(''); setVerifyError(null); setScanError(null); }
         setVerifyDialogOpen(open);
       }}>
-        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-emerald-200">
-          <DialogHeader className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-4 text-white shrink-0">
+        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200">
+          <DialogHeader className="bg-gradient-to-r from-amber-600 to-teal-600 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <ShieldCheck className="h-5 w-5" />
               Vérifier une commande
             </DialogTitle>
-            <DialogDescription className="text-emerald-200 text-xs mt-1">
+            <DialogDescription className="text-amber-200 text-xs mt-1">
               Saisissez le code du patient ou scannez le QR code
             </DialogDescription>
           </DialogHeader>
@@ -654,14 +654,14 @@ export function PharmacistOrdersView() {
             <div className="flex gap-2">
               <button
                 onClick={() => { cleanupScanner(); setScanMode(false); setScanError(null); }}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${!scanMode ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${!scanMode ? 'bg-amber-100 text-amber-700 border-2 border-amber-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
               >
                 <Keyboard className="h-4 w-4" />
                 Saisie manuelle
               </button>
               <button
                 onClick={() => { setScanError(null); startCameraScan(); }}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${scanMode ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${scanMode ? 'bg-amber-100 text-amber-700 border-2 border-amber-300' : 'bg-gray-50 text-gray-500 border-2 border-transparent hover:bg-gray-100'}`}
               >
                 <Camera className="h-4 w-4" />
                 Scanner QR
@@ -687,10 +687,10 @@ export function PharmacistOrdersView() {
                 {streamRef.current && !verifying && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-48 h-48 border-2 border-white/50 rounded-2xl">
-                      <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-emerald-400 rounded-tl-xl -translate-x-[1px] -translate-y-[1px]" />
-                      <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-emerald-400 rounded-tr-xl translate-x-[1px] -translate-y-[1px]" />
-                      <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-emerald-400 rounded-bl-xl -translate-x-[1px] translate-y-[1px]" />
-                      <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-emerald-400 rounded-br-xl translate-x-[1px] translate-y-[1px]" />
+                      <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-amber-400 rounded-tl-xl -translate-x-[1px] -translate-y-[1px]" />
+                      <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-amber-400 rounded-tr-xl translate-x-[1px] -translate-y-[1px]" />
+                      <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-amber-400 rounded-bl-xl -translate-x-[1px] translate-y-[1px]" />
+                      <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-amber-400 rounded-br-xl translate-x-[1px] translate-y-[1px]" />
                     </div>
                   </div>
                 )}
@@ -728,7 +728,7 @@ export function PharmacistOrdersView() {
                   setVerifyError(null);
                 }}
                 placeholder="Ex: A3K9X2"
-                className="h-12 text-center text-2xl font-mono tracking-[0.4em] font-bold border-emerald-200 focus:border-emerald-400"
+                className="h-12 text-center text-2xl font-mono tracking-[0.4em] font-bold border-amber-200 focus:border-amber-400"
                 maxLength={6}
                 disabled={verifying}
                 autoFocus={!scanMode}
@@ -736,7 +736,7 @@ export function PharmacistOrdersView() {
               <Button
                 onClick={() => handleVerify(verifyCode)}
                 disabled={verifyCode.length !== 6 || verifying}
-                className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm disabled:opacity-40"
+                className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm disabled:opacity-40"
               >
                 {verifying ? (
                   <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Vérification...</>

@@ -188,20 +188,20 @@ export function PharmacistStockAddView() {
             {/* ── Step 1: Select medication ── */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${selectedMedication ? 'bg-emerald-600 text-white' : 'bg-emerald-100 text-emerald-700'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${selectedMedication ? 'bg-orange-600 text-white' : 'bg-orange-100 text-orange-700'}`}>
                   {selectedMedication ? <CheckCircle2 className="h-4 w-4" /> : '1'}
                 </div>
                 <h3 className="text-sm font-semibold">Médicament</h3>
               </div>
 
-              <Card className={`border-emerald-100 overflow-visible ${selectedMedication ? 'border-emerald-300 bg-emerald-50/30' : ''}`}>
+              <Card className={`border-orange-100 overflow-visible ${selectedMedication ? 'border-orange-300 bg-orange-50/30' : ''}`}>
                 <CardContent className="p-4">
                   {selectedMedication ? (
                     /* Selected medication card */
                     <div className="space-y-3">
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-                          <Pill className="h-5 w-5 text-emerald-600" />
+                        <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
+                          <Pill className="h-5 w-5 text-orange-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-semibold text-sm truncate">
@@ -250,7 +250,7 @@ export function PharmacistStockAddView() {
                           onFocus={() => {
                             if (medications.length > 0) setShowDropdown(true);
                           }}
-                          className="pl-9 pr-9 h-11 border-emerald-200 focus:border-emerald-400 bg-emerald-50/30"
+                          className="pl-9 pr-9 h-11 border-orange-200 focus:border-orange-400 bg-orange-50/30"
                         />
                         {searchQuery && (
                           <button
@@ -272,7 +272,7 @@ export function PharmacistStockAddView() {
                             transition={{ duration: 0.15 }}
                             className="absolute z-50 left-4 right-4 sm:left-6 sm:right-6 mt-1"
                           >
-                            <div className="border border-emerald-200 rounded-xl bg-white shadow-lg max-h-64 overflow-y-auto divide-y divide-emerald-50">
+                            <div className="border border-orange-200 rounded-xl bg-white shadow-lg max-h-64 overflow-y-auto divide-y divide-orange-50">
                               {medications.map((med) => {
                                 const medDisplayName = med.commercialName || med.name;
                                 const genericName = med.commercialName ? med.name : null;
@@ -281,10 +281,10 @@ export function PharmacistStockAddView() {
                                   <button
                                     key={med.id}
                                     onClick={() => handleSelectMedication(med)}
-                                    className="w-full text-left px-3 py-3 hover:bg-emerald-50 transition-colors flex items-center gap-2.5"
+                                    className="w-full text-left px-3 py-3 hover:bg-orange-50 transition-colors flex items-center gap-2.5"
                                   >
-                                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-                                      <Pill className="h-4 w-4 text-emerald-600" />
+                                    <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
+                                      <Pill className="h-4 w-4 text-orange-600" />
                                     </div>
                                     <div className="min-w-0 flex-1">
                                       <p className="text-sm font-medium truncate">{medDisplayName}</p>
@@ -293,14 +293,14 @@ export function PharmacistStockAddView() {
                                       )}
                                       <div className="flex items-center gap-1.5 mt-0.5">
                                         {med.category && (
-                                          <span className="text-[10px] text-emerald-600">{med.category}</span>
+                                          <span className="text-[10px] text-orange-600">{med.category}</span>
                                         )}
                                         {med.form && (
                                           <span className="text-[10px] text-muted-foreground">· {med.form}</span>
                                         )}
                                       </div>
                                     </div>
-                                    <Plus className="h-4 w-4 text-emerald-400 shrink-0" />
+                                    <Plus className="h-4 w-4 text-orange-400 shrink-0" />
                                   </button>
                                 );
                               })}
@@ -334,19 +334,19 @@ export function PharmacistStockAddView() {
             {/* ── Step 2: Stock details ── */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isFormValid ? 'bg-emerald-600 text-white' : 'bg-emerald-100 text-emerald-700'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isFormValid ? 'bg-orange-600 text-white' : 'bg-orange-100 text-orange-700'}`}>
                   2
                 </div>
                 <h3 className="text-sm font-semibold">Détails du stock</h3>
               </div>
 
-              <Card className={`border-emerald-100 transition-opacity ${!selectedMedication ? 'opacity-50 pointer-events-none' : ''}`}>
+              <Card className={`border-orange-100 transition-opacity ${!selectedMedication ? 'opacity-50 pointer-events-none' : ''}`}>
                 <CardContent className="p-4 space-y-4">
                   {/* Price */}
                   <div className="space-y-1.5">
                     <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                       Prix unitaire
-                      <span className="text-emerald-600 font-semibold">(obligatoire)</span>
+                      <span className="text-orange-600 font-semibold">(obligatoire)</span>
                     </Label>
                     <div className="relative">
                       <Input
@@ -356,7 +356,7 @@ export function PharmacistStockAddView() {
                         placeholder="Ex: 2500"
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
-                        className="h-11 border-emerald-200 focus:border-emerald-400 text-sm pr-14"
+                        className="h-11 border-orange-200 focus:border-orange-400 text-sm pr-14"
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium">
                         FCFA
@@ -368,7 +368,7 @@ export function PharmacistStockAddView() {
                   <div className="space-y-1.5">
                     <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                       Quantité
-                      <span className="text-emerald-600 font-semibold">(obligatoire)</span>
+                      <span className="text-orange-600 font-semibold">(obligatoire)</span>
                     </Label>
                     <div className="relative">
                       <Input
@@ -378,7 +378,7 @@ export function PharmacistStockAddView() {
                         placeholder="Ex: 50"
                         value={quantity}
                         onChange={(e) => setQuantity(e.target.value)}
-                        className="h-11 border-emerald-200 focus:border-emerald-400 text-sm pr-16"
+                        className="h-11 border-orange-200 focus:border-orange-400 text-sm pr-16"
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium">
                         unités
@@ -395,7 +395,7 @@ export function PharmacistStockAddView() {
                       type="date"
                       value={expirationDate}
                       onChange={(e) => setExpirationDate(e.target.value)}
-                      className="h-11 border-emerald-200 focus:border-emerald-400 text-sm"
+                      className="h-11 border-orange-200 focus:border-orange-400 text-sm"
                     />
                   </div>
 
@@ -403,8 +403,8 @@ export function PharmacistStockAddView() {
                   <div className="space-y-3 pt-1">
                     <div className="flex items-center justify-between py-1">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                          <Package className="h-4 w-4 text-emerald-600" />
+                        <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+                          <Package className="h-4 w-4 text-orange-600" />
                         </div>
                         <div>
                           <Label className="text-sm font-medium">En stock</Label>
@@ -457,7 +457,7 @@ export function PharmacistStockAddView() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Card className="border-emerald-200 shadow-lg">
+              <Card className="border-orange-200 shadow-lg">
                 <CardContent className="p-3 flex gap-2">
                   <Button
                     variant="outline"
@@ -471,7 +471,7 @@ export function PharmacistStockAddView() {
                   <Button
                     onClick={handleSubmit}
                     disabled={!isFormValid || submitting}
-                    className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white text-sm disabled:opacity-40"
+                    className="flex-1 h-11 bg-orange-600 hover:bg-orange-700 text-white text-sm disabled:opacity-40"
                   >
                     {submitting ? (
                       <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Ajout en cours...</>

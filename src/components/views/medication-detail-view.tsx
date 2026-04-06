@@ -290,15 +290,15 @@ export function MedicationDetailView() {
 
         {/* Header Card */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="overflow-hidden border-emerald-100">
-            <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 px-4 py-5">
+          <Card className="overflow-hidden border-amber-100">
+            <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-4 py-5">
               <div className="flex items-start gap-3">
                 <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm flex-shrink-0">
                   <Pill className="h-7 w-7 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h1 className="text-lg font-bold text-white break-words">{medication.name}</h1>
-                  <p className="text-emerald-200 text-sm truncate">{medication.commercialName}</p>
+                  <p className="text-amber-200 text-sm truncate">{medication.commercialName}</p>
                 </div>
               </div>
             </div>
@@ -307,12 +307,12 @@ export function MedicationDetailView() {
               {/* Info badges */}
               <div className="flex flex-wrap gap-1.5">
                 {medication.category && (
-                  <Badge variant="secondary" className="text-xs bg-emerald-50 text-emerald-700">
+                  <Badge variant="secondary" className="text-xs bg-amber-50 text-amber-700">
                     {medication.category}
                   </Badge>
                 )}
                 {medication.form && (
-                  <Badge variant="outline" className="text-xs border-emerald-200 text-emerald-700">
+                  <Badge variant="outline" className="text-xs border-amber-200 text-amber-700">
                     {medication.form}
                   </Badge>
                 )}
@@ -323,7 +323,7 @@ export function MedicationDetailView() {
                   </Badge>
                 )}
                 {medication.activePrinciple && (
-                  <Badge variant="outline" className="text-xs border-emerald-200 text-emerald-700">
+                  <Badge variant="outline" className="text-xs border-amber-200 text-amber-700">
                     {medication.activePrinciple}
                   </Badge>
                 )}
@@ -332,9 +332,9 @@ export function MedicationDetailView() {
               {/* Key info */}
               <div className="grid grid-cols-2 gap-2 pt-1">
                 {medication.pathology && (
-                  <div className="bg-emerald-50 rounded-lg p-2.5">
-                    <p className="text-[11px] text-emerald-600 font-medium uppercase">Indication</p>
-                    <p className="text-xs text-emerald-800 mt-0.5 break-words">{medication.pathology}</p>
+                  <div className="bg-amber-50 rounded-lg p-2.5">
+                    <p className="text-[11px] text-amber-600 font-medium uppercase">Indication</p>
+                    <p className="text-xs text-amber-800 mt-0.5 break-words">{medication.pathology}</p>
                   </div>
                 )}
                 {cheapestPrice !== null && mostExpensivePrice !== null && (
@@ -362,7 +362,7 @@ export function MedicationDetailView() {
                     className="flex items-center justify-between w-full text-sm font-medium text-foreground"
                   >
                     <div className="flex items-center gap-2">
-                      <Info className="h-4 w-4 text-emerald-600" />
+                      <Info className="h-4 w-4 text-amber-600" />
                       Posologie
                     </div>
                     {showDosage ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
@@ -407,14 +407,14 @@ export function MedicationDetailView() {
         {medication.genericAlternatives.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mt-4">
             <h2 className="font-semibold text-sm mb-2 flex items-center gap-2">
-              <Pill className="h-5 w-5 text-emerald-600" />
+              <Pill className="h-5 w-5 text-amber-600" />
               Alternatives génériques
             </h2>
             <div className="space-y-2">
               {medication.genericAlternatives.map((alt) => (
                 <Card
                   key={alt.id}
-                  className="border-emerald-100 cursor-pointer hover:border-emerald-300 transition-colors"
+                  className="border-amber-100 cursor-pointer hover:border-amber-300 transition-colors"
                   onClick={() => {
                     useAppStore.getState().selectMedication(alt.id);
                     setCurrentView('medication-detail');
@@ -426,7 +426,7 @@ export function MedicationDetailView() {
                       <p className="font-medium text-sm truncate">{alt.name}</p>
                       <p className="text-xs text-muted-foreground truncate">{alt.commercialName}</p>
                     </div>
-                    <Badge variant="secondary" className="text-[10px] bg-emerald-50 text-emerald-700 flex-shrink-0 ml-2">
+                    <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 flex-shrink-0 ml-2">
                       Voir
                     </Badge>
                   </CardContent>
@@ -440,7 +440,7 @@ export function MedicationDetailView() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mt-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-emerald-600" />
+              <MapPin className="h-5 w-5 text-amber-600" />
               <h2 className="font-semibold text-sm">
                 Pharmacies
                 <span className="text-muted-foreground font-normal ml-1">({filteredPharmacies.length})</span>
@@ -450,11 +450,11 @@ export function MedicationDetailView() {
 
           {/* Price Summary Bar */}
           {filteredPharmacies.length > 0 && (
-            <div className="bg-gradient-to-r from-emerald-50 to-amber-50 rounded-xl p-3 mb-3 border border-emerald-100">
+            <div className="bg-gradient-to-r from-amber-50 to-amber-50 rounded-xl p-3 mb-3 border border-amber-100">
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div>
                   <p className="text-[11px] text-muted-foreground uppercase font-medium">Meilleur prix</p>
-                  <p className="text-sm font-bold text-emerald-700 flex items-center justify-center gap-0.5">
+                  <p className="text-sm font-bold text-amber-700 flex items-center justify-center gap-0.5">
                     <TrendingDown className="h-3 w-3" />
                     {cheapestPrice?.toLocaleString()} F
                   </p>
@@ -475,7 +475,7 @@ export function MedicationDetailView() {
           <div className="flex items-center gap-2 mb-3">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-amber-50 text-amber-700 text-xs font-medium"
             >
               <ArrowUpDown className="h-3 w-3" />
               <span className="truncate max-w-[70px]">{currentSortLabel}</span>
@@ -484,16 +484,16 @@ export function MedicationDetailView() {
               variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className={`border-emerald-200 text-emerald-700 text-xs h-8 px-2.5 ${showFilters ? 'bg-emerald-50' : ''}`}
+              className={`border-amber-200 text-amber-700 text-xs h-8 px-2.5 ${showFilters ? 'bg-amber-50' : ''}`}
             >
               <SlidersHorizontal className="h-3.5 w-3.5 mr-1" />
               Filtres
               {hasActiveFilters && (
-                <span className="ml-1 w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                <span className="ml-1 w-1.5 h-1.5 rounded-full bg-amber-600" />
               )}
             </Button>
             {filterCity && (
-              <Badge className="bg-emerald-100 text-emerald-700 gap-0.5 text-[11px] py-0.5 px-1.5">
+              <Badge className="bg-amber-100 text-amber-700 gap-0.5 text-[11px] py-0.5 px-1.5">
                 {filterCity}
                 <X className="h-2.5 w-2.5 cursor-pointer" onClick={(e) => { e.stopPropagation(); setFilterCity(null); }} />
               </Badge>
@@ -507,7 +507,7 @@ export function MedicationDetailView() {
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="text-[11px] text-emerald-600 hover:underline ml-auto flex-shrink-0"
+                className="text-[11px] text-amber-600 hover:underline ml-auto flex-shrink-0"
               >
                 Réinitialiser
               </button>
@@ -523,7 +523,7 @@ export function MedicationDetailView() {
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden"
               >
-                <div className="bg-white rounded-xl border border-emerald-100 p-4 mb-3 space-y-4">
+                <div className="bg-white rounded-xl border border-amber-100 p-4 mb-3 space-y-4">
                   {/* Sort Section */}
                   <div>
                     <label className="text-xs text-muted-foreground mb-2 block font-medium">Trier par</label>
@@ -534,8 +534,8 @@ export function MedicationDetailView() {
                           onClick={() => setSortBy(opt.value)}
                           className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
                             sortBy === opt.value
-                              ? 'bg-emerald-600 text-white'
-                              : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                              ? 'bg-amber-600 text-white'
+                              : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
                           }`}
                         >
                           {opt.label}
@@ -545,7 +545,7 @@ export function MedicationDetailView() {
                   </div>
 
                   {/* Separator */}
-                  <div className="border-t border-emerald-100" />
+                  <div className="border-t border-amber-100" />
 
                   {/* Filter Section */}
                   <div>
@@ -558,8 +558,8 @@ export function MedicationDetailView() {
                           <Badge
                             variant={filterCity === null ? 'default' : 'outline'}
                             className={filterCity === null
-                              ? 'bg-emerald-600 text-white cursor-pointer'
-                              : 'cursor-pointer border-emerald-200 text-emerald-700 hover:bg-emerald-50'
+                              ? 'bg-amber-600 text-white cursor-pointer'
+                              : 'cursor-pointer border-amber-200 text-amber-700 hover:bg-amber-50'
                             }
                             onClick={() => setFilterCity(null)}
                           >
@@ -570,8 +570,8 @@ export function MedicationDetailView() {
                               key={city}
                               variant={filterCity === city ? 'default' : 'outline'}
                               className={filterCity === city
-                                ? 'bg-emerald-600 text-white cursor-pointer'
-                                : 'cursor-pointer border-emerald-200 text-emerald-700 hover:bg-emerald-50'
+                                ? 'bg-amber-600 text-white cursor-pointer'
+                                : 'cursor-pointer border-amber-200 text-amber-700 hover:bg-amber-50'
                               }
                               onClick={() => setFilterCity(filterCity === city ? null : city)}
                             >
@@ -586,8 +586,8 @@ export function MedicationDetailView() {
                           onClick={() => setFilterGuard(filterGuard === true ? null : true)}
                           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs border transition-colors ${
                             filterGuard
-                              ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                              : 'border-emerald-200 text-muted-foreground hover:bg-emerald-50'
+                              ? 'bg-amber-50 border-amber-300 text-amber-700'
+                              : 'border-amber-200 text-muted-foreground hover:bg-amber-50'
                           }`}
                         >
                           <Shield className="h-3.5 w-3.5" />
@@ -603,14 +603,14 @@ export function MedicationDetailView() {
 
           {/* Pharmacy List */}
           {filteredPharmacies.length === 0 ? (
-            <Card className="border-emerald-100">
+            <Card className="border-amber-100">
               <CardContent className="p-6 text-center">
                 <p className="text-4xl mb-2">😅</p>
                 <p className="text-sm text-muted-foreground">
                   Aucune pharmacie ne correspond à vos filtres
                 </p>
                 {hasActiveFilters && (
-                  <button onClick={clearFilters} className="text-sm text-emerald-600 mt-2 hover:underline">
+                  <button onClick={clearFilters} className="text-sm text-amber-600 mt-2 hover:underline">
                     Réinitialiser les filtres
                   </button>
                 )}
@@ -629,7 +629,7 @@ export function MedicationDetailView() {
                   <Card
                     key={pharmacy.id}
                     className={`border overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 ${
-                      isCheapest ? 'border-emerald-400 bg-emerald-50/50' : 'border-emerald-100 hover:border-emerald-300'
+                      isCheapest ? 'border-amber-400 bg-amber-50/50' : 'border-amber-100 hover:border-amber-300'
                     }`}
                   >
                     <CardContent className="p-3">
@@ -640,7 +640,7 @@ export function MedicationDetailView() {
                       >
                         <p className="font-semibold text-sm text-foreground truncate min-w-0">{pharmacy.name}</p>
                         {isCheapest && (
-                          <Badge className="bg-emerald-600 text-white text-[10px] px-1.5 h-4 flex-shrink-0">
+                          <Badge className="bg-amber-600 text-white text-[10px] px-1.5 h-4 flex-shrink-0">
                             <TrendingDown className="h-2.5 w-2.5 mr-0.5" />
                             Meilleur prix
                           </Badge>
@@ -665,7 +665,7 @@ export function MedicationDetailView() {
                       >
                         <MapPin className="h-3 w-3 inline mr-0.5" />
                         {pharmacy.address}, {pharmacy.city}
-                        <span className="ml-2 text-emerald-600 font-medium">{formatDistance(distance)}</span>
+                        <span className="ml-2 text-amber-600 font-medium">{formatDistance(distance)}</span>
                       </p>
 
                       {/* Row 3: Rating + Stock */}
@@ -681,25 +681,25 @@ export function MedicationDetailView() {
                           Stock: {pharmacy.quantity}
                         </span>
                         {isCheapest && savings > 0 && (
-                          <span className="text-[10px] text-emerald-600 font-medium">
+                          <span className="text-[10px] text-amber-600 font-medium">
                             Économisez {savings.toLocaleString()} F
                           </span>
                         )}
                       </div>
 
                       {/* Separator */}
-                      <div className="border-t border-emerald-100/80 mb-2.5" />
+                      <div className="border-t border-amber-100/80 mb-2.5" />
 
                       {/* Row 4: Price + Commander */}
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-base text-emerald-700">
+                          <p className="font-bold text-base text-amber-700">
                             {pharmacy.price.toLocaleString()} <span className="text-xs font-normal">FCFA</span>
                           </p>
                         </div>
                         <Button
                           size="sm"
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-9 px-4 flex-shrink-0"
+                          className="bg-amber-600 hover:bg-amber-700 text-white text-xs h-9 px-4 flex-shrink-0"
                           onClick={(e) => {
                             e.stopPropagation();
                             openOrderDialog(pharmacy);
@@ -715,7 +715,7 @@ export function MedicationDetailView() {
                         <a
                           href={`tel:${pharmacy.phone}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="flex items-center justify-center gap-1.5 flex-1 h-8 rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-50 active:bg-emerald-100 transition-colors text-xs font-medium"
+                          className="flex items-center justify-center gap-1.5 flex-1 h-8 rounded-lg border border-amber-200 text-amber-700 hover:bg-amber-50 active:bg-amber-100 transition-colors text-xs font-medium"
                         >
                           <Phone className="h-3.5 w-3.5" />
                           Appeler
@@ -750,7 +750,7 @@ export function MedicationDetailView() {
         >
           <div className="max-w-5xl mx-auto">
             <Button
-              className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-lg shadow-emerald-600/30 flex items-center justify-between px-4"
+              className="w-full h-12 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl shadow-lg shadow-amber-600/30 flex items-center justify-between px-4"
               onClick={() => openOrderDialog(cheapestPharmacy)}
             >
               <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -779,15 +779,15 @@ export function MedicationDetailView() {
           {/* Scrollable body */}
           <div className="overflow-y-auto overscroll-contain px-4 pb-4 flex-1 min-h-0">
             {/* Product + Pharmacy info */}
-            <div className="bg-emerald-50 rounded-xl p-3 mb-3">
+            <div className="bg-amber-50 rounded-xl p-3 mb-3">
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-sm truncate">{medication.commercialName}</p>
                   <p className="text-xs text-muted-foreground">{medication.form}{medication.category ? ` · ${medication.category}` : ''}</p>
                 </div>
-                <Pill className="h-7 w-7 text-emerald-600 flex-shrink-0" />
+                <Pill className="h-7 w-7 text-amber-600 flex-shrink-0" />
               </div>
-              <div className="border-t border-emerald-200/60 mt-2 pt-2">
+              <div className="border-t border-amber-200/60 mt-2 pt-2">
                 <p className="font-medium text-xs truncate">{orderingPharmacy?.name}</p>
                 <p className="text-[11px] text-muted-foreground truncate">{orderingPharmacy?.address}, {orderingPharmacy?.city}</p>
               </div>
@@ -808,16 +808,16 @@ export function MedicationDetailView() {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => setOrderQuantity(Math.max(1, orderQuantity - 1))}
-                  className="w-9 h-9 rounded-lg border-2 border-emerald-200 flex items-center justify-center active:bg-emerald-100 transition-colors"
+                  className="w-9 h-9 rounded-lg border-2 border-amber-200 flex items-center justify-center active:bg-amber-100 transition-colors"
                 >
-                  <Minus className="h-4 w-4 text-emerald-700" />
+                  <Minus className="h-4 w-4 text-amber-700" />
                 </button>
                 <span className="text-xl font-bold w-8 text-center tabular-nums">{orderQuantity}</span>
                 <button
                   onClick={() => setOrderQuantity(Math.min(orderingPharmacy!.quantity, orderQuantity + 1))}
-                  className="w-9 h-9 rounded-lg border-2 border-emerald-200 flex items-center justify-center active:bg-emerald-100 transition-colors"
+                  className="w-9 h-9 rounded-lg border-2 border-amber-200 flex items-center justify-center active:bg-amber-100 transition-colors"
                 >
-                  <Plus className="h-4 w-4 text-emerald-700" />
+                  <Plus className="h-4 w-4 text-amber-700" />
                 </button>
               </div>
               <div className="text-xs text-muted-foreground">
@@ -836,17 +836,17 @@ export function MedicationDetailView() {
                 onChange={(e) => setOrderNote(e.target.value)}
                 placeholder="Ex: Je viendrai récupérer entre 16h et 18h..."
                 rows={2}
-                className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400 placeholder:text-muted-foreground"
+                className="w-full rounded-lg border border-amber-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder:text-muted-foreground"
               />
             </div>
           </div>
 
           {/* Sticky Footer - Always visible */}
-          <div className="shrink-0 border-t border-emerald-100 bg-white p-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] mt-auto">
+          <div className="shrink-0 border-t border-amber-100 bg-white p-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] mt-auto">
             <div className="flex items-center justify-between w-full mb-2">
               <span className="text-sm text-muted-foreground">Total</span>
               <div className="text-right">
-                <span className="text-lg font-bold text-emerald-700">
+                <span className="text-lg font-bold text-amber-700">
                   {orderingPharmacy ? (orderingPharmacy.price * orderQuantity).toLocaleString() : 0} FCFA
                 </span>
               </div>
@@ -880,7 +880,7 @@ export function MedicationDetailView() {
               </span>
             </Button>
             <Button
-              className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm"
+              className="w-full h-12 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-semibold text-sm"
               onClick={handleSubmitOrder}
               disabled={orderSubmitting}
             >

@@ -142,7 +142,7 @@ function ProfileSkeleton() {
   return (
     <div className="space-y-4">
       {/* Info card */}
-      <Card className="border-emerald-100">
+      <Card className="border-orange-100">
         <CardContent className="p-4 sm:p-5 space-y-4">
           <Skeleton className="h-5 w-40" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -171,7 +171,7 @@ function ProfileSkeleton() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         {[...Array(3)].map((_, i) => (
-          <Card key={i} className="border-emerald-100">
+          <Card key={i} className="border-orange-100">
             <CardContent className="p-3 text-center">
               <Skeleton className="h-7 w-12 mx-auto mb-1" />
               <Skeleton className="h-3 w-16 mx-auto" />
@@ -180,7 +180,7 @@ function ProfileSkeleton() {
         ))}
       </div>
       {/* Reviews */}
-      <Card className="border-emerald-100">
+      <Card className="border-orange-100">
         <CardHeader className="pb-3">
           <Skeleton className="h-5 w-32" />
         </CardHeader>
@@ -575,7 +575,7 @@ export function PharmacistProfileView() {
       <ViewHeader
         title="Profil de la pharmacie"
         back={true}
-        icon={<Building2 className="h-5 w-5 text-emerald-600" />}
+        icon={<Building2 className="h-5 w-5 text-orange-600" />}
       />
 
       {/* Error state */}
@@ -615,10 +615,10 @@ export function PharmacistProfileView() {
         >
           {/* ── Pharmacy Info Card ──────────────────────────────── */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-            <Card className="border-emerald-100">
+            <Card className="border-orange-100">
               <CardHeader className="pb-3 px-4 sm:px-5 pt-4 sm:pt-5">
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-emerald-600" />
+                  <Building2 className="h-4 w-4 text-orange-600" />
                   Informations de la pharmacie
                 </CardTitle>
               </CardHeader>
@@ -627,8 +627,8 @@ export function PharmacistProfileView() {
                 <div
                   className={`relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 border-dashed transition-colors cursor-pointer ${
                     isDragOver
-                      ? 'border-emerald-500 bg-emerald-50'
-                      : 'border-gray-200 hover:border-emerald-300 hover:bg-emerald-50/30'
+                      ? 'border-orange-500 bg-orange-50'
+                      : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50/30'
                   }`}
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
@@ -644,12 +644,12 @@ export function PharmacistProfileView() {
                   />
                   {uploading && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/80">
-                      <Loader2 className="h-8 w-8 text-emerald-600 animate-spin" />
+                      <Loader2 className="h-8 w-8 text-orange-600 animate-spin" />
                     </div>
                   )}
                   {photoPreview ? (
                     <div className="relative">
-                      <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-emerald-200 shadow-md">
+                      <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-orange-200 shadow-md">
                         <img
                           src={photoPreview}
                           alt="Photo de la pharmacie"
@@ -670,8 +670,8 @@ export function PharmacistProfileView() {
                       )}
                     </div>
                   ) : (
-                    <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <Camera className="h-8 w-8 text-emerald-400" />
+                    <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center">
+                      <Camera className="h-8 w-8 text-orange-400" />
                     </div>
                   )}
                   <div className="text-center">
@@ -684,7 +684,7 @@ export function PharmacistProfileView() {
                   </div>
                 </div>
 
-                <Separator className="bg-emerald-100/60" />
+                <Separator className="bg-orange-100/60" />
 
                 {/* Name */}
                 <div className="space-y-1.5">
@@ -774,7 +774,7 @@ export function PharmacistProfileView() {
                   />
                 </div>
 
-                <Separator className="bg-emerald-100/60" />
+                <Separator className="bg-orange-100/60" />
 
                 {/* Hours */}
                 <div className="grid grid-cols-2 gap-3">
@@ -821,7 +821,7 @@ export function PharmacistProfileView() {
                   />
                 </div>
 
-                <Separator className="bg-emerald-100/60" />
+                <Separator className="bg-orange-100/60" />
 
                 {/* Services */}
                 <div className="space-y-2.5">
@@ -832,14 +832,14 @@ export function PharmacistProfileView() {
                         key={key}
                         className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors text-sm ${
                           services.includes(key)
-                            ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
-                            : 'border-gray-200 hover:border-emerald-200 text-muted-foreground'
+                            ? 'border-orange-300 bg-orange-50 text-orange-700'
+                            : 'border-gray-200 hover:border-orange-200 text-muted-foreground'
                         }`}
                       >
                         <Checkbox
                           checked={services.includes(key)}
                           onCheckedChange={() => toggleService(key)}
-                          className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                          className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
                         />
                         <Icon className="h-3.5 w-3.5 flex-shrink-0" />
                         <span className="text-xs font-medium truncate">{label}</span>
@@ -848,7 +848,7 @@ export function PharmacistProfileView() {
                   </div>
                 </div>
 
-                <Separator className="bg-emerald-100/60" />
+                <Separator className="bg-orange-100/60" />
 
                 {/* Payment Methods */}
                 <div className="space-y-2.5">
@@ -859,14 +859,14 @@ export function PharmacistProfileView() {
                         key={key}
                         className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors text-xs font-medium ${
                           paymentMethods.includes(key)
-                            ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
-                            : 'border-gray-200 hover:border-emerald-200 text-muted-foreground'
+                            ? 'border-orange-300 bg-orange-50 text-orange-700'
+                            : 'border-gray-200 hover:border-orange-200 text-muted-foreground'
                         }`}
                       >
                         <Checkbox
                           checked={paymentMethods.includes(key)}
                           onCheckedChange={() => togglePayment(key)}
-                          className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                          className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
                         />
                         {label}
                       </label>
@@ -874,7 +874,7 @@ export function PharmacistProfileView() {
                   </div>
                 </div>
 
-                <Separator className="bg-emerald-100/60" />
+                <Separator className="bg-orange-100/60" />
 
                 {/* Parking Info */}
                 <div className="space-y-1.5">
@@ -891,7 +891,7 @@ export function PharmacistProfileView() {
                   />
                 </div>
 
-                <Separator className="bg-emerald-100/60" />
+                <Separator className="bg-orange-100/60" />
 
                 {/* GPS Coordinates */}
                 <div className="space-y-2.5">
@@ -901,7 +901,7 @@ export function PharmacistProfileView() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="text-xs h-8 px-2.5 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                      className="text-xs h-8 px-2.5 border-orange-200 text-orange-700 hover:bg-orange-50"
                       onClick={handleUseMyPosition}
                       disabled={geoLoading}
                     >
@@ -951,7 +951,7 @@ export function PharmacistProfileView() {
                   </div>
                 </div>
 
-                <Separator className="bg-emerald-100/60" />
+                <Separator className="bg-orange-100/60" />
 
                 {/* Toggles */}
                 <div className="space-y-4">
@@ -1003,7 +1003,7 @@ export function PharmacistProfileView() {
             transition={{ delay: 0.1 }}
             className="grid grid-cols-3 gap-3"
           >
-            <Card className="border-emerald-100">
+            <Card className="border-orange-100">
               <CardContent className="p-3 text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
@@ -1014,10 +1014,10 @@ export function PharmacistProfileView() {
                 <p className="text-[11px] text-muted-foreground">Note moyenne</p>
               </CardContent>
             </Card>
-            <Card className="border-emerald-100">
+            <Card className="border-orange-100">
               <CardContent className="p-3 text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <MessageSquare className="h-4 w-4 text-emerald-600" />
+                  <MessageSquare className="h-4 w-4 text-orange-600" />
                   <span className="text-lg font-bold text-foreground">
                     {reviewCount}
                   </span>
@@ -1025,10 +1025,10 @@ export function PharmacistProfileView() {
                 <p className="text-[11px] text-muted-foreground">Nombre d&apos;avis</p>
               </CardContent>
             </Card>
-            <Card className="border-emerald-100">
+            <Card className="border-orange-100">
               <CardContent className="p-3 text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <ShoppingCart className="h-4 w-4 text-emerald-600" />
+                  <ShoppingCart className="h-4 w-4 text-orange-600" />
                   <span className="text-lg font-bold text-foreground">
                     {totalOrders}
                   </span>
@@ -1044,13 +1044,13 @@ export function PharmacistProfileView() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
           >
-            <Card className="border-emerald-100">
+            <Card className="border-orange-100">
               <CardHeader className="pb-3 px-4 sm:px-5 pt-4 sm:pt-5">
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4 text-emerald-600" />
+                  <MessageSquare className="h-4 w-4 text-orange-600" />
                   Avis récents
                   {reviews.length > 0 && (
-                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-emerald-100 text-emerald-700">
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-orange-100 text-orange-700">
                       {reviews.length}
                     </Badge>
                   )}
@@ -1069,7 +1069,7 @@ export function PharmacistProfileView() {
                             const pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
                             const barColor =
                               star >= 4
-                                ? 'bg-emerald-500'
+                                ? 'bg-orange-500'
                                 : star === 3
                                   ? 'bg-amber-500'
                                   : 'bg-red-500';
@@ -1119,7 +1119,7 @@ export function PharmacistProfileView() {
                       >
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-2">
-                            <div className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">
+                            <div className="flex items-center justify-center w-7 h-7 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold">
                               {(review.user?.name || 'A').charAt(0).toUpperCase()}
                             </div>
                             <span className="text-sm font-medium text-foreground truncate max-w-[140px]">
@@ -1139,10 +1139,10 @@ export function PharmacistProfileView() {
 
                         {/* Existing reply */}
                         {review.reply && (
-                          <div className="mt-2 p-2.5 rounded-lg bg-emerald-50 border border-emerald-100">
+                          <div className="mt-2 p-2.5 rounded-lg bg-orange-50 border border-orange-100">
                             <div className="flex items-center gap-1.5 mb-1">
-                              <Building2 className="h-3 w-3 text-emerald-600" />
-                              <span className="text-[11px] font-semibold text-emerald-700">Réponse de la pharmacie</span>
+                              <Building2 className="h-3 w-3 text-orange-600" />
+                              <span className="text-[11px] font-semibold text-orange-700">Réponse de la pharmacie</span>
                             </div>
                             <p className="text-xs text-muted-foreground leading-relaxed">{review.reply}</p>
                           </div>
@@ -1158,7 +1158,7 @@ export function PharmacistProfileView() {
                                   value={replyText}
                                   onChange={(e) => setReplyText(e.target.value)}
                                   rows={2}
-                                  className="text-sm resize-none border-emerald-200 focus:border-emerald-400"
+                                  className="text-sm resize-none border-orange-200 focus:border-orange-400"
                                 />
                                 <div className="flex items-center gap-2 justify-end">
                                   <Button
@@ -1174,7 +1174,7 @@ export function PharmacistProfileView() {
                                   </Button>
                                   <Button
                                     size="sm"
-                                    className="text-xs h-8 px-3 bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    className="text-xs h-8 px-3 bg-orange-600 hover:bg-orange-700 text-white"
                                     onClick={() => handleSendReply(review.id)}
                                     disabled={replySending === review.id || !replyText.trim()}
                                   >
@@ -1191,7 +1191,7 @@ export function PharmacistProfileView() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-xs h-7 px-2 text-emerald-600 hover:bg-emerald-50"
+                                className="text-xs h-7 px-2 text-orange-600 hover:bg-orange-50"
                                 onClick={() => {
                                   setReplyingTo(review.id);
                                   setReplyText('');
@@ -1220,7 +1220,7 @@ export function PharmacistProfileView() {
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm"
+              className="w-full h-12 bg-orange-600 hover:bg-orange-700 text-white font-semibold text-sm"
             >
               {saving ? (
                 <>

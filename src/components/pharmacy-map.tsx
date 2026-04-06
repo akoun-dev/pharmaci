@@ -133,7 +133,7 @@ export function PharmacyMap({ pharmacies, onPharmacyClick, onReady }: PharmacyMa
                     borderRadius: 8,
                     marginBottom: 4,
                   }}>
-                    🛡️ Garde
+                    De darde
                   </span>
                 )}
                 <p style={{ fontSize: 12, color: '#6b7280', margin: '2px 0' }}>

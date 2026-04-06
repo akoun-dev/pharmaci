@@ -129,7 +129,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   antiinflammatoire: 'bg-orange-100 text-orange-700 border-orange-200',
   antihypertenseur: 'bg-sky-100 text-sky-700 border-sky-200',
   antidiabetique: 'bg-teal-100 text-teal-700 border-teal-200',
-  antiseptique: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  antiseptique: 'bg-orange-100 text-orange-700 border-orange-200',
   vitamin: 'bg-yellow-100 text-yellow-700 border-yellow-200',
   antihistaminique: 'bg-indigo-100 text-indigo-700 border-indigo-200',
   antispasmodique: 'bg-purple-100 text-purple-700 border-purple-200',
@@ -142,7 +142,7 @@ function getCategoryColor(category: string): string {
   for (const [key, value] of Object.entries(CATEGORY_COLORS)) {
     if (lower.includes(key) || key.includes(lower)) return value;
   }
-  return 'bg-violet-100 text-violet-700 border-violet-200';
+  return 'bg-amber-100 text-amber-700 border-amber-200';
 }
 
 const PRESCRIPTION_TABS: { key: PrescriptionFilter; label: string }[] = [
@@ -557,7 +557,7 @@ export function AdminMedicationsView() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
         <ViewHeader
           title="Gestion des médicaments"
-          icon={<FlaskConical className="h-5 w-5 text-violet-600" />}
+          icon={<FlaskConical className="h-5 w-5 text-amber-600" />}
         />
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
@@ -567,7 +567,7 @@ export function AdminMedicationsView() {
             <Button
               onClick={handleRefresh}
               variant="outline"
-              className="border-violet-200 text-violet-700 hover:bg-violet-50"
+              className="border-amber-200 text-amber-700 hover:bg-amber-50"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
@@ -583,16 +583,16 @@ export function AdminMedicationsView() {
       {/* ── Header ── */}
       <ViewHeader
         title="Gestion des médicaments"
-        icon={<FlaskConical className="h-5 w-5 text-violet-600" />}
+        icon={<FlaskConical className="h-5 w-5 text-amber-600" />}
         action={
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs bg-violet-100 text-violet-700">
+            <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">
               {total}
             </Badge>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-violet-600"
+              className="h-8 w-8 text-muted-foreground hover:text-amber-600"
               onClick={handleRefresh}
               disabled={refreshing}
             >
@@ -600,7 +600,7 @@ export function AdminMedicationsView() {
             </Button>
             <Button
               size="sm"
-              className="h-8 px-3 bg-violet-600 hover:bg-violet-700 text-white"
+              className="h-8 px-3 bg-amber-600 hover:bg-amber-700 text-white"
               onClick={handleCreateOpen}
             >
               <Plus className="h-4 w-4 mr-1" />
@@ -618,7 +618,7 @@ export function AdminMedicationsView() {
             placeholder="Rechercher par nom, nom commercial, principe actif..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-10 text-sm border-violet-200 focus:border-violet-400"
+            className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400"
           />
           {searchQuery && (
             <button
@@ -637,8 +637,8 @@ export function AdminMedicationsView() {
           onClick={() => setActiveCategory('all')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
             activeCategory === 'all'
-              ? 'bg-violet-600 text-white shadow-sm'
-              : 'bg-violet-50 text-violet-700 hover:bg-violet-100'
+              ? 'bg-amber-600 text-white shadow-sm'
+              : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
           }`}
         >
           Toutes
@@ -646,7 +646,7 @@ export function AdminMedicationsView() {
             className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${
               activeCategory === 'all'
                 ? 'bg-white/20 text-white'
-                : 'bg-violet-100 text-violet-600'
+                : 'bg-amber-100 text-amber-600'
             }`}
           >
             {total}
@@ -660,8 +660,8 @@ export function AdminMedicationsView() {
               onClick={() => setActiveCategory(isActive ? 'all' : cat)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                 isActive
-                  ? 'bg-violet-600 text-white shadow-sm'
-                  : 'bg-violet-50 text-violet-700 hover:bg-violet-100'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
               }`}
             >
               {cat}
@@ -680,7 +680,7 @@ export function AdminMedicationsView() {
               onClick={() => setActivePrescription(tab.key)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                 isActive
-                  ? 'bg-violet-600 text-white shadow-sm'
+                  ? 'bg-amber-600 text-white shadow-sm'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -698,9 +698,9 @@ export function AdminMedicationsView() {
 
       {/* ── Medications list ── */}
       {medications.length === 0 ? (
-        <Card className="border-violet-100">
+        <Card className="border-amber-100">
           <CardContent className="p-8 text-center">
-            <Inbox className="h-10 w-10 text-violet-300 mx-auto mb-3" />
+            <Inbox className="h-10 w-10 text-amber-300 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">Aucun médicament</h3>
             <p className="text-sm text-muted-foreground">
               {searchQuery || activeCategory !== 'all' || activePrescription !== 'all'
@@ -710,7 +710,7 @@ export function AdminMedicationsView() {
             {searchQuery || activeCategory !== 'all' || activePrescription !== 'all' ? (
               <Button
                 variant="outline"
-                className="mt-3 border-violet-200 text-violet-700 hover:bg-violet-50 text-xs"
+                className="mt-3 border-amber-200 text-amber-700 hover:bg-amber-50 text-xs"
                 onClick={() => {
                   setSearchQuery('');
                   setActiveCategory('all');
@@ -741,7 +741,7 @@ export function AdminMedicationsView() {
                 transition={{ delay: index * 0.03 }}
               >
                 <Card
-                  className="border-violet-100 overflow-hidden cursor-pointer hover:border-violet-300 transition-colors active:scale-[0.99] duration-150"
+                  className="border-amber-100 overflow-hidden cursor-pointer hover:border-amber-300 transition-colors active:scale-[0.99] duration-150"
                   onClick={() => handleMedClick(med)}
                 >
                   <CardContent className="p-4 space-y-2.5">
@@ -762,7 +762,7 @@ export function AdminMedicationsView() {
                         className={`text-[10px] px-1.5 py-0 flex-shrink-0 border-0 ${
                           med.needsPrescription
                             ? 'bg-red-100 text-red-700'
-                            : 'bg-emerald-100 text-emerald-700'
+                            : 'bg-orange-100 text-orange-700'
                         }`}
                       >
                         {med.needsPrescription ? (
@@ -812,7 +812,7 @@ export function AdminMedicationsView() {
                     )}
 
                     {/* Footer: Stats + Date */}
-                    <div className="border-t border-violet-100/80 flex items-center justify-between pt-2">
+                    <div className="border-t border-amber-100/80 flex items-center justify-between pt-2">
                       <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Building2 className="h-3 w-3" />
@@ -827,7 +827,7 @@ export function AdminMedicationsView() {
                         <span className="text-[11px] text-muted-foreground">
                           {formatRelativeTime(med.createdAt)}
                         </span>
-                        <Eye className="h-3.5 w-3.5 text-violet-400" />
+                        <Eye className="h-3.5 w-3.5 text-amber-400" />
                       </div>
                     </div>
                   </CardContent>
@@ -845,22 +845,22 @@ export function AdminMedicationsView() {
         onPageChange={goToPage}
         total={total}
         pageSize={PAGE_SIZE}
-        theme="violet"
+        theme="amber"
       />
 
       {/* ── Medication Detail Dialog ── */}
       <Dialog open={detailOpen} onOpenChange={(open) => { if (!open) closeDetailDialog(); }}>
         {selectedMed && (
-          <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-violet-200 max-h-[90dvh] flex flex-col">
+          <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 max-h-[90dvh] flex flex-col">
             {/* Dialog header */}
-            <DialogHeader className="bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-4 text-white shrink-0">
+            <DialogHeader className="bg-gradient-to-r from-amber-600 to-purple-600 px-5 py-4 text-white shrink-0">
               <DialogTitle className="text-base flex items-center gap-2">
                 <FlaskConical className="h-5 w-5" />
                 {isEditing
                   ? editForm.commercialName || editForm.name
                   : selectedMed.commercialName || selectedMed.name}
               </DialogTitle>
-              <DialogDescription className="text-violet-200 text-xs mt-1">
+              <DialogDescription className="text-amber-200 text-xs mt-1">
                 {isEditing ? 'Modifier les informations du médicament' : 'Fiche détaillée du médicament'}
               </DialogDescription>
             </DialogHeader>
@@ -878,7 +878,7 @@ export function AdminMedicationsView() {
                     <Input
                       value={editForm.commercialName}
                       onChange={(e) => setEditForm((f) => ({ ...f, commercialName: e.target.value }))}
-                      className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                      className="h-10 text-sm border-amber-200 focus:border-amber-400"
                     />
                   </div>
 
@@ -890,7 +890,7 @@ export function AdminMedicationsView() {
                     <Input
                       value={editForm.name}
                       onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-                      className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                      className="h-10 text-sm border-amber-200 focus:border-amber-400"
                     />
                   </div>
 
@@ -901,7 +901,7 @@ export function AdminMedicationsView() {
                       <Input
                         value={editForm.activePrinciple}
                         onChange={(e) => setEditForm((f) => ({ ...f, activePrinciple: e.target.value }))}
-                        className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                        className="h-10 text-sm border-amber-200 focus:border-amber-400"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -909,7 +909,7 @@ export function AdminMedicationsView() {
                       <Input
                         value={editForm.category}
                         onChange={(e) => setEditForm((f) => ({ ...f, category: e.target.value }))}
-                        className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                        className="h-10 text-sm border-amber-200 focus:border-amber-400"
                       />
                     </div>
                   </div>
@@ -922,7 +922,7 @@ export function AdminMedicationsView() {
                         value={editForm.form}
                         onValueChange={(val) => setEditForm((f) => ({ ...f, form: val }))}
                       >
-                        <SelectTrigger className="h-10 text-sm border-violet-200 w-full">
+                        <SelectTrigger className="h-10 text-sm border-amber-200 w-full">
                           <SelectValue placeholder="Sélectionner" />
                         </SelectTrigger>
                         <SelectContent>
@@ -939,7 +939,7 @@ export function AdminMedicationsView() {
                       <Input
                         value={editForm.pathology}
                         onChange={(e) => setEditForm((f) => ({ ...f, pathology: e.target.value }))}
-                        className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                        className="h-10 text-sm border-amber-200 focus:border-amber-400"
                       />
                     </div>
                   </div>
@@ -950,7 +950,7 @@ export function AdminMedicationsView() {
                       {editForm.needsPrescription ? (
                         <ShieldAlertIcon className="h-5 w-5 text-red-500" />
                       ) : (
-                        <ShieldCheckIcon className="h-5 w-5 text-emerald-500" />
+                        <ShieldCheckIcon className="h-5 w-5 text-orange-500" />
                       )}
                       <div>
                         <p className="text-sm font-medium">Ordonnance requise</p>
@@ -977,7 +977,7 @@ export function AdminMedicationsView() {
                     <Textarea
                       value={editForm.description}
                       onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
-                      className="text-sm border-violet-200 focus:border-violet-400 min-h-[80px]"
+                      className="text-sm border-amber-200 focus:border-amber-400 min-h-[80px]"
                       rows={3}
                     />
                   </div>
@@ -988,7 +988,7 @@ export function AdminMedicationsView() {
                     <Input
                       value={editForm.dosage}
                       onChange={(e) => setEditForm((f) => ({ ...f, dosage: e.target.value }))}
-                      className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                      className="h-10 text-sm border-amber-200 focus:border-amber-400"
                     />
                   </div>
 
@@ -1001,7 +1001,7 @@ export function AdminMedicationsView() {
                     <Textarea
                       value={editForm.sideEffects}
                       onChange={(e) => setEditForm((f) => ({ ...f, sideEffects: e.target.value }))}
-                      className="text-sm border-violet-200 focus:border-violet-400 min-h-[60px]"
+                      className="text-sm border-amber-200 focus:border-amber-400 min-h-[60px]"
                       rows={2}
                     />
                   </div>
@@ -1033,7 +1033,7 @@ export function AdminMedicationsView() {
                       className={`text-[11px] px-2 py-0.5 border-0 ${
                         selectedMed.needsPrescription
                           ? 'bg-red-100 text-red-700'
-                          : 'bg-emerald-100 text-emerald-700'
+                          : 'bg-orange-100 text-orange-700'
                       }`}
                     >
                       {selectedMed.needsPrescription ? (
@@ -1059,7 +1059,7 @@ export function AdminMedicationsView() {
                       <div>
                         <p className="text-[11px] text-muted-foreground">Principe actif</p>
                         <p className="text-sm font-medium truncate flex items-center gap-1">
-                          <Activity className="h-3.5 w-3.5 text-violet-500 flex-shrink-0" />
+                          <Activity className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
                           {selectedMed.activePrinciple}
                         </p>
                       </div>
@@ -1068,7 +1068,7 @@ export function AdminMedicationsView() {
                       <div>
                         <p className="text-[11px] text-muted-foreground">Pathologie(s)</p>
                         <p className="text-sm font-medium truncate flex items-center gap-1">
-                          <FileText className="h-3.5 w-3.5 text-violet-500 flex-shrink-0" />
+                          <FileText className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
                           {selectedMed.pathology}
                         </p>
                       </div>
@@ -1115,14 +1115,14 @@ export function AdminMedicationsView() {
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <p className="text-[11px] text-muted-foreground">Commandes</p>
-                          <p className="text-sm font-bold text-violet-700 flex items-center gap-1">
+                          <p className="text-sm font-bold text-amber-700 flex items-center gap-1">
                             <Package className="h-3.5 w-3.5" />
                             {selectedMed.orderCount}
                           </p>
                         </div>
                         <div>
                           <p className="text-[11px] text-muted-foreground">Pharmacies (stock)</p>
-                          <p className="text-sm font-bold text-violet-700 flex items-center gap-1">
+                          <p className="text-sm font-bold text-amber-700 flex items-center gap-1">
                             <Building2 className="h-3.5 w-3.5" />
                             {selectedMed.pharmacyCount}
                           </p>
@@ -1179,7 +1179,7 @@ export function AdminMedicationsView() {
                                 variant="outline"
                                 className={`text-[10px] px-1.5 py-0 border-0 ${
                                   stock.inStock
-                                    ? 'bg-emerald-100 text-emerald-700'
+                                    ? 'bg-orange-100 text-orange-700'
                                     : 'bg-red-100 text-red-700'
                                 }`}
                               >
@@ -1204,19 +1204,19 @@ export function AdminMedicationsView() {
             </div>
 
             {/* Dialog footer */}
-            <DialogFooter className="px-5 py-3 border-t border-violet-100 shrink-0 flex-row gap-2">
+            <DialogFooter className="px-5 py-3 border-t border-amber-100 shrink-0 flex-row gap-2">
               {isEditing ? (
                 <>
                   <Button
                     variant="outline"
-                    className="flex-1 border-violet-200 text-violet-700 hover:bg-violet-50"
+                    className="flex-1 border-amber-200 text-amber-700 hover:bg-amber-50"
                     onClick={cancelEditing}
                     disabled={saving}
                   >
                     Annuler
                   </Button>
                   <Button
-                    className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
+                    className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
                     onClick={handleSaveEdit}
                     disabled={saving}
                   >
@@ -1244,7 +1244,7 @@ export function AdminMedicationsView() {
                     Supprimer
                   </Button>
                   <Button
-                    className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
+                    className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
                     onClick={startEditing}
                   >
                     <Pencil className="h-4 w-4 mr-1.5" />
@@ -1300,14 +1300,14 @@ export function AdminMedicationsView() {
 
       {/* ── Create Medication Dialog ── */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-violet-200 max-h-[90dvh] flex flex-col">
+        <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 max-h-[90dvh] flex flex-col">
           {/* Dialog header */}
-          <DialogHeader className="bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-4 text-white shrink-0">
+          <DialogHeader className="bg-gradient-to-r from-amber-600 to-purple-600 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <Plus className="h-5 w-5" />
               Nouveau médicament
             </DialogTitle>
-            <DialogDescription className="text-violet-200 text-xs mt-1">
+            <DialogDescription className="text-amber-200 text-xs mt-1">
               Ajouter un nouveau médicament au catalogue
             </DialogDescription>
           </DialogHeader>
@@ -1325,7 +1325,7 @@ export function AdminMedicationsView() {
                 onChange={(e) =>
                   setCreateForm((f) => ({ ...f, commercialName: e.target.value }))
                 }
-                className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                className="h-10 text-sm border-amber-200 focus:border-amber-400"
               />
             </div>
 
@@ -1340,7 +1340,7 @@ export function AdminMedicationsView() {
                 onChange={(e) =>
                   setCreateForm((f) => ({ ...f, name: e.target.value }))
                 }
-                className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                className="h-10 text-sm border-amber-200 focus:border-amber-400"
               />
             </div>
 
@@ -1354,7 +1354,7 @@ export function AdminMedicationsView() {
                   onChange={(e) =>
                     setCreateForm((f) => ({ ...f, activePrinciple: e.target.value }))
                   }
-                  className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                  className="h-10 text-sm border-amber-200 focus:border-amber-400"
                 />
               </div>
               <div className="space-y-1.5">
@@ -1365,7 +1365,7 @@ export function AdminMedicationsView() {
                   onChange={(e) =>
                     setCreateForm((f) => ({ ...f, category: e.target.value }))
                   }
-                  className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                  className="h-10 text-sm border-amber-200 focus:border-amber-400"
                 />
               </div>
             </div>
@@ -1380,7 +1380,7 @@ export function AdminMedicationsView() {
                     setCreateForm((f) => ({ ...f, form: val }))
                   }
                 >
-                  <SelectTrigger className="h-10 text-sm border-violet-200 w-full">
+                  <SelectTrigger className="h-10 text-sm border-amber-200 w-full">
                     <SelectValue placeholder="Sélectionner" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1400,7 +1400,7 @@ export function AdminMedicationsView() {
                   onChange={(e) =>
                     setCreateForm((f) => ({ ...f, pathology: e.target.value }))
                   }
-                  className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                  className="h-10 text-sm border-amber-200 focus:border-amber-400"
                 />
               </div>
             </div>
@@ -1411,7 +1411,7 @@ export function AdminMedicationsView() {
                 {createForm.needsPrescription ? (
                   <ShieldAlertIcon className="h-5 w-5 text-red-500" />
                 ) : (
-                  <ShieldCheckIcon className="h-5 w-5 text-emerald-500" />
+                  <ShieldCheckIcon className="h-5 w-5 text-orange-500" />
                 )}
                 <div>
                   <p className="text-sm font-medium">Ordonnance requise</p>
@@ -1441,7 +1441,7 @@ export function AdminMedicationsView() {
                 onChange={(e) =>
                   setCreateForm((f) => ({ ...f, description: e.target.value }))
                 }
-                className="text-sm border-violet-200 focus:border-violet-400 min-h-[80px]"
+                className="text-sm border-amber-200 focus:border-amber-400 min-h-[80px]"
                 rows={3}
               />
             </div>
@@ -1455,7 +1455,7 @@ export function AdminMedicationsView() {
                 onChange={(e) =>
                   setCreateForm((f) => ({ ...f, dosage: e.target.value }))
                 }
-                className="h-10 text-sm border-violet-200 focus:border-violet-400"
+                className="h-10 text-sm border-amber-200 focus:border-amber-400"
               />
             </div>
 
@@ -1471,24 +1471,24 @@ export function AdminMedicationsView() {
                 onChange={(e) =>
                   setCreateForm((f) => ({ ...f, sideEffects: e.target.value }))
                 }
-                className="text-sm border-violet-200 focus:border-violet-400 min-h-[60px]"
+                className="text-sm border-amber-200 focus:border-amber-400 min-h-[60px]"
                 rows={2}
               />
             </div>
           </div>
 
           {/* Dialog footer */}
-          <DialogFooter className="px-5 py-4 border-t border-violet-100 shrink-0 gap-2">
+          <DialogFooter className="px-5 py-4 border-t border-amber-100 shrink-0 gap-2">
             <Button
               variant="outline"
-              className="border-violet-200 text-violet-700 hover:bg-violet-50"
+              className="border-amber-200 text-amber-700 hover:bg-amber-50"
               onClick={() => setCreateOpen(false)}
               disabled={creating}
             >
               Annuler
             </Button>
             <Button
-              className="bg-violet-600 hover:bg-violet-700 text-white"
+              className="bg-amber-600 hover:bg-amber-700 text-white"
               onClick={handleCreateSubmit}
               disabled={creating}
             >

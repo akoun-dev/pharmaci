@@ -178,17 +178,17 @@ export function AdminSettingsView() {
       >
         {/* ─── HEADER ─── */}
         <motion.div variants={itemVariants}>
-          <div className="rounded-2xl bg-gradient-to-br from-violet-600 to-violet-700 px-5 py-5 text-white">
+          <div className="rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 px-5 py-5 text-white">
             <div className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-violet-200" />
-              <p className="text-sm font-medium text-violet-100">
+              <Settings className="h-5 w-5 text-amber-200" />
+              <p className="text-sm font-medium text-amber-100">
                 Administration
               </p>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold mt-1">
               Paramètres
             </h1>
-            <p className="text-sm text-violet-100 mt-1">
+            <p className="text-sm text-amber-100 mt-1">
               Configuration de la plateforme Pharma CI
             </p>
           </div>
@@ -196,33 +196,33 @@ export function AdminSettingsView() {
 
         {/* ─── APP INFO ─── */}
         <motion.div variants={itemVariants}>
-          <Card className="border-violet-100">
+          <Card className="border-amber-100">
             <CardHeader className="flex flex-row items-center gap-3 pb-3 px-4 pt-4">
-              <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-violet-100">
-                <Info className="h-4.5 w-4.5 text-violet-600" />
+              <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-amber-100">
+                <Info className="h-4.5 w-4.5 text-amber-600" />
               </div>
               <CardTitle className="text-sm sm:text-base font-semibold">
                 Informations de l&apos;application
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-3">
-              <InfoRow icon={<Globe className="h-4 w-4 text-violet-500" />} label="Nom" value="Pharma CI" />
+              <InfoRow icon={<Globe className="h-4 w-4 text-amber-500" />} label="Nom" value="Pharma CI" />
               <Separator />
-              <InfoRow icon={<Server className="h-4 w-4 text-violet-500" />} label="Version" value="v1.0.0" />
+              <InfoRow icon={<Server className="h-4 w-4 text-amber-500" />} label="Version" value="v1.0.0" />
               <Separator />
-              <InfoRow icon={<HardDrive className="h-4 w-4 text-violet-500" />} label="Environnement" value="Production" />
+              <InfoRow icon={<HardDrive className="h-4 w-4 text-amber-500" />} label="Environnement" value="Production" />
               <Separator />
-              <InfoRow icon={<Globe className="h-4 w-4 text-violet-500" />} label="Région" value="Côte d&apos;Ivoire" />
+              <InfoRow icon={<Globe className="h-4 w-4 text-amber-500" />} label="Région" value="Côte d&apos;Ivoire" />
             </CardContent>
           </Card>
         </motion.div>
 
         {/* ─── DATABASE STATS ─── */}
         <motion.div variants={itemVariants}>
-          <Card className="border-violet-100">
+          <Card className="border-amber-100">
             <CardHeader className="flex flex-row items-center gap-3 pb-3 px-4 pt-4">
-              <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-violet-100">
-                <Database className="h-4.5 w-4.5 text-violet-600" />
+              <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-amber-100">
+                <Database className="h-4.5 w-4.5 text-amber-600" />
               </div>
               <CardTitle className="text-sm sm:text-base font-semibold">
                 Statistiques de la base de données
@@ -232,7 +232,7 @@ export function AdminSettingsView() {
               {statsLoading ? (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="bg-violet-50 rounded-xl p-3 text-center">
+                    <div key={i} className="bg-amber-50 rounded-xl p-3 text-center">
                       <Skeleton className="h-7 w-12 mx-auto mb-1" />
                       <Skeleton className="h-3 w-16 mx-auto" />
                     </div>
@@ -272,35 +272,35 @@ export function AdminSettingsView() {
 
         {/* ─── ADMIN ACCOUNT ─── */}
         <motion.div variants={itemVariants}>
-          <Card className="border-violet-100">
+          <Card className="border-amber-100">
             <CardHeader className="flex flex-row items-center gap-3 pb-3 px-4 pt-4">
-              <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-violet-100">
-                <Shield className="h-4.5 w-4.5 text-violet-600" />
+              <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-amber-100">
+                <Shield className="h-4.5 w-4.5 text-amber-600" />
               </div>
               <CardTitle className="text-sm sm:text-base font-semibold">
                 Compte administrateur
               </CardTitle>
-              <Badge className="ml-auto bg-violet-100 text-violet-700 border-0 text-xs">
+              <Badge className="ml-auto bg-amber-100 text-amber-700 border-0 text-xs">
                 <Shield className="h-3 w-3 mr-1" />
                 Admin
               </Badge>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-3">
-              <InfoRow icon={<User className="h-4 w-4 text-violet-500" />} label="Nom" value={currentUser?.name ?? '—'} />
+              <InfoRow icon={<User className="h-4 w-4 text-amber-500" />} label="Nom" value={currentUser?.name ?? '—'} />
               <Separator />
-              <InfoRow icon={<Globe className="h-4 w-4 text-violet-500" />} label="Email" value={currentUser?.email ?? '—'} />
+              <InfoRow icon={<Globe className="h-4 w-4 text-amber-500" />} label="Email" value={currentUser?.email ?? '—'} />
               <Separator />
-              <InfoRow icon={<User className="h-4 w-4 text-violet-500" />} label="Téléphone" value={currentUser?.phone ?? 'Non renseigné'} />
+              <InfoRow icon={<User className="h-4 w-4 text-amber-500" />} label="Téléphone" value={currentUser?.phone ?? 'Non renseigné'} />
             </CardContent>
           </Card>
         </motion.div>
 
         {/* ─── CHANGE PASSWORD ─── */}
         <motion.div variants={itemVariants}>
-          <Card className="border-violet-100">
+          <Card className="border-amber-100">
             <CardHeader className="flex flex-row items-center gap-3 pb-3 px-4 pt-4">
-              <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-violet-100">
-                <KeyRound className="h-4.5 w-4.5 text-violet-600" />
+              <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-amber-100">
+                <KeyRound className="h-4.5 w-4.5 text-amber-600" />
               </div>
               <CardTitle className="text-sm sm:text-base font-semibold">
                 Changer le mot de passe
@@ -324,12 +324,12 @@ export function AdminSettingsView() {
                       placeholder="Saisissez l'ancien mot de passe"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="pr-10 h-11 text-sm border-violet-200 focus:border-violet-400"
+                      className="pr-10 h-11 text-sm border-amber-200 focus:border-amber-400"
                       disabled={pwLoading}
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-violet-600 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-amber-600 transition-colors"
                       onClick={() => setShowCurrentPw(!showCurrentPw)}
                       tabIndex={-1}
                       aria-label={showCurrentPw ? 'Masquer' : 'Afficher'}
@@ -351,12 +351,12 @@ export function AdminSettingsView() {
                       placeholder="Minimum 6 caractères"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="pr-10 h-11 text-sm border-violet-200 focus:border-violet-400"
+                      className="pr-10 h-11 text-sm border-amber-200 focus:border-amber-400"
                       disabled={pwLoading}
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-violet-600 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-amber-600 transition-colors"
                       onClick={() => setShowNewPw(!showNewPw)}
                       tabIndex={-1}
                       aria-label={showNewPw ? 'Masquer' : 'Afficher'}
@@ -387,14 +387,14 @@ export function AdminSettingsView() {
                         confirmPassword.length > 0 && confirmPassword !== newPassword
                           ? 'border-red-300 focus:border-red-400'
                           : confirmPassword.length > 0 && confirmPassword === newPassword
-                            ? 'border-emerald-300 focus:border-emerald-400'
-                            : 'border-violet-200 focus:border-violet-400'
+                            ? 'border-orange-300 focus:border-orange-400'
+                            : 'border-amber-200 focus:border-amber-400'
                       }`}
                       disabled={pwLoading}
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-violet-600 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-amber-600 transition-colors"
                       onClick={() => setShowConfirmPw(!showConfirmPw)}
                       tabIndex={-1}
                       aria-label={showConfirmPw ? 'Masquer' : 'Afficher'}
@@ -408,7 +408,7 @@ export function AdminSettingsView() {
                     </p>
                   )}
                   {confirmPassword.length > 0 && confirmPassword === newPassword && newPassword.length >= 6 && (
-                    <p className="text-[11px] text-emerald-600">
+                    <p className="text-[11px] text-orange-600">
                       Les mots de passe correspondent
                     </p>
                   )}
@@ -418,7 +418,7 @@ export function AdminSettingsView() {
               <Button
                 onClick={handleChangePassword}
                 disabled={pwLoading || !currentPassword || !newPassword || !confirmPassword}
-                className="w-full bg-violet-600 hover:bg-violet-700 text-white h-11"
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white h-11"
               >
                 {pwLoading ? (
                   <>
@@ -534,11 +534,11 @@ function StatBlock({
   label: string;
 }) {
   return (
-    <div className="bg-violet-50 rounded-xl p-3 text-center">
-      <div className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-violet-100 text-violet-600 mb-1.5 mx-auto">
+    <div className="bg-amber-50 rounded-xl p-3 text-center">
+      <div className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-amber-100 text-amber-600 mb-1.5 mx-auto">
         {icon}
       </div>
-      <p className="text-lg font-bold text-violet-700 leading-tight">
+      <p className="text-lg font-bold text-amber-700 leading-tight">
         {value}
       </p>
       <p className="text-xs text-muted-foreground mt-0.5">{label}</p>

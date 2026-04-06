@@ -330,14 +330,14 @@ export function AdminPharmaciesView() {
         {/* ── Header ── */}
         <ViewHeader
           title="Pharmacies"
-          icon={<Building2 className="h-5 w-5 text-violet-600" />}
+          icon={<Building2 className="h-5 w-5 text-amber-600" />}
           back={false}
           action={
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-violet-600 hover:bg-violet-50"
+                className="h-9 w-9 text-amber-600 hover:bg-amber-50"
                 onClick={() => setSearchOpen(!searchOpen)}
               >
                 {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
@@ -345,12 +345,12 @@ export function AdminPharmaciesView() {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`h-9 w-9 ${showFilters ? 'text-violet-600 bg-violet-50' : 'text-violet-600 hover:bg-violet-50'}`}
+                className={`h-9 w-9 ${showFilters ? 'text-amber-600 bg-amber-50' : 'text-amber-600 hover:bg-amber-50'}`}
                 onClick={() => setShowFilters(!showFilters)}
               >
                 <SlidersHorizontal className="h-5 w-5" />
                 {activeFilterCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-violet-600 text-white text-[10px] font-bold flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-amber-600 text-white text-[10px] font-bold flex items-center justify-center">
                     {activeFilterCount}
                   </span>
                 )}
@@ -375,7 +375,7 @@ export function AdminPharmaciesView() {
                   placeholder="Rechercher par nom, adresse..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-11 border-violet-200 focus:border-violet-400 bg-violet-50/30"
+                  className="pl-9 h-11 border-amber-200 focus:border-amber-400 bg-amber-50/30"
                 />
               </div>
             </motion.div>
@@ -392,15 +392,15 @@ export function AdminPharmaciesView() {
               transition={{ duration: 0.2 }}
               className="overflow-hidden mb-3"
             >
-              <div className="p-3 sm:p-4 bg-violet-50/50 rounded-xl border border-violet-100 space-y-3">
+              <div className="p-3 sm:p-4 bg-amber-50/50 rounded-xl border border-amber-100 space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide">
+                  <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
                     Filtres
                   </p>
                   {activeFilterCount > 0 && (
                     <button
                       onClick={clearFilters}
-                      className="text-[11px] text-violet-600 hover:text-violet-800 font-medium"
+                      className="text-[11px] text-amber-600 hover:text-amber-800 font-medium"
                     >
                       Réinitialiser
                     </button>
@@ -412,7 +412,7 @@ export function AdminPharmaciesView() {
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground">Ville</label>
                     <Select value={cityFilter} onValueChange={(v) => setCityFilter(v === '__all__' ? '' : v)}>
-                      <SelectTrigger className="w-full h-10 border-violet-200 bg-white text-sm">
+                      <SelectTrigger className="w-full h-10 border-amber-200 bg-white text-sm">
                         <SelectValue placeholder="Toutes les villes" />
                       </SelectTrigger>
                       <SelectContent>
@@ -429,7 +429,7 @@ export function AdminPharmaciesView() {
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground">Statut garde</label>
                     <Select value={guardFilter} onValueChange={(v) => setGuardFilter(v === '__all__' ? '' : v)}>
-                      <SelectTrigger className="w-full h-10 border-violet-200 bg-white text-sm">
+                      <SelectTrigger className="w-full h-10 border-amber-200 bg-white text-sm">
                         <SelectValue placeholder="Tous" />
                       </SelectTrigger>
                       <SelectContent>
@@ -458,7 +458,7 @@ export function AdminPharmaciesView() {
           )}
           {activeFilterCount > 0 && !showFilters && (
             <div className="flex items-center gap-1.5 ml-auto">
-              <Badge variant="secondary" className="text-[10px] px-2 py-0.5 bg-violet-100 text-violet-700 border-violet-200">
+              <Badge variant="secondary" className="text-[10px] px-2 py-0.5 bg-amber-100 text-amber-700 border-amber-200">
                 {activeFilterCount} filtre{activeFilterCount > 1 ? 's' : ''}
               </Badge>
             </div>
@@ -496,10 +496,10 @@ export function AdminPharmaciesView() {
 
         {/* ── Empty state ── */}
         {!loading && !error && pharmacies.length === 0 && (
-          <Card className="border-violet-100">
+          <Card className="border-amber-100">
             <CardContent className="p-8 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-violet-50 flex items-center justify-center mx-auto mb-3">
-                <Building2 className="h-7 w-7 text-violet-400" />
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mx-auto mb-3">
+                <Building2 className="h-7 w-7 text-amber-400" />
               </div>
               <h3 className="font-semibold text-sm mb-1">
                 {activeFilterCount > 0 ? 'Aucun résultat' : 'Aucune pharmacie'}
@@ -512,7 +512,7 @@ export function AdminPharmaciesView() {
               {activeFilterCount > 0 && (
                 <Button
                   variant="outline"
-                  className="border-violet-200 text-violet-700 hover:bg-violet-50"
+                  className="border-amber-200 text-amber-700 hover:bg-amber-50"
                   onClick={clearFilters}
                 >
                   Effacer les filtres
@@ -534,15 +534,15 @@ export function AdminPharmaciesView() {
                   transition={{ delay: index * 0.03 }}
                 >
                   <Card
-                    className="border-violet-100 hover:border-violet-300 hover:shadow-md transition-all cursor-pointer active:scale-[0.99]"
+                    className="border-amber-100 hover:border-amber-300 hover:shadow-md transition-all cursor-pointer active:scale-[0.99]"
                     onClick={() => openDetail(pharmacy)}
                   >
                     <CardContent className="p-3 sm:p-4">
                       {/* Row 1: Name + Badges */}
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                          <div className="w-9 h-9 rounded-xl bg-violet-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <Building2 className="h-4 w-4 text-violet-600" />
+                          <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Building2 className="h-4 w-4 text-amber-600" />
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="font-semibold text-sm truncate leading-tight">
@@ -573,7 +573,7 @@ export function AdminPharmaciesView() {
                               </Badge>
                             )}
                             {pharmacy.isPartner && (
-                              <Badge className="bg-violet-100 text-violet-700 border-violet-200 text-[10px] px-1.5 py-0">
+                              <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px] px-1.5 py-0">
                                 Partenaire
                               </Badge>
                             )}
@@ -590,7 +590,7 @@ export function AdminPharmaciesView() {
                       )}
 
                       {/* Row 3: Rating + Stats */}
-                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-violet-50 ml-[2.875rem]">
+                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-amber-50 ml-[2.875rem]">
                         <div className="flex items-center gap-2 min-w-0 flex-1 flex-wrap">
                           {/* Stars */}
                           <div className="flex items-center gap-0.5">
@@ -603,7 +603,7 @@ export function AdminPharmaciesView() {
                             </span>
                           </div>
 
-                          <span className="text-violet-200">|</span>
+                          <span className="text-amber-200">|</span>
 
                           {/* Phone */}
                           {pharmacy.phone && (
@@ -654,7 +654,7 @@ export function AdminPharmaciesView() {
             onPageChange={setPage}
             total={total}
             pageSize={PAGE_SIZE}
-            theme="violet"
+            theme="amber"
             className="mt-4"
           />
         )}
@@ -668,13 +668,13 @@ export function AdminPharmaciesView() {
         }
         setDetailOpen(open);
       }}>
-        <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-violet-200 max-h-[90dvh] flex flex-col">
-          <DialogHeader className="bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-4 text-white shrink-0">
+        <DialogContent className="sm:max-w-lg mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200 max-h-[90dvh] flex flex-col">
+          <DialogHeader className="bg-gradient-to-r from-amber-600 to-purple-600 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <Building2 className="h-5 w-5" />
               {selectedPharmacy?.name || 'Détail de la pharmacie'}
             </DialogTitle>
-            <DialogDescription className="text-violet-200 text-xs mt-1">
+            <DialogDescription className="text-amber-200 text-xs mt-1">
               Informations détaillées de la pharmacie
             </DialogDescription>
           </DialogHeader>
@@ -707,7 +707,7 @@ export function AdminPharmaciesView() {
                       </Badge>
                     )}
                     {selectedPharmacy.isPartner && (
-                      <Badge className="bg-violet-100 text-violet-700 border-violet-200 text-[11px] px-2 py-0.5">
+                      <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[11px] px-2 py-0.5">
                         Partenaire
                       </Badge>
                     )}
@@ -745,14 +745,14 @@ export function AdminPharmaciesView() {
                   </div>
 
                   {/* Contact info */}
-                  <Card className="border-violet-100">
+                  <Card className="border-amber-100">
                     <CardContent className="p-3 sm:p-4 space-y-2.5">
-                      <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide mb-2">
+                      <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
                         Informations de contact
                       </p>
 
                       <div className="flex items-start gap-2.5">
-                        <MapPin className="h-4 w-4 text-violet-500 mt-0.5 shrink-0" />
+                        <MapPin className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
                         <div className="min-w-0">
                           <p className="text-sm text-foreground break-words">{selectedPharmacy.address || '—'}</p>
                           <p className="text-xs text-muted-foreground">
@@ -763,21 +763,21 @@ export function AdminPharmaciesView() {
 
                       {selectedPharmacy.phone && (
                         <div className="flex items-center gap-2.5">
-                          <Phone className="h-4 w-4 text-violet-500 shrink-0" />
+                          <Phone className="h-4 w-4 text-amber-500 shrink-0" />
                           <p className="text-sm text-foreground">{selectedPharmacy.phone}</p>
                         </div>
                       )}
 
                       {selectedPharmacy.email && (
                         <div className="flex items-center gap-2.5">
-                          <Mail className="h-4 w-4 text-violet-500 shrink-0" />
+                          <Mail className="h-4 w-4 text-amber-500 shrink-0" />
                           <p className="text-sm text-foreground break-words">{selectedPharmacy.email}</p>
                         </div>
                       )}
 
                       {(selectedPharmacy.openTime || selectedPharmacy.closeTime) && (
                         <div className="flex items-center gap-2.5">
-                          <Clock className="h-4 w-4 text-violet-500 shrink-0" />
+                          <Clock className="h-4 w-4 text-amber-500 shrink-0" />
                           <p className="text-sm text-foreground">
                             {selectedPharmacy.isOpen24h
                               ? 'Ouvert 24h/24'
@@ -791,7 +791,7 @@ export function AdminPharmaciesView() {
                   {/* Description */}
                   {selectedPharmacy.description && (
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide">
+                      <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
                         Description
                       </p>
                       <p className="text-xs text-muted-foreground leading-relaxed">
@@ -802,37 +802,37 @@ export function AdminPharmaciesView() {
 
                   {/* Stats grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    <Card className="border-violet-100 bg-violet-50/30">
+                    <Card className="border-amber-100 bg-amber-50/30">
                       <CardContent className="p-3 text-center">
-                        <Package className="h-4 w-4 text-violet-600 mx-auto mb-1" />
-                        <p className="text-base font-bold text-violet-700">
+                        <Package className="h-4 w-4 text-amber-600 mx-auto mb-1" />
+                        <p className="text-base font-bold text-amber-700">
                           {selectedPharmacy.medicationCount}
                         </p>
                         <p className="text-[10px] text-muted-foreground">Médicaments</p>
                       </CardContent>
                     </Card>
-                    <Card className="border-violet-100 bg-violet-50/30">
+                    <Card className="border-amber-100 bg-amber-50/30">
                       <CardContent className="p-3 text-center">
-                        <ShoppingCart className="h-4 w-4 text-violet-600 mx-auto mb-1" />
-                        <p className="text-base font-bold text-violet-700">
+                        <ShoppingCart className="h-4 w-4 text-amber-600 mx-auto mb-1" />
+                        <p className="text-base font-bold text-amber-700">
                           {selectedPharmacy.orderCount}
                         </p>
                         <p className="text-[10px] text-muted-foreground">Commandes</p>
                       </CardContent>
                     </Card>
-                    <Card className="border-violet-100 bg-violet-50/30">
+                    <Card className="border-amber-100 bg-amber-50/30">
                       <CardContent className="p-3 text-center">
                         <Star className="h-4 w-4 text-amber-500 mx-auto mb-1" />
-                        <p className="text-base font-bold text-violet-700">
+                        <p className="text-base font-bold text-amber-700">
                           {selectedPharmacy.reviewCountTotal || selectedPharmacy.reviewCount || 0}
                         </p>
                         <p className="text-[10px] text-muted-foreground">Avis</p>
                       </CardContent>
                     </Card>
-                    <Card className="border-violet-100 bg-violet-50/30">
+                    <Card className="border-amber-100 bg-amber-50/30">
                       <CardContent className="p-3 text-center">
                         <Heart className="h-4 w-4 text-rose-500 mx-auto mb-1" />
-                        <p className="text-base font-bold text-violet-700">
+                        <p className="text-base font-bold text-amber-700">
                           {selectedPharmacy.favoriteCount}
                         </p>
                         <p className="text-[10px] text-muted-foreground">Favoris</p>
@@ -842,9 +842,9 @@ export function AdminPharmaciesView() {
 
                   {/* Stock summary */}
                   {selectedPharmacy.stockSummary && (
-                    <Card className="border-violet-100">
+                    <Card className="border-amber-100">
                       <CardContent className="p-3 sm:p-4 space-y-2">
-                        <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide">
+                        <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
                           Résumé du stock
                         </p>
                         <div className="grid grid-cols-3 gap-2">
@@ -855,7 +855,7 @@ export function AdminPharmaciesView() {
                             <p className="text-[10px] text-muted-foreground">Produits</p>
                           </div>
                           <div className="text-center">
-                            <p className="text-sm font-bold text-emerald-600">
+                            <p className="text-sm font-bold text-orange-600">
                               {selectedPharmacy.stockSummary.inStockCount}
                             </p>
                             <p className="text-[10px] text-muted-foreground">En stock</p>
@@ -874,7 +874,7 @@ export function AdminPharmaciesView() {
                   {/* Services */}
                   {parseServices(selectedPharmacy.services).length > 0 && (
                     <div className="space-y-1.5">
-                      <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide">
+                      <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
                         Services
                       </p>
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -882,7 +882,7 @@ export function AdminPharmaciesView() {
                           <Badge
                             key={service}
                             variant="outline"
-                            className="text-[10px] px-2 py-0.5 border-violet-200 text-violet-700"
+                            className="text-[10px] px-2 py-0.5 border-amber-200 text-amber-700"
                           >
                             {SERVICE_LABELS[service] || service}
                           </Badge>
@@ -894,7 +894,7 @@ export function AdminPharmaciesView() {
                   {/* Payment methods */}
                   {parsePaymentMethods(selectedPharmacy.paymentMethods).length > 0 && (
                     <div className="space-y-1.5">
-                      <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide">
+                      <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
                         Moyens de paiement
                       </p>
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -902,7 +902,7 @@ export function AdminPharmaciesView() {
                           <Badge
                             key={method}
                             variant="secondary"
-                            className="text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-700"
+                            className="text-[10px] px-2 py-0.5 bg-orange-50 text-orange-700"
                           >
                             {PAYMENT_LABELS[method] || method}
                           </Badge>
@@ -914,7 +914,7 @@ export function AdminPharmaciesView() {
                   {/* Parking info */}
                   {selectedPharmacy.parkingInfo && (
                     <div className="space-y-1.5">
-                      <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide">
+                      <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
                         Parking
                       </p>
                       <p className="text-xs text-muted-foreground">{selectedPharmacy.parkingInfo}</p>
@@ -924,7 +924,7 @@ export function AdminPharmaciesView() {
                   {/* GPS coordinates */}
                   {(selectedPharmacy.latitude || selectedPharmacy.longitude) && (
                     <div className="space-y-1.5">
-                      <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide">
+                      <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
                         Coordonnées GPS
                       </p>
                       <p className="text-xs font-mono text-muted-foreground">
@@ -934,7 +934,7 @@ export function AdminPharmaciesView() {
                   )}
 
                   {/* Dates */}
-                  <Separator className="bg-violet-100" />
+                  <Separator className="bg-amber-100" />
                   <div className="flex items-center gap-4 text-[10px] text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
@@ -951,10 +951,10 @@ export function AdminPharmaciesView() {
           </ScrollArea>
 
           {/* Dialog footer with delete button */}
-          <DialogFooter className="px-5 py-3 border-t border-violet-100 shrink-0 flex-row gap-2">
+          <DialogFooter className="px-5 py-3 border-t border-amber-100 shrink-0 flex-row gap-2">
             <Button
               variant="outline"
-              className="flex-1 border-violet-200 text-violet-700 hover:bg-violet-50"
+              className="flex-1 border-amber-200 text-amber-700 hover:bg-amber-50"
               onClick={() => setDetailOpen(false)}
             >
               Fermer

@@ -70,7 +70,6 @@ export async function GET(request: NextRequest) {
           _count: {
             select: {
               stocks: true,
-              orders: true,
               alternatives: true,
               genericOf: true,
             },
@@ -87,6 +86,18 @@ export async function GET(request: NextRequest) {
         where: { category: { not: null } },
       }),
     ]);
+
+    // Calculate order counts from OrderItem for each medication
+    const medicationIds = medications.map((m) => m.id);
+    const orderCounts = medicationIds.length > 0
+      ? await db.orderItem.groupBy({
+          by: ['medicationId'],
+          where: { medicationId: { in: medicationIds } },
+          _count: true,
+        })
+      : [];
+
+    const orderCountMap = new Map(orderCounts.map((oc) => [oc.medicationId, oc._count]));
 
     const categories = categoryRows.map((r) => r.category).filter(Boolean);
 
@@ -107,7 +118,7 @@ export async function GET(request: NextRequest) {
         createdAt: m.createdAt.toISOString(),
         updatedAt: m.updatedAt.toISOString(),
         pharmacyCount: m._count.stocks,
-        orderCount: m._count.orders,
+        orderCount: orderCountMap.get(m.id) || 0,
         alternativeCount: m._count.alternatives,
         genericCount: m._count.genericOf,
       })),

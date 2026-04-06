@@ -93,7 +93,7 @@ export function HomeView() {
         const uidParam = currentUserId ? `&userId=${currentUserId}` : '';
         const [guardRes, allPharmaciesRes, medsCountRes] = await Promise.all([
           fetch(`/api/pharmacies?isGuard=true&limit=5${uidParam}`),
-          fetch(`/api/pharmacies?limit=50${uidParam}`),
+          fetch(`/api/pharmacies?limit=500${uidParam}`),
           fetch('/api/medications?count=true'),
         ]);
         const guardResData = await guardRes.json();
@@ -105,11 +105,18 @@ export function HomeView() {
 
         setGuardPharmacies(guardData);
         setAllPharmacies(allData);
-        const cities = new Set(allData.map((p: any) => p.city));
+
+        // Get unique cities from all pharmacies (use pagination total if available)
+        const uniqueCities = new Set(allData.map((p: any) => p.city));
+        const pharmacyTotal = allPharmaciesResData.pagination?.total || allData.length;
+
+        // Estimate cities: if we received all pharmacies, use actual cities, otherwise estimate
+        const cityCount = pharmacyTotal === allData.length ? uniqueCities.size : Math.ceil(uniqueCities.size * (pharmacyTotal / allData.length));
+
         setStats({
-          pharmacies: allData.length,
+          pharmacies: pharmacyTotal,
           medications: medsCountData.total || 0,
-          cities: cities.size,
+          cities: cityCount,
         });
       } catch (error) {
         logger.error('Error fetching home data:', error);
@@ -166,7 +173,7 @@ export function HomeView() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 text-white px-4 sm:px-6 pt-5 sm:pt-6 pb-7 sm:pb-8 rounded-b-3xl"
+        className="bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 text-white px-4 sm:px-6 pt-5 sm:pt-6 pb-7 sm:pb-8 rounded-b-3xl"
       >
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-3 mb-3 sm:mb-4">
@@ -175,21 +182,21 @@ export function HomeView() {
             </div>
             <div>
               <h1 className="text-lg font-bold">Pharma CI</h1>
-              <p className="text-emerald-200 text-xs">Côte d&apos;Ivoire</p>
+              <p className="text-amber-200 text-xs">Côte d&apos;Ivoire</p>
             </div>
           </div>
 
           <h2 className="text-xl sm:text-2xl font-bold mb-1 leading-tight">
             Trouvez vos médicaments
           </h2>
-          <p className="text-emerald-200 text-xs sm:text-sm mb-4 sm:mb-5">
+          <p className="text-amber-200 text-xs sm:text-sm mb-4 sm:mb-5">
             Pharmacies de garde, disponibilités et prix en temps réel
           </p>
 
           {/* Search Input */}
           <div className="relative">
             <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-3 shadow-sm">
-              <Search className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+              <Search className="h-4 w-4 text-amber-600 flex-shrink-0" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -229,7 +236,7 @@ export function HomeView() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.97 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-emerald-100 z-50 overflow-hidden"
+                  className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-amber-100 z-50 overflow-hidden"
                 >
                   {searchLoading ? (
                     <div className="p-4 space-y-3">
@@ -242,9 +249,9 @@ export function HomeView() {
                     <div className="max-h-72 overflow-y-auto">
                       {/* Medications */}
                       {searchResults.medications.length > 0 && (
-                        <div className="border-b border-emerald-50">
+                        <div className="border-b border-amber-50">
                           <div className="px-4 pt-3 pb-1.5">
-                            <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wide flex items-center gap-1">
+                            <span className="text-[11px] font-semibold text-amber-600 uppercase tracking-wide flex items-center gap-1">
                               <Pill className="h-3 w-3" /> Médicaments
                             </span>
                           </div>
@@ -252,10 +259,10 @@ export function HomeView() {
                             <button
                               key={med.id}
                               onClick={() => handleMedicationClick(med.id)}
-                              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-emerald-50 transition-colors text-left"
+                              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-amber-50 transition-colors text-left"
                             >
-                              <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                                <Pill className="h-4 w-4 text-emerald-600" />
+                              <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                                <Pill className="h-4 w-4 text-amber-600" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-gray-800 truncate">{med.commercialName || med.name}</p>
@@ -271,7 +278,7 @@ export function HomeView() {
                       {searchResults.pharmacies.length > 0 && (
                         <div>
                           <div className="px-4 pt-3 pb-1.5">
-                            <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wide flex items-center gap-1">
+                            <span className="text-[11px] font-semibold text-amber-600 uppercase tracking-wide flex items-center gap-1">
                               <Building2 className="h-3 w-3" /> Pharmacies
                             </span>
                           </div>
@@ -279,7 +286,7 @@ export function HomeView() {
                             <button
                               key={pharma.id}
                               onClick={() => handlePharmacyClick(pharma.id)}
-                              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-emerald-50 transition-colors text-left"
+                              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-amber-50 transition-colors text-left"
                             >
                               <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
                                 <Building2 className="h-4 w-4 text-indigo-600" />
@@ -295,10 +302,10 @@ export function HomeView() {
                       )}
 
                       {/* See all results link */}
-                      <div className="border-t border-emerald-100">
+                      <div className="border-t border-amber-100">
                         <button
                           onClick={goToFullSearch}
-                          className="w-full flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-medium text-emerald-600 hover:bg-emerald-50 transition-colors"
+                          className="w-full flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-medium text-amber-600 hover:bg-amber-50 transition-colors"
                         >
                           Voir tous les résultats
                           <ArrowRight className="h-3 w-3" />
@@ -326,7 +333,7 @@ export function HomeView() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-sm border border-emerald-100 p-3 sm:p-4 grid grid-cols-3 gap-2 sm:gap-3"
+          className="bg-white rounded-2xl shadow-sm border border-amber-100 p-3 sm:p-4 grid grid-cols-3 gap-2 sm:gap-3"
         >
           {loading ? (
             <div className="space-y-2">
@@ -338,23 +345,23 @@ export function HomeView() {
             <>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <Building2 className="h-5 w-5 text-emerald-600" />
+                  <Building2 className="h-5 w-5 text-amber-600" />
                 </div>
-                <p className="text-xl font-bold text-emerald-700">{stats.pharmacies}</p>
+                <p className="text-xl font-bold text-amber-700">{stats.pharmacies}</p>
                 <p className="text-[11px] text-muted-foreground">Pharmacies</p>
               </div>
-              <div className="text-center border-x border-emerald-100">
+              <div className="text-center border-x border-amber-100">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <Pill className="h-5 w-5 text-emerald-600" />
+                  <Pill className="h-5 w-5 text-amber-600" />
                 </div>
-                <p className="text-xl font-bold text-emerald-700">{stats.medications}</p>
+                <p className="text-xl font-bold text-amber-700">{stats.medications}</p>
                 <p className="text-[11px] text-muted-foreground">Médicaments</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <MapPin className="h-5 w-5 text-emerald-600" />
+                  <MapPin className="h-5 w-5 text-amber-600" />
                 </div>
-                <p className="text-xl font-bold text-emerald-700">{stats.cities}</p>
+                <p className="text-xl font-bold text-amber-700">{stats.cities}</p>
                 <p className="text-[11px] text-muted-foreground">Villes</p>
               </div>
             </>
@@ -377,7 +384,7 @@ export function HomeView() {
                 requestLocation();
                 setCurrentView('map');
               }}
-              className="text-xs text-indigo-600 flex items-center gap-0.5 hover:underline"
+              className="text-xs text-amber-500 flex items-center gap-0.5 hover:underline"
             >
               Voir la carte <ChevronRight className="h-3 w-3" />
             </button>
@@ -396,7 +403,7 @@ export function HomeView() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-emerald-100 p-4 text-center">
+            <div className="bg-white rounded-xl border border-amber-100 p-4 text-center">
               {loading ? (
                 <div className="space-y-2">
                   <Skeleton className="h-16 w-full rounded-lg" />
@@ -405,7 +412,7 @@ export function HomeView() {
               ) : (
                 <>
                   <div className="flex justify-center mb-2">
-                    <MapPin className="w-10 h-10 text-emerald-600" />
+                    <MapPin className="w-10 h-10 text-amber-600" />
                   </div>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-3">
                     Activez votre GPS pour voir les pharmacies les plus proches
@@ -464,7 +471,7 @@ export function HomeView() {
         >
           <div className="flex items-center justify-between mb-2 sm:mb-3">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
               <h3 className="font-semibold text-sm text-foreground">Meilleures pharmacies</h3>
             </div>
           </div>

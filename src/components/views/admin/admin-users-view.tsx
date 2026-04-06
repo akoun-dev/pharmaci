@@ -81,9 +81,9 @@ type RoleTab = 'all' | 'patient' | 'pharmacist' | 'admin';
 const ROLE_CONFIG: Record<string, { label: string; className: string; avatarBg: string; avatarText: string }> = {
   patient: {
     label: 'Patient',
-    className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    avatarBg: 'bg-emerald-100',
-    avatarText: 'text-emerald-700',
+    className: 'bg-orange-100 text-orange-700 border-orange-200',
+    avatarBg: 'bg-orange-100',
+    avatarText: 'text-orange-700',
   },
   pharmacist: {
     label: 'Pharmacien',
@@ -93,9 +93,9 @@ const ROLE_CONFIG: Record<string, { label: string; className: string; avatarBg: 
   },
   admin: {
     label: 'Admin',
-    className: 'bg-violet-100 text-violet-700 border-violet-200',
-    avatarBg: 'bg-violet-100',
-    avatarText: 'text-violet-700',
+    className: 'bg-amber-100 text-amber-700 border-amber-200',
+    avatarBg: 'bg-amber-100',
+    avatarText: 'text-amber-700',
   },
 };
 
@@ -107,7 +107,7 @@ const ROLE_TABS: { key: RoleTab; label: string }[] = [
 ];
 
 const AVATAR_COLORS = [
-  { bg: 'bg-violet-100', text: 'text-violet-700' },
+  { bg: 'bg-amber-100', text: 'text-amber-700' },
   { bg: 'bg-purple-100', text: 'text-purple-700' },
   { bg: 'bg-fuchsia-100', text: 'text-fuchsia-700' },
   { bg: 'bg-pink-100', text: 'text-pink-700' },
@@ -335,7 +335,7 @@ export function AdminUsersView() {
   if (error) {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
-        <ViewHeader title="Utilisateurs" icon={<Users className="h-5 w-5 text-violet-600" />} />
+        <ViewHeader title="Utilisateurs" icon={<Users className="h-5 w-5 text-amber-600" />} />
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-10 w-10 text-red-400 mx-auto mb-3" />
@@ -344,7 +344,7 @@ export function AdminUsersView() {
             <Button
               onClick={handleRefresh}
               variant="outline"
-              className="border-violet-200 text-violet-700 hover:bg-violet-50"
+              className="border-amber-200 text-amber-700 hover:bg-amber-50"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
@@ -360,7 +360,7 @@ export function AdminUsersView() {
       {/* Header */}
       <ViewHeader
         title="Utilisateurs"
-        icon={<Users className="h-5 w-5 text-violet-600" />}
+        icon={<Users className="h-5 w-5 text-amber-600" />}
         action={
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">
@@ -369,7 +369,7 @@ export function AdminUsersView() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-violet-600"
+              className="h-8 w-8 text-muted-foreground hover:text-amber-600"
               onClick={handleRefresh}
               disabled={refreshing}
             >
@@ -387,7 +387,7 @@ export function AdminUsersView() {
             placeholder="Rechercher par nom ou email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-10 text-sm border-violet-200 focus:border-violet-400"
+            className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400"
           />
         </div>
       </div>
@@ -403,8 +403,8 @@ export function AdminUsersView() {
               onClick={() => setActiveTab(tab.key)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                 isActive
-                  ? 'bg-violet-600 text-white shadow-sm'
-                  : 'bg-violet-50 text-violet-700 hover:bg-violet-100'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
               }`}
             >
               {tab.key === 'patient' && <Users className="h-3 w-3" />}
@@ -413,7 +413,7 @@ export function AdminUsersView() {
               {tab.label}
               <span
                 className={`text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-violet-100 text-violet-600'
+                  isActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-600'
                 }`}
               >
                 {count}
@@ -425,9 +425,9 @@ export function AdminUsersView() {
 
       {/* Users list */}
       {users.length === 0 ? (
-        <Card className="border-violet-100">
+        <Card className="border-amber-100">
           <CardContent className="p-8 text-center">
-            <Inbox className="h-10 w-10 text-violet-300 mx-auto mb-3" />
+            <Inbox className="h-10 w-10 text-amber-300 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">
               {searchQuery
                 ? 'Aucun résultat'
@@ -467,7 +467,7 @@ export function AdminUsersView() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.03 }}
                 >
-                  <Card className="border-violet-100 hover:border-violet-300 transition-colors overflow-hidden">
+                  <Card className="border-amber-100 hover:border-amber-300 transition-colors overflow-hidden">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
                         {/* Avatar */}
@@ -544,7 +544,7 @@ export function AdminUsersView() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 text-muted-foreground hover:text-violet-600 hover:bg-violet-50"
+                                className="h-8 w-8 text-muted-foreground hover:text-amber-600 hover:bg-amber-50"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
@@ -589,7 +589,7 @@ export function AdminUsersView() {
             variant="outline"
             onClick={handleLoadMore}
             disabled={loadingMore}
-            className="border-violet-200 text-violet-700 hover:bg-violet-50 px-6"
+            className="border-amber-200 text-amber-700 hover:bg-amber-50 px-6"
           >
             {loadingMore ? (
               <>
@@ -614,13 +614,13 @@ export function AdminUsersView() {
           setEditDialogOpen(open);
         }}
       >
-        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-violet-200">
-          <DialogHeader className="bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-4 text-white shrink-0">
+        <DialogContent className="sm:max-w-md mx-auto p-0 gap-0 overflow-hidden rounded-2xl border-amber-200">
+          <DialogHeader className="bg-gradient-to-r from-amber-600 to-purple-600 px-5 py-4 text-white shrink-0">
             <DialogTitle className="text-base flex items-center gap-2">
               <UserCog className="h-5 w-5" />
               Modifier le rôle
             </DialogTitle>
-            <DialogDescription className="text-violet-200 text-xs mt-1">
+            <DialogDescription className="text-amber-200 text-xs mt-1">
               {editUser
                 ? `Changer le rôle de ${editUser.name}`
                 : 'Sélectionnez un nouveau rôle'}
@@ -630,7 +630,7 @@ export function AdminUsersView() {
           <div className="p-5 space-y-4">
             {/* User info */}
             {editUser && (
-              <div className="flex items-center gap-3 p-3 bg-violet-50 rounded-lg">
+              <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center ${getAvatarColor(editUser.name).bg}`}
                 >
@@ -663,13 +663,13 @@ export function AdminUsersView() {
                 Nouveau rôle
               </label>
               <Select value={newRole} onValueChange={setNewRole}>
-                <SelectTrigger className="h-11 border-violet-200 focus:border-violet-400">
+                <SelectTrigger className="h-11 border-amber-200 focus:border-amber-400">
                   <SelectValue placeholder="Sélectionner un rôle" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="patient">
                     <span className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-emerald-600" />
+                      <Users className="h-4 w-4 text-orange-600" />
                       Patient
                     </span>
                   </SelectItem>
@@ -681,7 +681,7 @@ export function AdminUsersView() {
                   </SelectItem>
                   <SelectItem value="admin">
                     <span className="flex items-center gap-2">
-                      <UserCog className="h-4 w-4 text-violet-600" />
+                      <UserCog className="h-4 w-4 text-amber-600" />
                       Administrateur
                     </span>
                   </SelectItem>
@@ -706,14 +706,14 @@ export function AdminUsersView() {
                 variant="outline"
                 onClick={() => setEditDialogOpen(false)}
                 disabled={saving}
-                className="flex-1 h-11 border-violet-200 text-violet-700 hover:bg-violet-50"
+                className="flex-1 h-11 border-amber-200 text-amber-700 hover:bg-amber-50"
               >
                 Annuler
               </Button>
               <Button
                 onClick={handleSaveRole}
                 disabled={saving || !newRole || newRole === editUser?.role}
-                className="flex-1 h-11 bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-40"
+                className="flex-1 h-11 bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-40"
               >
                 {saving ? (
                   <>

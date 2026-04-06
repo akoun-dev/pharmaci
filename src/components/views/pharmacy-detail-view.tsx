@@ -230,8 +230,8 @@ export function PharmacyDetailView() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="overflow-hidden border-emerald-100">
-            <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 px-3 sm:px-4 py-3 sm:py-4">
+          <Card className="overflow-hidden border-amber-100">
+            <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-3 sm:px-4 py-3 sm:py-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
@@ -245,7 +245,7 @@ export function PharmacyDetailView() {
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
                     <RatingStars rating={pharmacy.rating} size={12} />
-                    <span className="text-emerald-200 text-[11px] sm:text-xs">
+                    <span className="text-amber-200 text-[11px] sm:text-xs">
                       {pharmacy.rating.toFixed(1)} ({pharmacy.reviewCount} avis)
                     </span>
                   </div>
@@ -272,7 +272,7 @@ export function PharmacyDetailView() {
                 </div>
                 <div className="flex items-center gap-2 text-xs sm:text-sm">
                   <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <a href={`tel:${pharmacy.phone}`} className="text-emerald-600 hover:underline">
+                  <a href={`tel:${pharmacy.phone}`} className="text-amber-600 hover:underline">
                     {pharmacy.phone}
                   </a>
                 </div>
@@ -287,7 +287,7 @@ export function PharmacyDetailView() {
                     variant="outline"
                     className={`text-[10px] ${
                       open
-                        ? 'border-emerald-300 text-emerald-700 bg-emerald-50'
+                        ? 'border-amber-300 text-amber-700 bg-amber-50'
                         : 'border-red-300 text-red-700 bg-red-50'
                     }`}
                   >
@@ -303,7 +303,7 @@ export function PharmacyDetailView() {
                     <Badge
                       key={s}
                       variant="secondary"
-                      className="text-[10px] bg-emerald-50 text-emerald-700 capitalize"
+                      className="text-[10px] bg-amber-50 text-amber-700 capitalize"
                     >
                       {s}
                     </Badge>
@@ -329,20 +329,20 @@ export function PharmacyDetailView() {
             transition={{ delay: 0.08 }}
             className="mt-3 sm:mt-4"
           >
-            <Card className="border-emerald-100">
+            <Card className="border-amber-100">
               <CardContent className="p-3 sm:p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                  <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                   <h3 className="font-semibold text-sm">Infos pratiques</h3>
                 </div>
 
                 {/* Parking info */}
                 {pharmacy.parkingInfo && (
-                  <div className="flex items-start gap-2 bg-emerald-50 rounded-lg p-2.5 sm:p-3">
-                    <ParkingCircle className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-2 bg-amber-50 rounded-lg p-2.5 sm:p-3">
+                    <ParkingCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-[11px] sm:text-xs font-medium text-emerald-800">Parking</p>
-                      <p className="text-[11px] sm:text-xs text-emerald-700 mt-0.5 break-words">{pharmacy.parkingInfo}</p>
+                      <p className="text-[11px] sm:text-xs font-medium text-amber-800">Parking</p>
+                      <p className="text-[11px] sm:text-xs text-amber-700 mt-0.5 break-words">{pharmacy.parkingInfo}</p>
                     </div>
                   </div>
                 )}
@@ -369,7 +369,7 @@ export function PharmacyDetailView() {
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <Pill className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+              <Pill className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
               <h2 className="font-semibold text-sm">Médicaments disponibles</h2>
             </div>
             <Badge variant="secondary" className="text-[10px] sm:text-xs">
@@ -381,7 +381,7 @@ export function PharmacyDetailView() {
             {displayedMeds.map((stock) => (
               <Card
                 key={stock.id}
-                className="overflow-hidden border-emerald-100 cursor-pointer hover:border-emerald-300 transition-colors"
+                className="overflow-hidden border-amber-100 cursor-pointer hover:border-amber-300 transition-colors"
                 onClick={() => handleMedicationClick(stock.medication.id)}
               >
                 <CardContent className="p-3">
@@ -390,7 +390,7 @@ export function PharmacyDetailView() {
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-medium text-sm">{stock.medication.name}</span>
                         {stock.inStock ? (
-                          <Badge className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 h-4">
+                          <Badge className="bg-amber-100 text-amber-700 text-[10px] px-1.5 h-4">
                             En stock
                           </Badge>
                         ) : (
@@ -404,7 +404,7 @@ export function PharmacyDetailView() {
                       </p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="font-semibold text-sm text-emerald-700">
+                      <p className="font-semibold text-sm text-amber-700">
                         {stock.price.toLocaleString()} FCFA
                       </p>
                       {stock.inStock && (
@@ -420,7 +420,7 @@ export function PharmacyDetailView() {
           {pharmacy.stocks.length > 5 && (
             <Button
               variant="ghost"
-              className="w-full mt-2 text-emerald-600 text-xs sm:text-sm"
+              className="w-full mt-2 text-amber-600 text-xs sm:text-sm"
               onClick={() => setShowAllMedications(!showAllMedications)}
             >
               {showAllMedications ? (
@@ -447,13 +447,13 @@ export function PharmacyDetailView() {
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+              <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
               <h2 className="font-semibold text-sm">Avis ({pharmacy.reviews.length})</h2>
             </div>
             <Button
               variant="outline"
               size="sm"
-              className="text-xs border-emerald-200 text-emerald-700"
+              className="text-xs border-amber-200 text-amber-700"
               onClick={() => setShowReviewForm(!showReviewForm)}
             >
               Écrire un avis
@@ -462,7 +462,7 @@ export function PharmacyDetailView() {
 
           {/* Review Form */}
           {showReviewForm && (
-            <Card className="mb-2 sm:mb-3 border-emerald-100">
+            <Card className="mb-2 sm:mb-3 border-amber-100">
               <CardContent className="p-3 sm:p-4 space-y-3">
                 <div>
                   <label className="text-xs text-muted-foreground mb-1 block">Votre note</label>
@@ -491,7 +491,7 @@ export function PharmacyDetailView() {
                   <Button
                     onClick={handleSubmitReview}
                     disabled={submittingReview || !newReviewComment}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="bg-amber-600 hover:bg-amber-700 text-white"
                     size="sm"
                   >
                     {submittingReview ? 'Publication...' : 'Publier'}
@@ -510,11 +510,11 @@ export function PharmacyDetailView() {
 
           {/* Rating breakdown */}
           {pharmacy.reviews.length > 0 && (
-            <Card className="mb-2 sm:mb-3 border-emerald-100">
+            <Card className="mb-2 sm:mb-3 border-amber-100">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="text-center flex-shrink-0">
-                    <p className="text-2xl sm:text-3xl font-bold text-emerald-700">{pharmacy.rating.toFixed(1)}</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-amber-700">{pharmacy.rating.toFixed(1)}</p>
                     <RatingStars rating={pharmacy.rating} size={12} />
                     <p className="text-[10px] text-muted-foreground mt-1">
                       {pharmacy.reviews.length} avis
@@ -543,7 +543,7 @@ export function PharmacyDetailView() {
           {/* Review list */}
           <div className="space-y-2">
             {displayedReviews.map((review) => (
-              <Card key={review.id} className="border-emerald-100">
+              <Card key={review.id} className="border-amber-100">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between mb-1 gap-2">
                     <span className="font-medium text-sm truncate">{review.user.name}</span>
@@ -563,7 +563,7 @@ export function PharmacyDetailView() {
           {pharmacy.reviews.length > 3 && (
             <Button
               variant="ghost"
-              className="w-full mt-2 text-emerald-600 text-xs sm:text-sm"
+              className="w-full mt-2 text-amber-600 text-xs sm:text-sm"
               onClick={() => setShowAllReviews(!showAllReviews)}
             >
               {showAllReviews ? (
@@ -587,7 +587,7 @@ export function PharmacyDetailView() {
         <div className="max-w-5xl mx-auto grid grid-cols-2 gap-2">
           <a
             href={`tel:${pharmacy.phone}`}
-            className="flex items-center justify-center gap-2 h-11 sm:h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-lg shadow-emerald-600/30 font-semibold text-sm transition-colors"
+            className="flex items-center justify-center gap-2 h-11 sm:h-12 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl shadow-lg shadow-amber-600/30 font-semibold text-sm transition-colors"
           >
             <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
             Appeler

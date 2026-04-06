@@ -129,11 +129,11 @@ function RatingDistributionBar({ distribution }: { distribution: RatingDistribut
   const avg = totalRatings > 0 ? (sumRating / totalRatings).toFixed(1) : '0.0';
 
   return (
-    <Card className="border-violet-100 mb-4">
+    <Card className="border-amber-100 mb-4">
       <CardContent className="p-3 sm:p-4">
         <div className="flex items-center gap-4 mb-3">
           <div className="text-center">
-            <p className="text-2xl font-bold text-violet-700">{avg}</p>
+            <p className="text-2xl font-bold text-amber-700">{avg}</p>
             <StarRating rating={Math.round(Number(avg))} size="md" />
             <p className="text-[11px] text-muted-foreground mt-0.5">{totalRatings} avis</p>
           </div>
@@ -152,7 +152,7 @@ function RatingDistributionBar({ distribution }: { distribution: RatingDistribut
                       transition={{ duration: 0.6, delay: (5 - star) * 0.08 }}
                       className={`h-full rounded-full ${
                         star >= 4
-                          ? 'bg-emerald-400'
+                          ? 'bg-orange-400'
                           : star === 3
                             ? 'bg-amber-400'
                             : 'bg-red-400'
@@ -392,7 +392,7 @@ export function AdminReviewsView() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
         <ViewHeader
           title="Gestion des avis"
-          icon={<Star className="h-5 w-5 text-violet-600" />}
+          icon={<Star className="h-5 w-5 text-amber-600" />}
         />
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
@@ -402,7 +402,7 @@ export function AdminReviewsView() {
             <Button
               onClick={handleRefresh}
               variant="outline"
-              className="border-violet-200 text-violet-700 hover:bg-violet-50"
+              className="border-amber-200 text-amber-700 hover:bg-amber-50"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
@@ -418,16 +418,16 @@ export function AdminReviewsView() {
       {/* ── Header ── */}
       <ViewHeader
         title="Gestion des avis"
-        icon={<Star className="h-5 w-5 text-violet-600" />}
+        icon={<Star className="h-5 w-5 text-amber-600" />}
         action={
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs bg-violet-100 text-violet-700">
+            <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">
               {total}
             </Badge>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-violet-600"
+              className="h-8 w-8 text-muted-foreground hover:text-amber-600"
               onClick={handleRefresh}
               disabled={refreshing}
             >
@@ -449,7 +449,7 @@ export function AdminReviewsView() {
               placeholder="Rechercher par patient, pharmacie..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-10 text-sm border-violet-200 focus:border-violet-400"
+              className="pl-9 h-10 text-sm border-amber-200 focus:border-amber-400"
             />
           </div>
           <Button
@@ -457,8 +457,8 @@ export function AdminReviewsView() {
             size="icon"
             className={`h-10 w-10 shrink-0 ${
               showFilters
-                ? 'border-violet-300 bg-violet-50 text-violet-700'
-                : 'border-violet-200'
+                ? 'border-amber-300 bg-amber-50 text-amber-700'
+                : 'border-amber-200'
             }`}
             onClick={() => setShowFilters(!showFilters)}
           >
@@ -488,8 +488,8 @@ export function AdminReviewsView() {
                         onClick={() => setReplyFilter(opt.key)}
                         className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 ${
                           isActive
-                            ? 'bg-violet-600 text-white shadow-sm'
-                            : 'bg-violet-50 text-violet-700 hover:bg-violet-100'
+                            ? 'bg-amber-600 text-white shadow-sm'
+                            : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
                         }`}
                       >
                         {opt.label}
@@ -525,8 +525,8 @@ export function AdminReviewsView() {
               onClick={() => setActiveRating(tab.key)}
               className={`flex items-center gap-1 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
                 isActive
-                  ? 'bg-violet-600 text-white shadow-sm'
-                  : 'bg-violet-50 text-violet-700 hover:bg-violet-100'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
               }`}
             >
               {tab.label}
@@ -537,9 +537,9 @@ export function AdminReviewsView() {
 
       {/* ── Reviews list ── */}
       {reviews.length === 0 ? (
-        <Card className="border-violet-100">
+        <Card className="border-amber-100">
           <CardContent className="p-8 text-center">
-            <Inbox className="h-10 w-10 text-violet-300 mx-auto mb-3" />
+            <Inbox className="h-10 w-10 text-amber-300 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">
               {hasActiveFilters ? 'Aucun avis trouvé' : 'Aucun avis'}
             </h3>
@@ -567,13 +567,13 @@ export function AdminReviewsView() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.03 }}
               >
-                <Card className="border-violet-100 overflow-hidden hover:border-violet-300 transition-colors duration-150">
+                <Card className="border-amber-100 overflow-hidden hover:border-amber-300 transition-colors duration-150">
                   <CardContent className="p-4 space-y-2.5">
                     {/* Top row: User + Rating + Actions */}
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-semibold text-violet-700">
+                        <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs font-semibold text-amber-700">
                             {review.user.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -602,10 +602,10 @@ export function AdminReviewsView() {
 
                     {/* Reply (if any) */}
                     {review.reply && (
-                      <div className="bg-violet-50 border border-violet-100 rounded-lg p-3 space-y-1.5">
+                      <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 space-y-1.5">
                         <div className="flex items-center gap-1.5">
-                          <Reply className="h-3.5 w-3.5 text-violet-600" />
-                          <span className="text-xs font-semibold text-violet-700">
+                          <Reply className="h-3.5 w-3.5 text-amber-600" />
+                          <span className="text-xs font-semibold text-amber-700">
                             Réponse de la pharmacie
                           </span>
                         </div>
@@ -623,7 +623,7 @@ export function AdminReviewsView() {
                     )}
 
                     {/* Footer */}
-                    <div className="border-t border-violet-100/80 flex items-center justify-between">
+                    <div className="border-t border-amber-100/80 flex items-center justify-between">
                       <span className="text-[11px] text-muted-foreground pt-2">
                         {formatRelativeTime(review.createdAt)}
                       </span>
@@ -632,7 +632,7 @@ export function AdminReviewsView() {
                         {review.reply ? (
                           <Badge
                             variant="outline"
-                            className="text-[10px] px-2 py-0 border-emerald-200 bg-emerald-50 text-emerald-700"
+                            className="text-[10px] px-2 py-0 border-orange-200 bg-orange-50 text-orange-700"
                           >
                             <Reply className="h-2.5 w-2.5 mr-1" />
                             Répondu
@@ -651,7 +651,7 @@ export function AdminReviewsView() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-violet-600 hover:bg-violet-50"
+                          className="h-8 w-8 text-muted-foreground hover:text-amber-600 hover:bg-amber-50"
                           onClick={() => openDetail(review)}
                           aria-label="Voir / Répondre"
                         >
@@ -689,14 +689,14 @@ export function AdminReviewsView() {
         onPageChange={goToPage}
         total={total}
         pageSize={PAGE_SIZE}
-        theme="violet"
+        theme="amber"
       />
 
       {/* ── Delete Confirmation Dialog ── */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         {deleteTarget && (
           <>
-            <AlertDialogContent className="sm:max-w-md rounded-2xl border-violet-200">
+            <AlertDialogContent className="sm:max-w-md rounded-2xl border-amber-200">
               <AlertDialogHeader>
                 <div className="flex items-center gap-3 mb-1">
                   <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
@@ -715,8 +715,8 @@ export function AdminReviewsView() {
 
               <div className="bg-gray-50 rounded-lg p-3 my-2 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-violet-50 flex items-center justify-center">
-                    <span className="text-[10px] font-semibold text-violet-700">
+                  <div className="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center">
+                    <span className="text-[10px] font-semibold text-amber-700">
                       {deleteTarget.user.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -734,7 +734,7 @@ export function AdminReviewsView() {
 
               <AlertDialogFooter className="flex-row gap-2 sm:justify-end">
                 <AlertDialogCancel
-                  className="flex-1 sm:flex-none border-violet-200 text-violet-700 hover:bg-violet-50 mt-0"
+                  className="flex-1 sm:flex-none border-amber-200 text-amber-700 hover:bg-amber-50 mt-0"
                   disabled={deleting}
                 >
                   Annuler
@@ -765,10 +765,10 @@ export function AdminReviewsView() {
       {/* ── Detail / Reply Dialog ── */}
       <Dialog open={!!detailReview} onOpenChange={(open) => !open && setDetailReview(null)}>
         {detailReview && (
-          <DialogContent className="sm:max-w-lg rounded-2xl border-violet-200 max-h-[85dvh] overflow-y-auto">
+          <DialogContent className="sm:max-w-lg rounded-2xl border-amber-200 max-h-[85dvh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-base">
-                <Eye className="h-4.5 w-4.5 text-violet-600" />
+                <Eye className="h-4.5 w-4.5 text-amber-600" />
                 Détail de l&apos;avis
               </DialogTitle>
               <DialogDescription className="text-xs">
@@ -780,8 +780,8 @@ export function AdminReviewsView() {
               {/* Review author & pharmacy */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-violet-50 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-semibold text-violet-700">
+                  <div className="w-9 h-9 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-semibold text-amber-700">
                       {detailReview.user.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -808,7 +808,7 @@ export function AdminReviewsView() {
                   variant="outline"
                   className={`text-[10px] px-2 py-0 ${
                     detailReview.rating >= 4
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                      ? 'border-orange-200 bg-orange-50 text-orange-700'
                       : detailReview.rating === 3
                         ? 'border-amber-200 bg-amber-50 text-amber-700'
                         : 'border-red-200 bg-red-50 text-red-700'
@@ -825,10 +825,10 @@ export function AdminReviewsView() {
 
               {/* Existing reply */}
               {detailReview.reply && (
-                <div className="bg-violet-50 border border-violet-100 rounded-lg p-3 space-y-1.5">
+                <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 space-y-1.5">
                   <div className="flex items-center gap-1.5">
-                    <Reply className="h-3.5 w-3.5 text-violet-600" />
-                    <span className="text-xs font-semibold text-violet-700">
+                    <Reply className="h-3.5 w-3.5 text-amber-600" />
+                    <span className="text-xs font-semibold text-amber-700">
                       Réponse de la pharmacie
                     </span>
                     {detailReview.replyAt && (
@@ -850,7 +850,7 @@ export function AdminReviewsView() {
                   placeholder="Votre réponse..."
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-                  className="min-h-[80px] text-sm border-violet-200 focus:border-violet-400 resize-none"
+                  className="min-h-[80px] text-sm border-amber-200 focus:border-amber-400 resize-none"
                   disabled={replySending}
                 />
                 <div className="flex justify-end gap-2">
@@ -858,7 +858,7 @@ export function AdminReviewsView() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-violet-200 text-violet-700 hover:bg-violet-50 text-xs"
+                      className="border-amber-200 text-amber-700 hover:bg-amber-50 text-xs"
                       onClick={() => setReplyText(detailReview.reply || '')}
                       disabled={replySending}
                     >
@@ -867,7 +867,7 @@ export function AdminReviewsView() {
                   )}
                   <Button
                     size="sm"
-                    className="bg-violet-600 hover:bg-violet-700 text-white text-xs"
+                    className="bg-amber-600 hover:bg-amber-700 text-white text-xs"
                     onClick={handleSendReply}
                     disabled={replySending || !replyText.trim()}
                   >

@@ -1,6 +1,7 @@
 'use client';
 
 import { logger } from '@/lib/logger';
+import { fetcher } from '@/lib/fetcher';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -148,9 +149,8 @@ export function PharmacistSettingsView() {
 
     try {
       setPasswordSaving(true);
-      const res = await fetch('/api/auth/password', {
+      const res = await fetcher('/api/auth/password', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           currentPassword: passwords.currentPassword,
           newPassword: passwords.newPassword,
@@ -174,7 +174,7 @@ export function PharmacistSettingsView() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetcher('/api/auth/logout', { method: 'POST' });
     } catch {
       // Ignore network errors
     }
@@ -187,15 +187,15 @@ export function PharmacistSettingsView() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <ViewHeader
           title="Paramètres"
-          icon={<Settings className="h-5 w-5 text-emerald-600" />}
+          icon={<Settings className="h-5 w-5 text-amber-600" />}
         />
 
         {/* Account Section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="border-emerald-100 dark:border-emerald-900/50 mb-4">
+          <Card className="border-amber-100 dark:border-amber-900/50 mb-4">
             <CardHeader className="pb-3 px-4 pt-4">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <User className="h-4 w-4 text-emerald-600" />
+                <User className="h-4 w-4 text-amber-600" />
                 Compte
               </CardTitle>
             </CardHeader>
@@ -228,7 +228,7 @@ export function PharmacistSettingsView() {
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full h-10 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                    className="w-full h-10 text-xs border-amber-200 text-amber-700 hover:bg-amber-50"
                   >
                     <Lock className="h-3.5 w-3.5 mr-2" />
                     Changer le mot de passe
@@ -284,7 +284,7 @@ export function PharmacistSettingsView() {
                     <Button
                       onClick={handleChangePassword}
                       disabled={passwordSaving}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs"
+                      className="bg-amber-600 hover:bg-amber-700 text-white text-xs"
                     >
                       {passwordSaving ? (
                         <span className="flex items-center gap-1.5">
@@ -304,10 +304,10 @@ export function PharmacistSettingsView() {
 
         {/* Notifications Section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-          <Card className="border-emerald-100 dark:border-emerald-900/50 mb-4">
+          <Card className="border-amber-100 dark:border-amber-900/50 mb-4">
             <CardHeader className="pb-3 px-4 pt-4">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Bell className="h-4 w-4 text-emerald-600" />
+                <Bell className="h-4 w-4 text-amber-600" />
                 Préférences de notification
               </CardTitle>
             </CardHeader>
@@ -335,8 +335,8 @@ export function PharmacistSettingsView() {
                     <div key={setting.id}>
                       <div className="flex items-center justify-between py-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                            <Icon className="h-4 w-4 text-emerald-600" />
+                          <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                            <Icon className="h-4 w-4 text-amber-600" />
                           </div>
                           <div className="min-w-0">
                             <p className="text-xs font-medium">{setting.label}</p>
@@ -344,7 +344,7 @@ export function PharmacistSettingsView() {
                           </div>
                         </div>
                         {isSaving ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-emerald-600 flex-shrink-0" />
+                          <Loader2 className="h-4 w-4 animate-spin text-amber-600 flex-shrink-0" />
                         ) : (
                           <Switch
                             checked={setting.enabled}
@@ -364,10 +364,10 @@ export function PharmacistSettingsView() {
 
         {/* Preferences Section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <Card className="border-emerald-100 dark:border-emerald-900/50 mb-4">
+          <Card className="border-amber-100 dark:border-amber-900/50 mb-4">
             <CardHeader className="pb-3 px-4 pt-4">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Globe className="h-4 w-4 text-emerald-600" />
+                <Globe className="h-4 w-4 text-amber-600" />
                 Préférences
               </CardTitle>
             </CardHeader>
@@ -414,17 +414,17 @@ export function PharmacistSettingsView() {
 
         {/* Support Section */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-          <Card className="border-emerald-100 dark:border-emerald-900/50 mb-4">
+          <Card className="border-amber-100 dark:border-amber-900/50 mb-4">
             <CardHeader className="pb-3 px-4 pt-4">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Headphones className="h-4 w-4 text-emerald-600" />
+                <Headphones className="h-4 w-4 text-amber-600" />
                 Support
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-1">
               <button
                 onClick={() => setCurrentView('ph-faq')}
-                className="flex items-center gap-3 w-full text-left p-2.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                className="flex items-center gap-3 w-full text-left p-2.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors"
               >
                 <HelpCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 <span className="text-xs font-medium flex-1">FAQ - Questions fréquentes</span>
@@ -432,7 +432,7 @@ export function PharmacistSettingsView() {
               </button>
               <button
                 onClick={() => setCurrentView('ph-messages')}
-                className="flex items-center gap-3 w-full text-left p-2.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                className="flex items-center gap-3 w-full text-left p-2.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors"
               >
                 <Headphones className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 <span className="text-xs font-medium flex-1">Contacter le support</span>
@@ -462,8 +462,8 @@ export function PharmacistSettingsView() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
           <div className="text-center py-2">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Shield className="h-3.5 w-3.5 text-emerald-600" />
-              <span className="text-[10px] font-medium text-emerald-700">Pharma CI</span>
+              <Shield className="h-3.5 w-3.5 text-amber-600" />
+              <span className="text-[10px] font-medium text-amber-700">Pharma CI</span>
             </div>
             <p className="text-[10px] text-muted-foreground">Version 1.0.0</p>
           </div>

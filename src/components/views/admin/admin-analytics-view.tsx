@@ -181,22 +181,22 @@ export function AdminAnalyticsView() {
         <motion.div variants={itemVariants}>
           <ViewHeader
             title="Analyses détaillées"
-            icon={<BarChart3 className="h-5 w-5 text-violet-600" />}
+            icon={<BarChart3 className="h-5 w-5 text-amber-600" />}
             back
           />
         </motion.div>
 
         {/* ─── PERIOD SELECTOR ─── */}
         <motion.div variants={itemVariants}>
-          <div className="flex gap-1.5 p-1 bg-violet-50 rounded-xl">
+          <div className="flex gap-1.5 p-1 bg-amber-50 rounded-xl">
             {PERIODS.map((p) => (
               <button
                 key={p.key}
                 onClick={() => setPeriod(p.key)}
                 className={`flex-1 text-xs sm:text-sm font-medium py-2 px-2 rounded-lg transition-all duration-200 ${
                   period === p.key
-                    ? 'bg-white text-violet-700 shadow-sm'
-                    : 'text-violet-600 hover:bg-violet-100/50'
+                    ? 'bg-white text-amber-700 shadow-sm'
+                    : 'text-amber-600 hover:bg-amber-100/50'
                 }`}
               >
                 {p.label}
@@ -211,7 +211,7 @@ export function AdminAnalyticsView() {
             {/* Metrics skeleton */}
             <div className="grid grid-cols-2 gap-3">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="border-violet-100">
+                <Card key={i} className="border-amber-100">
                   <CardContent className="p-4">
                     <Skeleton className="h-8 w-8 rounded-full mb-2" />
                     <Skeleton className="h-3 w-24 mb-1" />
@@ -221,7 +221,7 @@ export function AdminAnalyticsView() {
               ))}
             </div>
             {/* Revenue chart skeleton */}
-            <Card className="border-violet-100">
+            <Card className="border-amber-100">
               <CardHeader className="pb-2 px-4 pt-4">
                 <Skeleton className="h-5 w-40" />
               </CardHeader>
@@ -236,7 +236,7 @@ export function AdminAnalyticsView() {
               </CardContent>
             </Card>
             {/* City chart skeleton */}
-            <Card className="border-violet-100">
+            <Card className="border-amber-100">
               <CardHeader className="pb-2 px-4 pt-4">
                 <Skeleton className="h-5 w-36" />
               </CardHeader>
@@ -245,7 +245,7 @@ export function AdminAnalyticsView() {
                   {Array.from({ length: 6 }).map((_, i) => (
                     <Skeleton
                       key={i}
-                      className="flex-1 bg-violet-200/40 rounded-t-md"
+                      className="flex-1 bg-amber-200/40 rounded-t-md"
                       style={{ height: `${30 + Math.random() * 70}%` }}
                     />
                   ))}
@@ -253,7 +253,7 @@ export function AdminAnalyticsView() {
               </CardContent>
             </Card>
             {/* User registrations skeleton */}
-            <Card className="border-violet-100">
+            <Card className="border-amber-100">
               <CardHeader className="pb-2 px-4 pt-4">
                 <Skeleton className="h-5 w-44" />
               </CardHeader>
@@ -262,7 +262,7 @@ export function AdminAnalyticsView() {
                   {Array.from({ length: 8 }).map((_, i) => (
                     <Skeleton
                       key={i}
-                      className="flex-1 bg-violet-200/40 rounded-t-md"
+                      className="flex-1 bg-amber-200/40 rounded-t-md"
                       style={{ height: `${20 + Math.random() * 80}%` }}
                     />
                   ))}
@@ -270,7 +270,7 @@ export function AdminAnalyticsView() {
               </CardContent>
             </Card>
             {/* Categories skeleton */}
-            <Card className="border-violet-100">
+            <Card className="border-amber-100">
               <CardHeader className="pb-2 px-4 pt-4">
                 <Skeleton className="h-5 w-52" />
               </CardHeader>
@@ -319,22 +319,22 @@ export function AdminAnalyticsView() {
               className="grid grid-cols-2 gap-3"
             >
               {/* Revenue */}
-              <Card className="border-violet-100">
+              <Card className="border-amber-100">
                 <CardContent className="p-4">
-                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-violet-100 mb-2">
-                    <DollarSign className="h-4 w-4 text-violet-600" />
+                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-amber-100 mb-2">
+                    <DollarSign className="h-4 w-4 text-amber-600" />
                   </div>
                   <p className="text-[11px] sm:text-xs text-muted-foreground">
                     Chiffre d&apos;affaires
                   </p>
-                  <p className="text-lg sm:text-xl font-bold mt-0.5 text-violet-700 truncate">
+                  <p className="text-lg sm:text-xl font-bold mt-0.5 text-amber-700 truncate">
                     {formatFCFA(data.totalRevenue)}
                   </p>
                 </CardContent>
               </Card>
 
               {/* Orders */}
-              <Card className="border-violet-100">
+              <Card className="border-amber-100">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 mb-2">
                     <ShoppingCart className="h-4 w-4 text-blue-600" />
@@ -349,10 +349,10 @@ export function AdminAnalyticsView() {
               </Card>
 
               {/* Average order */}
-              <Card className="border-violet-100">
+              <Card className="border-amber-100">
                 <CardContent className="p-4">
-                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-emerald-100 mb-2">
-                    <TrendingUp className="h-4 w-4 text-emerald-600" />
+                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-orange-100 mb-2">
+                    <TrendingUp className="h-4 w-4 text-orange-600" />
                   </div>
                   <p className="text-[11px] sm:text-xs text-muted-foreground">
                     Panier moyen
@@ -364,7 +364,7 @@ export function AdminAnalyticsView() {
               </Card>
 
               {/* New users */}
-              <Card className="border-violet-100">
+              <Card className="border-amber-100">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-center h-8 w-8 rounded-full bg-amber-100 mb-2">
                     <UserPlus className="h-4 w-4 text-amber-600" />
@@ -381,15 +381,15 @@ export function AdminAnalyticsView() {
 
             {/* ── REVENUE BY PHARMACY (Horizontal Bar Chart) ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-violet-100">
+              <Card className="border-amber-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                    <Building2 className="h-4 w-4 text-violet-600" />
+                    <Building2 className="h-4 w-4 text-amber-600" />
                     CA par pharmacie
                   </CardTitle>
                   <Badge
                     variant="outline"
-                    className="text-[11px] border-violet-200 text-violet-700"
+                    className="text-[11px] border-amber-200 text-amber-700"
                   >
                     {data.revenueByPharmacy.length} pharmacies
                   </Badge>
@@ -419,9 +419,9 @@ export function AdminAnalyticsView() {
                               </p>
                             </div>
                             {/* Bar */}
-                            <div className="flex-1 h-6 bg-violet-50 rounded-full overflow-hidden relative">
+                            <div className="flex-1 h-6 bg-amber-50 rounded-full overflow-hidden relative">
                               <div
-                                className="h-full rounded-full bg-gradient-to-r from-violet-500 to-violet-400 transition-all duration-700 ease-out relative group-hover:from-violet-600 group-hover:to-violet-500"
+                                className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-700 ease-out relative group-hover:from-amber-600 group-hover:to-amber-500"
                                 style={{ width: `${Math.max(pct, 2)}%` }}
                               >
                                 {/* Value on hover */}
@@ -431,7 +431,7 @@ export function AdminAnalyticsView() {
                               </div>
                             </div>
                             {/* Value */}
-                            <span className="text-xs font-semibold text-violet-700 shrink-0 w-20 sm:w-24 text-right">
+                            <span className="text-xs font-semibold text-amber-700 shrink-0 w-20 sm:w-24 text-right">
                               {formatFCFA(item.revenue)}
                             </span>
                           </div>
@@ -445,15 +445,15 @@ export function AdminAnalyticsView() {
 
             {/* ── ORDERS BY CITY (Bar Chart) ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-violet-100">
+              <Card className="border-amber-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4 text-violet-600" />
+                    <MapPin className="h-4 w-4 text-amber-600" />
                     Commandes par ville
                   </CardTitle>
                   <Badge
                     variant="outline"
-                    className="text-[11px] border-violet-200 text-violet-700"
+                    className="text-[11px] border-amber-200 text-amber-700"
                   >
                     {PERIODS.find((p) => p.key === period)?.label}
                   </Badge>
@@ -498,7 +498,7 @@ export function AdminAnalyticsView() {
                                     {item.count > 0 ? formatNumber(item.count) : ''}
                                   </span>
                                   <div
-                                    className="w-full rounded-t-md bg-gradient-to-t from-violet-500 to-violet-400 transition-all duration-500 ease-out min-h-[2px] relative group cursor-pointer hover:from-violet-600 hover:to-violet-500"
+                                    className="w-full rounded-t-md bg-gradient-to-t from-amber-500 to-amber-400 transition-all duration-500 ease-out min-h-[2px] relative group cursor-pointer hover:from-amber-600 hover:to-amber-500"
                                     style={{
                                       height: `${Math.max(heightPct, 2)}%`,
                                     }}
@@ -535,15 +535,15 @@ export function AdminAnalyticsView() {
 
             {/* ── USER REGISTRATIONS OVER TIME (Bar Chart) ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-violet-100">
+              <Card className="border-amber-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                    <Users className="h-4 w-4 text-violet-600" />
+                    <Users className="h-4 w-4 text-amber-600" />
                     Nouvelles inscriptions
                   </CardTitle>
                   <Badge
                     variant="outline"
-                    className="text-[11px] border-violet-200 text-violet-700"
+                    className="text-[11px] border-amber-200 text-amber-700"
                   >
                     {data.userRegistrationsByMonth.reduce(
                       (s, r) => s + r.count,
@@ -633,15 +633,15 @@ export function AdminAnalyticsView() {
 
             {/* ── MEDICATION CATEGORY DISTRIBUTION (Stacked Bar) ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-violet-100">
+              <Card className="border-amber-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                    <FlaskConical className="h-4 w-4 text-violet-600" />
+                    <FlaskConical className="h-4 w-4 text-amber-600" />
                     Catégories de médicaments
                   </CardTitle>
                   <Badge
                     variant="outline"
-                    className="text-[11px] border-violet-200 text-violet-700"
+                    className="text-[11px] border-amber-200 text-amber-700"
                   >
                     {formatNumber(totalMedications)} au total
                   </Badge>
@@ -708,12 +708,12 @@ export function AdminAnalyticsView() {
 /* ------------------------------------------------------------------ */
 
 const CATEGORY_COLORS = [
-  'bg-violet-500',
-  'bg-violet-400',
+  'bg-amber-500',
+  'bg-amber-400',
   'bg-blue-500',
   'bg-blue-400',
-  'bg-emerald-500',
-  'bg-emerald-400',
+  'bg-orange-500',
+  'bg-orange-400',
   'bg-amber-500',
   'bg-amber-400',
   'bg-rose-500',

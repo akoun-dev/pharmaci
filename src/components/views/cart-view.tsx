@@ -63,7 +63,7 @@ export function CartView() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
         <ViewHeader
           title="Mon Panier"
-          icon={<ShoppingBag className="h-5 w-5 text-emerald-600" />}
+          icon={<ShoppingBag className="h-5 w-5 text-amber-600" />}
           back
         />
 
@@ -73,8 +73,8 @@ export function CartView() {
           transition={{ duration: 0.3 }}
           className="flex flex-col items-center justify-center py-16"
         >
-          <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
-            <ShoppingBag className="h-10 w-10 text-emerald-300" />
+          <div className="w-20 h-20 rounded-full bg-amber-50 flex items-center justify-center mb-4">
+            <ShoppingBag className="h-10 w-10 text-amber-300" />
           </div>
           <h2 className="text-lg font-bold text-foreground mb-1">
             Votre panier est vide
@@ -84,7 +84,7 @@ export function CartView() {
           </p>
           <Button
             onClick={() => setCurrentView('search')}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-11 px-6"
+            className="bg-amber-600 hover:bg-amber-700 text-white rounded-xl h-11 px-6"
           >
             <Search className="h-4 w-4 mr-2" />
             Rechercher des médicaments
@@ -99,11 +99,11 @@ export function CartView() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-40">
       <ViewHeader
         title="Mon Panier"
-        icon={<ShoppingBag className="h-5 w-5 text-emerald-600" />}
+        icon={<ShoppingBag className="h-5 w-5 text-amber-600" />}
         back
         action={
           itemCount > 0 && (
-            <Badge className="bg-emerald-600 text-white text-xs px-2 py-0.5">
+            <Badge className="bg-amber-600 text-white text-xs px-2 py-0.5">
               {itemCount}
             </Badge>
           )
@@ -133,12 +133,12 @@ export function CartView() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: groupIdx * 0.08, duration: 0.3 }}
             >
-              <Card className="border-emerald-100 overflow-hidden">
+              <Card className="border-amber-100 overflow-hidden">
                 {/* Pharmacy header */}
-                <div className="bg-emerald-50 dark:bg-emerald-950/30 px-3.5 py-2.5">
+                <div className="bg-amber-50 dark:bg-amber-950/30 px-3.5 py-2.5">
                   <div className="flex items-start gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Store className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Store className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-sm text-foreground truncate">
@@ -167,12 +167,12 @@ export function CartView() {
                   ))}
 
                   {/* Pharmacy subtotal with order count hint */}
-                  <div className="px-3.5 py-2.5 bg-gray-50/50 dark:bg-gray-900/30 border-t border-emerald-50">
+                  <div className="px-3.5 py-2.5 bg-gray-50/50 dark:bg-gray-900/30 border-t border-amber-50">
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-xs text-muted-foreground">
                         Sous-total {pharmacyName}
                       </span>
-                      <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+                      <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">
                         {formatFCFA(pharmacySubtotal)}
                       </span>
                     </div>
@@ -197,19 +197,19 @@ export function CartView() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: groups.size * 0.08 + 0.1, duration: 0.3 }}
         >
-          <Card className="border-emerald-100 overflow-hidden">
+          <Card className="border-amber-100 overflow-hidden">
             <CardContent className="p-3.5 sm:p-4 space-y-4">
               {/* Grand total */}
               <div className="flex items-center justify-between">
                 <span className="text-base font-semibold text-foreground">
                   Total
                 </span>
-                <span className="text-xl font-bold text-emerald-700 dark:text-emerald-400">
+                <span className="text-xl font-bold text-amber-700 dark:text-amber-400">
                   {formatFCFA(subtotal)}
                 </span>
               </div>
 
-              <Separator className="bg-emerald-100" />
+              <Separator className="bg-amber-100" />
 
               {/* Note */}
               <div>
@@ -223,11 +223,11 @@ export function CartView() {
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Instructions spéciales, préférences..."
-                  className="min-h-[72px] rounded-xl border-emerald-100 focus:border-emerald-400 text-sm resize-none"
+                  className="min-h-[72px] rounded-xl border-amber-100 focus:border-amber-400 text-sm resize-none"
                 />
               </div>
 
-              <Separator className="bg-emerald-100" />
+              <Separator className="bg-amber-100" />
 
               {/* Order count info */}
               {groupCount > 1 ? (
@@ -243,9 +243,9 @@ export function CartView() {
                   </div>
                 </div>
               ) : (
-                <div className="flex items-start gap-2 p-2.5 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl">
-                  <Store className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed">
+                <div className="flex items-start gap-2 p-2.5 bg-amber-50 dark:bg-amber-950/30 rounded-xl">
+                  <Store className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
                     <strong>1 commande sera créée</strong> auprès de votre pharmacie
                   </p>
                 </div>
@@ -254,7 +254,7 @@ export function CartView() {
               {/* Validate button */}
               <Button
                 onClick={handleProceedToCheckout}
-                className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm"
+                className="w-full h-12 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-semibold text-sm"
               >
                 Valider la commande
               </Button>
@@ -264,17 +264,17 @@ export function CartView() {
       </motion.div>
 
       {/* ═══ Sticky Bottom Bar (mobile) ═══ */}
-      <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-t border-emerald-100 dark:border-emerald-900/50 lg:hidden">
+      <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-t border-amber-100 dark:border-amber-900/50 lg:hidden">
         <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground">Total</p>
-            <p className="text-base font-bold text-emerald-700 dark:text-emerald-400">
+            <p className="text-base font-bold text-amber-700 dark:text-amber-400">
               {formatFCFA(subtotal)}
             </p>
           </div>
           <Button
             onClick={handleProceedToCheckout}
-            className="h-11 px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm"
+            className="h-11 px-5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-semibold text-sm"
           >
             Valider
           </Button>
@@ -299,11 +299,11 @@ function CartItemRow({
   const lineTotal = item.price * item.quantity;
 
   return (
-    <div className={!isLast ? 'border-b border-emerald-50' : ''}>
+    <div className={!isLast ? 'border-b border-amber-50' : ''}>
       <div className="flex items-center gap-2.5 px-3.5 py-3">
         {/* Medication icon */}
-        <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
-          <Pill className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+        <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
+          <Pill className="h-5 w-5 text-amber-600 dark:text-amber-400" />
         </div>
 
         {/* Medication info */}
@@ -316,7 +316,7 @@ function CartItemRow({
               {item.medicationForm}
             </span>
             <span className="text-[10px] text-muted-foreground/60">·</span>
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+            <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
               {formatFCFA(item.price)}
             </span>
           </div>
@@ -344,7 +344,7 @@ function CartItemRow({
             <button
               onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
               disabled={item.quantity <= 1}
-              className="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-muted-foreground hover:border-emerald-400 hover:text-emerald-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-muted-foreground hover:border-amber-400 hover:text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <Minus className="h-3 w-3" />
             </button>
@@ -354,7 +354,7 @@ function CartItemRow({
             <button
               onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
               disabled={item.quantity >= item.maxQuantity}
-              className="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-muted-foreground hover:border-emerald-400 hover:text-emerald-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-muted-foreground hover:border-amber-400 hover:text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <Plus className="h-3 w-3" />
             </button>

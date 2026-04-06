@@ -128,7 +128,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   },
   ready: {
     label: 'Prête',
-    className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    className: 'bg-amber-100 text-amber-700 border-amber-200',
   },
   picked_up: {
     label: 'Récupérée',
@@ -253,18 +253,18 @@ export function PharmacistDashboardView() {
       >
         {/* ─── HEADER ─── */}
         <motion.div variants={itemVariants}>
-          <div className="rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-700 px-5 py-5 text-white">
+          <div className="rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 px-5 py-5 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-emerald-100">Tableau de bord</p>
+                <p className="text-sm font-medium text-amber-100">Tableau de bord</p>
                 <h1 className="text-xl sm:text-2xl font-bold mt-1">
                   Bonjour, {firstName} 👋
                 </h1>
                 {pharmacy && (
-                  <p className="text-sm text-emerald-100 mt-1 truncate">{pharmacy.name}</p>
+                  <p className="text-sm text-amber-100 mt-1 truncate">{pharmacy.name}</p>
                 )}
                 {!pharmacy && loading && (
-                  <Skeleton className="mt-2 h-4 w-48 bg-emerald-500/30" />
+                  <Skeleton className="mt-2 h-4 w-48 bg-amber-500/30" />
                 )}
               </div>
               <Button
@@ -286,7 +286,7 @@ export function PharmacistDashboardView() {
             {/* Stats skeletons */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className="border-emerald-100">
+                <Card key={i} className="border-amber-100">
                   <CardContent className="p-3 sm:p-4">
                     <Skeleton className="h-8 w-8 rounded-full mb-2" />
                     <Skeleton className="h-3 w-20 mb-1" />
@@ -298,7 +298,7 @@ export function PharmacistDashboardView() {
             {/* Actions skeletons */}
             <Skeleton className="h-16 w-full rounded-xl" />
             {/* Recent orders skeletons */}
-            <Card className="border-emerald-100">
+            <Card className="border-amber-100">
               <CardHeader className="pb-2">
                 <Skeleton className="h-5 w-36" />
               </CardHeader>
@@ -315,7 +315,7 @@ export function PharmacistDashboardView() {
               </CardContent>
             </Card>
             {/* Low stock skeletons */}
-            <Card className="border-emerald-100">
+            <Card className="border-amber-100">
               <CardHeader className="pb-2">
                 <Skeleton className="h-5 w-28" />
               </CardHeader>
@@ -368,18 +368,18 @@ export function PharmacistDashboardView() {
                 iconColor="text-amber-600"
               />
               {/* Revenue card with toggle */}
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-emerald-100">
-                      <TrendingUp className="h-4 w-4 text-emerald-600" />
+                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-amber-100">
+                      <TrendingUp className="h-4 w-4 text-amber-600" />
                     </div>
                     <button
                       onClick={() => setShowTodayRevenue(!showTodayRevenue)}
                       className={`text-[10px] font-medium px-2 py-0.5 rounded-full transition-colors ${
                         showTodayRevenue
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-emerald-50 text-emerald-700'
+                          ? 'bg-amber-600 text-white'
+                          : 'bg-amber-50 text-amber-700'
                       }`}
                     >
                       {showTodayRevenue ? "Aujourd'hui" : 'Ce mois'}
@@ -397,8 +397,8 @@ export function PharmacistDashboardView() {
                 icon={<Package className="h-4 w-4" />}
                 label="Médicaments en stock"
                 value={String(stats.totalMedicationsCount)}
-                iconBg="bg-emerald-100"
-                iconColor="text-emerald-600"
+                iconBg="bg-amber-100"
+                iconColor="text-amber-600"
               />
               <StatCard
                 icon={<AlertTriangle className="h-4 w-4" />}
@@ -425,7 +425,7 @@ export function PharmacistDashboardView() {
 
             {/* ── ACTIONS RAPIDES ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardContent className="p-3 sm:p-4">
                   <div className="grid grid-cols-4 gap-2">
                     <ActionButton
@@ -455,16 +455,16 @@ export function PharmacistDashboardView() {
 
             {/* ── COMMANDES RÉCENTES ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                    <Clock className="h-4 w-4 text-emerald-600" />
+                    <Clock className="h-4 w-4 text-amber-600" />
                     Commandes récentes
                   </CardTitle>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 h-7 px-2"
+                    className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 h-7 px-2"
                     onClick={() => setCurrentView('ph-orders')}
                   >
                     Voir tout
@@ -488,7 +488,7 @@ export function PharmacistDashboardView() {
                               selectOrder(order.id);
                               setCurrentView('ph-order-detail');
                             }}
-                            className="flex items-center justify-between w-full text-left py-2.5 px-1 rounded-lg hover:bg-emerald-50 transition-colors"
+                            className="flex items-center justify-between w-full text-left py-2.5 px-1 rounded-lg hover:bg-amber-50 transition-colors"
                           >
                             <div className="min-w-0 flex-1 mr-3">
                               <p className="text-sm font-medium truncate">
@@ -518,7 +518,7 @@ export function PharmacistDashboardView() {
 
             {/* ── ALERTES EXPIRATION ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
                     <CalendarClock className="h-4 w-4 text-amber-500" />
@@ -527,7 +527,7 @@ export function PharmacistDashboardView() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 h-7 px-2"
+                    className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 h-7 px-2"
                     onClick={() => {
                       setCurrentView('ph-stock-list');
                     }}
@@ -590,7 +590,7 @@ export function PharmacistDashboardView() {
 
             {/* ── ALERTES STOCKS ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
                     <AlertTriangle className="h-4 w-4 text-red-500" />
@@ -599,7 +599,7 @@ export function PharmacistDashboardView() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 h-7 px-2"
+                    className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 h-7 px-2"
                     onClick={() => setCurrentView('ph-stock-list')}
                   >
                     Réappro.
@@ -660,7 +660,7 @@ function StatCard({
   iconColor: string;
 }) {
   return (
-    <Card className="border-emerald-100">
+    <Card className="border-amber-100">
       <CardContent className="p-3 sm:p-4">
         <div className={`inline-flex items-center justify-center h-8 w-8 rounded-full ${iconBg} mb-2`}>
           <span className={iconColor}>{icon}</span>
@@ -684,9 +684,9 @@ function ActionButton({
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-1.5 py-2 rounded-xl hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
+      className="flex flex-col items-center gap-1.5 py-2 rounded-xl hover:bg-amber-50 active:bg-amber-100 transition-colors"
     >
-      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-emerald-100 text-emerald-700">
+      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-amber-100 text-amber-700">
         {icon}
       </div>
       <span className="text-[11px] font-medium text-muted-foreground leading-tight text-center">

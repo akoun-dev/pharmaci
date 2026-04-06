@@ -4,10 +4,8 @@ import { deleteSessionCookie, deleteCSRFCookie } from '@/lib/auth';
 
 // POST /api/auth/logout — Clear session
 export async function POST() {
-  return NextResponse.json(
-    { message: 'Déconnexion réussie' },
-    {
-      headers: { 'Set-Cookie': [deleteSessionCookie(), deleteCSRFCookie()].join(', ') },
-    }
-  );
+  const response = NextResponse.json({ message: 'Déconnexion réussie' });
+  response.headers.append('Set-Cookie', deleteSessionCookie());
+  response.headers.append('Set-Cookie', deleteCSRFCookie());
+  return response;
 }

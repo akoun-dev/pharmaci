@@ -97,7 +97,7 @@ export function MyReviewsView() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <ViewHeader
           title="Mes Avis"
-          icon={<Star className="h-5 w-5 text-emerald-600" />}
+          icon={<Star className="h-5 w-5 text-amber-600" />}
           action={
             currentUserId && reviews.length > 0 ? (
               <Badge variant="secondary" className="text-xs">
@@ -108,7 +108,7 @@ export function MyReviewsView() {
         />
 
         {!currentUserId ? (
-          <Card className="border-emerald-100">
+          <Card className="border-amber-100">
             <CardContent className="p-6 sm:p-8 text-center">
               <div className="text-4xl mb-3">🔐</div>
               <h3 className="font-semibold mb-1">Connectez-vous</h3>
@@ -117,17 +117,17 @@ export function MyReviewsView() {
               </p>
               <Button
                 onClick={() => setCurrentView('profile')}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="bg-amber-600 hover:bg-amber-700 text-white"
               >
                 Se connecter
               </Button>
             </CardContent>
           </Card>
         ) : reviews.length === 0 ? (
-          <Card className="border-emerald-100">
+          <Card className="border-amber-100">
             <CardContent className="p-6 sm:p-8 text-center">
               <div className="text-4xl mb-3 flex justify-center">
-                <MessageSquare className="w-12 h-12 text-emerald-600" />
+                <MessageSquare className="w-12 h-12 text-amber-600" />
               </div>
               <h3 className="font-semibold mb-1">Aucun avis</h3>
               <p className="text-sm text-muted-foreground mb-4">
@@ -135,7 +135,7 @@ export function MyReviewsView() {
               </p>
               <Button
                 onClick={() => setCurrentView('search')}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="bg-amber-600 hover:bg-amber-700 text-white"
               >
                 Découvrir les pharmacies
               </Button>
@@ -152,7 +152,7 @@ export function MyReviewsView() {
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <Card className="border-emerald-100">
+                  <Card className="border-amber-100">
                     <CardContent className="p-3 sm:p-4">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div
@@ -160,10 +160,10 @@ export function MyReviewsView() {
                           onClick={() => handlePharmacyClick(review.pharmacyId)}
                         >
                           <div className="flex items-center gap-1.5 flex-wrap mb-1">
-                            <Building2 className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0" />
+                            <Building2 className="h-3.5 w-3.5 text-amber-600 flex-shrink-0" />
                             <h3 className="font-semibold text-sm">{review.pharmacy.name}</h3>
                             {review.pharmacy.isGuard && (
-                              <Badge className="bg-emerald-600 text-white text-[10px] px-1.5 h-4 flex-shrink-0">
+                              <Badge className="bg-amber-600 text-white text-[10px] px-1.5 h-4 flex-shrink-0">
                                 <Shield className="h-3 w-3" />
                                 Garde
                               </Badge>
@@ -213,8 +213,8 @@ export function MyReviewsView() {
                       </div>
 
                       {review.reply && (
-                        <div className="mt-3 p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg">
-                          <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-1">
+                        <div className="mt-3 p-2 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
+                          <p className="text-xs font-medium text-amber-700 dark:text-amber-400 mb-1">
                             Réponse de la pharmacie
                           </p>
                           <p className="text-xs text-muted-foreground">{review.reply}</p>

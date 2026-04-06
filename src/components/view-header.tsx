@@ -30,14 +30,14 @@ export function ViewHeader({ title, icon, back, onBack, action }: ViewHeaderProp
       {back && (
         <button
           onClick={handleBack}
-          className="flex items-center justify-center w-9 h-9 -ml-1 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 active:bg-emerald-100 transition-colors flex-shrink-0"
+          className="flex items-center justify-center w-9 h-9 -ml-1 rounded-xl text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/30 active:bg-orange-100 transition-colors flex-shrink-0"
           aria-label="Retour"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
       )}
       {icon && (
-        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex-shrink-0">
+        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-orange-50 dark:bg-orange-950/50 flex-shrink-0">
           {icon}
         </div>
       )}

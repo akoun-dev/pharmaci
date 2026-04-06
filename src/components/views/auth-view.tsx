@@ -1,6 +1,7 @@
 'use client';
 
 import { logger } from '@/lib/logger';
+import { fetcher } from '@/lib/fetcher';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -48,9 +49,8 @@ export function AuthView() {
       if (method === 'phone') {
         if (otpSent && otp) {
           // Verify OTP
-          const res = await fetch('/api/auth/verify-phone', {
+          const res = await fetcher('/api/auth/verify-phone', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone, code: otp }),
           });
           const data = await res.json();
@@ -66,9 +66,8 @@ export function AuthView() {
 
         if (mode === 'register') {
           // Send OTP then auto-register
-          const sendRes = await fetch('/api/auth/verify-phone', {
+          const sendRes = await fetcher('/api/auth/verify-phone', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone }),
           });
           const sendData = await sendRes.json();
@@ -84,9 +83,8 @@ export function AuthView() {
         }
 
         // Login with phone — just send OTP
-        const sendRes = await fetch('/api/auth/verify-phone', {
+        const sendRes = await fetcher('/api/auth/verify-phone', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone }),
         });
         const sendData = await sendRes.json();
@@ -143,7 +141,7 @@ export function AuthView() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -155,7 +153,7 @@ export function AuthView() {
             <Pill className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white">Pharma CI</h1>
-          <p className="text-emerald-200 text-sm mt-1">
+          <p className="text-amber-200 text-sm mt-1">
             {mode === 'login' ? 'Connectez-vous à votre compte' : 'Créez votre compte'}
           </p>
         </div>
@@ -163,11 +161,11 @@ export function AuthView() {
         {/* Auth Card */}
         <div className="bg-white rounded-2xl shadow-xl p-6">
           {/* Mode toggle */}
-          <div className="flex bg-emerald-50 rounded-xl p-1 mb-6">
+          <div className="flex bg-amber-50 rounded-xl p-1 mb-6">
             <button
               onClick={() => { setMode('login'); setError(''); setOtpSent(false); }}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                mode === 'login' ? 'bg-white text-emerald-700 shadow-sm' : 'text-emerald-600'
+                mode === 'login' ? 'bg-white text-amber-700 shadow-sm' : 'text-amber-600'
               }`}
             >
               Connexion
@@ -175,7 +173,7 @@ export function AuthView() {
             <button
               onClick={() => { setMode('register'); setError(''); setOtpSent(false); }}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                mode === 'register' ? 'bg-white text-emerald-700 shadow-sm' : 'text-emerald-600'
+                mode === 'register' ? 'bg-white text-amber-700 shadow-sm' : 'text-amber-600'
               }`}
             >
               Inscription
@@ -195,8 +193,8 @@ export function AuthView() {
                   onClick={() => { setMethod(m.key); setError(''); setOtpSent(false); }}
                   className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-medium border-2 transition-all ${
                     method === m.key
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                      : 'border-gray-200 text-gray-500 hover:border-emerald-300 hover:text-emerald-600'
+                      ? 'border-amber-500 bg-amber-50 text-amber-700'
+                      : 'border-gray-200 text-gray-500 hover:border-amber-300 hover:text-amber-600'
                   }`}
                 >
                   <m.icon className="h-4 w-4" />
@@ -400,7 +398,7 @@ export function AuthView() {
                   <button
                     type="button"
                     onClick={() => { setOtpSent(false); setError(''); }}
-                    className="text-xs text-emerald-600 hover:underline"
+                    className="text-xs text-amber-600 hover:underline"
                   >
                     Renvoyer un nouveau code
                   </button>
@@ -423,7 +421,7 @@ export function AuthView() {
             <Button
               type="submit"
               disabled={loading || (method === 'google' && !otpSent)}
-              className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium text-sm"
+              className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium text-sm"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
@@ -439,14 +437,14 @@ export function AuthView() {
           {/* Switch mode */}
           <p className="text-center text-xs text-gray-500 mt-4">
             {mode === 'login' ? 'Pas encore de compte ?' : 'Déjà un compte ?'}
-            <button onClick={switchMode} className="text-emerald-600 font-semibold hover:underline ml-1">
+            <button onClick={switchMode} className="text-amber-600 font-semibold hover:underline ml-1">
               {mode === 'login' ? 'S\'inscrire' : 'Se connecter'}
             </button>
           </p>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-emerald-200/60 text-[10px] mt-6">
+        <p className="text-center text-amber-200/60 text-[10px] mt-6">
           Pharma CI © 2025 — Côte d&apos;Ivoire
         </p>
       </motion.div>

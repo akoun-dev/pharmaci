@@ -91,7 +91,7 @@ export const PharmacyCard = React.memo(function PharmacyCard({
   return (
     <motion.div whileTap={{ scale: 0.98 }}>
       <Card
-        className="overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 border-emerald-100 hover:border-emerald-300"
+        className="overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 border-orange-100 hover:border-orange-300"
         onClick={() => onClick(pharmacy.id)}
       >
         <CardContent className={compact ? 'p-3' : 'p-3 sm:p-4'}>
@@ -102,9 +102,9 @@ export const PharmacyCard = React.memo(function PharmacyCard({
                   {pharmacy.name}
                 </h3>
                 {pharmacy.isGuard && (
-                  <Badge variant="default" className="bg-emerald-600 text-white text-[10px] px-1.5 py-0 h-5 flex items-center gap-0.5 flex-shrink-0">
+                  <Badge variant="default" className="bg-orange-600 text-white text-[10px] px-1.5 py-0 h-5 flex items-center gap-0.5 flex-shrink-0">
                     <Shield className="h-3 w-3" />
-                    Garde
+                    De garde
                   </Badge>
                 )}
                 {pharmacy.isOpen24h && (
@@ -127,7 +127,7 @@ export const PharmacyCard = React.memo(function PharmacyCard({
                 <span className="text-[11px] text-muted-foreground">
                   ({pharmacy.reviewCount})
                 </span>
-                <span className={`text-[11px] font-medium ${open ? 'text-emerald-600' : 'text-red-500'}`}>
+                <span className={`text-[11px] font-medium ${open ? 'text-orange-600' : 'text-red-500'}`}>
                   {open ? 'Ouvert' : 'Fermé'}
                 </span>
                 {distance != null && (
@@ -155,7 +155,7 @@ export const PharmacyCard = React.memo(function PharmacyCard({
                 <Badge
                   key={service}
                   variant="outline"
-                  className="text-[10px] px-1.5 py-0 border-emerald-200 text-emerald-700 capitalize"
+                  className="text-[10px] px-1.5 py-0 border-orange-200 text-orange-700 capitalize"
                 >
                   {service}
                 </Badge>

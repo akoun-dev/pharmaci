@@ -1,6 +1,7 @@
 'use client';
 
 import { logger } from '@/lib/logger';
+import { fetcher } from '@/lib/fetcher';
 import { useEffect, useSyncExternalStore, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -240,7 +241,7 @@ function CartFloatingButton() {
   return (
     <button
       onClick={() => setCurrentView('cart')}
-      className="fixed bottom-20 right-4 z-40 lg:hidden flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-4 py-3 shadow-lg shadow-emerald-600/30 transition-all duration-200 active:scale-95"
+      className="fixed bottom-20 right-4 z-40 lg:hidden flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white rounded-full px-4 py-3 shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95"
     >
       <ShoppingCart className="h-5 w-5" />
       <span className="text-sm font-semibold">{itemCount}</span>
@@ -256,20 +257,20 @@ function CartSidebarButton() {
     <button
       onClick={() => setCurrentView('cart')}
       className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative ${
-        'text-muted-foreground hover:bg-emerald-50/50 hover:text-emerald-600'
+        'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
       }`}
     >
       <div className="relative">
         <ShoppingCart className="h-5 w-5" />
         {itemCount > 0 && (
-          <span className="absolute -top-2 -right-2 bg-emerald-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+          <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
             {itemCount > 9 ? '9+' : itemCount}
           </span>
         )}
       </div>
       Panier
       {itemCount > 0 && (
-        <span className="ml-auto text-xs text-emerald-600 font-medium">
+        <span className="ml-auto text-xs text-amber-600 font-medium">
           {itemCount} article{itemCount > 1 ? 's' : ''}
         </span>
       )}
@@ -291,7 +292,7 @@ export function AppShell() {
   // Check session on mount
   const checkSession = useCallback(async () => {
     try {
-      const res = await fetch('/api/auth/me');
+      const res = await fetcher('/api/auth/me');
       if (res.ok) {
         const data = await res.json();
         if (data.user) {
@@ -319,7 +320,7 @@ export function AppShell() {
   // Logout handler
   const handleLogout = useCallback(async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetcher('/api/auth/logout', { method: 'POST' });
     } catch {
       // Ignore network errors
     }
@@ -330,7 +331,7 @@ export function AppShell() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center mx-auto mb-3 animate-pulse">
+          <div className="w-12 h-12 rounded-2xl bg-amber-600 flex items-center justify-center mx-auto mb-3 animate-pulse">
             <Pill className="h-7 w-7 text-white" />
           </div>
           <p className="text-sm text-muted-foreground">Chargement...</p>
@@ -360,19 +361,19 @@ export function AppShell() {
         <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-col z-50">
           {/* Logo */}
           <div className="p-5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center">
-              <Shield className="h-6 w-6 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-purple-600 flex items-center justify-center">
+              <Pill className="h-6 w-6 text-white" />
             </div>
             <div>
               <h1 className="font-bold text-lg text-foreground">Pharma CI</h1>
-              <p className="text-[10px] text-violet-600 font-medium">Administration</p>
+              <p className="text-[10px] text-amber-600 font-medium">Administration</p>
             </div>
           </div>
 
           {/* User info */}
-          <div className="mx-4 mb-4 p-3 bg-violet-50 dark:bg-violet-950/50 rounded-xl">
-            <p className="text-sm font-semibold text-violet-800 dark:text-violet-300">{currentUser?.name}</p>
-            <p className="text-[11px] text-violet-600 dark:text-violet-400">{currentUser?.email}</p>
+          <div className="mx-4 mb-4 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl">
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">{currentUser?.name}</p>
+            <p className="text-[11px] text-amber-600 dark:text-amber-400">{currentUser?.email}</p>
           </div>
 
           {/* Nav items */}
@@ -386,7 +387,7 @@ export function AppShell() {
                   onClick={() => handleTabClick(tab.key)}
                   className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-400'
+                      ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
                       : 'text-muted-foreground hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-foreground'
                   }`}
                 >
@@ -400,7 +401,7 @@ export function AppShell() {
                 onClick={() => setCurrentView('admin-settings')}
                 className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                   currentView === 'admin-settings'
-                    ? 'bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-400'
+                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
                     : 'text-muted-foreground hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-foreground'
                 }`}
               >
@@ -445,8 +446,8 @@ export function AppShell() {
                   onClick={() => handleTabClick(tab.key)}
                   className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-xl transition-all duration-200 min-w-0 flex-1 ${
                     isActive
-                      ? 'text-violet-700 bg-violet-50'
-                      : 'text-muted-foreground hover:text-violet-600'
+                      ? 'text-amber-700 bg-amber-50'
+                      : 'text-muted-foreground hover:text-amber-600'
                   }`}
                 >
                   <Icon className="h-[18px] w-[18px]" />
@@ -477,7 +478,7 @@ export function AppShell() {
         </main>
 
         {/* Bottom navigation (mobile) */}
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900/95 backdrop-blur-md border-t border-emerald-100 dark:border-emerald-900/50 lg:hidden pb-safe">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900/95 backdrop-blur-md border-t border-amber-100 dark:border-amber-900/50 lg:hidden pb-safe">
           <div className="flex items-center justify-around px-0.5 py-1 max-w-2xl mx-auto">
             {pharmacistTabs.map((tab) => {
               const isActive = activeTab === tab.key;
@@ -488,16 +489,16 @@ export function AppShell() {
                   onClick={() => handleTabClick(tab.key)}
                   className={`flex flex-col items-center justify-center gap-0.5 px-0.5 sm:px-1 py-1.5 rounded-xl transition-all duration-200 min-w-0 flex-1 ${
                     isActive
-                      ? 'text-emerald-700 bg-emerald-50'
-                      : 'text-muted-foreground hover:text-emerald-600'
+                      ? 'text-amber-700 bg-amber-50'
+                      : 'text-muted-foreground hover:text-amber-600'
                   }`}
                 >
                   <Icon
-                    className={`h-[18px] sm:h-5 w-[18px] sm:w-5 transition-colors ${isActive ? 'text-emerald-700' : ''}`}
+                    className={`h-[18px] sm:h-5 w-[18px] sm:w-5 transition-colors ${isActive ? 'text-amber-700' : ''}`}
                   />
                   <span className="text-[9px] sm:text-[10px] font-medium leading-tight truncate max-w-full">{tab.label}</span>
                   {isActive && (
-                    <div className="w-1 h-1 rounded-full bg-emerald-600 -mt-0.5" />
+                    <div className="w-1 h-1 rounded-full bg-amber-600 -mt-0.5" />
                   )}
                 </button>
               );
@@ -506,9 +507,9 @@ export function AppShell() {
         </nav>
 
         {/* Sidebar navigation (desktop) */}
-        <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-950 border-r border-emerald-100 dark:border-emerald-900/50 flex-col z-50">
+        <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-950 border-r border-amber-100 dark:border-amber-900/50 flex-col z-50">
           <div className="p-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center">
               <Pill className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -517,9 +518,9 @@ export function AppShell() {
             </div>
           </div>
 
-          <div className="mx-4 mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl">
-            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">{currentUser?.name}</p>
-            <p className="text-[11px] text-emerald-600 dark:text-emerald-400">{currentUser?.email}</p>
+          <div className="mx-4 mb-4 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl">
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">{currentUser?.name}</p>
+            <p className="text-[11px] text-amber-600 dark:text-amber-400">{currentUser?.email}</p>
           </div>
 
           <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
@@ -532,8 +533,8 @@ export function AppShell() {
                   onClick={() => handleTabClick(tab.key)}
                   className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
-                      : 'text-muted-foreground hover:bg-emerald-50/50 hover:text-emerald-600'
+                      ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
+                      : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -541,13 +542,13 @@ export function AppShell() {
                 </button>
               );
             })}
-            <div className="pt-2 mt-2 border-t border-emerald-100 dark:border-emerald-900/50">
+            <div className="pt-2 mt-2 border-t border-amber-100 dark:border-amber-900/50">
               <button
                 onClick={() => setCurrentView('ph-messages')}
                 className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   currentView === 'ph-messages'
-                    ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
-                    : 'text-muted-foreground hover:bg-emerald-50/50 hover:text-emerald-600'
+                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
+                    : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
                 }`}
               >
                 <MessageCircle className="h-5 w-5" />
@@ -557,8 +558,8 @@ export function AppShell() {
                 onClick={() => setCurrentView('ph-promotions')}
                 className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   currentView === 'ph-promotions'
-                    ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
-                    : 'text-muted-foreground hover:bg-emerald-50/50 hover:text-emerald-600'
+                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
+                    : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
                 }`}
               >
                 <Tag className="h-5 w-5" />
@@ -568,8 +569,8 @@ export function AppShell() {
                 onClick={() => setCurrentView('ph-settings')}
                 className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   currentView === 'ph-settings'
-                    ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
-                    : 'text-muted-foreground hover:bg-emerald-50/50 hover:text-emerald-600'
+                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
+                    : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
                 }`}
               >
                 <Settings className="h-5 w-5" />
@@ -587,7 +588,7 @@ export function AppShell() {
             </button>
           </div>
 
-          <div className="p-4 border-t border-emerald-100 dark:border-emerald-900/50">
+          <div className="p-4 border-t border-amber-100 dark:border-amber-900/50">
             <p className="text-[10px] text-muted-foreground text-center">
               Pharma CI © 2025
             </p>
@@ -615,7 +616,7 @@ export function AppShell() {
       {/* Cart floating button (mobile) */}
       <CartFloatingButton />
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900/95 backdrop-blur-md border-t border-emerald-100 dark:border-emerald-900/50 lg:hidden pb-safe">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900/95 backdrop-blur-md border-t border-amber-100 dark:border-amber-900/50 lg:hidden pb-safe">
         <div className="flex items-center justify-around px-0.5 py-1 max-w-2xl mx-auto">
           {patientTabs.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -626,16 +627,16 @@ export function AppShell() {
                 onClick={() => handleTabClick(tab.key)}
                 className={`flex flex-col items-center justify-center gap-0.5 px-0.5 sm:px-1 py-1.5 rounded-xl transition-all duration-200 min-w-0 flex-1 ${
                   isActive
-                    ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50'
-                    : 'text-muted-foreground hover:text-emerald-600'
+                    ? 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50'
+                    : 'text-muted-foreground hover:text-amber-600'
                 }`}
               >
                 <Icon
-                  className={`h-[18px] sm:h-5 w-[18px] sm:w-5 transition-colors ${isActive ? 'text-emerald-700 dark:text-emerald-400' : ''}`}
+                  className={`h-[18px] sm:h-5 w-[18px] sm:w-5 transition-colors ${isActive ? 'text-amber-700 dark:text-amber-400' : ''}`}
                 />
                 <span className="text-[9px] sm:text-[10px] font-medium leading-tight truncate max-w-full">{tab.label}</span>
                 {isActive && (
-                  <div className="w-1 h-1 rounded-full bg-emerald-600 -mt-0.5" />
+                  <div className="w-1 h-1 rounded-full bg-amber-600 -mt-0.5" />
                 )}
               </button>
             );
@@ -643,9 +644,9 @@ export function AppShell() {
         </div>
       </nav>
 
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-950 border-r border-emerald-100 dark:border-emerald-900/50 flex-col z-50">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-950 border-r border-amber-100 dark:border-amber-900/50 flex-col z-50">
         <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center">
             <Pill className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -664,8 +665,8 @@ export function AppShell() {
                 onClick={() => handleTabClick(tab.key)}
                 className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
-                    : 'text-muted-foreground hover:bg-emerald-50/50 hover:text-emerald-600'
+                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
+                    : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -673,7 +674,7 @@ export function AppShell() {
               </button>
             );
           })}
-          <div className="pt-2 mt-2 border-t border-emerald-100 dark:border-emerald-900/50">
+          <div className="pt-2 mt-2 border-t border-amber-100 dark:border-amber-900/50">
             <CartSidebarButton />
           </div>
         </nav>
@@ -687,7 +688,7 @@ export function AppShell() {
           </button>
         </div>
 
-        <div className="p-4 border-t border-emerald-100 dark:border-emerald-900/50">
+        <div className="p-4 border-t border-amber-100 dark:border-amber-900/50">
           <p className="text-[10px] text-muted-foreground text-center">
             Pharma CI © 2025
           </p>

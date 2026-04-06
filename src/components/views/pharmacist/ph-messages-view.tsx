@@ -260,16 +260,16 @@ export function PharmacistMessagesView() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-col" style={{ height: 'calc(100dvh - 5rem - 2rem)' }}>
         {/* Chat header */}
-        <div className="flex items-center gap-3 pb-3 border-b border-emerald-100 flex-shrink-0">
+        <div className="flex items-center gap-3 pb-3 border-b border-orange-100 flex-shrink-0">
           <button
             onClick={handleBackToList}
-            className="flex items-center justify-center w-9 h-9 -ml-1 rounded-xl text-emerald-600 hover:bg-emerald-50 active:bg-emerald-100 transition-colors flex-shrink-0"
+            className="flex items-center justify-center w-9 h-9 -ml-1 rounded-xl text-orange-600 hover:bg-orange-50 active:bg-orange-100 transition-colors flex-shrink-0"
             aria-label="Retour"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-            <span className="text-sm font-bold text-emerald-700">
+          <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+            <span className="text-sm font-bold text-orange-700">
               {selectedPatient.name.charAt(0).toUpperCase()}
             </span>
           </div>
@@ -303,7 +303,7 @@ export function PharmacistMessagesView() {
             </div>
           ) : messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-8">
-              <MessageCircle className="h-10 w-10 text-emerald-300 mb-3" />
+              <MessageCircle className="h-10 w-10 text-orange-300 mb-3" />
               <p className="text-sm font-medium text-muted-foreground">Aucun message</p>
               <p className="text-xs text-muted-foreground mt-1">
                 Envoyez le premier message à {selectedPatient.name}
@@ -324,14 +324,14 @@ export function PharmacistMessagesView() {
                     <div
                       className={`max-w-[80%] sm:max-w-[70%] rounded-2xl px-3.5 py-2.5 ${
                         isSent
-                          ? 'bg-emerald-600 text-white rounded-br-md'
+                          ? 'bg-orange-600 text-white rounded-br-md'
                           : 'bg-gray-100 text-foreground rounded-bl-md'
                       }`}
                     >
                       <p className="text-sm leading-relaxed break-words">{msg.content}</p>
                       <p
                         className={`text-[10px] mt-1 text-right ${
-                          isSent ? 'text-emerald-200' : 'text-muted-foreground'
+                          isSent ? 'text-orange-200' : 'text-muted-foreground'
                         }`}
                       >
                         {formatMessageTime(msg.createdAt)}
@@ -346,21 +346,21 @@ export function PharmacistMessagesView() {
         </div>
 
         {/* Input bar */}
-        <div className="flex items-center gap-2 pt-3 border-t border-emerald-100 flex-shrink-0 pb-safe">
+        <div className="flex items-center gap-2 pt-3 border-t border-orange-100 flex-shrink-0 pb-safe">
           <Input
             ref={inputRef}
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Écrire un message..."
-            className="flex-1 h-11 text-sm border-emerald-200 focus-visible:ring-emerald-400"
+            className="flex-1 h-11 text-sm border-orange-200 focus-visible:ring-orange-400"
             disabled={sending}
           />
           <Button
             onClick={handleSendMessage}
             disabled={!messageInput.trim() || sending}
             size="icon"
-            className="h-11 w-11 bg-emerald-600 hover:bg-emerald-700 text-white flex-shrink-0 disabled:opacity-40"
+            className="h-11 w-11 bg-orange-600 hover:bg-orange-700 text-white flex-shrink-0 disabled:opacity-40"
           >
             {sending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -391,13 +391,13 @@ export function PharmacistMessagesView() {
       {/* Header */}
       <ViewHeader
         title="Messagerie"
-        icon={<MessageCircle className="h-5 w-5 text-emerald-600" />}
+        icon={<MessageCircle className="h-5 w-5 text-orange-600" />}
         back
         action={
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-emerald-600"
+            className="h-8 w-8 text-muted-foreground hover:text-orange-600"
             onClick={fetchPatients}
           >
             <RefreshCw className="h-4 w-4" />
@@ -413,7 +413,7 @@ export function PharmacistMessagesView() {
             placeholder="Rechercher un patient..."
             value={contactSearch}
             onChange={(e) => setContactSearch(e.target.value)}
-            className="pl-9 h-10 text-sm border-emerald-200 focus:border-emerald-400"
+            className="pl-9 h-10 text-sm border-orange-200 focus:border-orange-400"
           />
           {contactSearch && (
             <button
@@ -432,9 +432,9 @@ export function PharmacistMessagesView() {
           ? patients.filter((p) => p.name.toLowerCase().includes(contactSearch.toLowerCase()))
           : patients;
         return filtered.length === 0 ? (
-          <Card className="border-emerald-100 mt-2">
+          <Card className="border-orange-100 mt-2">
             <CardContent className="p-8 text-center">
-              <Inbox className="h-12 w-12 text-emerald-300 mx-auto mb-3" />
+              <Inbox className="h-12 w-12 text-orange-300 mx-auto mb-3" />
               <h3 className="font-semibold mb-1">
                 {contactSearch ? 'Aucun résultat' : 'Aucune conversation'}
               </h3>
@@ -460,15 +460,15 @@ export function PharmacistMessagesView() {
                 transition={{ delay: index * 0.03, duration: 0.2 }}
               >
                 <Card
-                  className="border-emerald-100 overflow-hidden cursor-pointer hover:border-emerald-300 transition-colors active:scale-[0.99] duration-150"
+                  className="border-orange-100 overflow-hidden cursor-pointer hover:border-orange-300 transition-colors active:scale-[0.99] duration-150"
                   onClick={() => handleSelectPatient(patient)}
                 >
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex items-center gap-3">
                       {/* Avatar with unread badge */}
                       <div className="relative flex-shrink-0">
-                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-emerald-100 flex items-center justify-center">
-                          <span className="text-sm sm:text-base font-bold text-emerald-700">
+                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-orange-100 flex items-center justify-center">
+                          <span className="text-sm sm:text-base font-bold text-orange-700">
                             {patient.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -500,7 +500,7 @@ export function PharmacistMessagesView() {
                             {formatRelativeTime(patient.lastMessageTime)}
                           </span>
                         )}
-                        <MessageCircle className="h-4 w-4 text-emerald-400" />
+                        <MessageCircle className="h-4 w-4 text-orange-400" />
                       </div>
                     </div>
                   </CardContent>

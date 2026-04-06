@@ -698,7 +698,6 @@ async function seed() {
   });
 
   const orderStatuses = ["pending", "confirmed", "ready", "picked_up", "cancelled"];
-  const paymentMethods = ["especes", "orange_money", "wave", "carte"];
   const patientUsers = users.filter(u => u.role === "patient");
 
   for (let i = 0; i < 12; i++) {
@@ -724,8 +723,6 @@ async function seed() {
         status,
         totalQuantity: qty,
         totalPrice: Math.round(stock.price * qty),
-        paymentMethod: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
-        pickupTime: `${8 + Math.floor(Math.random() * 10)}:00`,
         note: i % 4 === 0 ? "Urgent svp" : null,
         verificationCode,
         createdAt,

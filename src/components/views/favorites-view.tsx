@@ -86,7 +86,7 @@ export function FavoritesView() {
   return (
     <div className="pb-4">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <ViewHeader title="Mes Favoris" icon={<Heart className="h-5 w-5 text-emerald-600" />} action={
+        <ViewHeader title="Mes Favoris" icon={<Heart className="h-5 w-5 text-orange-600" />} action={
           currentUserId && favorites.length > 0 ? (
             <Badge variant="secondary" className="text-xs">
               {favorites.length}
@@ -95,7 +95,7 @@ export function FavoritesView() {
         } />
 
         {!currentUserId ? (
-          <Card className="border-emerald-100">
+          <Card className="border-orange-100">
             <CardContent className="p-6 sm:p-8 text-center">
               <div className="text-4xl mb-3">🔐</div>
               <h3 className="font-semibold mb-1">Connectez-vous</h3>
@@ -104,17 +104,17 @@ export function FavoritesView() {
               </p>
               <Button
                 onClick={() => setCurrentView('profile')}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="bg-orange-600 hover:bg-orange-700 text-white"
               >
                 Se connecter
               </Button>
             </CardContent>
           </Card>
         ) : favorites.length === 0 ? (
-          <Card className="border-emerald-100">
+          <Card className="border-orange-100">
             <CardContent className="p-6 sm:p-8 text-center">
               <div className="text-4xl mb-3 flex justify-center">
-                <Pill className="w-12 h-12 text-emerald-600" />
+                <Pill className="w-12 h-12 text-orange-600" />
               </div>
               <h3 className="font-semibold mb-1">Aucun favori</h3>
               <p className="text-sm text-muted-foreground mb-4">
@@ -122,7 +122,7 @@ export function FavoritesView() {
               </p>
               <Button
                 onClick={() => setCurrentView('search')}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="bg-orange-600 hover:bg-orange-700 text-white"
               >
                 Explorer les pharmacies
               </Button>
@@ -140,7 +140,7 @@ export function FavoritesView() {
                   transition={{ delay: index * 0.05 }}
                 >
                   <Card
-                    className="border-emerald-100 cursor-pointer hover:border-emerald-300 transition-colors"
+                    className="border-orange-100 cursor-pointer hover:border-orange-300 transition-colors"
                     onClick={() => handlePharmacyClick(fav.pharmacyId)}
                   >
                     <CardContent className="p-3 sm:p-4">
@@ -149,9 +149,9 @@ export function FavoritesView() {
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <h3 className="font-semibold text-sm">{fav.pharmacy.name}</h3>
                             {fav.pharmacy.isGuard && (
-                              <Badge className="bg-emerald-600 text-white text-[10px] px-1.5 h-4 flex-shrink-0">
+                              <Badge className="bg-orange-600 text-white text-[10px] px-1.5 h-4 flex-shrink-0">
                                 <Shield className="h-3 w-3" />
-                                Garde
+                                De garde
                               </Badge>
                             )}
                           </div>

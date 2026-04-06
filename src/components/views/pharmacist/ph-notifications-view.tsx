@@ -49,8 +49,8 @@ const TYPE_CONFIG: Record<string, { icon: typeof Bell; colorClass: string; bgCla
   },
   info: {
     icon: Bell,
-    colorClass: 'text-emerald-600',
-    bgClass: 'bg-emerald-100',
+    colorClass: 'text-orange-600',
+    bgClass: 'bg-orange-100',
   },
 };
 
@@ -170,7 +170,7 @@ export function PharmacistNotificationsView() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
         <ViewHeader
           title="Notifications"
-          icon={<Bell className="h-5 w-5 text-emerald-600" />}
+          icon={<Bell className="h-5 w-5 text-orange-600" />}
         />
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
@@ -180,7 +180,7 @@ export function PharmacistNotificationsView() {
             <Button
               onClick={fetchNotifications}
               variant="outline"
-              className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+              className="border-orange-200 text-orange-700 hover:bg-orange-50"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Réessayer
@@ -196,7 +196,7 @@ export function PharmacistNotificationsView() {
       {/* Header */}
       <ViewHeader
         title="Notifications"
-        icon={<Bell className="h-5 w-5 text-emerald-600" />}
+        icon={<Bell className="h-5 w-5 text-orange-600" />}
         action={
           unreadCount > 0 ? (
             <Button
@@ -204,7 +204,7 @@ export function PharmacistNotificationsView() {
               size="sm"
               onClick={handleMarkAllRead}
               disabled={markingAll}
-              className="text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 h-8 gap-1.5"
+              className="text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 h-8 gap-1.5"
             >
               <CheckCheck className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Tout </span>lire
@@ -216,7 +216,7 @@ export function PharmacistNotificationsView() {
       {/* Unread count badge */}
       {unreadCount > 0 && (
         <div className="flex items-center gap-2 mb-4">
-          <Badge className="bg-emerald-600 text-white text-xs hover:bg-emerald-700">
+          <Badge className="bg-orange-600 text-white text-xs hover:bg-orange-700">
             {unreadCount} non lue{unreadCount > 1 ? 's' : ''}
           </Badge>
         </div>
@@ -230,7 +230,7 @@ export function PharmacistNotificationsView() {
             size="sm"
             onClick={handleMarkAllRead}
             disabled={markingAll}
-            className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50 h-9 text-xs gap-1.5"
+            className="w-full border-orange-200 text-orange-700 hover:bg-orange-50 h-9 text-xs gap-1.5"
           >
             <CheckCheck className={`h-3.5 w-3.5 ${markingAll ? 'animate-spin' : ''}`} />
             Tout marquer comme lu
@@ -240,9 +240,9 @@ export function PharmacistNotificationsView() {
 
       {/* Notifications list */}
       {notifications.length === 0 ? (
-        <Card className="border-emerald-100">
+        <Card className="border-orange-100">
           <CardContent className="p-8 text-center">
-            <Inbox className="h-12 w-12 text-emerald-300 mx-auto mb-3" />
+            <Inbox className="h-12 w-12 text-orange-300 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">Aucune notification</h3>
             <p className="text-sm text-muted-foreground">
               Vos nouvelles alertes et messages apparaîtront ici
@@ -270,10 +270,10 @@ export function PharmacistNotificationsView() {
                   transition={{ delay: index * 0.03, duration: 0.2 }}
                 >
                   <Card
-                    className={`border overflow-hidden transition-colors cursor-pointer hover:border-emerald-200 active:scale-[0.99] duration-150 ${
+                    className={`border overflow-hidden transition-colors cursor-pointer hover:border-orange-200 active:scale-[0.99] duration-150 ${
                       notification.read
-                        ? 'border-emerald-100 bg-white'
-                        : 'border-emerald-200 bg-emerald-50'
+                        ? 'border-orange-100 bg-white'
+                        : 'border-orange-200 bg-orange-50'
                     }`}
                     onClick={() => handleNotificationClick(notification)}
                   >
@@ -301,7 +301,7 @@ export function PharmacistNotificationsView() {
                                   {notification.title}
                                 </h3>
                                 {!notification.read && (
-                                  <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                                  <span className="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0" />
                                 )}
                               </div>
                             </div>

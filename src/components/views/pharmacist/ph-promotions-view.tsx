@@ -86,8 +86,8 @@ function getStatusConfig(status: 'active' | 'expired' | 'upcoming') {
     case 'active':
       return {
         label: 'Active',
-        className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-        dot: 'bg-emerald-500',
+        className: 'bg-orange-100 text-orange-700 border-orange-200',
+        dot: 'bg-orange-500',
       };
     case 'expired':
       return {
@@ -399,19 +399,19 @@ export function PharmacistPromotionsView() {
       <ViewHeader
         title="Promotions & Fidélisation"
         back
-        icon={<Tag className="h-5 w-5 text-emerald-600" />}
+        icon={<Tag className="h-5 w-5 text-orange-600" />}
       />
 
       {/* ── Section: Créer une promotion ─────────────────── */}
       <motion.div {...fadeInUp} transition={{ duration: 0.3 }}>
-        <Card className="border-emerald-100 overflow-hidden">
+        <Card className="border-orange-100 overflow-hidden">
           <button
             onClick={() => setFormOpen(!formOpen)}
-            className="w-full flex items-center justify-between p-4 text-left hover:bg-emerald-50/50 transition-colors"
+            className="w-full flex items-center justify-between p-4 text-left hover:bg-orange-50/50 transition-colors"
           >
             <div className="flex items-center gap-2.5">
-              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-100">
-                <Plus className="h-5 w-5 text-emerald-600" />
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-orange-100">
+                <Plus className="h-5 w-5 text-orange-600" />
               </div>
               <span className="font-semibold text-sm text-foreground">
                 Créer une promotion
@@ -440,8 +440,8 @@ export function PharmacistPromotionsView() {
                       Médicament (optionnel)
                     </Label>
                     {selectedMedication ? (
-                      <div className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-50 border border-emerald-200">
-                        <Pill className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                      <div className="flex items-center gap-2 p-2.5 rounded-lg bg-orange-50 border border-orange-200">
+                        <Pill className="h-4 w-4 text-orange-600 flex-shrink-0" />
                         <span className="text-sm font-medium flex-1 truncate">
                           {selectedMedication.commercialName || selectedMedication.name}
                         </span>
@@ -468,13 +468,13 @@ export function PharmacistPromotionsView() {
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
                               exit={{ opacity: 0, height: 0 }}
-                              className="overflow-hidden border border-emerald-100 rounded-lg max-h-40 overflow-y-auto"
+                              className="overflow-hidden border border-orange-100 rounded-lg max-h-40 overflow-y-auto"
                             >
                               {medications.map((med) => (
                                 <button
                                   key={med.id}
                                   onClick={() => handleSelectMedication(med)}
-                                  className="w-full text-left px-3 py-2 hover:bg-emerald-50 text-sm transition-colors border-b border-emerald-50 last:border-0"
+                                  className="w-full text-left px-3 py-2 hover:bg-orange-50 text-sm transition-colors border-b border-orange-50 last:border-0"
                                 >
                                   {med.commercialName || med.name}
                                   {med.commercialName && med.commercialName !== med.name && (
@@ -574,7 +574,7 @@ export function PharmacistPromotionsView() {
                   <Button
                     onClick={handleCreate}
                     disabled={submitting}
-                    className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm"
+                    className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white font-semibold text-sm"
                   >
                     {submitting ? (
                       <span className="flex items-center gap-2">
@@ -595,11 +595,11 @@ export function PharmacistPromotionsView() {
       {/* ── Section: Promotions actives ──────────────────── */}
       <motion.div {...fadeInUp} transition={{ duration: 0.3, delay: 0.1 }}>
         <div className="flex items-center gap-2 mb-3">
-          <Calendar className="h-4 w-4 text-emerald-600" />
+          <Calendar className="h-4 w-4 text-orange-600" />
           <h2 className="font-semibold text-sm text-foreground">
             Promotions actives
           </h2>
-          <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-[11px] px-2 py-0">
+          <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-[11px] px-2 py-0">
             {promotions.length}
           </Badge>
         </div>
@@ -630,11 +630,11 @@ export function PharmacistPromotionsView() {
         )}
 
         {!loading && !error && promotions.length === 0 && (
-          <Card className="border-dashed border-emerald-200">
+          <Card className="border-dashed border-orange-200">
             <CardContent className="p-8 text-center">
               <div className="flex justify-center mb-3">
-                <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center">
-                  <Package className="h-6 w-6 text-emerald-400" />
+                <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center">
+                  <Package className="h-6 w-6 text-orange-400" />
                 </div>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -665,7 +665,7 @@ export function PharmacistPromotionsView() {
                     exit={{ opacity: 0, x: -60, transition: { duration: 0.2 } }}
                     transition={{ duration: 0.25 }}
                   >
-                    <Card className="border-emerald-100 relative overflow-hidden">
+                    <Card className="border-orange-100 relative overflow-hidden">
                       {/* Discount ribbon */}
                       <div className="absolute top-0 right-0">
                         <Badge className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-none rounded-bl-lg border-0">
@@ -680,7 +680,7 @@ export function PharmacistPromotionsView() {
                             {promo.name}
                           </h3>
                           {medLabel && (
-                            <p className="text-xs text-emerald-600 mt-0.5 truncate flex items-center gap-1">
+                            <p className="text-xs text-orange-600 mt-0.5 truncate flex items-center gap-1">
                               <Pill className="h-3 w-3 flex-shrink-0" />
                               {medLabel}
                             </p>
@@ -717,7 +717,7 @@ export function PharmacistPromotionsView() {
                               variant="ghost"
                               size="sm"
                               onClick={() => openEditDialog(promo)}
-                              className="h-8 px-2 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50"
+                              className="h-8 px-2 text-muted-foreground hover:text-orange-600 hover:bg-orange-50"
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
@@ -749,7 +749,7 @@ export function PharmacistPromotionsView() {
       {/* ── Section: Programme de fidélité ────────────────── */}
       <motion.div {...fadeInUp} transition={{ duration: 0.3, delay: 0.2 }} className="space-y-3">
         <div className="flex items-center gap-2 mb-3">
-          <Gift className="h-4 w-4 text-emerald-600" />
+          <Gift className="h-4 w-4 text-orange-600" />
           <h2 className="font-semibold text-sm text-foreground">
             Programme de fidélité
           </h2>
@@ -759,9 +759,9 @@ export function PharmacistPromotionsView() {
         </div>
 
         <Collapsible open={loyaltyOpen} onOpenChange={setLoyaltyOpen}>
-          <Card className="border-emerald-200 overflow-hidden">
+          <Card className="border-orange-200 overflow-hidden">
             <CollapsibleTrigger className="w-full">
-              <div className="bg-gradient-to-br from-emerald-600 to-teal-600 p-4">
+              <div className="bg-gradient-to-br from-orange-600 to-teal-600 p-4">
                 <div className="flex items-center gap-2.5">
                   <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                     <Award className="h-5 w-5 text-white" />
@@ -769,9 +769,9 @@ export function PharmacistPromotionsView() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-white text-sm">Pharma Fidélité</h3>
-                      <Lock className="h-3.5 w-3.5 text-emerald-200" />
+                      <Lock className="h-3.5 w-3.5 text-orange-200" />
                     </div>
-                    <p className="text-emerald-100 text-xs">Gagnez des points à chaque achat</p>
+                    <p className="text-orange-100 text-xs">Gagnez des points à chaque achat</p>
                   </div>
                   {loyaltyOpen ? (
                     <ChevronUp className="h-5 w-5 text-white/70" />
@@ -812,7 +812,7 @@ export function PharmacistPromotionsView() {
         <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Pencil className="h-4 w-4 text-emerald-600" />
+              <Pencil className="h-4 w-4 text-orange-600" />
               Modifier la promotion
             </DialogTitle>
             <DialogDescription>
@@ -825,8 +825,8 @@ export function PharmacistPromotionsView() {
             <div className="space-y-1.5">
               <Label className="text-xs font-medium">Médicament (optionnel)</Label>
               {editSelectedMedication ? (
-                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-50 border border-emerald-200">
-                  <Pill className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-orange-50 border border-orange-200">
+                  <Pill className="h-4 w-4 text-orange-600 flex-shrink-0" />
                   <span className="text-sm font-medium flex-1 truncate">
                     {editSelectedMedication.commercialName || editSelectedMedication.name}
                   </span>
@@ -853,13 +853,13 @@ export function PharmacistPromotionsView() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="overflow-hidden border border-emerald-100 rounded-lg max-h-40 overflow-y-auto"
+                        className="overflow-hidden border border-orange-100 rounded-lg max-h-40 overflow-y-auto"
                       >
                         {editMedications.map((med) => (
                           <button
                             key={med.id}
                             onClick={() => handleEditSelectMedication(med)}
-                            className="w-full text-left px-3 py-2 hover:bg-emerald-50 text-sm transition-colors border-b border-emerald-50 last:border-0"
+                            className="w-full text-left px-3 py-2 hover:bg-orange-50 text-sm transition-colors border-b border-orange-50 last:border-0"
                           >
                             {med.commercialName || med.name}
                             {med.commercialName && med.commercialName !== med.name && (
@@ -949,7 +949,7 @@ export function PharmacistPromotionsView() {
             <Button
               onClick={handleEdit}
               disabled={editSubmitting}
-              className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm"
+              className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white font-semibold text-sm"
             >
               {editSubmitting ? (
                 <span className="flex items-center gap-2">

@@ -238,22 +238,22 @@ export function PharmacistReportsView() {
         <motion.div variants={itemVariants}>
           <ViewHeader
             title="Rapports & Analyses"
-            icon={<BarChart3 className="h-5 w-5 text-emerald-600" />}
+            icon={<BarChart3 className="h-5 w-5 text-amber-600" />}
             back
           />
         </motion.div>
 
         {/* ─── PERIOD SELECTOR ─── */}
         <motion.div variants={itemVariants}>
-          <div className="flex gap-1.5 p-1 bg-emerald-50 rounded-xl">
+          <div className="flex gap-1.5 p-1 bg-amber-50 rounded-xl">
             {PERIODS.map((p) => (
               <button
                 key={p.key}
                 onClick={() => setPeriod(p.key)}
                 className={`flex-1 text-xs sm:text-sm font-medium py-2 px-2 rounded-lg transition-all duration-200 ${
                   period === p.key
-                    ? 'bg-white text-emerald-700 shadow-sm'
-                    : 'text-emerald-600 hover:bg-emerald-100/50'
+                    ? 'bg-white text-amber-700 shadow-sm'
+                    : 'text-amber-600 hover:bg-amber-100/50'
                 }`}
               >
                 {p.label}
@@ -265,7 +265,7 @@ export function PharmacistReportsView() {
         {/* ─── LOADING SKELETON ─── */}
         {loading && (
           <motion.div variants={itemVariants} className="space-y-5">
-            <Card className="border-emerald-100">
+            <Card className="border-amber-100">
               <CardContent className="p-4 sm:p-6">
                 <Skeleton className="h-3 w-28 mb-2" />
                 <Skeleton className="h-8 w-40 mb-2" />
@@ -274,7 +274,7 @@ export function PharmacistReportsView() {
             </Card>
             <div className="grid grid-cols-2 gap-3">
               {Array.from({ length: 2 }).map((_, i) => (
-                <Card key={i} className="border-emerald-100">
+                <Card key={i} className="border-amber-100">
                   <CardContent className="p-4">
                     <Skeleton className="h-3 w-20 mb-2" />
                     <Skeleton className="h-6 w-16" />
@@ -282,19 +282,19 @@ export function PharmacistReportsView() {
                 </Card>
               ))}
             </div>
-            <Card className="border-emerald-100">
+            <Card className="border-amber-100">
               <CardHeader className="pb-2">
                 <Skeleton className="h-5 w-32" />
               </CardHeader>
               <CardContent>
                 <div className="flex items-end gap-2 h-40">
                   {Array.from({ length: 7 }).map((_, i) => (
-                    <Skeleton key={i} className="flex-1 bg-emerald-200/40" style={{ height: `${30 + Math.random() * 70}%` }} />
+                    <Skeleton key={i} className="flex-1 bg-amber-200/40" style={{ height: `${30 + Math.random() * 70}%` }} />
                   ))}
                 </div>
               </CardContent>
             </Card>
-            <Card className="border-emerald-100">
+            <Card className="border-amber-100">
               <CardHeader className="pb-2">
                 <Skeleton className="h-5 w-44" />
               </CardHeader>
@@ -338,7 +338,7 @@ export function PharmacistReportsView() {
           <>
             {/* ── REVENUE CARD ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-emerald-100 overflow-hidden">
+              <Card className="border-amber-100 overflow-hidden">
                 <CardContent className="p-4 sm:p-6">
                   <p className="text-xs sm:text-sm text-muted-foreground mb-1">Chiffre d&apos;affaires</p>
                   <div className="flex items-end gap-3">
@@ -346,7 +346,7 @@ export function PharmacistReportsView() {
                       {formatFCFA(data.revenue)}
                     </p>
                     <div className={`flex items-center gap-1 mb-1 text-sm font-medium ${
-                      data.percentageChange >= 0 ? 'text-emerald-600' : 'text-red-600'
+                      data.percentageChange >= 0 ? 'text-amber-600' : 'text-red-600'
                     }`}>
                       {data.percentageChange >= 0 ? (
                         <TrendingUp className="h-4 w-4" />
@@ -368,7 +368,7 @@ export function PharmacistReportsView() {
 
             {/* ── STATS ROW ── */}
             <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3">
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100">
@@ -379,11 +379,11 @@ export function PharmacistReportsView() {
                   <p className="text-lg sm:text-xl font-bold mt-0.5">{data.orderCount}</p>
                 </CardContent>
               </Card>
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-emerald-100">
-                      <Package className="h-4 w-4 text-emerald-600" />
+                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-amber-100">
+                      <Package className="h-4 w-4 text-amber-600" />
                     </div>
                   </div>
                   <p className="text-[11px] sm:text-xs text-muted-foreground">Panier moyen</p>
@@ -394,13 +394,13 @@ export function PharmacistReportsView() {
 
             {/* ── DAILY REVENUE CHART (CSS-only bar chart) ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                    <TrendingUp className="h-4 w-4 text-emerald-600" />
+                    <TrendingUp className="h-4 w-4 text-amber-600" />
                     CA journalier
                   </CardTitle>
-                  <Badge variant="outline" className="text-[11px] border-emerald-200 text-emerald-700">
+                  <Badge variant="outline" className="text-[11px] border-amber-200 text-amber-700">
                     {PERIODS.find((p) => p.key === period)?.label}
                   </Badge>
                 </CardHeader>
@@ -438,7 +438,7 @@ export function PharmacistReportsView() {
                                     {d.value > 0 ? formatFCFA(d.value) : ''}
                                   </span>
                                   <div
-                                    className="w-full rounded-t-md bg-gradient-to-t from-emerald-500 to-emerald-400 transition-all duration-500 ease-out min-h-[2px] relative group cursor-pointer hover:from-emerald-600 hover:to-emerald-500"
+                                    className="w-full rounded-t-md bg-gradient-to-t from-amber-500 to-amber-400 transition-all duration-500 ease-out min-h-[2px] relative group cursor-pointer hover:from-amber-600 hover:to-amber-500"
                                     style={{ height: `${Math.max(height, 2)}%` }}
                                     onClick={() => handleBarClick(d.date, d.label)}
                                   >
@@ -475,13 +475,13 @@ export function PharmacistReportsView() {
 
             {/* ── TOP MEDICATIONS ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                    <Award className="h-4 w-4 text-emerald-600" />
+                    <Award className="h-4 w-4 text-amber-600" />
                     Médicaments les plus vendus
                   </CardTitle>
-                  <Badge variant="outline" className="text-[11px] border-emerald-200 text-emerald-700">
+                  <Badge variant="outline" className="text-[11px] border-amber-200 text-amber-700">
                     Top {data.topMedications.length}
                   </Badge>
                 </CardHeader>
@@ -496,7 +496,7 @@ export function PharmacistReportsView() {
                       {data.topMedications.map((med) => (
                         <div
                           key={med.medicationId}
-                          className="flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-emerald-50 transition-colors"
+                          className="flex items-center gap-3 py-2 px-2 rounded-lg hover:bg-amber-50 transition-colors"
                         >
                           {/* Rank badge */}
                           <div className={`flex items-center justify-center h-6 w-6 rounded-full text-[11px] font-bold shrink-0 ${
@@ -519,7 +519,7 @@ export function PharmacistReportsView() {
                             {med.quantitySold} pcs
                           </span>
                           {/* Revenue */}
-                          <span className="text-xs font-semibold text-emerald-700 shrink-0">
+                          <span className="text-xs font-semibold text-amber-700 shrink-0">
                             {formatFCFA(med.revenue)}
                           </span>
                         </div>
@@ -532,10 +532,10 @@ export function PharmacistReportsView() {
 
             {/* ── STOCK STATUS ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardHeader className="pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                    <Package className="h-4 w-4 text-emerald-600" />
+                    <Package className="h-4 w-4 text-amber-600" />
                     État du stock
                   </CardTitle>
                 </CardHeader>
@@ -544,9 +544,9 @@ export function PharmacistReportsView() {
                     <StockStatCard
                       label="En stock"
                       value={data.stockStatus.inStock}
-                      color="bg-emerald-100"
-                      textColor="text-emerald-700"
-                      iconColor="text-emerald-500"
+                      color="bg-amber-100"
+                      textColor="text-amber-700"
+                      iconColor="text-amber-500"
                     />
                     <StockStatCard
                       label="Rupture"
@@ -583,10 +583,10 @@ export function PharmacistReportsView() {
 
             {/* ── ORDER STATUS BREAKDOWN ── */}
             <motion.div variants={itemVariants}>
-              <Card className="border-emerald-100">
+              <Card className="border-amber-100">
                 <CardHeader className="pb-2 px-4 pt-4">
                   <CardTitle className="text-sm sm:text-base font-semibold flex items-center gap-1.5">
-                    <ShoppingCart className="h-4 w-4 text-emerald-600" />
+                    <ShoppingCart className="h-4 w-4 text-amber-600" />
                     Répartition des commandes
                   </CardTitle>
                 </CardHeader>
@@ -614,7 +614,7 @@ export function PharmacistReportsView() {
                         )}
                         {data.orderStatusBreakdown.ready > 0 && (
                           <div
-                            className="bg-emerald-400 transition-all duration-500"
+                            className="bg-amber-400 transition-all duration-500"
                             style={{ width: `${(data.orderStatusBreakdown.ready / totalOrders) * 100}%` }}
                           />
                         )}
@@ -635,7 +635,7 @@ export function PharmacistReportsView() {
                       <div className="flex flex-wrap gap-x-4 gap-y-2">
                         <StatusLegendItem color="bg-amber-400" label="En attente" count={data.orderStatusBreakdown.pending} total={totalOrders} />
                         <StatusLegendItem color="bg-blue-400" label="Confirmées" count={data.orderStatusBreakdown.confirmed} total={totalOrders} />
-                        <StatusLegendItem color="bg-emerald-400" label="Prêtées" count={data.orderStatusBreakdown.ready} total={totalOrders} />
+                        <StatusLegendItem color="bg-amber-400" label="Prêtées" count={data.orderStatusBreakdown.ready} total={totalOrders} />
                         <StatusLegendItem color="bg-gray-400" label="Récupérées" count={data.orderStatusBreakdown.pickedUp} total={totalOrders} />
                         <StatusLegendItem color="bg-red-400" label="Annulées" count={data.orderStatusBreakdown.cancelled} total={totalOrders} />
                       </div>
@@ -652,7 +652,7 @@ export function PharmacistReportsView() {
           <DialogContent className="max-w-lg max-h-[80dvh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-base">
-                <TrendingUp className="h-4 w-4 text-emerald-600" />
+                <TrendingUp className="h-4 w-4 text-amber-600" />
                 Commandes du {drillDownDate}
               </DialogTitle>
               <DialogDescription>
@@ -662,19 +662,19 @@ export function PharmacistReportsView() {
 
             {drillDownLoading ? (
               <div className="flex flex-col items-center gap-3 py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                <Loader2 className="h-6 w-6 animate-spin text-amber-600" />
                 <p className="text-sm text-muted-foreground">Chargement...</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {/* Summary stats */}
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-emerald-50 rounded-xl p-3 text-center">
-                    <p className="text-lg font-bold text-emerald-700">{drillDownCount}</p>
+                  <div className="bg-amber-50 rounded-xl p-3 text-center">
+                    <p className="text-lg font-bold text-amber-700">{drillDownCount}</p>
                     <p className="text-[11px] text-muted-foreground">Commandes</p>
                   </div>
-                  <div className="bg-emerald-50 rounded-xl p-3 text-center">
-                    <p className="text-lg font-bold text-emerald-700">{formatFCFA(drillDownTotal)}</p>
+                  <div className="bg-amber-50 rounded-xl p-3 text-center">
+                    <p className="text-lg font-bold text-amber-700">{formatFCFA(drillDownTotal)}</p>
                     <p className="text-[11px] text-muted-foreground">CA total</p>
                   </div>
                   <div className="bg-amber-50 rounded-xl p-3 text-center">
@@ -715,7 +715,7 @@ export function PharmacistReportsView() {
                           <p className="text-xs text-muted-foreground">{order.user.name} · ×{order.totalQuantity}</p>
                         </div>
                         <div className="text-right shrink-0 ml-3">
-                          <p className="text-sm font-semibold text-emerald-700">{formatFCFA(order.totalPrice)}</p>
+                          <p className="text-sm font-semibold text-amber-700">{formatFCFA(order.totalPrice)}</p>
                         </div>
                       </div>
                     ))}

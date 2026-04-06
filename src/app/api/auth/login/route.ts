@@ -57,9 +57,14 @@ export async function POST(request: Request) {
           token,
           csrfToken,
           user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role, avatar: user.avatar, city: user.city, authProvider: user.authProvider, linkedPharmacyId: user.linkedPharmacyId },
-        },
-        { headers: { 'Set-Cookie': [sessionCookie, csrfCookie].filter(Boolean).join(', ') } }
+        }
       );
+
+      // Set cookies using append to properly set multiple Set-Cookie headers
+      response.headers.append('Set-Cookie', sessionCookie);
+      if (csrfCookie) {
+        response.headers.append('Set-Cookie', csrfCookie);
+      }
 
       // Add rate limit headers
       response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString());

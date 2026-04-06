@@ -234,10 +234,10 @@ export function OrderConfirmationView() {
           title="Confirmation"
           back
         />
-        <Card className="border-emerald-100">
+        <Card className="border-amber-100">
           <CardContent className="p-8 text-center">
             <div className="text-4xl mb-3 flex justify-center">
-              <PartyPopper className="w-12 h-12 text-emerald-600" />
+              <PartyPopper className="w-12 h-12 text-amber-600" />
             </div>
             <h3 className="font-semibold mb-1">
               {error || 'Commande terminée'}
@@ -247,7 +247,7 @@ export function OrderConfirmationView() {
             </p>
             <Button
               onClick={() => setCurrentView('order-history')}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-amber-600 hover:bg-amber-700 text-white"
             >
               <ClipboardList className="h-4 w-4 mr-2" />
               Voir mes commandes
@@ -277,9 +277,9 @@ export function OrderConfirmationView() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-4"
+            className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center mb-4"
           >
-            <CheckCircle2 className="h-12 w-12 text-emerald-600" />
+            <CheckCircle2 className="h-12 w-12 text-amber-600" />
           </motion.div>
           <h2 className="text-xl font-bold text-foreground">
             Commande confirmée !
@@ -296,15 +296,15 @@ export function OrderConfirmationView() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
           >
-            <Card className="border-emerald-200 overflow-hidden">
-              <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3 text-center">
+            <Card className="border-amber-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-amber-600 to-teal-600 px-4 py-3 text-center">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <QrCode className="h-4 w-4 text-white/90" />
                   <p className="font-semibold text-sm text-white">
                     Code de vérification
                   </p>
                 </div>
-                <p className="text-xs text-emerald-200">
+                <p className="text-xs text-amber-200">
                   Présentez ce QR code à la pharmacie pour récupérer votre commande
                 </p>
               </div>
@@ -325,16 +325,16 @@ export function OrderConfirmationView() {
                 {/* Verification code display */}
                 <div className="text-center space-y-2">
                   <div className="flex items-center justify-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                    <ShieldCheck className="h-4 w-4 text-amber-600" />
                     <span className="text-sm font-medium text-muted-foreground">Code :</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold tracking-[0.3em] text-emerald-700 font-mono">
+                    <span className="text-2xl font-bold tracking-[0.3em] text-amber-700 font-mono">
                       {order.verificationCode}
                     </span>
                     <button
                       onClick={handleCopyCode}
-                      className="p-1.5 rounded-lg hover:bg-emerald-50 text-muted-foreground hover:text-emerald-600 transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-amber-50 text-muted-foreground hover:text-amber-600 transition-colors"
                     >
                       <Copy className="h-4 w-4" />
                     </button>
@@ -345,7 +345,7 @@ export function OrderConfirmationView() {
                 <Button
                   variant="outline"
                   onClick={handleDownloadQR}
-                  className="w-full max-w-xs h-10 border-emerald-200 text-emerald-700 hover:bg-emerald-50 text-sm rounded-xl"
+                  className="w-full max-w-xs h-10 border-amber-200 text-amber-700 hover:bg-amber-50 text-sm rounded-xl"
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Télécharger le QR Code
@@ -361,16 +361,16 @@ export function OrderConfirmationView() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="border-emerald-100 overflow-hidden">
+          <Card className="border-amber-100 overflow-hidden">
             {/* Pharmacy header */}
-            <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 px-4 py-3">
+            <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-4 py-3">
               <div className="flex items-center gap-2">
                 <Store className="h-4 w-4 text-white/80 flex-shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-sm text-white truncate">
                     {order.pharmacy.name}
                   </p>
-                  <p className="text-xs text-emerald-200 truncate">
+                  <p className="text-xs text-amber-200 truncate">
                     {order.pharmacy.address}, {order.pharmacy.city}
                   </p>
                 </div>
@@ -381,8 +381,8 @@ export function OrderConfirmationView() {
               {/* Medications */}
               {order.items.length === 1 ? (
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                    <Pill className="h-5 w-5 text-emerald-600" />
+                  <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                    <Pill className="h-5 w-5 text-amber-600" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-sm truncate">
@@ -399,8 +399,8 @@ export function OrderConfirmationView() {
                 <div className="space-y-2">
                   {order.items.map((item, idx) => (
                     <div key={item.id || idx} className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                        <Pill className="h-5 w-5 text-emerald-600" />
+                      <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                        <Pill className="h-5 w-5 text-amber-600" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-sm truncate">
@@ -415,7 +415,7 @@ export function OrderConfirmationView() {
                 </div>
               )}
 
-              <div className="border-t border-emerald-100" />
+              <div className="border-t border-amber-100" />
 
               {/* Price breakdown */}
               <div className="space-y-1.5">
@@ -431,9 +431,9 @@ export function OrderConfirmationView() {
                     </span>
                   </div>
                 )}
-                <div className="border-t border-emerald-100 pt-1.5 flex items-center justify-between">
+                <div className="border-t border-amber-100 pt-1.5 flex items-center justify-between">
                   <span className="text-sm font-semibold">Total</span>
-                  <span className="text-lg font-bold text-emerald-700">
+                  <span className="text-lg font-bold text-amber-700">
                     {order.totalPrice.toLocaleString()} FCFA
                   </span>
                 </div>
@@ -457,17 +457,17 @@ export function OrderConfirmationView() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 }}
           >
-            <Card className="border-emerald-200 bg-emerald-50 dark:bg-emerald-950/40">
+            <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/40">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-200 dark:bg-emerald-800 flex items-center justify-center flex-shrink-0">
-                    <Layers className="h-5 w-5 text-emerald-700 dark:text-emerald-300" />
+                  <div className="w-10 h-10 rounded-lg bg-amber-200 dark:bg-amber-800 flex items-center justify-center flex-shrink-0">
+                    <Layers className="h-5 w-5 text-amber-700 dark:text-amber-300" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-sm text-emerald-900 dark:text-emerald-100 mb-1">
+                    <h3 className="font-semibold text-sm text-amber-900 dark:text-amber-100 mb-1">
                       Commandes groupées
                     </h3>
-                    <p className="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed">
+                    <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
                       Vous avez <strong>{relatedOrders.length + 1} commande(s)</strong> auprès de <strong>{order.pharmacy.name}</strong>.
                       {relatedOrders.length > 0 && (
                         <span className="block mt-1">
@@ -481,7 +481,7 @@ export function OrderConfirmationView() {
                           <Badge
                             key={relatedOrder.id}
                             variant="secondary"
-                            className="text-[10px] bg-white dark:bg-gray-900 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+                            className="text-[10px] bg-white dark:bg-gray-900 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800"
                           >
                             <Pill className="h-2.5 w-2.5 mr-1" />
                             {relatedOrder.items.length === 1
@@ -520,7 +520,7 @@ export function OrderConfirmationView() {
             className="block"
           >
             <Button
-              className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium text-sm"
+              className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium text-sm"
             >
               <Phone className="h-4 w-4 mr-2" />
               Appeler la pharmacie
@@ -531,7 +531,7 @@ export function OrderConfirmationView() {
           {pharmacyDetail && (
             <Button
               variant="outline"
-              className="w-full h-11 border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-xl font-medium text-sm"
+              className="w-full h-11 border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl font-medium text-sm"
               onClick={handleNavigate}
             >
               <Navigation className="h-4 w-4 mr-2" />
@@ -542,7 +542,7 @@ export function OrderConfirmationView() {
           {/* View orders */}
           <Button
             variant="outline"
-            className="w-full h-11 border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-xl font-medium text-sm"
+            className="w-full h-11 border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl font-medium text-sm"
             onClick={() => setCurrentView('order-history')}
           >
             <ClipboardList className="h-4 w-4 mr-2" />
@@ -555,10 +555,10 @@ export function OrderConfirmationView() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="mt-4 flex items-start gap-2.5 p-3 bg-emerald-50 rounded-xl"
+          className="mt-4 flex items-start gap-2.5 p-3 bg-amber-50 rounded-xl"
         >
-          <Package className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-emerald-800 leading-relaxed">
+          <Package className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-800 leading-relaxed">
             Retrait en pharmacie — Présentez le QR code ou communiquez le code
             de vérification au pharmacien lors du retrait de votre commande.
           </p>

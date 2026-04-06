@@ -145,11 +145,11 @@ export function CartCheckoutView() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
         <ViewHeader
           title="Récapitulatif"
-          icon={<ClipboardCheck className="h-5 w-5 text-emerald-600" />}
+          icon={<ClipboardCheck className="h-5 w-5 text-amber-600" />}
           back
         />
 
-        <Card className="border-emerald-100 mt-4">
+        <Card className="border-amber-100 mt-4">
           <CardContent className="p-8 text-center">
             <AlertTriangle className="h-10 w-10 text-amber-400 mx-auto mb-3" />
             <h3 className="font-semibold mb-1">Panier vide</h3>
@@ -158,7 +158,7 @@ export function CartCheckoutView() {
             </p>
             <Button
               onClick={() => setCurrentView('search')}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
+              className="bg-amber-600 hover:bg-amber-700 text-white rounded-xl"
             >
               Rechercher des médicaments
             </Button>
@@ -172,7 +172,7 @@ export function CartCheckoutView() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-28">
       <ViewHeader
         title="Récapitulatif"
-        icon={<ClipboardCheck className="h-5 w-5 text-emerald-600" />}
+        icon={<ClipboardCheck className="h-5 w-5 text-amber-600" />}
         back
       />
 
@@ -199,12 +199,12 @@ export function CartCheckoutView() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.08, duration: 0.3 }}
             >
-              <Card className="border-emerald-100 overflow-hidden">
+              <Card className="border-amber-100 overflow-hidden">
                 {/* Pharmacy header */}
-                <div className="bg-emerald-50 dark:bg-emerald-950/30 px-3.5 py-2.5">
+                <div className="bg-amber-50 dark:bg-amber-950/30 px-3.5 py-2.5">
                   <div className="flex items-start gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Store className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Store className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-sm text-foreground truncate">
@@ -218,7 +218,7 @@ export function CartCheckoutView() {
                         </p>
                       </div>
                     </div>
-                    <Badge className="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs flex-shrink-0">
+                    <Badge className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 text-xs flex-shrink-0">
                       {formatFCFA(pharmacySubtotal)}
                     </Badge>
                   </div>
@@ -230,13 +230,13 @@ export function CartCheckoutView() {
                       key={item.id}
                       className={
                         itemIdx < pharmacyItems.length - 1
-                          ? 'border-b border-emerald-50'
+                          ? 'border-b border-amber-50'
                           : ''
                       }
                     >
                       <div className="flex items-center gap-2.5 px-3.5 py-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
-                          <Pill className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
+                          <Pill className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-foreground truncate">
@@ -250,7 +250,7 @@ export function CartCheckoutView() {
                           <p className="text-sm font-semibold text-foreground">
                             ×{item.quantity}
                           </p>
-                          <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
                             {formatFCFA(item.price * item.quantity)}
                           </p>
                         </div>
@@ -270,7 +270,7 @@ export function CartCheckoutView() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: groups.size * 0.08 + 0.1, duration: 0.3 }}
           >
-            <Card className="border-emerald-100 overflow-hidden">
+            <Card className="border-amber-100 overflow-hidden">
               <CardContent className="p-3.5 sm:p-4">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
@@ -294,7 +294,7 @@ export function CartCheckoutView() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: groups.size * 0.08 + 0.2, duration: 0.3 }}
         >
-          <Card className="border-emerald-200 overflow-hidden">
+          <Card className="border-amber-200 overflow-hidden">
             <CardContent className="p-3.5 sm:p-4 space-y-3">
               {/* Summary stats */}
               <div className="flex items-center justify-between text-sm">
@@ -304,14 +304,14 @@ export function CartCheckoutView() {
                 </span>
               </div>
 
-              <Separator className="bg-emerald-100" />
+              <Separator className="bg-amber-100" />
 
               {/* Grand total */}
               <div className="flex items-center justify-between">
                 <span className="text-base font-semibold text-foreground">
                   Total à payer
                 </span>
-                <span className="text-xl font-bold text-emerald-700 dark:text-emerald-400">
+                <span className="text-xl font-bold text-amber-700 dark:text-amber-400">
                   {formatFCFA(subtotal)}
                 </span>
               </div>
@@ -320,7 +320,7 @@ export function CartCheckoutView() {
               <Button
                 onClick={handleConfirm}
                 disabled={isSubmitting}
-                className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white rounded-xl font-semibold text-sm"
+                className="w-full h-12 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white rounded-xl font-semibold text-sm"
               >
                 {isSubmitting ? (
                   <>
@@ -340,18 +340,18 @@ export function CartCheckoutView() {
       </motion.div>
 
       {/* ═══ Sticky Bottom Bar (mobile) ═══ */}
-      <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-t border-emerald-100 dark:border-emerald-900/50 lg:hidden">
+      <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-t border-amber-100 dark:border-amber-900/50 lg:hidden">
         <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground">Total</p>
-            <p className="text-base font-bold text-emerald-700 dark:text-emerald-400">
+            <p className="text-base font-bold text-amber-700 dark:text-amber-400">
               {formatFCFA(subtotal)}
             </p>
           </div>
           <Button
             onClick={handleConfirm}
             disabled={isSubmitting}
-            className="h-11 px-5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white rounded-xl font-semibold text-sm flex-shrink-0"
+            className="h-11 px-5 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white rounded-xl font-semibold text-sm flex-shrink-0"
           >
             {isSubmitting ? (
               <>

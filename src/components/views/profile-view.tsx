@@ -1,6 +1,7 @@
 'use client';
 
 import { logger } from '@/lib/logger';
+import { fetcher } from '@/lib/fetcher';
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -138,7 +139,7 @@ export function ProfileView() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetcher('/api/auth/logout', { method: 'POST' });
     } catch {
       // Ignore network errors
     }
@@ -158,9 +159,8 @@ export function ProfileView() {
     }
     setSaving(true);
     try {
-      const res = await fetch('/api/users', {
+      const res = await fetcher('/api/users', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: editName,
           phone: editPhone || null,
@@ -209,9 +209,8 @@ export function ProfileView() {
 
     try {
       setPasswordSaving(true);
-      const res = await fetch('/api/auth/password', {
+      const res = await fetcher('/api/auth/password', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           currentPassword: passwords.currentPassword,
           newPassword: passwords.newPassword,
@@ -283,16 +282,16 @@ export function ProfileView() {
   return (
     <div className="pb-4">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <ViewHeader title="Mon Profil" icon={<User className="h-5 w-5 text-emerald-600" />} />
+        <ViewHeader title="Mon Profil" icon={<User className="h-5 w-5 text-amber-600" />} />
 
         {/* User card */}
         {currentUser ? (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border-emerald-100 dark:border-emerald-900/50 mb-4">
+            <Card className="border-amber-100 dark:border-amber-900/50 mb-4">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <Avatar className="h-12 w-12 sm:h-14 sm:w-14 bg-emerald-100 flex-shrink-0">
-                    <AvatarFallback className="bg-emerald-100 text-emerald-700 text-base sm:text-lg font-bold">
+                  <Avatar className="h-12 w-12 sm:h-14 sm:w-14 bg-amber-100 flex-shrink-0">
+                    <AvatarFallback className="bg-amber-100 text-amber-700 text-base sm:text-lg font-bold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
@@ -302,7 +301,7 @@ export function ProfileView() {
                     <div className="flex items-center gap-1.5 sm:gap-2 mt-1 flex-wrap">
                       <Badge
                         variant="secondary"
-                        className="text-[10px] bg-emerald-50 text-emerald-700"
+                        className="text-[10px] bg-amber-50 text-amber-700"
                       >
                         {currentUser.role === 'pharmacist' ? 'Pharmacien' : 'Patient'}
                       </Badge>
@@ -319,7 +318,7 @@ export function ProfileView() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-emerald-200 text-emerald-700 text-xs"
+                        className="border-amber-200 text-amber-700 text-xs"
                         onClick={() => setView('pharmacy-dashboard')}
                       >
                         <Building2 className="h-3.5 w-3.5 mr-1" />
@@ -329,7 +328,7 @@ export function ProfileView() {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                      className="h-8 w-8 border-amber-200 text-amber-700 hover:bg-amber-50"
                       onClick={() => {
                         setEditName(currentUser.name || '');
                         setEditPhone(currentUser.phone || '');
@@ -350,27 +349,27 @@ export function ProfileView() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-4 mt-3 pt-3 border-t border-emerald-100">
+                <div className="flex items-center gap-4 mt-3 pt-3 border-t border-amber-100">
                   <div className="text-center">
-                    <p className="text-base sm:text-lg font-bold text-emerald-700">
+                    <p className="text-base sm:text-lg font-bold text-amber-700">
                       {user?._count?.reviews || 0}
                     </p>
                     <p className="text-[10px] text-muted-foreground">Avis</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-base sm:text-lg font-bold text-emerald-700">
+                    <p className="text-base sm:text-lg font-bold text-amber-700">
                       {user?.favorites?.length || 0}
                     </p>
                     <p className="text-[10px] text-muted-foreground">Favoris</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-base sm:text-lg font-bold text-emerald-700">
+                    <p className="text-base sm:text-lg font-bold text-amber-700">
                       {user?._count?.orders || 0}
                     </p>
                     <p className="text-[10px] text-muted-foreground">Commandes</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-base sm:text-lg font-bold text-emerald-700">
+                    <p className="text-base sm:text-lg font-bold text-amber-700">
                       {recentSearches.length}
                     </p>
                     <p className="text-[10px] text-muted-foreground">Recherches</p>
@@ -381,10 +380,10 @@ export function ProfileView() {
           </motion.div>
         ) : (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border-emerald-100 mb-4">
+            <Card className="border-amber-100 mb-4">
               <CardContent className="p-5 sm:p-6 text-center">
-                <Avatar className="h-14 w-14 sm:h-16 sm:w-16 mx-auto mb-3 bg-emerald-50">
-                  <AvatarFallback className="bg-emerald-50 text-emerald-600">
+                <Avatar className="h-14 w-14 sm:h-16 sm:w-16 mx-auto mb-3 bg-amber-50">
+                  <AvatarFallback className="bg-amber-50 text-amber-600">
                     <User className="h-7 w-7 sm:h-8 sm:w-8" />
                   </AvatarFallback>
                 </Avatar>
@@ -456,7 +455,7 @@ export function ProfileView() {
               <Button
                 onClick={handleSaveProfile}
                 disabled={saving}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs"
+                className="bg-amber-600 hover:bg-amber-700 text-white text-xs"
               >
                 {saving ? (
                   <span className="flex items-center gap-1.5">
@@ -482,10 +481,10 @@ export function ProfileView() {
             transition={{ delay: 0.1 }}
             className="mb-4"
           >
-            <Card className="border-emerald-100 dark:border-emerald-900/50">
+            <Card className="border-amber-100 dark:border-amber-900/50">
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                   <h3 className="font-semibold text-sm">Recherches récentes</h3>
                 </div>
                 <div className="space-y-1">
@@ -493,13 +492,13 @@ export function ProfileView() {
                     <button
                       key={s.id}
                       onClick={() => handleSearchClick(s.query)}
-                      className="flex items-center gap-3 w-full text-left text-sm hover:bg-emerald-50 dark:hover:bg-emerald-950/30 p-2 rounded-lg transition-colors"
+                      className="flex items-center gap-3 w-full text-left text-sm hover:bg-amber-50 dark:hover:bg-amber-950/30 p-2 rounded-lg transition-colors"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
-                        <Search className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center flex-shrink-0">
+                        <Search className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                       </div>
                       <span className="flex-1 truncate text-xs">{s.query}</span>
-                      <Badge variant="outline" className="text-[10px] flex-shrink-0 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400">
+                      <Badge variant="outline" className="text-[10px] flex-shrink-0 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400">
                         {s.searchType}
                       </Badge>
                     </button>
@@ -516,10 +515,10 @@ export function ProfileView() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
         >
-          <Card className="border-emerald-100 dark:border-emerald-900/50">
+          <Card className="border-amber-100 dark:border-amber-900/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <Settings className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                <Settings className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                 <h3 className="font-semibold text-sm">Accès rapide</h3>
               </div>
               <div className="space-y-1">
@@ -531,10 +530,10 @@ export function ProfileView() {
                   <button
                     key={item.label}
                     onClick={() => setView(item.view)}
-                    className="flex items-center gap-3 w-full text-left text-sm hover:bg-emerald-50 dark:hover:bg-emerald-950/30 p-2.5 rounded-lg transition-colors"
+                    className="flex items-center gap-3 w-full text-left text-sm hover:bg-amber-50 dark:hover:bg-amber-950/30 p-2.5 rounded-lg transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
-                      <item.icon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center flex-shrink-0">
+                      <item.icon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                     </div>
                     <span className="flex-1 text-xs font-medium">{item.label}</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -543,10 +542,10 @@ export function ProfileView() {
                 {currentUser?.role === 'pharmacist' && (
                   <button
                     onClick={() => setView('pharmacy-dashboard')}
-                    className="flex items-center gap-3 w-full text-left text-sm hover:bg-emerald-50 dark:hover:bg-emerald-950/30 p-2.5 rounded-lg transition-colors"
+                    className="flex items-center gap-3 w-full text-left text-sm hover:bg-amber-50 dark:hover:bg-amber-950/30 p-2.5 rounded-lg transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
-                      <Building2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center flex-shrink-0">
+                      <Building2 className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                     </div>
                     <span className="flex-1 text-xs font-medium">Gestion pharmacie</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -565,10 +564,10 @@ export function ProfileView() {
           transition={{ delay: 0.16 }}
           className="mt-4"
         >
-          <Card className="border-emerald-100 dark:border-emerald-900/50">
+          <Card className="border-amber-100 dark:border-amber-900/50">
             <CardHeader className="pb-3 px-4 pt-4">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Settings className="h-4 w-4 text-emerald-600" />
+                <Settings className="h-4 w-4 text-amber-600" />
                 Paramètres
               </CardTitle>
             </CardHeader>
@@ -576,9 +575,9 @@ export function ProfileView() {
               {/* Change password */}
               <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
                 <DialogTrigger asChild>
-                  <button className="flex items-center gap-3 w-full text-left p-2.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
-                      <Lock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <button className="flex items-center gap-3 w-full text-left p-2.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center flex-shrink-0">
+                      <Lock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                     </div>
                     <span className="text-xs font-medium flex-1">Changer le mot de passe</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -634,7 +633,7 @@ export function ProfileView() {
                     <Button
                       onClick={handleChangePassword}
                       disabled={passwordSaving}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs"
+                      className="bg-amber-600 hover:bg-amber-700 text-white text-xs"
                     >
                       {passwordSaving ? (
                         <span className="flex items-center gap-1.5">
@@ -654,8 +653,8 @@ export function ProfileView() {
               {/* Dark mode */}
               <div className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
-                    {darkMode ? <Moon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> : <Sun className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
+                  <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center flex-shrink-0">
+                    {darkMode ? <Moon className="h-4 w-4 text-amber-600 dark:text-amber-400" /> : <Sun className="h-4 w-4 text-amber-600 dark:text-amber-400" />}
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-medium">Mode sombre</p>
@@ -673,8 +672,8 @@ export function ProfileView() {
               {/* Language */}
               <div className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
-                    <Globe className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center flex-shrink-0">
+                    <Globe className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-medium">Langue</p>
@@ -720,10 +719,10 @@ export function ProfileView() {
           transition={{ delay: 0.2 }}
           className="mt-4"
         >
-          <Card className="border-emerald-100 dark:border-emerald-900/50">
+          <Card className="border-amber-100 dark:border-amber-900/50">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <Info className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+                <Info className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                 <h3 className="font-semibold text-sm">À propos</h3>
               </div>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
@@ -732,7 +731,7 @@ export function ProfileView() {
                 pharmacies de garde près de chez vous.
               </p>
               <div className="flex items-center gap-2 mt-3">
-                <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600" />
+                <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-600" />
                 <span className="text-[10px] sm:text-xs text-muted-foreground">Version 1.0.0 • 2025</span>
               </div>
             </CardContent>

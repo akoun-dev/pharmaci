@@ -72,7 +72,7 @@ interface HistoryEntry {
 }
 
 const HISTORY_CONFIG: Record<string, { icon: typeof ArrowUp; color: string; bgColor: string; label: string }> = {
-  entry: { icon: ArrowUp, color: 'text-emerald-600', bgColor: 'bg-emerald-50', label: 'Entrée' },
+  entry: { icon: ArrowUp, color: 'text-orange-600', bgColor: 'bg-orange-50', label: 'Entrée' },
   exit: { icon: ArrowDown, color: 'text-red-600', bgColor: 'bg-red-50', label: 'Sortie' },
   adjustment: { icon: RotateCcw, color: 'text-orange-600', bgColor: 'bg-orange-50', label: 'Ajustement' },
 };
@@ -262,7 +262,7 @@ export function PharmacistStockDetailView() {
   if (error || !stock) {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
-        <ViewHeader title="Détail du stock" icon={<Package className="h-5 w-5 text-emerald-600" />} back />
+        <ViewHeader title="Détail du stock" icon={<Package className="h-5 w-5 text-orange-600" />} back />
         <Card className="border-red-200">
           <CardContent className="p-6 text-center">
             <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-2" />
@@ -307,7 +307,7 @@ export function PharmacistStockDetailView() {
     ? 'text-orange-600'
     : currentQty <= 20
     ? 'text-amber-600'
-    : 'text-emerald-600';
+    : 'text-orange-600';
 
   const qtyBgColor = !stock.inStock || currentQty === 0
     ? 'bg-red-50'
@@ -315,7 +315,7 @@ export function PharmacistStockDetailView() {
     ? 'bg-orange-50'
     : currentQty <= 20
     ? 'bg-amber-50'
-    : 'bg-emerald-50';
+    : 'bg-orange-50';
 
   return (
     <div className="pb-6">
@@ -323,7 +323,7 @@ export function PharmacistStockDetailView() {
         {/* Header */}
         <ViewHeader
           title="Détail du stock"
-          icon={<Package className="h-5 w-5 text-emerald-600" />}
+          icon={<Package className="h-5 w-5 text-orange-600" />}
           back
         />
 
@@ -332,11 +332,11 @@ export function PharmacistStockDetailView() {
           animate={{ opacity: 1, y: 0 }}
         >
           {/* Medication info header */}
-          <Card className="border-emerald-100 mb-3">
+          <Card className="border-orange-100 mb-3">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                  <Pill className="h-5 w-5 text-emerald-600" />
+                <div className="w-11 h-11 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+                  <Pill className="h-5 w-5 text-orange-600" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h2 className="font-bold text-base">{medName}</h2>
@@ -387,7 +387,7 @@ export function PharmacistStockDetailView() {
           </Card>
 
           {/* Current stock card */}
-          <Card className="border-emerald-100 mb-3">
+          <Card className="border-orange-100 mb-3">
             <CardContent className="p-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className={`${qtyBgColor} rounded-xl p-3 text-center`}>
@@ -395,9 +395,9 @@ export function PharmacistStockDetailView() {
                   <p className={`text-3xl font-bold ${qtyColor}`}>{currentQty}</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">unités</p>
                 </div>
-                <div className="bg-emerald-50 rounded-xl p-3 text-center">
+                <div className="bg-orange-50 rounded-xl p-3 text-center">
                   <p className="text-xs text-muted-foreground mb-1">Prix</p>
-                  <p className="text-2xl font-bold text-emerald-700">{stock.price.toLocaleString('fr-FR')}</p>
+                  <p className="text-2xl font-bold text-orange-700">{stock.price.toLocaleString('fr-FR')}</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">FCFA</p>
                 </div>
               </div>
@@ -406,7 +406,7 @@ export function PharmacistStockDetailView() {
                   variant="outline"
                   className={`text-xs px-3 py-1 ${
                     stock.inStock
-                      ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
+                      ? 'border-orange-200 text-orange-700 bg-orange-50'
                       : 'border-red-200 text-red-700 bg-red-50'
                   }`}
                 >
@@ -417,10 +417,10 @@ export function PharmacistStockDetailView() {
           </Card>
 
           {/* Edit section */}
-          <Card className="border-emerald-100 mb-3">
+          <Card className="border-orange-100 mb-3">
             <CardContent className="p-4 space-y-4">
               <div className="flex items-center gap-2 mb-1">
-                <Save className="h-4 w-4 text-emerald-600" />
+                <Save className="h-4 w-4 text-orange-600" />
                 <h3 className="font-semibold text-sm">Modifier le stock</h3>
               </div>
 
@@ -433,7 +433,7 @@ export function PharmacistStockDetailView() {
                     step="0.01"
                     value={editPrice}
                     onChange={(e) => setEditPrice(e.target.value)}
-                    className="h-10 border-emerald-200 focus:border-emerald-400 text-sm"
+                    className="h-10 border-orange-200 focus:border-orange-400 text-sm"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -444,7 +444,7 @@ export function PharmacistStockDetailView() {
                     step="1"
                     value={editQuantity}
                     onChange={(e) => setEditQuantity(e.target.value)}
-                    className="h-10 border-emerald-200 focus:border-emerald-400 text-sm"
+                    className="h-10 border-orange-200 focus:border-orange-400 text-sm"
                   />
                 </div>
               </div>
@@ -455,7 +455,7 @@ export function PharmacistStockDetailView() {
                   type="date"
                   value={editExpirationDate}
                   onChange={(e) => setEditExpirationDate(e.target.value)}
-                  className="h-10 border-emerald-200 focus:border-emerald-400 text-sm"
+                  className="h-10 border-orange-200 focus:border-orange-400 text-sm"
                 />
                 {expirationStatus === 'expired' && (
                   <p className="text-[11px] text-red-600">⚠ Ce produit est périmé depuis {Math.abs(expirationDiffDays)} jours</p>
@@ -493,7 +493,7 @@ export function PharmacistStockDetailView() {
               <Button
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-11"
+                className="w-full bg-orange-600 hover:bg-orange-700 text-white h-11"
               >
                 {saving ? (
                   <div className="flex items-center gap-2">
@@ -511,10 +511,10 @@ export function PharmacistStockDetailView() {
           </Card>
 
           {/* Stock history */}
-          <Card className="border-emerald-100 mb-3">
+          <Card className="border-orange-100 mb-3">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Clock className="h-4 w-4 text-emerald-600" />
+                <Clock className="h-4 w-4 text-orange-600" />
                 <h3 className="font-semibold text-sm">Historique des mouvements</h3>
               </div>
 
@@ -577,7 +577,7 @@ export function PharmacistStockDetailView() {
                         size="sm"
                         onClick={() => fetchHistory(true)}
                         disabled={loadingMoreHistory}
-                        className="w-full text-xs text-emerald-700 hover:bg-emerald-50 border border-emerald-200"
+                        className="w-full text-xs text-orange-700 hover:bg-orange-50 border border-orange-200"
                       >
                         {loadingMoreHistory ? (
                           <>

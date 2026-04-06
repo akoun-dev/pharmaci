@@ -279,7 +279,7 @@ export function MapView() {
   return (
     <div className="pb-4">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <ViewHeader title="Carte" icon={<Navigation className="h-5 w-5 text-emerald-600" />} />
+        <ViewHeader title="Carte" icon={<Navigation className="h-5 w-5 text-orange-600" />} />
 
         {/* Filter buttons + Sort + Near me */}
         <div className="flex flex-wrap gap-1.5 mb-2 sm:mb-3 items-center">
@@ -291,8 +291,8 @@ export function MapView() {
               onClick={() => handleFilterChange(f)}
               className={
                 filter === f
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white text-xs'
-                  : 'border-emerald-200 text-emerald-700 text-xs'
+                  ? 'bg-orange-600 hover:bg-orange-700 text-white text-xs'
+                  : 'border-orange-200 text-orange-700 text-xs'
               }
             >
               {f === 'all' ? (
@@ -300,7 +300,7 @@ export function MapView() {
               ) : f === 'guard' ? (
                 <>
                   <Shield className="h-3 w-3 mr-1" />
-                  Garde
+                  De garde
                 </>
               ) : (
                 <>
@@ -319,7 +319,7 @@ export function MapView() {
             className={
               sortMode === 'distance'
                 ? 'bg-indigo-50 border-indigo-300 text-indigo-700 text-xs'
-                : 'border-emerald-200 text-emerald-700 text-xs'
+                : 'border-orange-200 text-orange-700 text-xs'
             }
           >
             <ArrowUpDown className="h-3 w-3 mr-1" />
@@ -328,7 +328,7 @@ export function MapView() {
 
           {selectedCity && (
             <Badge
-              className="bg-emerald-100 text-emerald-700 self-center ml-auto gap-1 cursor-pointer text-xs"
+              className="bg-orange-100 text-orange-700 self-center ml-auto gap-1 cursor-pointer text-xs"
               onClick={() => setSelectedCity(null)}
             >
               {selectedCity} ✕
@@ -340,26 +340,26 @@ export function MapView() {
         <div className="relative mb-3 sm:mb-4">
           {!mapReady && (
             <div
-              className="rounded-2xl border border-emerald-200 mb-3 sm:mb-4 animate-pulse bg-emerald-50"
+              className="rounded-2xl border border-orange-200 mb-3 sm:mb-4 animate-pulse bg-orange-50"
               style={{ height: MAP_HEIGHT }}
             />
           )}
           <div
             ref={mapContainerRef}
-            className="rounded-2xl overflow-hidden border border-emerald-200"
+            className="rounded-2xl overflow-hidden border border-orange-200"
             style={{ height: MAP_HEIGHT, width: '100%' }}
           />
 
           {/* Floating "Ma position" button */}
           <button
             onClick={handleLocateMe}
-            className="absolute bottom-3 left-3 z-[1000] bg-white border border-emerald-200 shadow-lg rounded-full w-11 h-11 flex items-center justify-center hover:bg-emerald-50 transition-colors"
+            className="absolute bottom-3 left-3 z-[1000] bg-white border border-orange-200 shadow-lg rounded-full w-11 h-11 flex items-center justify-center hover:bg-orange-50 transition-colors"
             title="Ma position"
           >
             {locating ? (
-              <Crosshair className="h-5 w-5 text-emerald-600 animate-pulse" />
+              <Crosshair className="h-5 w-5 text-orange-600 animate-pulse" />
             ) : (
-              <LocateFixed className="h-5 w-5 text-emerald-600" />
+              <LocateFixed className="h-5 w-5 text-orange-600" />
             )}
           </button>
 
@@ -381,7 +381,7 @@ export function MapView() {
         {/* Legend */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4 px-1">
           <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground">
-            <div className="w-3 h-3 rounded-full bg-emerald-500" />
+            <div className="w-3 h-3 rounded-full bg-orange-500" />
             <span>Pharmacie</span>
           </div>
           <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground">
@@ -414,7 +414,7 @@ export function MapView() {
               Array.isArray(cityPharmacies) && cityPharmacies.length > 0 ? (
                 <div key={city}>
                   <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
-                    <MapPin className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                    <MapPin className="h-4 w-4 text-orange-600 flex-shrink-0" />
                     <h3 className="font-semibold text-sm">{city}</h3>
                     <Badge variant="secondary" className="text-[10px] ml-auto">
                       {cityPharmacies.length} pharmacie{cityPharmacies.length > 1 ? 's' : ''}

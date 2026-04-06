@@ -29,7 +29,7 @@ export default function Error({
           Réessayer
         </Button>
         <a href="/">
-          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+          <Button className="bg-orange-600 hover:bg-orange-700 text-white">
             Accueil
           </Button>
         </a>
