@@ -207,8 +207,9 @@ export function AuthView() {
           {/* OTP verification mode */}
           {otpSent && (
             <div className="mb-4 bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-center">
-              <p className="text-xs text-indigo-700 font-medium mb-1">
-                📱 Code envoyé par SMS
+              <p className="text-xs text-indigo-700 font-medium mb-1 flex items-center justify-center gap-1.5">
+                <Smartphone className="h-3.5 w-3.5" />
+                Code envoyé par SMS
               </p>
               <p className="text-[10px] text-indigo-500">
                 Mode démo — code affiché ci-dessous

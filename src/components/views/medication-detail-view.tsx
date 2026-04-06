@@ -25,6 +25,7 @@ import {
   Package,
   Navigation,
   Star,
+  SearchX,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -605,7 +606,9 @@ export function MedicationDetailView() {
           {filteredPharmacies.length === 0 ? (
             <Card className="border-amber-100">
               <CardContent className="p-6 text-center">
-                <p className="text-4xl mb-2">😅</p>
+                <div className="flex justify-center mb-2">
+                  <SearchX className="w-12 h-12 text-amber-400" />
+                </div>
                 <p className="text-sm text-muted-foreground">
                   Aucune pharmacie ne correspond à vos filtres
                 </p>

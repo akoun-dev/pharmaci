@@ -201,9 +201,9 @@ export async function GET(request: NextRequest) {
     // Add legend at bottom
     const legendRow = sheet.addRow([]);
     sheet.addRow(['', 'Légende :']);
-    sheet.addRow(['', '🟢 Vert = En stock (> 10 unités)']);
-    sheet.addRow(['', '🟡 Orange = Stock faible (< 10 unités)']);
-    sheet.addRow(['', '🔴 Rouge = Rupture de stock']);
+    sheet.addRow(['', 'Vert = En stock (> 10 unités)']);
+    sheet.addRow(['', 'Orange = Stock faible (< 10 unités)']);
+    sheet.addRow(['', 'Rouge = Rupture de stock']);
 
     // Generate buffer
     const buffer = await workbook.xlsx.writeBuffer();

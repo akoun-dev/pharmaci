@@ -25,6 +25,7 @@ import {
   Download,
   BarChart3,
   CalendarClock,
+  Hand,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -257,8 +258,9 @@ export function PharmacistDashboardView() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-amber-100">Tableau de bord</p>
-                <h1 className="text-xl sm:text-2xl font-bold mt-1">
-                  Bonjour, {firstName} 👋
+                <h1 className="text-xl sm:text-2xl font-bold mt-1 flex items-center gap-2">
+                  Bonjour, {firstName}
+                  <Hand className="h-5 w-5" />
                 </h1>
                 {pharmacy && (
                   <p className="text-sm text-amber-100 mt-1 truncate">{pharmacy.name}</p>

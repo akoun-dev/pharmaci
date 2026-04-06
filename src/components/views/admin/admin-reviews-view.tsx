@@ -76,11 +76,11 @@ type ReplyFilter = 'all' | 'with_reply' | 'without_reply';
 
 const RATING_TABS = [
   { key: 0, label: 'Toutes' },
-  { key: 5, label: '5 ★' },
-  { key: 4, label: '4 ★' },
-  { key: 3, label: '3 ★' },
-  { key: 2, label: '2 ★' },
-  { key: 1, label: '1 ★' },
+  { key: 5, label: '5 étoiles' },
+  { key: 4, label: '4 étoiles' },
+  { key: 3, label: '3 étoiles' },
+  { key: 2, label: '2 étoiles' },
+  { key: 1, label: '1 étoile' },
 ];
 
 const REPLY_FILTER_OPTIONS: { key: ReplyFilter; label: string }[] = [

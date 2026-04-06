@@ -110,7 +110,9 @@ export function MyReviewsView() {
         {!currentUserId ? (
           <Card className="border-amber-100">
             <CardContent className="p-6 sm:p-8 text-center">
-              <div className="text-4xl mb-3">🔐</div>
+              <div className="flex justify-center mb-3">
+                <Lock className="w-12 h-12 text-amber-600" />
+              </div>
               <h3 className="font-semibold mb-1">Connectez-vous</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Connectez-vous pour voir vos avis

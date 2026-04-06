@@ -23,6 +23,7 @@ import {
   Clock,
   BarChart3,
   Trophy,
+  Hand,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -275,8 +276,9 @@ export function AdminDashboardView() {
                     Administration
                   </p>
                 </div>
-                <h1 className="text-xl sm:text-2xl font-bold mt-1">
-                  Bonjour, {firstName} 👋
+                <h1 className="text-xl sm:text-2xl font-bold mt-1 flex items-center gap-2">
+                  Bonjour, {firstName}
+                  <Hand className="h-5 w-5" />
                 </h1>
                 <p className="text-sm text-amber-100 mt-1">
                   Vue d&apos;ensemble de la plateforme Pharma CI

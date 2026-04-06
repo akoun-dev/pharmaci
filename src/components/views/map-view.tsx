@@ -159,22 +159,22 @@ export function MapView() {
 
       const ratingStr = p.rating != null ? Number(p.rating).toFixed(1) : '';
       const ratingHtml = ratingStr
-        ? `<div style="font-size:12px;color:#059669;font-weight:700;margin-top:4px;">${ratingStr} ⭐</div>`
+        ? `<div style="font-size:12px;color:#059669;font-weight:700;margin-top:4px;">Note: ${ratingStr}/5</div>`
         : '';
       const distHtml = distStr
-        ? `<div style="font-size:11px;color:#6366f1;font-weight:600;margin-top:2px;">📍 ${distStr}</div>`
+        ? `<div style="font-size:11px;color:#6366f1;font-weight:600;margin-top:2px;">${distStr}</div>`
         : '';
 
       const popupContent = `
         <div style="padding:8px;min-width:200px;font-family:system-ui,sans-serif;">
           <h3 style="font-size:14px;font-weight:700;margin:0 0 4px;">${p.name}</h3>
-          ${isGuard ? '<span style="display:inline-block;background:#fef3c7;color:#d97706;font-size:10px;padding:1px 6px;border-radius:8px;margin-bottom:4px;">🛡️ Garde</span>' : ''}
-          <p style="font-size:12px;color:#6b7280;margin:2px 0;">📍 ${p.address}, ${p.city}</p>
-          <p style="font-size:12px;color:#6b7280;margin:2px 0;">📞 ${p.phone}</p>
+          ${isGuard ? '<span style="display:inline-block;background:#fef3c7;color:#d97706;font-size:10px;padding:1px 6px;border-radius:8px;margin-bottom:4px;">Garde</span>' : ''}
+          <p style="font-size:12px;color:#6b7280;margin:2px 0;">${p.address}, ${p.city}</p>
+          <p style="font-size:12px;color:#6b7280;margin:2px 0;">${p.phone}</p>
           ${ratingHtml}${distHtml}
           <div style="margin-top:6px;display:flex;gap:4px;">
-            <a href="tel:${p.phone}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:6px 8px;background:#059669;color:white;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none;">📞 Appeler</a>
-            <a href="javascript:void(0)" onclick="window.openGoogleMapsNav(${p.latitude},${p.longitude},'${(p.name || '').replace(/'/g, "\\'")}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:6px 8px;background:#2563eb;color:white;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none;">🧭 Y aller</a>
+            <a href="tel:${p.phone}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:6px 8px;background:#059669;color:white;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none;">Appeler</a>
+            <a href="javascript:void(0)" onclick="window.openGoogleMapsNav(${p.latitude},${p.longitude},'${(p.name || '').replace(/'/g, "\\'")}')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:6px 8px;background:#2563eb;color:white;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none;">Itinéraire</a>
           </div>
         </div>
       `;

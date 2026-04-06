@@ -303,7 +303,7 @@ export function SearchView() {
                             : 'border-orange-200 text-muted-foreground hover:bg-orange-50'
                         }`}
                       >
-                        <span className="text-sm">🛡️</span>
+                        <Shield className="h-4 w-4" />
                         Pharmacies de garde uniquement
                       </button>
                     </div>

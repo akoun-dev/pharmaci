@@ -28,7 +28,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RatingStars } from '@/components/rating-stars';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
-import { openGoogleMaps, openWaze, PAYMENT_LABELS, PAYMENT_ICONS } from '@/lib/navigation';
+import { openGoogleMaps, openWaze, PAYMENT_LABELS } from '@/lib/navigation';
 
 interface PharmacyDetail {
   id: string;

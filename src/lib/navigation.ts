@@ -47,12 +47,3 @@ export const PAYMENT_LABELS: Record<string, string> = {
   mtn_money: 'MTN Money',
   carte: 'Carte bancaire',
 };
-
-/** Payment method icons (emoji) */
-export const PAYMENT_ICONS: Record<string, string> = {
-  especes: '💵',
-  orange_money: '🟠',
-  wave: '🌊',
-  mtn_money: '🟡',
-  carte: '💳',
-};

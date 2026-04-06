@@ -137,15 +137,15 @@ export function PharmacyMap({ pharmacies, onPharmacyClick, onReady }: PharmacyMa
                   </span>
                 )}
                 <p style={{ fontSize: 12, color: '#6b7280', margin: '2px 0' }}>
-                  📍 {p.address}, {p.city}
+                  {p.address}, {p.city}
                 </p>
                 <p style={{ fontSize: 12, color: '#6b7280', margin: '2px 0' }}>
-                  📞 {p.phone}
+                  {p.phone}
                 </p>
                 {p.rating != null && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
                     <span style={{ fontSize: 12, color: '#059669', fontWeight: 700 }}>
-                      {p.rating.toFixed(1)} ⭐
+                      Note: {p.rating.toFixed(1)}/5
                     </span>
                   </div>
                 )}
@@ -167,7 +167,7 @@ export function PharmacyMap({ pharmacies, onPharmacyClick, onReady }: PharmacyMa
                       textDecoration: 'none',
                     }}
                   >
-                    📞 Appeler
+                    Appeler
                   </a>
                   <button
                     onClick={(e) => {
@@ -190,7 +190,7 @@ export function PharmacyMap({ pharmacies, onPharmacyClick, onReady }: PharmacyMa
                       cursor: 'pointer',
                     }}
                   >
-                    🧭 Y aller
+                    Itinéraire
                   </button>
                 </div>
               </div>

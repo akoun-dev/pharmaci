@@ -12,6 +12,7 @@ import {
   Trash2,
   MessageSquare,
   Pill,
+  Lock,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -97,7 +98,9 @@ export function FavoritesView() {
         {!currentUserId ? (
           <Card className="border-orange-100">
             <CardContent className="p-6 sm:p-8 text-center">
-              <div className="text-4xl mb-3">🔐</div>
+              <div className="flex justify-center mb-3">
+                <Lock className="w-12 h-12 text-orange-600" />
+              </div>
               <h3 className="font-semibold mb-1">Connectez-vous</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Connectez-vous pour voir vos favoris

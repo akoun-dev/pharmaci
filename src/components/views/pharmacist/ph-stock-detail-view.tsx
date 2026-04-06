@@ -458,10 +458,16 @@ export function PharmacistStockDetailView() {
                   className="h-10 border-orange-200 focus:border-orange-400 text-sm"
                 />
                 {expirationStatus === 'expired' && (
-                  <p className="text-[11px] text-red-600">⚠ Ce produit est périmé depuis {Math.abs(expirationDiffDays)} jours</p>
+                  <p className="text-[11px] text-red-600 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    Ce produit est périmé depuis {Math.abs(expirationDiffDays)} jours
+                  </p>
                 )}
                 {expirationStatus === 'soon' && (
-                  <p className="text-[11px] text-orange-600">⚠ Ce produit expire dans {expirationDiffDays} jours</p>
+                  <p className="text-[11px] text-orange-600 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    Ce produit expire dans {expirationDiffDays} jours
+                  </p>
                 )}
               </div>
 
