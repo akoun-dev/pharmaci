@@ -845,7 +845,7 @@ export function MedicationDetailView() {
           </div>
 
           {/* Sticky Footer - Always visible */}
-          <div className="shrink-0 border-t border-amber-100 bg-white p-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] mt-auto">
+          <div className="shrink-0 border-t border-amber-100 bg-white/86 backdrop-blur-xl dark:bg-gray-950/84 p-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] mt-auto">
             <div className="flex items-center justify-between w-full mb-2">
               <span className="text-sm text-muted-foreground">Total</span>
               <div className="text-right">

@@ -267,7 +267,7 @@ export function PharmacistDashboardView() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setCurrentView('ph-reports')}
-                className="h-10 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
+                className="h-10 rounded-2xl bg-white/12 px-4 text-white hover:bg-white/18"
               >
                 <Download className="mr-1.5 h-4 w-4" />
                 Export

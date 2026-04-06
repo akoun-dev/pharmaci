@@ -367,7 +367,7 @@ export function PharmacistOrderDetailView() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-10 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
+              className="h-10 rounded-2xl bg-white/12 px-4 text-white hover:bg-white/18"
               onClick={goBack}
             >
               Retour

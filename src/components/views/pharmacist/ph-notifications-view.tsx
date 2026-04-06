@@ -206,7 +206,7 @@ export function PharmacistNotificationsView() {
               size="sm"
               onClick={handleMarkAllRead}
               disabled={markingAll}
-              className="h-10 gap-1.5 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
+              className="h-10 gap-1.5 rounded-2xl bg-white/12 px-4 text-white hover:bg-white/18"
             >
               <CheckCheck className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Tout </span>lire

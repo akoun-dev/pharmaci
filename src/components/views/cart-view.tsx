@@ -264,7 +264,7 @@ export function CartView() {
       </motion.div>
 
       {/* ═══ Sticky Bottom Bar (mobile) ═══ */}
-      <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-t border-amber-100 dark:border-amber-900/50 lg:hidden">
+      <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 bg-white/82 dark:bg-gray-950/82 backdrop-blur-xl border-t border-amber-100/80 dark:border-amber-900/50 lg:hidden">
         <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground">Total</p>

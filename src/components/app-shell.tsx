@@ -647,7 +647,7 @@ export function AppShell() {
           </div>
         </main>
 
-        <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex-col z-50">
+        <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-900/78 border-r border-gray-200/80 dark:border-gray-800/80 flex-col z-50">
           <div className="p-5 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-purple-600 flex items-center justify-center">
               <Pill className="h-6 w-6 text-white" />
@@ -753,7 +753,7 @@ export function AppShell() {
         </main>
 
         {/* Sidebar navigation (desktop) */}
-        <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-950 border-r border-amber-100 dark:border-amber-900/50 flex-col z-50">
+        <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-950/76 border-r border-amber-100/80 dark:border-amber-900/50 flex-col z-50">
           <div className="p-6 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center">
               <Pill className="h-6 w-6 text-white" />
@@ -862,7 +862,7 @@ export function AppShell() {
       {/* Cart floating button (mobile) */}
       <CartFloatingButton />
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900/95 backdrop-blur-md border-t border-amber-100 dark:border-amber-900/50 lg:hidden pb-safe">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/82 dark:bg-gray-900/82 backdrop-blur-xl border-t border-amber-100/80 dark:border-amber-900/50 lg:hidden pb-safe">
         <div className="flex items-center justify-around px-0.5 py-1 max-w-2xl mx-auto">
           {patientTabs.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -890,7 +890,7 @@ export function AppShell() {
         </div>
       </nav>
 
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-950 border-r border-amber-100 dark:border-amber-900/50 flex-col z-50">
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-950/76 border-r border-amber-100/80 dark:border-amber-900/50 flex-col z-50">
         <div className="p-6 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center">
             <Pill className="h-6 w-6 text-white" />
