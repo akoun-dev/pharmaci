@@ -371,7 +371,7 @@ export function PharmacistOrdersView() {
   // Loading skeletons
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="w-full px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-48" />
         <div className="flex gap-2 overflow-x-auto">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -388,7 +388,7 @@ export function PharmacistOrdersView() {
   // Error state
   if (error) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
+      <div className="w-full px-4 sm:px-6 py-4">
         <ViewHeader title="Commandes" icon={<ClipboardList className="h-5 w-5 text-amber-600" />} />
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
@@ -406,7 +406,7 @@ export function PharmacistOrdersView() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-28">
+    <div className="w-full px-4 sm:px-6 py-4 pb-28">
       {/* Header */}
       <PharmacistPageHeader
         title="Commandes"
@@ -703,7 +703,7 @@ export function PharmacistOrdersView() {
 
       {/* ── Floating Verify Button ── */}
       <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40 pointer-events-none">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 pointer-events-auto">
+        <div className="w-full px-4 sm:px-6 pointer-events-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <Button
               onClick={openVerifyDialog}

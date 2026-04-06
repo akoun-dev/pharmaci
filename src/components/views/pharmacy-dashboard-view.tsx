@@ -104,7 +104,7 @@ export function PharmacyDashboardView() {
 
   return (
     <div className="pb-4">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="w-full px-4 sm:px-6">
         <ViewHeader title="Gestion de stock" back icon={<Building2 className="h-5 w-5 text-orange-600" />} />
 
         {/* Pharmacy selector */}

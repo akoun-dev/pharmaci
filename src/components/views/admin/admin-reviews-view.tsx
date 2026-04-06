@@ -372,7 +372,7 @@ export function AdminReviewsView() {
   // ── Loading skeleton ──
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="w-full px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-32 rounded-xl" />
         <div className="flex gap-2 overflow-x-auto">
@@ -390,7 +390,7 @@ export function AdminReviewsView() {
   // ── Error state ──
   if (error) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+      <div className="w-full px-4 sm:px-6 py-4">
         <ViewHeader
           title="Gestion des avis"
           icon={<Star className="h-5 w-5 text-amber-600" />}
@@ -415,7 +415,7 @@ export function AdminReviewsView() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 pb-28">
+    <div className="w-full px-4 sm:px-6 py-4 pb-28">
       <AdminPageHeader
         title="Gestion des avis"
         description="Suivez la satisfaction des utilisateurs, filtrez les notes et gérez les réponses ou suppressions depuis une même vue."

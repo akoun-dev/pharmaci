@@ -250,7 +250,7 @@ export function PharmacistStockDetailView() {
   // Loading state
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="w-full px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-40 rounded-xl" />
         <Skeleton className="h-32 rounded-xl" />
@@ -262,7 +262,7 @@ export function PharmacistStockDetailView() {
   // Error state
   if (error || !stock) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
+      <div className="w-full px-4 sm:px-6 py-4">
         <ViewHeader title="Détail du stock" icon={<Package className="h-5 w-5 text-orange-600" />} back />
         <Card className="border-red-200">
           <CardContent className="p-6 text-center">
@@ -320,7 +320,7 @@ export function PharmacistStockDetailView() {
 
   return (
     <div className="pb-6">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="w-full px-4 sm:px-6">
         {/* Header */}
         <PharmacistPageHeader
           title="Détail du stock"

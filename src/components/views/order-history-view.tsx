@@ -257,7 +257,7 @@ export function OrderHistoryView() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="w-full px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-40" />
         {[1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-32 rounded-xl" />
@@ -268,7 +268,7 @@ export function OrderHistoryView() {
 
   return (
     <div className="pb-4">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="w-full px-4 sm:px-6">
         <ViewHeader
           title="Mes commandes"
           icon={<ClipboardList className="h-5 w-5 text-amber-600" />}

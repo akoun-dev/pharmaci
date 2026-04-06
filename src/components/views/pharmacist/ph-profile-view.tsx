@@ -527,7 +527,7 @@ export function PharmacistProfileView() {
   // ── Render ───────────────────────────────────────────────────────
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-6">
+    <div className="w-full px-4 sm:px-6 py-4 pb-6">
       <PharmacistPageHeader
         title="Profil de la pharmacie"
         description="Mettez à jour les informations publiques, les horaires, les services et la présentation de votre pharmacie."

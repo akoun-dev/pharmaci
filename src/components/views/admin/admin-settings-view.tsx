@@ -168,7 +168,7 @@ export function AdminSettingsView() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 lg:pb-6 pt-6">
+    <div className="w-full px-4 sm:px-6 pb-20 lg:pb-6 pt-6">
       <motion.div
         variants={containerVariants}
         initial="hidden"

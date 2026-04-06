@@ -152,7 +152,7 @@ export function CartCheckoutView() {
   // ═══ Empty State ═══
   if (items.length === 0) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
+      <div className="w-full px-4 sm:px-6 py-4">
         <ViewHeader
           title="Récapitulatif"
           icon={<ClipboardCheck className="h-5 w-5 text-amber-600" />}
@@ -179,7 +179,7 @@ export function CartCheckoutView() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-28">
+    <div className="w-full px-4 sm:px-6 py-4 pb-28">
       <ViewHeader
         title="Récapitulatif"
         icon={<ClipboardCheck className="h-5 w-5 text-amber-600" />}
@@ -351,7 +351,7 @@ export function CartCheckoutView() {
 
       {/* ═══ Sticky Bottom Bar (mobile) ═══ */}
       <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 bg-white/82 dark:bg-gray-950/82 backdrop-blur-xl border-t border-amber-100/80 dark:border-amber-900/50 lg:hidden">
-        <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
+        <div className="w-full px-4 py-2.5 flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground">Total</p>
             <p className="text-base font-bold text-amber-700 dark:text-amber-400">

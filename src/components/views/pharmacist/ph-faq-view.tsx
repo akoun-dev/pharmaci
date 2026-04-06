@@ -266,7 +266,7 @@ export function PharmacistFaqView() {
   const totalResults = filteredSections.reduce((acc, s) => acc + s.items.length, 0);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-6">
+    <div className="w-full px-4 sm:px-6 pb-6">
       <motion.div
         variants={containerVariants}
         initial="hidden"

@@ -396,7 +396,7 @@ export function PharmacistPromotionsView() {
 
   // ── Render ─────────────────────────────────────────────────
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-24 space-y-5">
+    <div className="w-full px-4 sm:px-6 py-4 pb-24 space-y-5">
       <PharmacistPageHeader
         title="Promotions & Fidélisation"
         description="Créez des offres, suivez leur période d’activité et animez la fidélisation depuis un seul écran."

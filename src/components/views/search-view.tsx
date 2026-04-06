@@ -128,7 +128,7 @@ export function SearchView() {
 
   return (
     <div className="pb-4">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="w-full px-4 sm:px-6">
         <ViewHeader title="Recherche" icon={<Search className="h-5 w-5 text-amber-600" />} />
 
         {/* Search */}

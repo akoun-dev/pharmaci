@@ -75,7 +75,7 @@ export function FavoritesView() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="w-full px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-32" />
         {[1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-24 rounded-xl" />
@@ -86,7 +86,7 @@ export function FavoritesView() {
 
   return (
     <div className="pb-4">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="w-full px-4 sm:px-6">
         <ViewHeader title="Mes Favoris" icon={<Heart className="h-5 w-5 text-amber-600" />} action={
           currentUserId && favorites.length > 0 ? (
             <Badge variant="secondary" className="text-xs">

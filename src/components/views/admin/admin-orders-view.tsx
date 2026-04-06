@@ -334,7 +334,7 @@ export function AdminOrdersView() {
   // ── Loading skeleton ──
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="w-full px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-48" />
         <div className="flex gap-2 overflow-x-auto">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -351,7 +351,7 @@ export function AdminOrdersView() {
   // ── Error state ──
   if (error) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+      <div className="w-full px-4 sm:px-6 py-4">
         <ViewHeader
           title="Gestion des commandes"
           icon={<ClipboardList className="h-5 w-5 text-amber-600" />}
@@ -376,7 +376,7 @@ export function AdminOrdersView() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 pb-28 space-y-4">
+    <div className="w-full px-4 sm:px-6 py-4 pb-28 space-y-4">
       <AdminPageHeader
         title="Gestion des commandes"
         description="Suivez les commandes de la plateforme, les statuts en cours et les recherches multi-critères depuis une même vue."

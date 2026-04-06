@@ -318,7 +318,7 @@ export function AdminUsersView() {
   // ── Loading skeletons ──
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="w-full px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-48" />
         <div className="flex gap-2 overflow-x-auto">
           {[1, 2, 3, 4].map((i) => (
@@ -335,7 +335,7 @@ export function AdminUsersView() {
   // ── Error state ──
   if (error) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+      <div className="w-full px-4 sm:px-6 py-4">
         <ViewHeader title="Utilisateurs" icon={<Users className="h-5 w-5 text-amber-600" />} />
         <Card className="border-red-200">
           <CardContent className="p-8 text-center">
@@ -357,7 +357,7 @@ export function AdminUsersView() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 pb-28 space-y-4">
+    <div className="w-full px-4 sm:px-6 py-4 pb-28 space-y-4">
       <AdminPageHeader
         title="Utilisateurs"
         description="Supervisez les patients, pharmaciens et administrateurs depuis un point d’entrée clair, avec recherche et filtres rapides."

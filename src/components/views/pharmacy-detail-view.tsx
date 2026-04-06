@@ -188,7 +188,7 @@ export function PharmacyDetailView() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+      <div className="w-full px-4 sm:px-6 py-4 space-y-4">
         <Skeleton className="h-8 w-32" />
         <Skeleton className="h-48 rounded-xl" />
         <Skeleton className="h-24 rounded-xl" />
@@ -199,7 +199,7 @@ export function PharmacyDetailView() {
 
   if (!pharmacy) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 text-center">
+      <div className="w-full px-4 sm:px-6 py-4 text-center">
         <p className="text-muted-foreground">Pharmacie non trouvée</p>
       </div>
     );
@@ -225,7 +225,7 @@ export function PharmacyDetailView() {
 
   return (
     <div className="pb-36">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="w-full px-4 sm:px-6">
         <ViewHeader title="Détails de la pharmacie" back />
 
         {/* Header */}
@@ -584,7 +584,7 @@ export function PharmacyDetailView() {
 
       {/* Fixed bottom: Call + Navigate */}
       <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+0.5rem)] left-0 right-0 z-40 lg:bottom-6 lg:left-64 lg:right-0 px-3 sm:px-4">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 gap-2">
+        <div className="w-full grid grid-cols-2 gap-2">
           <a
             href={`tel:${pharmacy.phone}`}
             className="flex items-center justify-center gap-2 h-11 sm:h-12 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl shadow-lg shadow-amber-600/30 font-semibold text-sm transition-colors"

@@ -163,7 +163,7 @@ export function PharmacistStockAddView() {
 
   return (
     <div className="pb-32">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="w-full px-4 sm:px-6">
         {/* Header */}
         <PharmacistPageHeader
           title="Ajouter au stock"
@@ -463,7 +463,7 @@ export function PharmacistStockAddView() {
       {/* ── Fixed Submit Button ── */}
       {pharmacyId && (
         <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="w-full px-4 sm:px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
