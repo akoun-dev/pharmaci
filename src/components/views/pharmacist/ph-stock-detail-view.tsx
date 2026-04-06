@@ -35,6 +35,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
@@ -321,10 +322,20 @@ export function PharmacistStockDetailView() {
     <div className="pb-6">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <ViewHeader
+        <PharmacistPageHeader
           title="Détail du stock"
-          icon={<Package className="h-5 w-5 text-orange-600" />}
-          back
+          description="Consultez les quantités, les informations produit et l’état du stock pour cette référence en pharmacie."
+          icon={<Package className="h-5 w-5" />}
+          action={
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-10 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
+              onClick={goBack}
+            >
+              Retour
+            </Button>
+          }
         />
 
         <motion.div

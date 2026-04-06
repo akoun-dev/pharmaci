@@ -38,6 +38,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
@@ -407,17 +408,26 @@ export function PharmacistOrdersView() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-28">
       {/* Header */}
-      <ViewHeader
+      <PharmacistPageHeader
         title="Commandes"
-        icon={<ClipboardList className="h-5 w-5 text-amber-600" />}
+        description="Suivez les retraits, contrôlez les statuts et vérifiez les codes client depuis le centre de commande de la pharmacie."
+        icon={<ClipboardList className="h-5 w-5" />}
         action={
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs">{total}</Badge>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-amber-600" onClick={handleRefresh} disabled={refreshing}>
+            <Badge variant="secondary" className="border border-white/20 bg-white/12 text-xs text-white">
+              {total}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 rounded-2xl bg-white/12 text-white hover:bg-white/18 hover:text-white"
+              onClick={handleRefresh}
+              disabled={refreshing}
+            >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
-          }
+        }
       />
 
       <motion.div

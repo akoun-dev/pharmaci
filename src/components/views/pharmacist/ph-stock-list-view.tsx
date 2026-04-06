@@ -37,6 +37,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
@@ -318,16 +319,16 @@ export function PharmacistStockListView() {
     <div className="pb-4">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <ViewHeader
-          title="Gestion des Stocks"
-          icon={<Package className="h-5 w-5 text-orange-600" />}
-          back={false}
+        <PharmacistPageHeader
+          title="Gestion des stocks"
+          description="Surveillez les références disponibles, filtrez rapidement vos produits et exportez le stock complet depuis cette vue."
+          icon={<Package className="h-5 w-5" />}
           action={
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-orange-600 hover:bg-orange-50"
+                className="h-10 w-10 rounded-2xl bg-white/12 text-white hover:bg-white/18 hover:text-white"
                 onClick={handleSearchToggle}
               >
                 {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
@@ -335,17 +336,16 @@ export function PharmacistStockListView() {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`h-9 w-9 ${showSort ? 'text-orange-600 bg-orange-50' : 'text-orange-600 hover:bg-orange-50'}`}
+                className={`h-10 w-10 rounded-2xl ${showSort ? 'bg-white text-amber-700' : 'bg-white/12 text-white hover:bg-white/18 hover:text-white'}`}
                 onClick={() => setShowSort(!showSort)}
               >
                 <SlidersHorizontal className="h-5 w-5" />
               </Button>
-              {/* More menu */}
               <div className="relative">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 text-orange-600 hover:bg-orange-50"
+                  className="h-10 w-10 rounded-2xl bg-white/12 text-white hover:bg-white/18 hover:text-white"
                   onClick={() => setShowMoreMenu(!showMoreMenu)}
                 >
                   <MoreVertical className="h-5 w-5" />

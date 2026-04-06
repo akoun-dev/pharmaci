@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
@@ -194,9 +195,10 @@ export function PharmacistNotificationsView() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
       {/* Header */}
-      <ViewHeader
+      <PharmacistPageHeader
         title="Notifications"
-        icon={<Bell className="h-5 w-5 text-orange-600" />}
+        description="Centralisez les alertes de commandes, de stock et les messages importants de votre pharmacie."
+        icon={<Bell className="h-5 w-5" />}
         action={
           unreadCount > 0 ? (
             <Button
@@ -204,7 +206,7 @@ export function PharmacistNotificationsView() {
               size="sm"
               onClick={handleMarkAllRead}
               disabled={markingAll}
-              className="text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 h-8 gap-1.5"
+              className="h-10 gap-1.5 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
             >
               <CheckCheck className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Tout </span>lire

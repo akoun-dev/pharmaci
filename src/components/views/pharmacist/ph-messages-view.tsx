@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
@@ -389,15 +390,15 @@ export function PharmacistMessagesView() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
       {/* Header */}
-      <ViewHeader
+      <PharmacistPageHeader
         title="Messagerie"
-        icon={<MessageCircle className="h-5 w-5 text-orange-600" />}
-        back
+        description="Retrouvez les conversations avec vos patients et relancez rapidement les échanges liés aux commandes."
+        icon={<MessageCircle className="h-5 w-5" />}
         action={
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-orange-600"
+            className="h-10 w-10 rounded-2xl bg-white/12 text-white hover:bg-white/18 hover:text-white"
             onClick={fetchPatients}
           >
             <RefreshCw className="h-4 w-4" />

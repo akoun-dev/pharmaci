@@ -59,6 +59,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { ViewHeader } from '@/components/view-header';
+import { AdminPageHeader } from '@/components/views/admin/admin-page-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
@@ -357,36 +358,30 @@ export function AdminUsersView() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 pb-28 space-y-4">
-      <div className="rounded-[26px] border border-amber-100 bg-white/90 p-4 shadow-sm shadow-amber-100/40 sm:p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
-                <Users className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Utilisateurs</p>
-                <p className="text-xs text-muted-foreground">Patients, pharmaciens et administrateurs</p>
-              </div>
-            </div>
-          </div>
+      <AdminPageHeader
+        title="Utilisateurs"
+        description="Supervisez les patients, pharmaciens et administrateurs depuis un point d’entrée clair, avec recherche et filtres rapides."
+        icon={<Users className="h-5 w-5" />}
+        action={
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="border border-amber-200 bg-amber-50 text-xs text-amber-700">
+            <Badge variant="secondary" className="border border-white/20 bg-white/12 text-xs text-white">
               {total}
             </Badge>
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-2xl text-green-700 hover:bg-green-50 hover:text-green-800"
+              className="h-10 w-10 rounded-2xl bg-white/12 text-white hover:bg-white/18 hover:text-white"
               onClick={handleRefresh}
               disabled={refreshing}
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
-        </div>
+        }
+      />
 
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+      <div className="rounded-[26px] border border-amber-100 bg-white/90 p-4 shadow-sm shadow-amber-100/40 sm:p-5">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <div className="rounded-2xl bg-amber-50/70 px-3 py-3">
             <p className="text-[11px] uppercase tracking-[0.16em] text-amber-700/80">Volume</p>
             <p className="mt-1 text-lg font-semibold text-foreground">{total}</p>

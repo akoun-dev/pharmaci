@@ -59,6 +59,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { ViewHeader } from '@/components/view-header';
+import { AdminPageHeader } from '@/components/views/admin/admin-page-header';
 import { toast } from 'sonner';
 import { SmartPagination } from '@/components/ui/smart-pagination';
 
@@ -580,19 +581,19 @@ export function AdminMedicationsView() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 pb-28">
-      {/* ── Header ── */}
-      <ViewHeader
+      <AdminPageHeader
         title="Gestion des médicaments"
-        icon={<FlaskConical className="h-5 w-5 text-amber-600" />}
+        description="Gérez le catalogue, la recherche, les détails produit et les créations de nouvelles références depuis une interface centralisée."
+        icon={<FlaskConical className="h-5 w-5" />}
         action={
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">
+            <Badge variant="secondary" className="border border-white/20 bg-white/12 text-xs text-white">
               {total}
             </Badge>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-amber-600"
+              className="h-10 w-10 rounded-2xl bg-white/12 text-white hover:bg-white/18 hover:text-white"
               onClick={handleRefresh}
               disabled={refreshing}
             >
@@ -600,10 +601,10 @@ export function AdminMedicationsView() {
             </Button>
             <Button
               size="sm"
-              className="h-8 px-3 bg-amber-600 hover:bg-amber-700 text-white"
+              className="h-10 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
               onClick={handleCreateOpen}
             >
-              <Plus className="h-4 w-4 mr-1" />
+              <Plus className="mr-1 h-4 w-4" />
               <span className="text-xs">Créer</span>
             </Button>
           </div>

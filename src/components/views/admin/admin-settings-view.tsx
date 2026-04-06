@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store/app-store';
+import { AdminPageHeader } from '@/components/views/admin/admin-page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -117,8 +118,6 @@ export function AdminSettingsView() {
     fetchStats();
   }, [fetchStats]);
 
-  const firstName = currentUser?.name?.split(' ')[0] ?? 'Admin';
-
   /* ---- Password change handler ---- */
   const handleChangePassword = async () => {
     // Validation
@@ -178,20 +177,11 @@ export function AdminSettingsView() {
       >
         {/* ─── HEADER ─── */}
         <motion.div variants={itemVariants}>
-          <div className="rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 px-5 py-5 text-white">
-            <div className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-amber-200" />
-              <p className="text-sm font-medium text-amber-100">
-                Administration
-              </p>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold mt-1">
-              Paramètres
-            </h1>
-            <p className="text-sm text-amber-100 mt-1">
-              Configuration de la plateforme Pharma CI
-            </p>
-          </div>
+          <AdminPageHeader
+            title="Paramètres"
+            description="Configuration de la plateforme Pharma CI et accès aux réglages sensibles de l’espace d’administration."
+            icon={<Settings className="h-5 w-5" />}
+          />
         </motion.div>
 
         {/* ─── APP INFO ─── */}

@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store/app-store';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,6 @@ import {
   Download,
   BarChart3,
   CalendarClock,
-  Hand,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -254,32 +254,26 @@ export function PharmacistDashboardView() {
       >
         {/* ─── HEADER ─── */}
         <motion.div variants={itemVariants}>
-          <div className="rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 px-5 py-5 text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-amber-100">Tableau de bord</p>
-                <h1 className="text-xl sm:text-2xl font-bold mt-1 flex items-center gap-2">
-                  Bonjour, {firstName}
-                  <Hand className="h-5 w-5" />
-                </h1>
-                {pharmacy && (
-                  <p className="text-sm text-amber-100 mt-1 truncate">{pharmacy.name}</p>
-                )}
-                {!pharmacy && loading && (
-                  <Skeleton className="mt-2 h-4 w-48 bg-amber-500/30" />
-                )}
-              </div>
+          <PharmacistPageHeader
+            title="Tableau de bord"
+            description={
+              pharmacy
+                ? `${pharmacy.name} : suivez vos commandes, vos alertes de stock et les performances de votre pharmacie depuis cette vue d’ensemble.`
+                : `Bonjour, ${firstName}. Suivez vos commandes, vos alertes de stock et les performances de votre pharmacie depuis cette vue d’ensemble.`
+            }
+            icon={<BarChart3 className="h-5 w-5" />}
+            action={
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setCurrentView('ph-reports')}
-                className="text-white hover:bg-white/10 h-9 px-3"
+                className="h-10 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
               >
-                <Download className="h-4 w-4 mr-1.5" />
-                <span className="text-xs font-medium">Export</span>
+                <Download className="mr-1.5 h-4 w-4" />
+                Export
               </Button>
-            </div>
-          </div>
+            }
+          />
         </motion.div>
 
         {/* ─── LOADING SKELETON ─── */}

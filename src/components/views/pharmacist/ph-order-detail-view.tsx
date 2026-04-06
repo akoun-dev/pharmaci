@@ -36,6 +36,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
@@ -351,21 +352,26 @@ export function PharmacistOrderDetailView() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-32">
       {/* Header */}
-      <ViewHeader
+      <PharmacistPageHeader
         title="Détail de la commande"
-        back
-        onBack={goBack}
+        description="Consultez les informations client, le statut et les actions de vérification pour cette commande."
+        icon={<Package className="h-5 w-5" />}
         action={
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             {isVerified && (
-              <Badge className="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 border-0">
-                <ShieldCheck className="h-3 w-3 mr-0.5" />
+              <Badge className="border-0 bg-white/18 px-2 py-0.5 text-[10px] text-white">
+                <ShieldCheck className="mr-0.5 h-3 w-3" />
                 Vérifié
               </Badge>
             )}
-            <Badge variant="outline" className={`text-[11px] px-2 py-0.5 ${statusInfo.className}`}>
-              {statusInfo.label}
-            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-10 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
+              onClick={goBack}
+            >
+              Retour
+            </Button>
           </div>
         }
       />

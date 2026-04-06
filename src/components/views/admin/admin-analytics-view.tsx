@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store/app-store';
 import { ViewHeader } from '@/components/view-header';
+import { AdminPageHeader } from '@/components/views/admin/admin-page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -179,10 +180,20 @@ export function AdminAnalyticsView() {
       >
         {/* ─── HEADER ─── */}
         <motion.div variants={itemVariants}>
-          <ViewHeader
+          <AdminPageHeader
             title="Analyses détaillées"
-            icon={<BarChart3 className="h-5 w-5 text-amber-600" />}
-            back
+            description="Consultez les performances détaillées de la plateforme par période, ville, pharmacie et croissance d’activité."
+            icon={<BarChart3 className="h-5 w-5" />}
+            action={
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentView('admin-dashboard')}
+                className="h-10 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
+              >
+                Retour
+              </Button>
+            }
           />
         </motion.div>
 

@@ -4,6 +4,7 @@ import { logger } from '@/lib/logger';
 import { fetcher } from '@/lib/fetcher';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import {
   Settings,
   User,
@@ -185,9 +186,10 @@ export function PharmacistSettingsView() {
   return (
     <div className="pb-4">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <ViewHeader
+        <PharmacistPageHeader
           title="Paramètres"
-          icon={<Settings className="h-5 w-5 text-amber-600" />}
+          description="Réglez votre compte, vos notifications et les préférences générales de votre espace pharmacien."
+          icon={<Settings className="h-5 w-5" />}
         />
 
         {/* Account Section */}

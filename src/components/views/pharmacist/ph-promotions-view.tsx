@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -396,10 +397,10 @@ export function PharmacistPromotionsView() {
   // ── Render ─────────────────────────────────────────────────
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-24 space-y-5">
-      <ViewHeader
+      <PharmacistPageHeader
         title="Promotions & Fidélisation"
-        back
-        icon={<Tag className="h-5 w-5 text-orange-600" />}
+        description="Créez des offres, suivez leur période d’activité et animez la fidélisation depuis un seul écran."
+        icon={<Tag className="h-5 w-5" />}
       />
 
       {/* ── Section: Créer une promotion ─────────────────── */}

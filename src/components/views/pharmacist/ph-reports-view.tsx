@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store/app-store';
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -236,10 +237,10 @@ export function PharmacistReportsView() {
       >
         {/* ─── HEADER ─── */}
         <motion.div variants={itemVariants}>
-          <ViewHeader
+          <PharmacistPageHeader
             title="Rapports & Analyses"
-            icon={<BarChart3 className="h-5 w-5 text-amber-600" />}
-            back
+            description="Consultez les indicateurs clés de votre pharmacie, les tendances et les synthèses exportables sur la période choisie."
+            icon={<BarChart3 className="h-5 w-5" />}
           />
         </motion.div>
 

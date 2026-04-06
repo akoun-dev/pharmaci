@@ -40,6 +40,7 @@ import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { RatingStars } from '@/components/rating-stars';
 import { useAppStore } from '@/store/app-store';
 import { useRef } from 'react';
@@ -527,10 +528,10 @@ export function PharmacistProfileView() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-6">
-      <ViewHeader
+      <PharmacistPageHeader
         title="Profil de la pharmacie"
-        back={true}
-        icon={<Building2 className="h-5 w-5 text-orange-600" />}
+        description="Mettez à jour les informations publiques, les horaires, les services et la présentation de votre pharmacie."
+        icon={<Building2 className="h-5 w-5" />}
       />
 
       {/* Error state */}

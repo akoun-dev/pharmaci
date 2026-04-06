@@ -44,6 +44,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { ViewHeader } from '@/components/view-header';
+import { AdminPageHeader } from '@/components/views/admin/admin-page-header';
 import { toast } from 'sonner';
 import { SmartPagination } from '@/components/ui/smart-pagination';
 import { formatRelativeTime, formatDateFull } from '@/lib/date-utils';
@@ -415,19 +416,19 @@ export function AdminReviewsView() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 pb-28">
-      {/* ── Header ── */}
-      <ViewHeader
+      <AdminPageHeader
         title="Gestion des avis"
-        icon={<Star className="h-5 w-5 text-amber-600" />}
+        description="Suivez la satisfaction des utilisateurs, filtrez les notes et gérez les réponses ou suppressions depuis une même vue."
+        icon={<Star className="h-5 w-5" />}
         action={
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">
+            <Badge variant="secondary" className="border border-white/20 bg-white/12 text-xs text-white">
               {total}
             </Badge>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-amber-600"
+              className="h-10 w-10 rounded-2xl bg-white/12 text-white hover:bg-white/18 hover:text-white"
               onClick={handleRefresh}
               disabled={refreshing}
             >

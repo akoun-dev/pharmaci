@@ -58,6 +58,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { ViewHeader } from '@/components/view-header';
+import { AdminPageHeader } from '@/components/views/admin/admin-page-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 import { SmartPagination } from '@/components/ui/smart-pagination';
@@ -327,17 +328,16 @@ export function AdminPharmaciesView() {
   return (
     <div className="pb-4">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* ── Header ── */}
-        <ViewHeader
+        <AdminPageHeader
           title="Pharmacies"
-          icon={<Building2 className="h-5 w-5 text-amber-600" />}
-          back={false}
+          description="Parcourez le réseau de pharmacies, filtrez par ville ou garde et ouvrez les fiches établissement depuis une vue unifiée."
+          icon={<Building2 className="h-5 w-5" />}
           action={
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 text-amber-600 hover:bg-amber-50"
+                className="h-10 w-10 rounded-2xl bg-white/12 text-white hover:bg-white/18 hover:text-white"
                 onClick={() => setSearchOpen(!searchOpen)}
               >
                 {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
@@ -345,12 +345,14 @@ export function AdminPharmaciesView() {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`h-9 w-9 ${showFilters ? 'text-amber-600 bg-amber-50' : 'text-amber-600 hover:bg-amber-50'}`}
+                className={`h-10 w-10 rounded-2xl ${
+                  showFilters ? 'bg-white text-amber-700' : 'bg-white/12 text-white hover:bg-white/18'
+                }`}
                 onClick={() => setShowFilters(!showFilters)}
               >
                 <SlidersHorizontal className="h-5 w-5" />
                 {activeFilterCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-amber-600 text-white text-[10px] font-bold flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-amber-700">
                     {activeFilterCount}
                   </span>
                 )}

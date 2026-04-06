@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/store/app-store';
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -274,10 +275,10 @@ export function PharmacistFaqView() {
       >
         {/* ─── HEADER ─── */}
         <motion.div variants={itemVariants}>
-          <ViewHeader
+          <PharmacistPageHeader
             title="Aide & Support"
-            icon={<HelpCircle className="h-5 w-5 text-orange-600" />}
-            back
+            description="Retrouvez les réponses utiles, les questions fréquentes et les contacts d’assistance pour votre espace pharmacien."
+            icon={<HelpCircle className="h-5 w-5" />}
           />
         </motion.div>
 

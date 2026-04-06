@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ViewHeader } from '@/components/view-header';
+import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
 
@@ -164,9 +165,20 @@ export function PharmacistStockAddView() {
     <div className="pb-32">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <ViewHeader
+        <PharmacistPageHeader
           title="Ajouter au stock"
-          back
+          description="Ajoutez une référence à votre stock, rattachez-la au bon médicament et définissez ses informations de vente."
+          icon={<Package className="h-5 w-5" />}
+          action={
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-10 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
+              onClick={() => setCurrentView('ph-stock-list')}
+            >
+              Retour
+            </Button>
+          }
         />
 
         {!pharmacyId ? (

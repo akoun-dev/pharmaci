@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store/app-store';
+import { AdminPageHeader } from '@/components/views/admin/admin-page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -263,31 +264,23 @@ export function AdminDashboardView() {
         animate="visible"
         className="space-y-6"
       >
-        <motion.div variants={itemVariants} className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
-                <BarChart3 className="h-5 w-5" />
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-foreground sm:text-xl">
-                  Tableau de bord admin
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Vue d&apos;ensemble de la plateforme, {firstName}.
-                </p>
-              </div>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentView('admin-analytics')}
-            className="h-10 rounded-2xl border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800"
-          >
-            <BarChart3 className="mr-1.5 h-4 w-4" />
-            Analyses
-          </Button>
+        <motion.div variants={itemVariants}>
+          <AdminPageHeader
+            title="Tableau de bord admin"
+            description={`Vue d'ensemble de la plateforme, ${firstName}. Suivez les indicateurs clés, les nouvelles inscriptions et les commandes du jour.`}
+            icon={<BarChart3 className="h-5 w-5" />}
+            action={
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentView('admin-analytics')}
+                className="h-10 rounded-2xl bg-white px-4 text-amber-700 hover:bg-amber-50"
+              >
+                <BarChart3 className="mr-1.5 h-4 w-4" />
+                Analyses
+              </Button>
+            }
+          />
         </motion.div>
 
         {!loading && !error && data && (
