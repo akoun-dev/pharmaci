@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Pharma CI</string>
+    <string name="title_activity_main">Pharma CI</string>
+    <string name="package_name">ci.pharmaci.app</string>
+    <string name="custom_url_scheme">ci.pharmaci.app</string>
+</resources>
