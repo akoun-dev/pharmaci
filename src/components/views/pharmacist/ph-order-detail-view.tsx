@@ -601,7 +601,7 @@ export function PharmacistOrderDetailView() {
 
       {/* ── Fixed Action Buttons ── */}
       {order.status === 'pending' && (
-        <div className="fixed bottom-0 lg:bottom-6 left-0 right-0 z-40 safe-area-bottom">
+        <div className="fixed bottom-0 lg:bottom-6 left-0 lg:left-64 right-0 z-50 safe-area-bottom">
           <div className="w-full px-4 sm:px-6 pb-safe">
             <Card className="border-amber-200 shadow-lg">
               <CardContent className="p-3 flex gap-2">
@@ -620,7 +620,7 @@ export function PharmacistOrderDetailView() {
       )}
 
       {order.status === 'confirmed' && (
-        <div className="fixed bottom-0 lg:bottom-6 left-0 right-0 z-40 safe-area-bottom">
+        <div className="fixed bottom-0 lg:bottom-6 left-0 lg:left-64 right-0 z-50 safe-area-bottom">
           <div className="w-full px-4 sm:px-6 pb-safe">
             <Card className="border-amber-200 shadow-lg">
               <CardContent className="p-3">
@@ -635,7 +635,7 @@ export function PharmacistOrderDetailView() {
       )}
 
       {order.status === 'ready' && (
-        <div className="fixed bottom-0 lg:bottom-6 left-0 right-0 z-40 safe-area-bottom">
+        <div className="fixed bottom-0 lg:bottom-6 left-0 lg:left-64 right-0 z-50 safe-area-bottom">
           <div className="w-full px-4 sm:px-6 pb-safe">
             <Card className="border-amber-200 shadow-lg">
               <CardContent className="p-3">
