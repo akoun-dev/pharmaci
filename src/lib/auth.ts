@@ -70,6 +70,8 @@ export function createSessionCookie(token: string, userId?: string): {
   csrfToken?: string;
 } {
   const isProduction = process.env.NODE_ENV === 'production';
+  // Only set Secure flag if HTTPS is explicitly enabled
+  const isHttps = process.env.HTTPS_ENABLED === 'true' || process.env.NEXTAUTH_URL?.startsWith('https://');
   const maxAge = 7 * 24 * 60 * 60; // 7 days
 
   // For IP access without domain, use simpler cookie settings
@@ -77,7 +79,7 @@ export function createSessionCookie(token: string, userId?: string): {
   const domain = process.env.COOKIE_DOMAIN;
 
   const sessionCookie = `${COOKIE_NAME}=${token}; Path=/; ${
-    isProduction ? 'Secure; ' : ''
+    isHttps ? 'Secure; ' : ''
   }${domain ? `Domain=${domain}; ` : ''}SameSite=Lax; Max-Age=${maxAge}`;
 
   // Generate and set CSRF token if userId is provided
@@ -87,7 +89,7 @@ export function createSessionCookie(token: string, userId?: string): {
   if (userId) {
     csrfToken = generateCSRFToken(userId);
     csrfCookie = `${CSRF_COOKIE_NAME}=${csrfToken}; Path=/; ${
-      isProduction ? 'Secure; ' : ''
+      isHttps ? 'Secure; ' : ''
     }${domain ? `Domain=${domain}; ` : ''}SameSite=Lax; Max-Age=${maxAge}`;
   }
 
