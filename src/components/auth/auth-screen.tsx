@@ -439,8 +439,7 @@ export function AuthScreen() {
                             <Input
                               id="loginEmail"
                               type="email"
-                              placeholder="votre@email.com"
-                              value={loginEmail}
+                              placeholder="Email"
                               onChange={(e) => setLoginEmail(e.target.value)}
                               className="h-11"
                               onKeyDown={(e) => e.key === 'Enter' && handleEmailLogin()}

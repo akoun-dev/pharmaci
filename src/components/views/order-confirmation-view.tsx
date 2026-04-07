@@ -308,7 +308,7 @@ export function OrderConfirmationView() {
             Votre commande a été enregistrée avec succès
           </p>
 
-          {/* Prescription required warning */}
+          {/* Prescription requiamber warning */}
           {order.items.some(item => item.medication.needsPrescription) && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -316,15 +316,15 @@ export function OrderConfirmationView() {
               transition={{ delay: 0.3 }}
               className="mt-4 w-full max-w-sm"
             >
-              <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-950/40 rounded-xl border border-red-200 dark:border-red-800">
-                <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0">
-                  <ClipboardList className="h-4 w-4 text-red-600 dark:text-red-400" />
+              <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800">
+                <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0">
+                  <ClipboardList className="h-4 w-4 text-amber-600 dark:amber-amber-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-0.5">
+                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-0.5">
                     Ordonnance obligatoire
                   </p>
-                  <p className="text-xs text-red-700 dark:text-red-300 leading-relaxed">
+                  <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
                     N'oubliez pas de munir votre ordonnance lors du retrait de vos médicaments.
                   </p>
                 </div>
