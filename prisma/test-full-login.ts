@@ -35,7 +35,7 @@ async function testFullLogin() {
     
     console.log('7. Creating cookie...');
     const cookie = createSessionCookie(token);
-    console.log('8. Cookie created:', cookie.substring(0, 100) + '...');
+    console.log('8. Cookie created:', cookie.sessionCookie.substring(0, 100) + '...');
     
     console.log('SUCCESS: Login process completed successfully');
   } catch (error) {
