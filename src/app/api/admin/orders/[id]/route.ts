@@ -50,16 +50,20 @@ export async function GET(
             longitude: true,
           },
         },
-        medication: {
-          select: {
-            id: true,
-            name: true,
-            commercialName: true,
-            form: true,
-            category: true,
-            activePrinciple: true,
-            dosage: true,
-            imageUrl: true,
+        items: {
+          include: {
+            medication: {
+              select: {
+                id: true,
+                name: true,
+                commercialName: true,
+                form: true,
+                category: true,
+                activePrinciple: true,
+                dosage: true,
+                imageUrl: true,
+              },
+            },
           },
         },
       },
@@ -73,21 +77,28 @@ export async function GET(
       id: order.id,
       userId: order.userId,
       pharmacyId: order.pharmacyId,
-      medicationId: order.medicationId,
       status: order.status,
-      deliveryStatus: order.deliveryStatus,
-      quantity: order.quantity,
+      deliveryStatus: null,
+      quantity: order.totalQuantity,
+      totalQuantity: order.totalQuantity,
       totalPrice: order.totalPrice,
       note: order.note,
-      paymentMethod: order.paymentMethod,
-      pickupTime: order.pickupTime,
+      paymentMethod: null,
+      pickupTime: null,
       verificationCode: order.verificationCode,
       verifiedAt: order.verifiedAt?.toISOString() || null,
       createdAt: order.createdAt.toISOString(),
       updatedAt: order.updatedAt.toISOString(),
       user: order.user,
       pharmacy: order.pharmacy,
-      medication: order.medication,
+      medication: order.items[0]?.medication || null,
+      items: order.items.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        stockId: item.stockId,
+        medication: item.medication,
+      })),
     });
   } catch (error) {
     logger.error('Erreur détail commande admin:', error);
@@ -118,7 +129,10 @@ export async function PATCH(
     const body = await request.json();
     const { status, note } = body;
 
-    const existingOrder = await db.order.findUnique({ where: { id } });
+    const existingOrder = await db.order.findUnique({
+      where: { id },
+      include: { items: true },
+    });
     if (!existingOrder) {
       return NextResponse.json({ error: 'Commande introuvable' }, { status: 404 });
     }
@@ -137,24 +151,32 @@ export async function PATCH(
 
       // If cancelling, restore stock
       if (status === 'cancelled' && existingOrder.status !== 'cancelled') {
-        await db.pharmacyMedication.updateMany({
-          where: {
-            pharmacyId: existingOrder.pharmacyId,
-            medicationId: existingOrder.medicationId,
-          },
-          data: { quantity: { increment: existingOrder.quantity } },
-        });
+        await db.$transaction(
+          existingOrder.items.map((item) =>
+            db.pharmacyMedication.updateMany({
+              where: {
+                pharmacyId: existingOrder.pharmacyId,
+                medicationId: item.medicationId,
+              },
+              data: { quantity: { increment: item.quantity } },
+            })
+          )
+        );
       }
 
       // If re-confirming a cancelled order, deduct stock
       if (status !== 'cancelled' && existingOrder.status === 'cancelled') {
-        await db.pharmacyMedication.updateMany({
-          where: {
-            pharmacyId: existingOrder.pharmacyId,
-            medicationId: existingOrder.medicationId,
-          },
-          data: { quantity: { decrement: existingOrder.quantity } },
-        });
+        await db.$transaction(
+          existingOrder.items.map((item) =>
+            db.pharmacyMedication.updateMany({
+              where: {
+                pharmacyId: existingOrder.pharmacyId,
+                medicationId: item.medicationId,
+              },
+              data: { quantity: { decrement: item.quantity } },
+            })
+          )
+        );
       }
     }
 
@@ -168,23 +190,34 @@ export async function PATCH(
       include: {
         user: { select: { id: true, name: true, email: true, phone: true } },
         pharmacy: { select: { id: true, name: true, city: true } },
-        medication: { select: { id: true, name: true, commercialName: true } },
+        items: {
+          include: {
+            medication: { select: { id: true, name: true, commercialName: true, form: true, category: true } },
+          },
+        },
       },
     });
 
     return NextResponse.json({
       id: updatedOrder.id,
       status: updatedOrder.status,
-      quantity: updatedOrder.quantity,
+      quantity: updatedOrder.totalQuantity,
+      totalQuantity: updatedOrder.totalQuantity,
       totalPrice: updatedOrder.totalPrice,
       note: updatedOrder.note,
-      paymentMethod: updatedOrder.paymentMethod,
-      pickupTime: updatedOrder.pickupTime,
+      paymentMethod: null,
+      pickupTime: null,
       createdAt: updatedOrder.createdAt.toISOString(),
       updatedAt: updatedOrder.updatedAt.toISOString(),
       user: updatedOrder.user,
       pharmacy: updatedOrder.pharmacy,
-      medication: updatedOrder.medication,
+      medication: updatedOrder.items[0]?.medication || null,
+      items: updatedOrder.items.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        medication: item.medication,
+      })),
     });
   } catch (error) {
     logger.error('Erreur mise à jour commande admin:', error);

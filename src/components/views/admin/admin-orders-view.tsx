@@ -50,7 +50,8 @@ interface OrderData {
   id: string;
   status: string;
   deliveryStatus?: string;
-  quantity: number;
+  quantity?: number;
+  totalQuantity?: number;
   totalPrice: number;
   note?: string | null;
   paymentMethod?: string | null;
@@ -72,13 +73,25 @@ interface OrderData {
     city: string;
     address?: string;
   };
-  medication: {
+  medication?: {
     id: string;
     name: string;
     commercialName: string;
     form?: string;
     category?: string;
   };
+  items?: Array<{
+    id?: string;
+    quantity: number;
+    price: number;
+    medication?: {
+      id: string;
+      name: string;
+      commercialName: string;
+      form?: string;
+      category?: string;
+    } | null;
+  }>;
 }
 
 interface OrderStats {
@@ -181,6 +194,15 @@ function formatDateFull(dateStr: string): string {
   } catch {
     return dateStr;
   }
+}
+
+function getPrimaryMedication(order: Pick<OrderData, 'medication' | 'items'>) {
+  return order.medication ?? order.items?.find((item) => item?.medication)?.medication ?? null;
+}
+
+function getMedicationTitle(order: Pick<OrderData, 'medication' | 'items'>) {
+  const medication = getPrimaryMedication(order);
+  return medication?.commercialName || medication?.name || 'Médicament indisponible';
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
@@ -560,6 +582,8 @@ export function AdminOrdersView() {
           >
             {orders.map((order, index) => {
               const statusInfo = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
+              const primaryMedication = getPrimaryMedication(order);
+              const itemCount = order.items?.length ?? 0;
               return (
                 <motion.div
                   key={order.id}
@@ -613,19 +637,20 @@ export function AdminOrdersView() {
                       <div className="flex items-start gap-2">
                         <Pill className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                         <div className="min-w-0 flex-1 space-y-0.5">
-                          {order.items.length === 1 ? (
+                          {itemCount === 1 ? (
                             <>
                               <p className="text-sm truncate">
-                                {order.items[0].medication.commercialName || order.items[0].medication.name}
+                                {getMedicationTitle(order)}
                               </p>
-                              {order.items[0].medication.name !== order.items[0].medication.commercialName && (
+                              {primaryMedication &&
+                                primaryMedication.name !== primaryMedication.commercialName && (
                                 <p className="text-xs text-muted-foreground truncate">
-                                  {order.items[0].medication.name}
+                                  {primaryMedication.name}
                                 </p>
                               )}
                             </>
                           ) : (
-                            <p className="text-sm truncate">{order.items.length} médicaments</p>
+                            <p className="text-sm truncate">{itemCount || order.totalQuantity || order.quantity || 0} médicament{(itemCount || order.totalQuantity || order.quantity || 0) > 1 ? 's' : ''}</p>
                           )}
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Building2 className="h-3 w-3" />
@@ -763,26 +788,37 @@ export function AdminOrdersView() {
                   Médicament
                 </h4>
                 <div className="bg-gray-50 rounded-lg p-3 space-y-1.5 dark:bg-gray-900">
+                  {(() => {
+                    const primaryMedication = getPrimaryMedication(selectedOrder);
+                    return (
+                      <>
                   <p className="text-sm font-semibold">
-                    {selectedOrder.medication.commercialName ||
-                      selectedOrder.medication.name}
+                    {getMedicationTitle(selectedOrder)}
                   </p>
-                  {selectedOrder.medication.name !==
-                    selectedOrder.medication.commercialName && (
+                  {primaryMedication &&
+                    primaryMedication.name !== primaryMedication.commercialName && (
                     <p className="text-xs text-muted-foreground">
-                      {selectedOrder.medication.name}
+                      {primaryMedication.name}
                     </p>
                   )}
-                  {selectedOrder.medication.form && (
+                  {primaryMedication?.form && (
                     <p className="text-xs text-muted-foreground">
-                      Forme : {selectedOrder.medication.form}
+                      Forme : {primaryMedication.form}
                     </p>
                   )}
-                  {selectedOrder.medication.category && (
+                  {primaryMedication?.category && (
                     <p className="text-xs text-muted-foreground">
-                      Catégorie : {selectedOrder.medication.category}
+                      Catégorie : {primaryMedication.category}
                     </p>
                   )}
+                  {selectedOrder.items && selectedOrder.items.length > 1 && (
+                    <p className="text-xs text-muted-foreground">
+                      {selectedOrder.items.length} lignes de commande
+                    </p>
+                  )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -797,7 +833,7 @@ export function AdminOrdersView() {
                       <p className="text-[11px] text-muted-foreground">Quantité</p>
                       <p className="text-sm font-semibold flex items-center gap-1">
                         <Package className="h-3.5 w-3.5 text-amber-500" />
-                        {selectedOrder.quantity}
+                        {selectedOrder.totalQuantity ?? selectedOrder.quantity ?? 0}
                       </p>
                     </div>
                     <div>

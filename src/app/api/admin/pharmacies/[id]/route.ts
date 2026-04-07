@@ -105,7 +105,19 @@ export async function GET(
       where: { pharmacyId: id },
       include: {
         user: { select: { id: true, name: true, phone: true } },
-        medication: { select: { id: true, name: true, commercialName: true } },
+        items: {
+          include: {
+            medication: {
+              select: {
+                id: true,
+                name: true,
+                commercialName: true,
+                form: true,
+                category: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
       take: 10,
@@ -183,13 +195,19 @@ export async function GET(
       recentOrders: recentOrders.map((o) => ({
         id: o.id,
         status: o.status,
-        quantity: o.quantity,
+        quantity: o.totalQuantity,
+        totalQuantity: o.totalQuantity,
         totalPrice: o.totalPrice,
-        paymentMethod: o.paymentMethod,
         createdAt: o.createdAt.toISOString(),
         updatedAt: o.updatedAt.toISOString(),
         user: o.user,
-        medication: o.medication,
+        medication: o.items[0]?.medication || null,
+        items: o.items.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          medication: item.medication,
+        })),
       })),
     });
   } catch (error) {

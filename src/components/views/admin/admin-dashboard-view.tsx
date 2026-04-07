@@ -131,6 +131,15 @@ function formatRelativeTime(dateStr: string): string {
   return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 }
 
+function getRecentOrderTitle(order: RecentAdminOrder): string {
+  const medication = order.items?.find((item) => item?.medication)?.medication;
+  if (medication) {
+    return medication.commercialName || medication.name;
+  }
+  const count = order.items?.length || order.totalQuantity || 0;
+  return count > 1 ? `${count} médicaments` : 'Médicament indisponible';
+}
+
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   pending: {
     label: 'En attente',
@@ -747,10 +756,7 @@ export function AdminDashboardView() {
                           >
                             <div className="min-w-0 flex-1 mr-3">
                               <p className="text-sm font-medium truncate">
-                                {order.items.length === 1
-                                  ? (order.items[0].medication.commercialName || order.items[0].medication.name)
-                                  : `${order.items.length} médicaments`
-                                }
+                                {getRecentOrderTitle(order)}
                               </p>
                               <p className="text-xs text-muted-foreground mt-0.5 truncate">
                                 {order.pharmacy.name} · {order.user.name} ·{' '}
