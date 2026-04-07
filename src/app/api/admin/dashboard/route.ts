@@ -87,6 +87,7 @@ export async function GET(request: NextRequest) {
       db.order.groupBy({
         by: ['pharmacyId'],
         where: { status: { in: ['confirmed', 'ready', 'picked_up'] } },
+        _count: true,
         _sum: { totalPrice: true },
         orderBy: { _sum: { totalPrice: 'desc' } },
         take: 5,
