@@ -130,7 +130,7 @@ export async function PUT(
           db.pharmacyMedication.update({
             where: {
               pharmacyId_medicationId: {
-                pharmacyId: user.linkedPharmacyId,
+                pharmacyId: existing.pharmacyId,
                 medicationId: item.medicationId,
               },
             },

@@ -16,6 +16,7 @@ export type NotificationType = 'info' | 'order' | 'alert' | 'review' | 'message'
 export interface NotificationData {
   orderId?: string;
   medicationId?: string;
+  medicationName?: string;
   pharmacyId?: string;
   reviewId?: string;
   messageId?: string;

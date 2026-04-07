@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     if (!validatedParams.success) {
       return NextResponse.json(
-        { error: 'Paramètres de recherche invalides', details: validatedParams.error.errors },
+        { error: 'Paramètres de recherche invalides', details: validatedParams.error.issues },
         { status: 400 }
       );
     }

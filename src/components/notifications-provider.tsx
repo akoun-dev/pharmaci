@@ -20,7 +20,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   const { isAuthenticated, currentUser } = useAppStore();
 
   // Callback quand de nouvelles notifications arrivent
-  const handleNotificationUpdate = (data: { count: number; notifications?: Array<{ id: string; title: string; message: string }> }) => {
+  const handleNotificationUpdate = (data: { count: number; notifications?: Array<{ id: string; title: string; message: string; read?: boolean; type?: string }> }) => {
     // Afficher un toast si nouvelle notification et page visible
     if (data.count > 0 && data.notifications && data.notifications.length > 0) {
       const latestNotification = data.notifications[0];

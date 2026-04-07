@@ -23,7 +23,7 @@ export function usePolling<T>(
   callback: (data: T) => void,
   options: PollingOptions = {}
 ) {
-  const { enabled = true, interval = 30000, isActive: true } = options;
+  const { enabled = true, interval = 30000, isActive = true } = options;
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isPolling, setIsPolling] = useState(false);
 

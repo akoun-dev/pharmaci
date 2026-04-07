@@ -48,8 +48,8 @@ model Pharmacy {
   address     String
   city        String
   district    String?
-  latitude    Float
-  longitude   Float
+  latitude    Float?
+  longitude   Float?
   phone       String
   email       String?
   isGuard     Boolean  @default(false)

@@ -89,7 +89,7 @@ export function CartCheckoutView() {
 
       if (batchRes.ok) {
         batchData = await batchRes.json();
-        if (batchData.orders && batchData.orders.length > 0) {
+        if (batchData && batchData.orders && batchData.orders.length > 0) {
           pharmacyCount = batchData.pharmacyCount || 1;
 
           // Show appropriate success message

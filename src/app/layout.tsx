@@ -44,8 +44,6 @@ export const metadata: Metadata = {
       "Trouvez vos médicaments et pharmacies en Côte d'Ivoire",
     type: "website",
   },
-  // Optimisation du preloading et performance
-  prefetch: true,
 };
 
 export default function RootLayout({

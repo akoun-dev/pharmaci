@@ -61,7 +61,7 @@ export async function GET(
     }
 
     // Get linked pharmacy info
-    let linkedPharmacy = null;
+    let linkedPharmacy: { id: string; name: string; city: string; address: string; } | null = null;
     if (user.linkedPharmacyId) {
       linkedPharmacy = await db.pharmacy.findUnique({
         where: { id: user.linkedPharmacyId },

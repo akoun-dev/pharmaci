@@ -48,8 +48,11 @@ interface RecentOrder {
   quantity: number;
   totalPrice: number;
   createdAt: string;
+  updatedAt: string;
   user: { name: string; phone: string };
-  medication: { name: string; commercialName: string; form: string };
+  items: Array<{
+    medication: { name: string; commercialName: string; form: string };
+  }>;
 }
 
 interface PharmacyProfile {

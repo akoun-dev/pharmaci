@@ -83,14 +83,10 @@ export interface Order {
   id: string;
   userId: string;
   pharmacyId: string;
-  medicationId: string;
   status: 'pending' | 'confirmed' | 'ready' | 'picked_up' | 'cancelled' | 'delivered';
-  deliveryStatus: 'pickup' | 'delivery';
-  quantity: number;
+  totalQuantity: number;
   totalPrice: number;
   note?: string | null;
-  paymentMethod?: string | null;
-  pickupTime?: string | null;
   verificationCode?: string | null;
   verifiedAt?: Date | null;
   createdAt: Date;
@@ -99,6 +95,19 @@ export interface Order {
   // Expanded relations
   user?: User;
   pharmacy?: Pharmacy;
+  items?: OrderItem[];
+}
+
+/**
+ * OrderItem interface - items within an order
+ */
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  medicationId: string;
+  quantity: number;
+  price: number;
+  stockId?: string | null;
   medication?: Medication;
 }
 

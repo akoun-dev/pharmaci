@@ -1,7 +1,7 @@
 import { randomBytes, createHash, timingSafeEqual } from 'crypto';
 
 const CSRF_TOKEN_LENGTH = 32;
-const CSRF_SECRET = process.env.CSRF_SECRET;
+const CSRF_SECRET: string = process.env.CSRF_SECRET || '';
 
 if (!CSRF_SECRET) {
   throw new Error('CSRF_SECRET environment variable is required but not set');

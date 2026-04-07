@@ -40,8 +40,8 @@ export async function POST(request: NextRequest) {
       pharmacyGroups.get(pharmacyId)!.push(item);
     }
 
-    const createdOrders = [];
-    const errors = [];
+    const createdOrders: any[] = [];
+    const errors: { medicationId?: string; pharmacyId: string; error: string | undefined; }[] = [];
 
     // Process each pharmacy group
     for (const [pharmacyId, pharmacyItems] of pharmacyGroups.entries()) {

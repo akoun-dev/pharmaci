@@ -95,9 +95,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Format invalide. Utilisez .xlsx' }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const arrayBuffer = await file.arrayBuffer();
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(buffer);
+    await workbook.xlsx.load(arrayBuffer);
 
     const sheet = workbook.worksheets[0];
     if (!sheet || sheet.rowCount < 3) {
@@ -166,8 +166,8 @@ export async function POST(request: NextRequest) {
         const existingMeds = await db.medication.findMany({
           where: {
             OR: [
-              ...(item.commercialName ? [{ commercialName: { contains: item.commercialName, mode: 'insensitive' as const } }] : []),
-              ...(item.genericName ? [{ name: { contains: item.genericName, mode: 'insensitive' as const } }] : []),
+              ...(item.commercialName ? [{ commercialName: { contains: item.commercialName } }] : []),
+              ...(item.genericName ? [{ name: { contains: item.genericName } }] : []),
             ],
           },
           take: 5,
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
           const newMed = await db.medication.create({
             data: {
               name: newName,
-              commercialName: newCommercial !== newName ? newCommercial : null,
+              commercialName: newCommercial,
               category: item.category || null,
               form: item.form || null,
               needsPrescription: item.needsPrescription,
@@ -208,8 +208,8 @@ export async function POST(request: NextRequest) {
           await db.pharmacyMedication.update({
             where: { id: existingStock.id },
             data: {
-              price: item.price,
-              quantity: item.quantity,
+              price: item.price ?? 0,
+              quantity: item.quantity ?? 0,
               inStock: item.inStock,
               needsPrescription: item.needsPrescription,
               ...(item.expirationDate ? { expirationDate: new Date(item.expirationDate) } : {}),
@@ -220,8 +220,8 @@ export async function POST(request: NextRequest) {
               pharmacyId,
               medicationId,
               type: 'adjustment',
-              quantity: item.quantity,
-              note: `Import Excel — Qté: ${item.quantity}, Prix: ${item.price} FCFA`,
+              quantity: item.quantity ?? 0,
+              note: `Import Excel — Qté: ${item.quantity ?? 0}, Prix: ${item.price ?? 0} FCFA`,
             },
           });
           result.updated++;
@@ -230,8 +230,8 @@ export async function POST(request: NextRequest) {
             data: {
               pharmacyId,
               medicationId,
-              price: item.price,
-              quantity: item.quantity,
+              price: item.price ?? 0,
+              quantity: item.quantity ?? 0,
               inStock: item.inStock,
               needsPrescription: item.needsPrescription,
               ...(item.expirationDate ? { expirationDate: new Date(item.expirationDate) } : {}),
@@ -242,8 +242,8 @@ export async function POST(request: NextRequest) {
               pharmacyId,
               medicationId,
               type: 'entry',
-              quantity: item.quantity,
-              note: `Import Excel — Nouvel ajout, Qté: ${item.quantity}, Prix: ${item.price} FCFA`,
+              quantity: item.quantity ?? 0,
+              note: `Import Excel — Nouvel ajout, Qté: ${item.quantity ?? 0}, Prix: ${item.price ?? 0} FCFA`,
             },
           });
           result.created++;

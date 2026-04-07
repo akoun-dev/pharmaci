@@ -115,7 +115,7 @@ export function groupOrdersByPharmacy(orders: Order[]): OrderGroup[] {
           longitude: firstOrder.pharmacy?.longitude,
         },
         orders: pharmacyOrders,
-        totalItems: pharmacyOrders.reduce((sum, o) => sum + o.quantity, 0),
+        totalItems: pharmacyOrders.reduce((sum, o) => sum + o.totalQuantity, 0),
         totalPrice: pharmacyOrders.reduce((sum, o) => sum + o.totalPrice, 0),
         status: getWorstStatus(pharmacyOrders),
         createdAt: getMostRecentDate(pharmacyOrders),

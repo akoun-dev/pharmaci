@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     // Search filter: patient name
     if (q) {
       where.user = {
-        name: { contains: q, mode: 'insensitive' },
+        name: { contains: q },
       };
     }
 
@@ -52,12 +52,14 @@ export async function GET(request: NextRequest) {
     if (dateFrom) {
       const from = new Date(dateFrom);
       from.setHours(0, 0, 0, 0);
-      where.createdAt = { ...(where.createdAt as Prisma.DateTimeNullableFilter || {}), gte: from };
+      const currentFilter = typeof where.createdAt === 'object' ? where.createdAt : {};
+      where.createdAt = { ...currentFilter, gte: from };
     }
     if (dateTo) {
       const to = new Date(dateTo);
       to.setHours(23, 59, 59, 999);
-      where.createdAt = { ...(where.createdAt as Prisma.DateTimeNullableFilter || {}), lte: to };
+      const currentFilter = typeof where.createdAt === 'object' ? where.createdAt : {};
+      where.createdAt = { ...currentFilter, lte: to };
     }
 
     // Count per status (global, without search/date filters — only pharmacyId)

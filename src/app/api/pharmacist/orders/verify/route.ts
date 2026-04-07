@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       totalPrice: updated.totalPrice,
       note: updated.note,
       verificationCode: updated.verificationCode,
-      verifiedAt: updated.verifiedAt.toISOString(),
+      verifiedAt: updated.verifiedAt?.toISOString() || null,
       alreadyVerified: false,
       createdAt: updated.createdAt.toISOString(),
       updatedAt: updated.updatedAt.toISOString(),

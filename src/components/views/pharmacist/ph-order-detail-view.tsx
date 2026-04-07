@@ -43,7 +43,7 @@ import { toast } from 'sonner';
 interface OrderData {
   id: string;
   status: string;
-  quantity: number;
+  totalQuantity: number;
   totalPrice: number;
   note?: string | null;
   pickupTime?: string | null;
@@ -61,12 +61,17 @@ interface OrderData {
     city: string;
     phone: string;
   };
-  medication: {
-    name: string;
-    commercialName: string;
-    form?: string;
-    needsPrescription?: boolean;
-  };
+  items: Array<{
+    id: string;
+    quantity: number;
+    price: number;
+    medication: {
+      name: string;
+      commercialName: string;
+      form?: string;
+      needsPrescription?: boolean;
+    };
+  }>;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {

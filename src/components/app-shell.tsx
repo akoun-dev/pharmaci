@@ -770,7 +770,7 @@ export function AppShell() {
             {pharmacistTabs.map((tab) => {
               const isActive = activeTab === tab.key;
               const Icon = tab.icon;
-              const showBadge = tab.key === 'ph-notifications' && unreadNotifications.count > 0;
+              const showBadge = tab.key === 'ph-notifications' && unreadCount > 0;
               return (
                 <button
                   key={tab.key}
@@ -785,7 +785,7 @@ export function AppShell() {
                     <Icon className="h-5 w-5" />
                     {showBadge && (
                       <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                        {unreadNotifications.count > 9 ? '9+' : unreadNotifications.count}
+                        {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
                   </div>
@@ -861,7 +861,7 @@ export function AppShell() {
           {patientTabs.map((tab) => {
             const isActive = activeTab === tab.key;
             const Icon = tab.icon;
-            const showBadge = tab.key === 'notifications' && unreadNotifications.count > 0;
+            const showBadge = tab.key === 'notifications' && unreadCount > 0;
             return (
               <button
                 key={tab.key}
@@ -878,7 +878,7 @@ export function AppShell() {
                   />
                   {showBadge && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center">
-                      {unreadNotifications.count > 9 ? '9+' : unreadNotifications.count}
+                      {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
                 </div>
@@ -907,7 +907,7 @@ export function AppShell() {
           {patientTabs.map((tab) => {
             const isActive = activeTab === tab.key;
             const Icon = tab.icon;
-            const showBadge = tab.key === 'notifications' && unreadNotifications.count > 0;
+            const showBadge = tab.key === 'notifications' && unreadCount > 0;
             return (
               <button
                 key={tab.key}
@@ -922,7 +922,7 @@ export function AppShell() {
                   <Icon className="h-5 w-5" />
                   {showBadge && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                      {unreadNotifications.count > 9 ? '9+' : unreadNotifications.count}
+                      {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
                 </div>

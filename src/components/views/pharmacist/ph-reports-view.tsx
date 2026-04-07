@@ -132,8 +132,8 @@ export function PharmacistReportsView() {
   const [drillDownOrders, setDrillDownOrders] = useState<{
     id: string;
     user: { name: string };
-    medication: { name: string; commercialName: string };
-    quantity: number;
+    items: Array<{ medication: { name: string; commercialName: string } }>;
+    totalQuantity: number;
     totalPrice: number;
     status: string;
     createdAt: string;

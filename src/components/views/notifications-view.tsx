@@ -222,7 +222,6 @@ export function NotificationsView() {
       {/* Header */}
       <ViewHeader
         title="Notifications"
-        description="Retrouvez toutes vos alertes de commandes et messages importants."
         icon={<Bell className="h-5 w-5 text-amber-600" />}
       />
 

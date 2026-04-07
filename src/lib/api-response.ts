@@ -125,15 +125,13 @@ export function apiError(
 
   // ApiError instances
   if (error instanceof ApiError) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: error.message,
-        ...(error.code && { code: error.code }),
-        ...(error.details && { details: error.details }),
-      },
-      { status: error.statusCode }
-    );
+    const responseData: ApiErrorResponse = {
+      success: false,
+      error: error.message,
+    };
+    if (error.code) responseData.code = error.code;
+    if (error.details) responseData.details = error.details;
+    return NextResponse.json(responseData, { status: error.statusCode });
   }
 
   // Zod validation errors
@@ -143,7 +141,7 @@ export function apiError(
         success: false,
         error: 'Données invalides',
         code: 'VALIDATION_ERROR',
-        details: error.errors,
+        details: error.issues,
       },
       { status: 400 }
     );
@@ -209,10 +207,10 @@ export async function validateBody<T>(
   const result = schema.safeParse(body);
 
   if (!result.success) {
-    throw Errors.validation('Données invalides', result.error.errors);
+    throw Errors.validation('Données invalides', result.error?.issues || []);
   }
 
-  return result.data;
+  return result.data!;
 }
 
 /**
@@ -230,8 +228,8 @@ export function validateSearchParams<T>(
   const result = schema.safeParse(params);
 
   if (!result.success) {
-    throw Errors.validation('Paramètres de recherche invalides', result.error.errors);
+    throw Errors.validation('Paramètres de recherche invalides', result.error?.issues || []);
   }
 
-  return result.data;
+  return result.data!;
 }

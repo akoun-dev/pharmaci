@@ -49,9 +49,9 @@ export async function GET(request: NextRequest) {
 
     if (q) {
       where.OR = [
-        { comment: { contains: q, mode: 'insensitive' } },
-        { user: { name: { contains: q, mode: 'insensitive' } } },
-        { pharmacy: { name: { contains: q, mode: 'insensitive' } } },
+        { comment: { contains: q } },
+        { user: { name: { contains: q } } },
+        { pharmacy: { name: { contains: q } } },
       ];
     }
 
