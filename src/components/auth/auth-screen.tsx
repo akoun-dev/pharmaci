@@ -358,7 +358,7 @@ export function AuthScreen() {
           exit={{ opacity: 0, height: 0 }}
           className="mb-4"
         >
-          <div className="bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs px-3 py-2 rounded-lg">
             {error}
           </div>
         </motion.div>
@@ -407,7 +407,7 @@ export function AuthScreen() {
                         }}
                         className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
                           loginMethod === 'email'
-                            ? 'bg-white text-amber-700 shadow-sm'
+                            ? 'bg-white text-green-700 shadow-sm'
                             : 'text-muted-foreground'
                         }`}
                       >
@@ -421,7 +421,7 @@ export function AuthScreen() {
                         }}
                         className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
                           loginMethod === 'phone'
-                            ? 'bg-white text-amber-700 shadow-sm'
+                            ? 'bg-white text-green-700 shadow-sm'
                             : 'text-muted-foreground'
                         }`}
                       >
@@ -469,7 +469,7 @@ export function AuthScreen() {
                           <Button
                             onClick={handleEmailLogin}
                             disabled={loading}
-                            className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium"
+                            className="w-full h-11 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium"
                           >
                             {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
                             Se connecter
@@ -492,7 +492,7 @@ export function AuthScreen() {
                           <Button
                             onClick={handlePhoneLogin}
                             disabled={loading}
-                            className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium"
+                            className="w-full h-11 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium"
                           >
                             {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
                             Recevoir le code
@@ -507,7 +507,7 @@ export function AuthScreen() {
                         Pas encore de compte ?{' '}
                         <button
                           onClick={handleGoToRegister}
-                          className="text-amber-600 hover:text-amber-700 font-medium"
+                          className="text-green-600 hover:text-green-700 font-medium"
                         >
                           Créer un compte
                         </button>
@@ -536,7 +536,7 @@ export function AuthScreen() {
                         setRole('patient');
                         setStep('register-form');
                       }}
-                      className="w-full h-14 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium text-base"
+                      className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium text-base"
                     >
                       <User className="h-5 w-5 mr-2" />
                       Patient
@@ -583,7 +583,7 @@ export function AuthScreen() {
                         }}
                         className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
                           registerMethod === 'email'
-                            ? 'bg-white text-amber-700 shadow-sm'
+                            ? 'bg-white text-green-700 shadow-sm'
                             : 'text-muted-foreground'
                         }`}
                       >
@@ -597,7 +597,7 @@ export function AuthScreen() {
                         }}
                         className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
                           registerMethod === 'phone'
-                            ? 'bg-white text-amber-700 shadow-sm'
+                            ? 'bg-white text-green-700 shadow-sm'
                             : 'text-muted-foreground'
                         }`}
                       >
@@ -737,7 +737,7 @@ export function AuthScreen() {
                     <Button
                       onClick={registerMethod === 'email' ? handleEmailRegister : handlePhoneRegister}
                       disabled={loading}
-                      className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium mt-4"
+                      className="w-full h-11 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium mt-4"
                     >
                       {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
                       {registerMethod === 'email' ? "S'inscrire" : "Recevoir le code"}
@@ -755,8 +755,8 @@ export function AuthScreen() {
                     className="text-center"
                   >
                     <div className="flex items-center justify-center mb-2">
-                      <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
-                        <Mail className="h-6 w-6 text-amber-600" />
+                      <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+                        <Mail className="h-6 w-6 text-green-600 dark:text-green-400" />
                       </div>
                     </div>
                     <StepHeader
@@ -784,7 +784,7 @@ export function AuthScreen() {
                       ) : (
                         <button
                           onClick={handleResendOtp}
-                          className="text-amber-600 hover:underline flex items-center gap-1 mx-auto"
+                          className="text-green-600 hover:underline flex items-center gap-1 mx-auto"
                         >
                           <RefreshCw className="h-3 w-3" />
                           Renvoyer le code
@@ -794,7 +794,7 @@ export function AuthScreen() {
                     <Button
                       onClick={handleOtpVerify}
                       disabled={loading || otpCode.length !== 4}
-                      className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium"
+                      className="w-full h-11 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium"
                     >
                       {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
                       Vérifier
