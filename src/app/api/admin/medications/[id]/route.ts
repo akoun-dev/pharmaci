@@ -76,19 +76,19 @@ export async function GET(
 
     // Order stats for this medication (via OrderItem since Medication -> OrderItem -> Order)
     const orderStats = await db.orderItem.groupBy({
-      by: ['order'],
+      by: ['orderId'],
       where: { medicationId: id },
       _count: true,
       _sum: { quantity: true },
     });
 
     // Compter le nombre total de commandes uniques
-    const uniqueOrderIds = orderStats.map((o) => o.order);
+    const uniqueOrderIds = orderStats.map((o) => o.orderId);
     const totalOrders = uniqueOrderIds.length;
 
     // Pour le chiffre d'affaires, on fait une requête séparée
     const ordersRevenue = await db.orderItem.groupBy({
-      by: ['order'],
+      by: ['orderId'],
       where: { medicationId: id },
       _sum: { price: true },
     });
