@@ -42,6 +42,14 @@ export async function GET(request: NextRequest) {
       take: limit,
     });
 
+    // Compter le total des non-lues pour le badge
+    const unreadCount = await db.notification.count({
+      where: {
+        userId: session.userId,
+        read: false,
+      },
+    });
+
     return NextResponse.json({
       notifications: notifications.map((n) => ({
         id: n.id,
@@ -52,6 +60,7 @@ export async function GET(request: NextRequest) {
         data: n.data,
         createdAt: n.createdAt.toISOString(),
       })),
+      unreadCount,
     });
   } catch (error) {
     logger.error('Error fetching notifications:', error);

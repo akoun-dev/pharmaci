@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
 import { useAppStore, View } from '@/store/app-store';
+import { useUnreadNotifications } from '@/hooks/use-unread-notifications';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { HomeView } from '@/components/views/home-view';
@@ -67,7 +68,7 @@ import { AdminReviewsView } from '@/components/views/admin/admin-reviews-view';
 import { AdminAnalyticsView } from '@/components/views/admin/admin-analytics-view';
 import { AdminSettingsView } from '@/components/views/admin/admin-settings-view';
 
-type PatientTabKey = 'home' | 'search' | 'map' | 'favorites' | 'order-history' | 'profile';
+type PatientTabKey = 'home' | 'search' | 'map' | 'favorites' | 'order-history' | 'notifications' | 'profile';
 type PharmacistTabKey = 'ph-dashboard' | 'ph-stock-list' | 'ph-orders' | 'ph-notifications' | 'ph-profile';
 type AdminTabKey = 'admin-dashboard' | 'admin-users' | 'admin-pharmacies' | 'admin-orders' | 'admin-medications' | 'admin-reviews' | 'admin-analytics';
 
@@ -76,6 +77,7 @@ const patientTabs: { key: PatientTabKey; label: string; icon: typeof Home }[] = 
   { key: 'search', label: 'Recherche', icon: Search },
   { key: 'order-history', label: 'Mes commandes', icon: ClipboardList },
   { key: 'map', label: 'Ma carte', icon: Globe },
+  { key: 'notifications', label: 'Notifications', icon: Bell },
   { key: 'profile', label: 'Mon profil', icon: User },
 ];
 
@@ -536,6 +538,7 @@ function MobileSidebarMenu({
 
 export function AppShell() {
   const { currentView, setCurrentView, isAuthenticated, currentUser, setCurrentUser, logout } = useAppStore();
+  const unreadNotifications = useUnreadNotifications(isAuthenticated, currentUser?.role);
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -766,6 +769,7 @@ export function AppShell() {
             {pharmacistTabs.map((tab) => {
               const isActive = activeTab === tab.key;
               const Icon = tab.icon;
+              const showBadge = tab.key === 'ph-notifications' && unreadNotifications.count > 0;
               return (
                 <button
                   key={tab.key}
@@ -776,7 +780,14 @@ export function AppShell() {
                       : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
+                  <div className="relative">
+                    <Icon className="h-5 w-5" />
+                    {showBadge && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                        {unreadNotifications.count > 9 ? '9+' : unreadNotifications.count}
+                      </span>
+                    )}
+                  </div>
                   {tab.label}
                 </button>
               );
@@ -849,6 +860,7 @@ export function AppShell() {
           {patientTabs.map((tab) => {
             const isActive = activeTab === tab.key;
             const Icon = tab.icon;
+            const showBadge = tab.key === 'notifications' && unreadNotifications.count > 0;
             return (
               <button
                 key={tab.key}
@@ -859,9 +871,16 @@ export function AppShell() {
                     : 'text-muted-foreground hover:text-amber-600'
                 }`}
               >
-                <Icon
-                  className={`h-[18px] sm:h-5 w-[18px] sm:w-5 transition-colors ${isActive ? 'text-amber-700 dark:text-amber-400' : ''}`}
-                />
+                <div className="relative">
+                  <Icon
+                    className={`h-[18px] sm:h-5 w-[18px] sm:w-5 transition-colors ${isActive ? 'text-amber-700 dark:text-amber-400' : ''}`}
+                  />
+                  {showBadge && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center">
+                      {unreadNotifications.count > 9 ? '9+' : unreadNotifications.count}
+                    </span>
+                  )}
+                </div>
                 <span className="text-[9px] sm:text-[10px] font-medium leading-tight truncate max-w-full">{tab.label}</span>
                 {isActive && (
                   <div className="w-1 h-1 rounded-full bg-amber-600 -mt-0.5" />
@@ -887,6 +906,7 @@ export function AppShell() {
           {patientTabs.map((tab) => {
             const isActive = activeTab === tab.key;
             const Icon = tab.icon;
+            const showBadge = tab.key === 'notifications' && unreadNotifications.count > 0;
             return (
               <button
                 key={tab.key}
@@ -897,7 +917,14 @@ export function AppShell() {
                     : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
                 }`}
               >
-                <Icon className="h-5 w-5" />
+                <div className="relative">
+                  <Icon className="h-5 w-5" />
+                  {showBadge && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                      {unreadNotifications.count > 9 ? '9+' : unreadNotifications.count}
+                    </span>
+                  )}
+                </div>
                 {tab.label}
               </button>
             );
