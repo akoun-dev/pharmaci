@@ -53,14 +53,32 @@ export async function GET(request: NextRequest) {
     }
 
     if (q) {
+      // Pour la recherche par médicament, on doit d'abord trouver les orderIds correspondants
+      const medicationOrders = await db.orderItem.findMany({
+        where: {
+          medication: {
+            OR: [
+              { name: { contains: q } },
+              { commercialName: { contains: q } },
+            ],
+          },
+        },
+        select: { orderId: true },
+      });
+
+      const medicationOrderIds = [...new Set(medicationOrders.map(o => o.orderId))];
+
       where.OR = [
         { note: { contains: q } },
         { user: { name: { contains: q } } },
         { user: { email: { contains: q } } },
         { pharmacy: { name: { contains: q } } },
-        { items: { medication: { name: { contains: q } } } },
-        { items: { medication: { commercialName: { contains: q } } } },
       ];
+
+      // Ajouter les IDs des commandes contenant le médicament recherché
+      if (medicationOrderIds.length > 0) {
+        where.OR.push({ id: { in: medicationOrderIds } });
+      }
     }
 
     const [orders, total, orderStats] = await Promise.all([

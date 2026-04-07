@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { signToken, hashPassword, createSessionCookie } from '@/lib/auth';
+import { passwordSchema, strongPasswordSchema, emailSchema } from '@/lib/validations';
 
 // POST /api/auth/register
 export async function POST(request: Request) {
@@ -22,14 +23,18 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "L'email et le mot de passe sont requis" }, { status: 400 });
       }
 
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return NextResponse.json({ error: "Format d'email invalide" }, { status: 400 });
+      // Validate email with Zod schema
+      const emailValidation = emailSchema.safeParse(email);
+      if (!emailValidation.success) {
+        return NextResponse.json({ error: emailValidation.error.message || "Format d'email invalide" }, { status: 400 });
       }
-      if (password.length < 8) {
-        return NextResponse.json({ error: 'Le mot de passe doit contenir au moins 8 caractères' }, { status: 400 });
+
+      // Validate password with strong password schema (pharmacist = sensitive account)
+      const passwordValidation = strongPasswordSchema.safeParse(password);
+      if (!passwordValidation.success) {
+        return NextResponse.json({ error: passwordValidation.error.message || 'Le mot de passe ne respecte pas les exigences de sécurité' }, { status: 400 });
       }
+
       if (confirmPassword && password !== confirmPassword) {
         return NextResponse.json({ error: 'Les mots de passe ne correspondent pas' }, { status: 400 });
       }
@@ -112,14 +117,19 @@ export async function POST(request: Request) {
       if (!email || !password) {
         return NextResponse.json({ error: "L'email et le mot de passe sont requis" }, { status: 400 });
       }
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return NextResponse.json({ error: "Format d'email invalide" }, { status: 400 });
+
+      // Validate email with Zod schema
+      const emailValidation = emailSchema.safeParse(email);
+      if (!emailValidation.success) {
+        return NextResponse.json({ error: emailValidation.error.message || "Format d'email invalide" }, { status: 400 });
       }
-      if (password.length < 8) {
-        return NextResponse.json({ error: 'Le mot de passe doit contenir au moins 8 caractères' }, { status: 400 });
+
+      // Validate password with standard password schema (patient)
+      const passwordValidation = passwordSchema.safeParse(password);
+      if (!passwordValidation.success) {
+        return NextResponse.json({ error: passwordValidation.error.message || 'Le mot de passe ne respecte pas les exigences de sécurité' }, { status: 400 });
       }
+
       if (confirmPassword && password !== confirmPassword) {
         return NextResponse.json({ error: 'Les mots de passe ne correspondent pas' }, { status: 400 });
       }
