@@ -71,22 +71,26 @@ export function createSessionCookie(token: string, userId?: string): {
 } {
   const isProduction = process.env.NODE_ENV === 'production';
   const maxAge = 7 * 24 * 60 * 60; // 7 days
-  
+
+  // Get the domain from environment or use the current request domain
+  // For IP addresses, we don't set the Domain attribute
+  const domain = process.env.COOKIE_DOMAIN;
+
   const sessionCookie = `${COOKIE_NAME}=${token}; Path=/; HttpOnly; ${
     isProduction ? 'Secure; ' : ''
-  }SameSite=Lax; Max-Age=${maxAge}`;
-  
+  }${domain ? `Domain=${domain}; ` : ''}SameSite=Lax; Max-Age=${maxAge}`;
+
   // Generate and set CSRF token if userId is provided
   let csrfToken: string | undefined;
   let csrfCookie = '';
-  
+
   if (userId) {
     csrfToken = generateCSRFToken(userId);
     csrfCookie = `${CSRF_COOKIE_NAME}=${csrfToken}; Path=/; ${
       isProduction ? 'Secure; ' : ''
-    }SameSite=Lax; Max-Age=${maxAge}`;
+    }${domain ? `Domain=${domain}; ` : ''}SameSite=Lax; Max-Age=${maxAge}`;
   }
-  
+
   return { sessionCookie, csrfCookie, csrfToken };
 }
 

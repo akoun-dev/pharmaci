@@ -74,13 +74,17 @@ export async function middleware(request: NextRequest) {
   if (pathname === '/api/reviews' && method === 'GET') return NextResponse.next();
 
   const token = getToken(request);
-  if (!token) return unauthorized('Session non trouvée.');
+  if (!token) {
+    logger.warn('Middleware: No token found', { pathname, method, cookie: request.headers.get('cookie')?.substring(0, 100) });
+    return unauthorized('Session non trouvée.');
+  }
 
   let payload: Record<string, unknown>;
   try {
     const result = await jwtVerify(token, getJwtSecret());
     payload = result.payload as Record<string, unknown>;
-  } catch {
+  } catch (error) {
+    logger.warn('Middleware: Invalid token', { pathname, method, error });
     return unauthorized('Session invalide ou expirée.');
   }
 
