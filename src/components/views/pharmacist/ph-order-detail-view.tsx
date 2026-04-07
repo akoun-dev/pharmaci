@@ -355,7 +355,7 @@ export function PharmacistOrderDetailView() {
   const isPickedUp = order.status === 'picked_up';
 
   return (
-    <div className="w-full px-4 sm:px-6 py-4 pb-32">
+    <div className="w-full px-4 sm:px-6 py-4 pb-safe lg:pb-6">
       {/* Header */}
       <PharmacistPageHeader
         title="Détail de la commande"
@@ -601,8 +601,8 @@ export function PharmacistOrderDetailView() {
 
       {/* ── Fixed Action Buttons ── */}
       {order.status === 'pending' && (
-        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
-          <div className="w-full px-4 sm:px-6">
+        <div className="fixed bottom-0 lg:bottom-6 left-0 right-0 z-40 safe-area-bottom">
+          <div className="w-full px-4 sm:px-6 pb-safe">
             <Card className="border-amber-200 shadow-lg">
               <CardContent className="p-3 flex gap-2">
                 <Button className="flex-1 h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm" onClick={() => updateStatus('confirmed', 'Confirmée')} disabled={updating}>
@@ -620,8 +620,8 @@ export function PharmacistOrderDetailView() {
       )}
 
       {order.status === 'confirmed' && (
-        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
-          <div className="w-full px-4 sm:px-6">
+        <div className="fixed bottom-0 lg:bottom-6 left-0 right-0 z-40 safe-area-bottom">
+          <div className="w-full px-4 sm:px-6 pb-safe">
             <Card className="border-amber-200 shadow-lg">
               <CardContent className="p-3">
                 <Button className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm" onClick={() => updateStatus('ready', 'Prêtée')} disabled={updating}>
@@ -635,8 +635,8 @@ export function PharmacistOrderDetailView() {
       )}
 
       {order.status === 'ready' && (
-        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 left-0 right-0 z-40">
-          <div className="w-full px-4 sm:px-6">
+        <div className="fixed bottom-0 lg:bottom-6 left-0 right-0 z-40 safe-area-bottom">
+          <div className="w-full px-4 sm:px-6 pb-safe">
             <Card className="border-amber-200 shadow-lg">
               <CardContent className="p-3">
                 <Button className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm" onClick={() => updateStatus('picked_up', 'Récupérée')} disabled={updating}>
