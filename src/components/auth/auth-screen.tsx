@@ -370,21 +370,21 @@ export function AuthScreen() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Emerald gradient header */}
-      <div className="bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 px-6 pt-12 pb-10 rounded-b-[2rem]">
+      {/* Green gradient header */}
+      <div className="bg-gradient-to-r from-green-600 to-teal-600 px-6 pt-12 pb-10 rounded-b-[2rem]">
         <div className="max-w-md mx-auto text-center">
           <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-4">
             <Pill className="h-9 w-9 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white">Pharma CI</h1>
-          <p className="text-amber-100 text-sm mt-1">Côte d&apos;Ivoire</p>
+          <p className="text-green-100 text-sm mt-1">Côte d&apos;Ivoire</p>
         </div>
       </div>
 
       {/* Auth content */}
       <div className="flex-1 px-4 -mt-4">
         <div className="max-w-md mx-auto">
-          <Card className="border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70 shadow-lg">
+          <Card className="border-green-100 dark:border-green-900/50 dark:bg-gray-950/70 shadow-lg">
             <CardContent className="p-5 pt-6">
               <AnimatePresence mode="wait">
                 {/* Step: Login with Email/Phone tabs */}
@@ -609,8 +609,8 @@ export function AuthScreen() {
                     <div className="space-y-4 max-h-[50vh] overflow-y-auto -mx-2 px-2">
                       {/* Pharmacist pharmacy info */}
                       {role === 'pharmacist' && (
-                        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl p-3 space-y-3">
-                          <p className="text-xs font-medium text-amber-800 dark:text-amber-200 flex items-center gap-2">
+                        <div className="bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 rounded-xl p-3 space-y-3">
+                          <p className="text-xs font-medium text-green-800 dark:text-green-200 flex items-center gap-2">
                             <Building2 className="h-4 w-4" />
                             Informations de la pharmacie
                           </p>
