@@ -2,5 +2,8 @@
 	"appId": "ci.pharmaci.app",
 	"appName": "Pharma CI",
 	"webDir": "public",
-	"bundledWebRuntime": false
+	"server": {
+		"url": "http://62.84.185.143:3000/",
+		"cleartext": true
+	}
 }

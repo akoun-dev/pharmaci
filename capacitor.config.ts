@@ -1,6 +1,6 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
-const serverUrl = process.env.CAPACITOR_SERVER_URL?.trim();
+const serverUrl = process.env.CAPACITOR_SERVER_URL?.trim() || "http://62.84.185.143:3000/" ;
 
 const config: CapacitorConfig = {
   appId: 'ci.pharmaci.app',
@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
   webDir: 'public',
   server: serverUrl
     ? {
-        url: serverUrl,
+        url: serverUrl || "http://62.84.185.143:3000",
         cleartext: serverUrl.startsWith('http://'),
       }
     : undefined,
