@@ -189,6 +189,23 @@ export function SearchView() {
             </Button>
           )}
 
+          {/* "De garde" button — only in pharmacy tab */}
+          {tab === 'pharmacies' && (
+            <Button
+              variant={isGuardOnly ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setIsGuardOnly(!isGuardOnly)}
+              className={
+                isGuardOnly
+                  ? 'bg-red-600 hover:bg-red-700 text-white text-xs'
+                  : 'border-red-200 text-red-600 text-xs'
+              }
+            >
+              <ShieldCheck className="h-3.5 w-3.5 mr-1" />
+              De garde
+            </Button>
+          )}
+
           <Button
             variant="outline"
             size="sm"
