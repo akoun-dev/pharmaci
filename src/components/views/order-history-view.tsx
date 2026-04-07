@@ -75,6 +75,7 @@ interface OrderData {
       name: string;
       commercialName: string;
       form?: string;
+      needsPrescription?: boolean;
     };
   }[];
 }
@@ -384,6 +385,16 @@ export function OrderHistoryView() {
                           </div>
                         )}
 
+                        {/* Prescription required warning */}
+                        {order.items.some(item => item.medication.needsPrescription) && (
+                          <div className="flex items-start gap-2 p-2.5 bg-red-50 dark:bg-red-950/40 rounded-lg border border-red-200 dark:border-red-800">
+                            <FileText className="h-3.5 w-3.5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                            <p className="text-xs text-red-700 dark:text-red-300 font-medium">
+                              Ordonnance obligatoire
+                            </p>
+                          </div>
+                        )}
+
                         {/* Pharmacy (clickable) */}
                         <button
                           onClick={() => handlePharmacyClick(order.pharmacyId)}
@@ -603,6 +614,21 @@ export function OrderHistoryView() {
                     </span>
                   </div>
                 </div>
+
+                {/* Prescription required warning */}
+                {selectedOrder.items.some(item => item.medication.needsPrescription) && (
+                  <div className="flex items-start gap-2.5 p-3 bg-red-50 dark:bg-red-950/40 rounded-lg border border-red-200 dark:border-red-800">
+                    <FileText className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-red-800 dark:text-red-200">
+                        Ordonnance obligatoire
+                      </p>
+                      <p className="text-xs text-red-700 dark:text-red-300 mt-0.5">
+                        N'oubliez pas de munir votre ordonnance lors du retrait.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex gap-2">
