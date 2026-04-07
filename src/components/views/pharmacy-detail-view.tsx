@@ -594,7 +594,7 @@ export function PharmacyDetailView() {
           </a>
           <button
             onClick={handleNavigate}
-            className="flex items-center justify-center gap-2 h-11 sm:h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-600/30 font-semibold text-sm transition-colors"
+            className="flex items-center justify-center gap-2 h-11 sm:h-12 bg-green-600 hover:bg-green-700 text-white rounded-2xl shadow-lg shadow-blue-600/30 font-semibold text-sm transition-colors"
           >
             <Navigation className="h-4 w-4 sm:h-5 sm:w-5" />
             Y aller

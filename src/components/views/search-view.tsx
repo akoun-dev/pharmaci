@@ -197,8 +197,8 @@ export function SearchView() {
               onClick={() => setIsGuardOnly(!isGuardOnly)}
               className={
                 isGuardOnly
-                  ? 'bg-red-600 hover:bg-red-700 text-white text-xs'
-                  : 'border-red-200 text-red-600 text-xs'
+                  ? 'bg-amber-600 hover:bg-amber-700 text-white text-xs'
+                  : 'border-amber-600 text-amber-700 text-xs'
               }
             >
               <ShieldCheck className="h-3.5 w-3.5 mr-1" />
