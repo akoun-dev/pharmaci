@@ -71,6 +71,7 @@ interface AppState {
   searchQuery: string;
   currentUserId: string;
   currentUser: CurrentUser | null;
+  authToken: string | null;
   isAuthenticated: boolean;
   setCurrentView: (view: View) => void;
   goBack: () => void;
@@ -81,7 +82,8 @@ interface AppState {
   selectOrder: (id: string) => void;
   selectStock: (id: string) => void;
   setSearchQuery: (query: string) => void;
-  setCurrentUser: (user: CurrentUser | null) => void;
+  setCurrentUser: (user: CurrentUser | null, token?: string | null) => void;
+  setAuthToken: (token: string | null) => void;
   logout: () => void;
   getPreviousView: () => View | null;
 }
@@ -98,6 +100,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   searchQuery: '',
   currentUserId: '',
   currentUser: null,
+  authToken: null,
   isAuthenticated: false,
 
   setCurrentView: (view) =>
@@ -212,7 +215,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       searchQuery: query,
     })),
 
-  setCurrentUser: (user) =>
+  setCurrentUser: (user, token) =>
     set(() => {
       // Restore dark mode preference from localStorage
       let darkMode = false;
@@ -231,6 +234,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         currentUser: user,
         isAuthenticated: !!user,
         currentUserId: user?.id || '',
+        authToken: token || null,
         currentView: user?.role === 'admin' ? 'admin-dashboard' : user?.role === 'pharmacist' ? 'ph-dashboard' : 'home',
         viewHistory: [],
         previousView: null,
@@ -238,11 +242,17 @@ export const useAppStore = create<AppState>((set, get) => ({
       };
     }),
 
+  setAuthToken: (token) =>
+    set(() => ({
+      authToken: token,
+    })),
+
   logout: () =>
     set(() => ({
       currentUser: null,
       isAuthenticated: false,
       currentUserId: '',
+      authToken: null,
       currentView: 'home',
       viewHistory: [],
       previousView: null,

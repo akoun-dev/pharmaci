@@ -142,7 +142,7 @@ export function AuthScreen() {
         setError(data.error || 'Erreur de connexion');
         return;
       }
-      setCurrentUser(data.user);
+      setCurrentUser(data.user, data.token);
     } catch {
       setError('Erreur réseau');
     } finally {
@@ -204,7 +204,7 @@ export function AuthScreen() {
         setError(data.error || 'Code invalide');
         return;
       }
-      setCurrentUser(data.user);
+      setCurrentUser(data.user, data.token);
     } catch {
       setError('Erreur réseau');
     } finally {
@@ -290,7 +290,7 @@ export function AuthScreen() {
         setError(data.error || "Erreur d'inscription");
         return;
       }
-      setCurrentUser(data.user);
+      setCurrentUser(data.user, data.token);
     } catch {
       setError('Erreur réseau');
     } finally {

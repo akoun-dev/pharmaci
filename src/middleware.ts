@@ -19,7 +19,18 @@ function getJwtSecret(): Uint8Array {
 }
 
 function getToken(request: NextRequest): string | null {
-  return request.cookies.get(COOKIE_NAME)?.value ?? null;
+  // First try to get from cookie
+  const cookieToken = request.cookies.get(COOKIE_NAME)?.value;
+  if (cookieToken) return cookieToken;
+
+  // Fallback: try to get from Authorization header (Bearer token)
+  // This is useful for IP access where cookies might not work properly
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+
+  return null;
 }
 
 function getCSRFToken(request: NextRequest): string | null {

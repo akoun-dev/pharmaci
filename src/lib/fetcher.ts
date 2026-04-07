@@ -3,11 +3,33 @@
  * Use this for all authenticated API requests.
  */
 export async function fetcher(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  // Try to get the token from the store for Authorization header fallback
+  let authHeader = init?.headers as Record<string, string> | undefined;
+
+  // Only try to access store in client-side context
+  if (typeof window !== 'undefined') {
+    try {
+      // Dynamic import to avoid SSR issues
+      const { useAppStore } = await import('@/store/app-store');
+      const token = useAppStore.getState().authToken;
+
+      if (token && !authHeader?.['Authorization']) {
+        authHeader = {
+          ...authHeader,
+          'Authorization': `Bearer ${token}`,
+        };
+      }
+    } catch {
+      // Ignore store access errors
+    }
+  }
+
   return fetch(input, {
     ...init,
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...authHeader,
       ...init?.headers,
     },
   });

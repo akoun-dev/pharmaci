@@ -72,11 +72,11 @@ export function createSessionCookie(token: string, userId?: string): {
   const isProduction = process.env.NODE_ENV === 'production';
   const maxAge = 7 * 24 * 60 * 60; // 7 days
 
-  // Get the domain from environment or use the current request domain
-  // For IP addresses, we don't set the Domain attribute
+  // For IP access without domain, use simpler cookie settings
+  // Don't set Domain attribute for IP addresses
   const domain = process.env.COOKIE_DOMAIN;
 
-  const sessionCookie = `${COOKIE_NAME}=${token}; Path=/; HttpOnly; ${
+  const sessionCookie = `${COOKIE_NAME}=${token}; Path=/; ${
     isProduction ? 'Secure; ' : ''
   }${domain ? `Domain=${domain}; ` : ''}SameSite=Lax; Max-Age=${maxAge}`;
 
