@@ -5,5 +5,26 @@
 	"server": {
 		"url": "http://62.84.185.143:3000/",
 		"cleartext": true
+	},
+	"plugins": {
+		"LocalNotifications": {
+			"smallIcon": "ic_stat_icon_config_sample",
+			"iconColor": "#FF9800",
+			"sound": "beep.wav"
+		},
+		"Camera": {
+			"permissions": [
+				"camera",
+				"photos"
+			]
+		},
+		"BarcodeScanner": {
+			"configure": {
+				"enabled": true
+			}
+		},
+		"StatusBar": {
+			"style": "LIGHT"
+		}
 	}
 }

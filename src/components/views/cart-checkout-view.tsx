@@ -21,6 +21,8 @@ import { ViewHeader } from '@/components/view-header';
 import { useCartStore } from '@/store/cart-store';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
+import { useCapacitorNotifications } from '@/hooks/use-capacitor-notifications';
+import { Haptics } from '@/lib/capacitor';
 
 function formatFCFA(amount: number): string {
   return amount.toLocaleString('fr-FR') + ' FCFA';
@@ -42,6 +44,7 @@ export function CartCheckoutView() {
   } = useCartStore();
 
   const { setCurrentView, selectOrder } = useAppStore();
+  const { schedule } = useCapacitorNotifications();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -92,11 +95,28 @@ export function CartCheckoutView() {
         if (batchData && batchData.orders && batchData.orders.length > 0) {
           pharmacyCount = batchData.pharmacyCount || 1;
 
+          // Feedback vibreur de succès
+          Haptics.success();
+
           // Show appropriate success message
           if (pharmacyCount > 1) {
             toast.success(`${pharmacyCount} commandes créées — une par pharmacie`);
           } else {
             toast.success('Commande créée avec succès');
+          }
+
+          // Notification locale programmée (rappel dans 2h si toujours "en attente")
+          try {
+            await schedule({
+              title: 'Pharma CI - Rappel commande',
+              body: 'Votre commande est toujours en attente de confirmation.',
+              largeBody: 'N\'oubliez pas de vérifier l\'état de votre commande.',
+              schedule: {
+                at: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 heures plus tard
+              },
+            });
+          } catch {
+            // Ignore notification errors
           }
 
           // Log any partial errors
@@ -131,6 +151,7 @@ export function CartCheckoutView() {
       }
     } catch (error) {
       logger.error('Order submission error:', error);
+      Haptics.error();
       toast.error(
         error instanceof Error
           ? error.message

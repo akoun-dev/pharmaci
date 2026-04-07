@@ -228,7 +228,7 @@ export function PharmacistReportsView() {
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 pb-6">
+    <div className="w-full px-4 sm:px-6 pt-4 sm:pt-5 pb-6">
       <motion.div
         variants={containerVariants}
         initial="hidden"

@@ -68,6 +68,7 @@ import { AdminMedicationsView } from '@/components/views/admin/admin-medications
 import { AdminReviewsView } from '@/components/views/admin/admin-reviews-view';
 import { AdminAnalyticsView } from '@/components/views/admin/admin-analytics-view';
 import { AdminSettingsView } from '@/components/views/admin/admin-settings-view';
+import { StatusBar } from '@/lib/capacitor';
 
 type PatientTabKey = 'home' | 'search' | 'map' | 'favorites' | 'order-history' | 'notifications' | 'profile';
 type PharmacistTabKey = 'ph-dashboard' | 'ph-stock-list' | 'ph-orders' | 'ph-notifications' | 'ph-profile';
@@ -364,7 +365,7 @@ function CartFloatingButton() {
   return (
     <button
       onClick={() => setCurrentView('cart')}
-      className="fixed bottom-20 right-4 z-40 lg:hidden flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white rounded-full px-4 py-3 shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95"
+      className="fixed bottom-24 right-4 z-40 lg:hidden flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white rounded-full px-4 py-3 shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95"
     >
       <ShoppingCart className="h-5 w-5" />
       <span className="text-sm font-semibold">{itemCount}</span>
@@ -589,6 +590,11 @@ export function AppShell() {
     checkSession();
   }, [checkSession]);
 
+  // Configure StatusBar on mount
+  useEffect(() => {
+    StatusBar.applyAppStyle();
+  }, []);
+
   // Logout handler
   const handleLogout = useCallback(async () => {
     try {
@@ -653,9 +659,7 @@ export function AppShell() {
         />
 
         <main className="flex-1 overflow-y-auto pb-6 pt-16 lg:pb-0 lg:pt-0 lg:pl-64">
-          <div className="pt-4 sm:pt-5">
-            <AdminViewRenderer />
-          </div>
+          <AdminViewRenderer />
         </main>
 
         <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-900/78 border-r border-gray-200/80 dark:border-gray-800/80 flex-col z-50">
@@ -760,9 +764,7 @@ export function AppShell() {
         />
 
         <main className="flex-1 overflow-y-auto pb-6 pt-16 lg:pb-0 lg:pt-0 lg:pl-64">
-          <div className="pt-4 sm:pt-5">
-            <PharmacistViewRenderer />
-          </div>
+          <PharmacistViewRenderer />
         </main>
 
         {/* Sidebar navigation (desktop) */}

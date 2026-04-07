@@ -21,6 +21,7 @@ import {
   X,
   FileText,
   Lock,
+  Scan,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -48,6 +49,8 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
+import { useCapacitorBarcode } from '@/hooks/use-capacitor-barcode';
+import { Haptics } from '@/lib/capacitor';
 
 interface OrderData {
   id: string;
@@ -133,6 +136,9 @@ export function OrderHistoryView() {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancellingOrder, setCancellingOrder] = useState<OrderData | null>(null);
   const [cancelling, setCancelling] = useState(false);
+
+  // Hook pour le scan QR code
+  const { scan: scanQRCode, loading: scanningQR } = useCapacitorBarcode();
 
   const fetchOrders = useCallback(async () => {
     if (!currentUserId) {
@@ -246,10 +252,66 @@ export function OrderHistoryView() {
     if (selectedOrder?.verificationCode) {
       navigator.clipboard.writeText(selectedOrder.verificationCode).then(() => {
         toast.success('Code copié');
+        Haptics.light();
       }).catch(() => {
         toast.error('Impossible de copier');
+        Haptics.error();
       });
     }
+  };
+
+  const handleScanQR = async () => {
+    Haptics.medium();
+    const result = await scanQRCode({ text: 'Placez le QR code de votre commande dans le cadre' });
+
+    if (result) {
+      // Vérifier si c'est un QR code de commande valide
+      const orderData = parseQRCodeContent(result.content);
+
+      if (orderData) {
+        Haptics.success();
+
+        // Vérifier si la commande existe dans la liste
+        const existingOrder = orders.find(o => o.id === orderData.orderId);
+
+        if (existingOrder) {
+          // Afficher les détails de la commande
+          setSelectedOrder(existingOrder);
+          setQrDialogOpen(true);
+          toast.success('Commande trouvée !');
+        } else {
+          // Récupérer les détails de la commande depuis l'API
+          try {
+            const res = await fetch(`/api/orders/${orderData.orderId}`);
+            if (res.ok) {
+              const orderDetails = await res.json();
+              setSelectedOrder(orderDetails);
+              setQrDialogOpen(true);
+              toast.success('Commande trouvée !');
+            } else {
+              toast.error('Commande non trouvée');
+              Haptics.error();
+            }
+          } catch {
+            toast.error('Impossible de récupérer la commande');
+            Haptics.error();
+          }
+        }
+      } else {
+        toast.error('QR code invalide');
+        Haptics.error();
+      }
+    }
+  };
+
+  const parseQRCodeContent = (content: string): { orderId: string } | null => {
+    // Format: PHARMAPP-{orderId}-{verificationCode}
+    const match = content.match(/^PHARMAPP-([\w-]+)-([A-Z0-9]+)$/);
+    if (!match) return null;
+
+    return {
+      orderId: match[1],
+    };
   };
 
   const qrValue = selectedOrder?.verificationCode
@@ -274,11 +336,23 @@ export function OrderHistoryView() {
           title="Mes commandes"
           icon={<ClipboardList className="h-5 w-5 text-amber-600" />}
           action={
-            orders.length > 0 ? (
-              <Badge variant="secondary" className="text-xs">
-                {orders.length}
-              </Badge>
-            ) : null
+            <div className="flex items-center gap-2">
+              {orders.length > 0 && (
+                <Badge variant="secondary" className="text-xs">
+                  {orders.length}
+                </Badge>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleScanQR}
+                disabled={scanningQR}
+                className="h-8 px-2 sm:px-3 text-xs border-green-200 text-green-700 hover:bg-green-50 dark:border-green-900/50 dark:text-green-200"
+              >
+                <Scan className="h-3.5 w-3.5 sm:mr-1.5" />
+                <span className="hidden sm:inline">Scanner QR</span>
+              </Button>
+            </div>
           }
         />
 
@@ -442,18 +516,18 @@ export function OrderHistoryView() {
                         <div className="border-t border-amber-100/80 dark:border-amber-900/40" />
 
                         {/* Action row */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           {(order.status === 'pending' || order.status === 'confirmed') && (
                             <AlertDialog open={cancelDialogOpen && cancellingOrder?.id === order.id} onOpenChange={(open) => { if (!open) { setCancelDialogOpen(false); setCancellingOrder(null); } else { openCancelDialog(order); } }}>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-9 border-red-200 px-3 text-xs text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-300 dark:hover:bg-red-950/40"
+                                className="h-9 flex-1 min-w-[80px] border-red-200 px-2 sm:px-3 text-xs text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-300 dark:hover:bg-red-950/40"
                                 onClick={(e) => openCancelDialog(order, e)}
                                 disabled={cancelling}
                               >
-                                <X className="h-3.5 w-3.5 mr-1.5" />
-                                Annuler
+                                <X className="h-3.5 w-3.5 sm:mr-1.5" />
+                                <span className="hidden sm:inline">Annuler</span>
                               </Button>
                               <AlertDialogContent className="sm:max-w-md">
                                 <AlertDialogHeader>
@@ -484,36 +558,36 @@ export function OrderHistoryView() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-9 border-amber-200 px-3 text-xs text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-200 dark:hover:bg-amber-950/40"
+                              className="h-9 flex-1 min-w-[80px] border-amber-200 px-2 sm:px-3 text-xs text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-200 dark:hover:bg-amber-950/40"
                               onClick={(e) => openQrDialog(order, e)}
                             >
-                              <QrCode className="h-3.5 w-3.5 mr-1.5" />
-                              QR Code
+                              <QrCode className="h-3.5 w-3.5 sm:mr-1.5" />
+                              <span className="hidden sm:inline">QR Code</span>
                             </Button>
                           )}
                           <a
                             href={`tel:${order.pharmacy.phone}`}
-                            className="flex-shrink-0"
+                            className="flex-1 min-w-[80px]"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-9 border-green-200 px-3 text-xs text-green-700 hover:bg-amber-50 dark:border-green-900/50 dark:text-green-200 dark:hover:bg-green-950/30"
+                              className="h-9 w-full border-green-200 px-2 sm:px-3 text-xs text-green-700 hover:bg-amber-50 dark:border-green-900/50 dark:text-green-200 dark:hover:bg-green-950/30"
                             >
-                              <Phone className="h-3.5 w-3.5 mr-1.5" />
-                              Appeler
+                              <Phone className="h-3.5 w-3.5 sm:mr-1.5" />
+                              <span className="hidden sm:inline">Appeler</span>
                             </Button>
                           </a>
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-9 border-amber-200 px-3 text-xs text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-200 dark:hover:bg-amber-950/40"
+                            className="h-9 flex-1 min-w-[80px] border-amber-200 px-2 sm:px-3 text-xs text-amber-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-200 dark:hover:bg-amber-950/40"
                             onClick={() => handleNavigate(order)}
                             disabled={!order.pharmacy.latitude || !order.pharmacy.longitude}
                           >
-                            <Navigation className="h-3.5 w-3.5 mr-1.5" />
-                            Y aller
+                            <Navigation className="h-3.5 w-3.5 sm:mr-1.5" />
+                            <span className="hidden sm:inline">Y aller</span>
                           </Button>
                         </div>
                       </CardContent>

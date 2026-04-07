@@ -327,7 +327,7 @@ export function AdminPharmaciesView() {
 
   return (
     <div className="pb-4">
-      <div className="w-full px-4 sm:px-6">
+      <div className="w-full px-4 sm:px-6 pt-4 sm:pt-5">
         <AdminPageHeader
           title="Pharmacies"
           description="Parcourez le réseau de pharmacies, filtrez par ville ou garde et ouvrez les fiches établissement depuis une vue unifiée."

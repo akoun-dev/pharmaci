@@ -12,6 +12,28 @@ const config: CapacitorConfig = {
         cleartext: serverUrl.startsWith('http://'),
       }
     : undefined,
+  plugins: {
+    // Configuration des notifications locales
+    LocalNotifications: {
+      smallIcon: 'ic_stat_icon_config_sample',
+      iconColor: '#FF9800',
+      sound: 'beep.wav',
+    },
+    // Configuration de la caméra
+    Camera: {
+      permissions: ['camera', 'photos'],
+    },
+    // Configuration du scanner de codes-barres
+    BarcodeScanner: {
+      configure: {
+        enabled: true,
+      },
+    },
+    // Configuration de la barre d'état
+    StatusBar: {
+      style: 'LIGHT',
+    },
+  },
 };
 
 export default config;

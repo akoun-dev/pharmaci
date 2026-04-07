@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { Haptics } from '@/lib/capacitor';
 
 export interface CartItem {
   id: string; // unique key: pharmacyId_medicationId
@@ -48,12 +49,14 @@ export const useCartStore = create<CartState>()(
           if (existing) {
             // Increase quantity
             const newQty = Math.min(existing.quantity + item.quantity, existing.maxQuantity);
+            Haptics.medium();
             return {
               items: state.items.map((i) =>
                 i.id === id ? { ...i, quantity: newQty } : i
               ),
             };
           }
+          Haptics.success();
           return {
             items: [
               ...state.items,
@@ -63,9 +66,12 @@ export const useCartStore = create<CartState>()(
         }),
 
       removeItem: (id) =>
-        set((state) => ({
-          items: state.items.filter((i) => i.id !== id),
-        })),
+        set((state) => {
+          Haptics.light();
+          return {
+            items: state.items.filter((i) => i.id !== id),
+          };
+        }),
 
       updateQuantity: (id, quantity) =>
         set((state) => ({
