@@ -417,6 +417,8 @@ function MobileSidebarMenu({
   secondaryItems = [],
   onSelect,
   onLogout,
+  showBadgeForKeys = [],
+  unreadCount = 0,
 }: {
   sectionLabel: string;
   currentLabel: string;
@@ -427,6 +429,8 @@ function MobileSidebarMenu({
   secondaryItems?: MobileNavItem[];
   onSelect: (key: string) => void;
   onLogout: () => void;
+  showBadgeForKeys?: string[];
+  unreadCount?: number;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -479,6 +483,7 @@ function MobileSidebarMenu({
             {primaryItems.map((tab) => {
               const isActive = activeKey === tab.key;
               const Icon = tab.icon;
+              const showBadge = showBadgeForKeys.includes(tab.key) && unreadCount > 0;
               return (
                 <button
                   key={tab.key}
@@ -489,7 +494,14 @@ function MobileSidebarMenu({
                       : 'text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600 dark:hover:bg-amber-950/40 dark:hover:text-amber-300'
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
+                  <div className="relative">
+                    <Icon className="h-5 w-5" />
+                    {showBadge && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </div>
                   {tab.label}
                 </button>
               );
@@ -636,6 +648,8 @@ export function AppShell() {
           secondaryItems={[{ key: 'admin-settings', label: 'Paramètres', icon: Settings }]}
           onSelect={(key) => setCurrentView(key as View)}
           onLogout={handleLogout}
+          showBadgeForKeys={[]}
+          unreadCount={unreadCount}
         />
 
         <main className="flex-1 overflow-y-auto pb-6 pt-16 lg:pb-0 lg:pt-0 lg:pl-64">
@@ -741,6 +755,8 @@ export function AppShell() {
           secondaryItems={pharmacistSecondaryTabs}
           onSelect={(key) => setCurrentView(key as View)}
           onLogout={handleLogout}
+          showBadgeForKeys={['ph-notifications']}
+          unreadCount={unreadCount}
         />
 
         <main className="flex-1 overflow-y-auto pb-6 pt-16 lg:pb-0 lg:pt-0 lg:pl-64">
