@@ -41,6 +41,8 @@ import { ViewHeader } from '@/components/view-header';
 import { PharmacistPageHeader } from '@/components/views/pharmacist/ph-page-header';
 import { useAppStore } from '@/store/app-store';
 import { toast } from 'sonner';
+import { useCapacitorBarcode } from '@/hooks/use-capacitor-barcode';
+import { Haptics } from '@/lib/capacitor';
 
 interface OrderData {
   id: string;
@@ -135,6 +137,9 @@ function formatPrice(price: number): string {
 export function PharmacistOrdersView() {
   const { currentUser, selectOrder, setCurrentView } = useAppStore();
 
+  // Hook pour le scan QR code
+  const { scan: scanQRCode, loading: scanningQR } = useCapacitorBarcode();
+
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -161,9 +166,6 @@ export function PharmacistOrdersView() {
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [scanMode, setScanMode] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const pharmacyId = currentUser?.linkedPharmacyId;
 
@@ -310,38 +312,36 @@ export function PharmacistOrdersView() {
   };
 
   const startCameraScan = async () => {
+    Haptics.medium();
+    setScanError(null);
+    setScanMode(true);
+
     try {
-      setScanError(null);
-      setScanMode(true);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
+      const result = await scanQRCode({
+        text: 'Placez le QR code de la commande dans le cadre'
       });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-      if ('BarcodeDetector' in window) {
-        const barcodeDetector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
-        scanIntervalRef.current = setInterval(async () => {
-          if (!videoRef.current || videoRef.current.readyState < 2) return;
-          try {
-            const barcodes = await barcodeDetector.detect(videoRef.current);
-            if (barcodes.length > 0) {
-              const text = barcodes[0].rawValue;
-              const match = text.match(/PHARMAPP-[a-zA-Z0-9]+-([A-Z2-9]{6})$/);
-              if (match) { cleanupScanner(); await handleVerify(match[1]); }
-              else if (/^[A-Z2-9]{6}$/.test(text.toUpperCase().trim())) {
-                cleanupScanner(); await handleVerify(text.toUpperCase().trim());
-              }
-            }
-          } catch { /* continue scanning */ }
-        }, 500);
+
+      if (result) {
+        const content = result.content;
+        const match = content.match(/PHARMAPP-[a-zA-Z0-9]+-([A-Z2-9]{6})$/);
+
+        if (match) {
+          setScanMode(false);
+          await handleVerify(match[1]);
+        } else if (/^[A-Z2-9]{6}$/.test(content.toUpperCase().trim())) {
+          setScanMode(false);
+          await handleVerify(content.toUpperCase().trim());
+        } else {
+          Haptics.error();
+          toast.error('QR code invalide');
+          setScanMode(false);
+        }
       } else {
-        setScanError("La détection QR n'est pas supportée sur ce navigateur.");
+        setScanMode(false);
       }
     } catch {
-      setScanError("Impossible d'accéder à la caméra.");
+      Haptics.error();
+      setScanError('Scan annulé ou erreur');
       setScanMode(false);
     }
   };
