@@ -247,7 +247,6 @@ export async function DELETE(
         _count: {
           select: {
             stocks: true,
-            orders: true,
             alternatives: true,
             genericOf: true,
           },
@@ -259,10 +258,16 @@ export async function DELETE(
       return NextResponse.json({ error: 'Médicament introuvable' }, { status: 404 });
     }
 
-    // Check for active orders referencing this medication
+    // Check for active orders referencing this medication (via OrderItem)
+    const activeOrderItems = await db.orderItem.findMany({
+      where: { medicationId: id },
+      select: { orderId: true },
+    });
+
+    const activeOrderIds = [...new Set(activeOrderItems.map(o => o.orderId))];
     const activeOrders = await db.order.count({
       where: {
-        medicationId: id,
+        id: { in: activeOrderIds },
         status: { in: ['pending', 'confirmed', 'ready'] },
       },
     });
