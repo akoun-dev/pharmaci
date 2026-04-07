@@ -465,8 +465,8 @@ function MobileSidebarMenu({
         >
           <SheetHeader className="border-b border-amber-100 p-5 text-left dark:border-amber-900/50">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-600">
-                <Pill className="h-6 w-6 text-white" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-600 overflow-hidden">
+                <img src="/logo.svg" alt="Pharma CI" className="h-6 w-6 text-white" />
               </div>
               <div>
                 <SheetTitle className="text-base">Pharma CI</SheetTitle>
@@ -653,8 +653,8 @@ export function AppShell() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-2xl bg-amber-600 flex items-center justify-center mx-auto mb-3 animate-pulse">
-            <Pill className="h-7 w-7 text-white" />
+          <div className="w-12 h-12 rounded-2xl bg-amber-600 flex items-center justify-center mx-auto mb-3 animate-pulse overflow-hidden">
+            <img src="/logo.svg" alt="Pharma CI" className="h-7 w-7 text-white" />
           </div>
           <p className="text-sm text-muted-foreground">Chargement...</p>
         </div>
@@ -709,7 +709,7 @@ export function AppShell() {
         <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-900/78 border-r border-gray-200/80 dark:border-gray-800/80 flex-col z-50">
           <div className="p-5 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-purple-600 flex items-center justify-center">
-              <Pill className="h-6 w-6 text-white" />
+              <img src="/logo.svg" alt="Pharma CI" className="h-6 w-6 text-white" />
             </div>
             <div>
               <h1 className="font-bold text-lg text-foreground">Pharma CI</h1>
@@ -815,7 +815,7 @@ export function AppShell() {
         <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-950/76 border-r border-amber-100/80 dark:border-amber-900/50 flex-col z-50">
           <div className="p-6 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center">
-              <Pill className="h-6 w-6 text-white" />
+              <img src="/logo.svg" alt="Pharma CI" className="h-6 w-6 text-white" />
             </div>
             <div>
               <h1 className="font-bold text-lg text-foreground">Pharma CI</h1>
@@ -956,8 +956,8 @@ export function AppShell() {
 
       <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-950/76 border-r border-amber-100/80 dark:border-amber-900/50 flex-col z-50">
         <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center">
-            <Pill className="h-6 w-6 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center overflow-hidden">
+            <img src="/logo.svg" alt="Pharma CI" className="h-6 w-6 text-white" />
           </div>
           <div>
             <h1 className="font-bold text-lg text-foreground">Pharma CI</h1>
