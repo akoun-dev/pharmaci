@@ -27,8 +27,8 @@ export async function POST(request: Request) {
       if (!emailRegex.test(email)) {
         return NextResponse.json({ error: "Format d'email invalide" }, { status: 400 });
       }
-      if (password.length < 6) {
-        return NextResponse.json({ error: 'Le mot de passe doit contenir au moins 6 caractères' }, { status: 400 });
+      if (password.length < 8) {
+        return NextResponse.json({ error: 'Le mot de passe doit contenir au moins 8 caractères' }, { status: 400 });
       }
       if (confirmPassword && password !== confirmPassword) {
         return NextResponse.json({ error: 'Les mots de passe ne correspondent pas' }, { status: 400 });
@@ -117,8 +117,8 @@ export async function POST(request: Request) {
       if (!emailRegex.test(email)) {
         return NextResponse.json({ error: "Format d'email invalide" }, { status: 400 });
       }
-      if (password.length < 6) {
-        return NextResponse.json({ error: 'Le mot de passe doit contenir au moins 6 caractères' }, { status: 400 });
+      if (password.length < 8) {
+        return NextResponse.json({ error: 'Le mot de passe doit contenir au moins 8 caractères' }, { status: 400 });
       }
       if (confirmPassword && password !== confirmPassword) {
         return NextResponse.json({ error: 'Les mots de passe ne correspondent pas' }, { status: 400 });

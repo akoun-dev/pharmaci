@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
 
+  // TODO: Corriger les erreurs TypeScript et désactiver ignoreBuildErrors
+  // Voir le rapport AUDIT_REPORT.md pour les détails
   typescript: {
     ignoreBuildErrors: true,
   },
