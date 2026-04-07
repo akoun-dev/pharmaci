@@ -45,6 +45,7 @@ import { CartCheckoutView } from '@/components/views/cart-checkout-view';
 import { OrderConfirmationView } from '@/components/views/order-confirmation-view';
 import { OrderHistoryView } from '@/components/views/order-history-view';
 import { MyReviewsView } from '@/components/views/my-reviews-view';
+import { NotificationsView } from '@/components/views/notifications-view';
 import { PharmacistDashboardView } from '@/components/views/pharmacist/ph-dashboard-view';
 import { PharmacistStockListView } from '@/components/views/pharmacist/ph-stock-list-view';
 import { PharmacistStockDetailView } from '@/components/views/pharmacist/ph-stock-detail-view';
@@ -269,6 +270,7 @@ function PatientViewRenderer() {
     'order-confirmation': <OrderConfirmationView />,
     'order-history': <OrderHistoryView />,
     'my-reviews': <MyReviewsView />,
+    notifications: <NotificationsView />,
     cart: <CartView />,
     'cart-checkout': <CartCheckoutView />,
   };

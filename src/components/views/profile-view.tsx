@@ -526,6 +526,7 @@ export function ProfileView() {
                   { icon: Globe, label: 'Carte', view: 'map' as const },
                   { icon: ClipboardList, label: 'Mes commandes', view: 'order-history' as const },
                   { icon: Heart, label: 'Mes favoris', view: 'favorites' as const },
+                  { icon: Bell, label: 'Mes notifications', view: 'notifications' as const },
                   { icon: Star, label: 'Mes avis', view: 'my-reviews' as const },
                 ].map((item) => (
                   <button

@@ -24,6 +24,7 @@ export type View =
   | 'order-confirmation'
   | 'order-history'
   | 'my-reviews'
+  | 'notifications'
   // Pharmacist views
   | 'ph-dashboard'
   | 'ph-stock-list'
