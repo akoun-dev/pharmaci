@@ -1,1 +1,0 @@
-implementons La prochaine étape un système de temps réel (WebSocket ou polling)    

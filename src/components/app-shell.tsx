@@ -30,7 +30,8 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
 import { useAppStore, View } from '@/store/app-store';
-import { useUnreadNotifications } from '@/hooks/use-unread-notifications';
+import { useGlobalNotificationCount, refreshNotifications, resetGlobalNotificationCount } from '@/hooks/use-notifications-polling';
+import { NotificationsProvider } from '@/components/notifications-provider';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { HomeView } from '@/components/views/home-view';
@@ -538,7 +539,7 @@ function MobileSidebarMenu({
 
 export function AppShell() {
   const { currentView, setCurrentView, isAuthenticated, currentUser, setCurrentUser, logout } = useAppStore();
-  const unreadNotifications = useUnreadNotifications(isAuthenticated, currentUser?.role);
+  const unreadCount = useGlobalNotificationCount();
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -950,5 +951,14 @@ export function AppShell() {
         </div>
       </aside>
     </div>
+  );
+}
+
+// Envelopper l'app avec le NotificationsProvider pour le temps réel
+export function AppShellWithProvider() {
+  return (
+    <NotificationsProvider>
+      <AppShell />
+    </NotificationsProvider>
   );
 }
