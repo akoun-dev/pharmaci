@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { notifyNewReview } from '@/lib/notifications';
 
 export async function GET(request: NextRequest) {
   try {
@@ -57,6 +58,9 @@ export async function POST(request: NextRequest) {
         user: { select: { id: true, name: true, avatar: true } },
       },
     });
+
+    // Notify pharmacist of new review
+    await notifyNewReview(review.id, pharmacyId, rating, review.user.name);
 
     // Update pharmacy rating
     const allReviews = await db.review.findMany({

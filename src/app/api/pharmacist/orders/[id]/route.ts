@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
+import { notifyOrderStatusChange } from '@/lib/notifications';
 
 const ALLOWED_STATUSES = ['confirmed', 'ready', 'picked_up', 'cancelled'];
 
@@ -146,6 +147,9 @@ export async function PUT(
     const updateData: Record<string, string> = {};
     if (status) updateData.status = status;
 
+    // Store old status for notification logic
+    const oldStatus = existing.status;
+
     const updated = await db.order.update({
       where: { id },
       data: updateData,
@@ -169,6 +173,11 @@ export async function PUT(
         },
       },
     });
+
+    // Notify user of status change (only if status actually changed)
+    if (status && status !== oldStatus) {
+      await notifyOrderStatusChange(id, status);
+    }
 
     return NextResponse.json({
       id: updated.id,

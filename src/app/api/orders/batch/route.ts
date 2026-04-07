@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { notifyNewOrder } from '@/lib/notifications';
 
 function generateVerificationCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -174,6 +175,9 @@ export async function POST(request: NextRequest) {
             });
           })
         );
+
+        // Notify pharmacist of new order
+        await notifyNewOrder(order.id, pharmacyId);
 
         createdOrders.push(order);
         logger.info('Order created with multiple items', { orderId: order.id, userId, pharmacyId, itemCount: pharmacyItems.length });

@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromCookie } from '@/lib/auth';
 import { Prisma } from '@prisma/client';
+import { notifyNewMessage } from '@/lib/notifications';
 
 export async function GET(request: NextRequest) {
   try {
@@ -117,6 +118,15 @@ export async function POST(request: NextRequest) {
         receiver: { select: { id: true, name: true, avatar: true } },
       },
     });
+
+    // Notify receiver of new message
+    const sender = await db.user.findUnique({
+      where: { id: session.userId },
+      select: { name: true },
+    });
+    if (sender) {
+      await notifyNewMessage(message.id, receiverId, sender.name);
+    }
 
     return NextResponse.json(
       {
