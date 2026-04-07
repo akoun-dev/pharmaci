@@ -67,11 +67,6 @@ export async function GET(
             },
           },
         },
-        _count: {
-          select: {
-            orders: true,
-          },
-        },
       },
     });
 
@@ -79,25 +74,28 @@ export async function GET(
       return NextResponse.json({ error: 'Médicament introuvable' }, { status: 404 });
     }
 
-    // Order stats for this medication
-    const orderStats = await db.order.groupBy({
-      by: ['status'],
+    // Order stats for this medication (via OrderItem since Medication -> OrderItem -> Order)
+    const orderStats = await db.orderItem.groupBy({
+      by: ['order'],
       where: { medicationId: id },
       _count: true,
-      _sum: { totalPrice: true, quantity: true },
+      _sum: { quantity: true },
     });
 
-    const orderStatsMap: Record<string, { count: number; total: number; quantity: number }> = {};
-    let totalOrders = 0;
+    // Compter le nombre total de commandes uniques
+    const uniqueOrderIds = orderStats.map((o) => o.order);
+    const totalOrders = uniqueOrderIds.length;
+
+    // Pour le chiffre d'affaires, on fait une requête séparée
+    const ordersRevenue = await db.orderItem.groupBy({
+      by: ['order'],
+      where: { medicationId: id },
+      _sum: { price: true },
+    });
+
     let totalRevenue = 0;
-    for (const o of orderStats) {
-      orderStatsMap[o.status] = {
-        count: o._count,
-        total: o._sum.totalPrice || 0,
-        quantity: o._sum.quantity || 0,
-      };
-      totalOrders += o._count;
-      totalRevenue += o._sum.totalPrice || 0;
+    for (const o of ordersRevenue) {
+      totalRevenue += o._sum.price || 0;
     }
 
     // Stock summary across pharmacies
@@ -129,7 +127,6 @@ export async function GET(
         inStockPharmacies,
         totalStock,
         avgPrice,
-        orderStats: orderStatsMap,
       },
       alternatives: medication.alternatives.map((a) => ({
         id: a.id,
