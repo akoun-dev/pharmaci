@@ -756,12 +756,18 @@ export function PharmacistOrderDetailView() {
               <Button
                 onClick={() => handleVerify(verifyCode)}
                 disabled={verifyCode.length !== 6 || verifying}
-                className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm disabled:opacity-40"
+                className="w-full h-11 bg-amber-600 hover:bg-amber-700 text-white text-sm disabled:opacity-40 flex items-center justify-center gap-2"
               >
                 {verifying ? (
-                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Vérification...</>
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Vérification...</span>
+                  </>
                 ) : (
-                  <><ShieldCheck className="h-4 w-4 mr-2" />Vérifier le code</>
+                  <>
+                    <ShieldCheck className="h-4 w-4" />
+                    <span>Vérifier le code</span>
+                  </>
                 )}
               </Button>
             </div>
