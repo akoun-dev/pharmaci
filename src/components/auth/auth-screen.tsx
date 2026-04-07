@@ -384,7 +384,7 @@ export function AuthScreen() {
       {/* Auth content */}
       <div className="flex-1 px-4 -mt-4">
         <div className="max-w-md mx-auto">
-          <Card className="border-0 shadow-lg">
+          <Card className="border-amber-100 dark:border-amber-900/50 dark:bg-gray-950/70 shadow-lg">
             <CardContent className="p-5 pt-6">
               <AnimatePresence mode="wait">
                 {/* Step: Login with Email/Phone tabs */}
@@ -609,8 +609,8 @@ export function AuthScreen() {
                     <div className="space-y-4 max-h-[50vh] overflow-y-auto -mx-2 px-2">
                       {/* Pharmacist pharmacy info */}
                       {role === 'pharmacist' && (
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-3">
-                          <p className="text-xs font-medium text-amber-800 flex items-center gap-2">
+                        <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl p-3 space-y-3">
+                          <p className="text-xs font-medium text-amber-800 dark:text-amber-200 flex items-center gap-2">
                             <Building2 className="h-4 w-4" />
                             Informations de la pharmacie
                           </p>
