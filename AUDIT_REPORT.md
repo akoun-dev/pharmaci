@@ -1,2 +1,1 @@
-implementons La prochaine étape pourrait être                                                                                                           
-    d'implémenter un système de temps réel (WebSocket ou polling)    
+implementons La prochaine étape un système de temps réel (WebSocket ou polling)    
