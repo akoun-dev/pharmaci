@@ -6,7 +6,6 @@ const config: CapacitorConfig = {
   appId: 'ci.pharmaci.app',
   appName: 'Pharma CI',
   webDir: 'public',
-  bundledWebRuntime: false,
   server: serverUrl
     ? {
         url: serverUrl,
