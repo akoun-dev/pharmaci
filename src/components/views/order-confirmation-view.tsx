@@ -58,6 +58,7 @@ interface OrderData {
       name: string;
       commercialName: string;
       form?: string;
+      needsPrescription?: boolean;
     };
   }[];
 }
@@ -306,6 +307,30 @@ export function OrderConfirmationView() {
           <p className="text-sm text-muted-foreground mt-1">
             Votre commande a été enregistrée avec succès
           </p>
+
+          {/* Prescription required warning */}
+          {order.items.some(item => item.medication.needsPrescription) && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mt-4 w-full max-w-sm"
+            >
+              <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-950/40 rounded-xl border border-red-200 dark:border-red-800">
+                <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0">
+                  <ClipboardList className="h-4 w-4 text-red-600 dark:text-red-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-0.5">
+                    Ordonnance obligatoire
+                  </p>
+                  <p className="text-xs text-red-700 dark:text-red-300 leading-relaxed">
+                    N'oubliez pas de munir votre ordonnance lors du retrait de vos médicaments.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* QR Code Card */}
@@ -571,16 +596,24 @@ export function OrderConfirmationView() {
 
         {/* Pickup info */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="mt-4 flex items-start gap-2.5 p-3 bg-amber-50 rounded-xl"
+          className="mt-4"
         >
-          <Package className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-800 leading-relaxed">
-            Retrait en pharmacie — Présentez le QR code ou communiquez le code
-            de vérification au pharmacien lors du retrait de votre commande.
-          </p>
+          <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800">
+            <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0">
+              <Package className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                Retrait en pharmacie
+              </p>
+              <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
+                Présentez le QR code ou communiquez le code de vérification au pharmacien lors du retrait de votre commande.
+              </p>
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>

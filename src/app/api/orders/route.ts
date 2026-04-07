@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
           },
           items: {
             include: {
-              medication: { select: { name: true, commercialName: true, form: true } },
+              medication: { select: { name: true, commercialName: true, form: true, needsPrescription: true } },
             },
           },
         },
@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
         },
         items: {
           include: {
-            medication: { select: { name: true, commercialName: true, form: true } },
+            medication: { select: { name: true, commercialName: true, form: true, needsPrescription: true } },
           },
         },
       },
