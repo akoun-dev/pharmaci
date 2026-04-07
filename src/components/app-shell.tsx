@@ -54,7 +54,6 @@ import { PharmacistOrderDetailView } from '@/components/views/pharmacist/ph-orde
 import { PharmacistProfileView } from '@/components/views/pharmacist/ph-profile-view';
 import { PharmacistNotificationsView } from '@/components/views/pharmacist/ph-notifications-view';
 import { PharmacistMessagesView } from '@/components/views/pharmacist/ph-messages-view';
-import { PharmacistPromotionsView } from '@/components/views/pharmacist/ph-promotions-view';
 import { PharmacistSettingsView } from '@/components/views/pharmacist/ph-settings-view';
 import { PharmacistReportsView } from '@/components/views/pharmacist/ph-reports-view';
 import { PharmacistFaqView } from '@/components/views/pharmacist/ph-faq-view';
@@ -122,7 +121,6 @@ const pharmacistViewToTab: Partial<Record<View, PharmacistTabKey>> = {
   'ph-profile': 'ph-profile',
   'ph-notifications': 'ph-notifications',
   'ph-messages': 'ph-notifications',
-  'ph-promotions': 'ph-profile',
   'ph-settings': 'ph-profile',
   'ph-reports': 'ph-dashboard',
   'ph-faq': 'ph-profile',
@@ -141,7 +139,6 @@ const adminViewToTab: Partial<Record<View, AdminTabKey>> = {
 
 const pharmacistSecondaryTabs = [
   { key: 'ph-messages' as const, label: 'Messagerie', icon: MessageCircle },
-  { key: 'ph-promotions' as const, label: 'Promotions', icon: Tag },
   { key: 'ph-settings' as const, label: 'Paramètres', icon: Settings },
 ];
 
@@ -196,11 +193,6 @@ const pharmacistViewMeta: Partial<Record<View, { title: string; description: str
     title: 'Échangez avec vos clients',
     description: 'Retrouvez vos conversations, réponses et suivis depuis un espace mieux intégré au reste de l’application.',
     badge: 'Messages',
-  },
-  'ph-promotions': {
-    title: 'Mettez vos offres en avant',
-    description: 'Gérez les promotions avec une présentation plus proche de l’expérience publique du produit.',
-    badge: 'Promotions',
   },
   'ph-settings': {
     title: 'Ajustez votre espace',
@@ -309,7 +301,6 @@ function PharmacistViewRenderer() {
     'ph-profile': <PharmacistProfileView />,
     'ph-notifications': <PharmacistNotificationsView />,
     'ph-messages': <PharmacistMessagesView />,
-    'ph-promotions': <PharmacistPromotionsView />,
     'ph-settings': <PharmacistSettingsView />,
     'ph-reports': <PharmacistReportsView />,
     'ph-faq': <PharmacistFaqView />,
@@ -799,17 +790,6 @@ export function AppShell() {
               >
                 <MessageCircle className="h-5 w-5" />
                 Messagerie
-              </button>
-              <button
-                onClick={() => setCurrentView('ph-promotions')}
-                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  currentView === 'ph-promotions'
-                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
-                    : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
-                }`}
-              >
-                <Tag className="h-5 w-5" />
-                Promotions
               </button>
               <button
                 onClick={() => setCurrentView('ph-settings')}

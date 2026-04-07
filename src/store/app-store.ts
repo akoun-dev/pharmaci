@@ -34,7 +34,6 @@ export type View =
   | 'ph-profile'
   | 'ph-notifications'
   | 'ph-messages'
-  | 'ph-promotions'
   | 'ph-settings'
   | 'ph-reports'
   | 'ph-faq'

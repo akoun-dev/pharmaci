@@ -122,21 +122,6 @@ const FAQ_SECTIONS: FaqSection[] = [
     ],
   },
   {
-    id: 'promotions',
-    title: 'Promotions',
-    icon: <Tag className="h-4 w-4 text-orange-600" />,
-    items: [
-      {
-        question: 'Comment créer une promotion ?',
-        answer: "Allez dans l'onglet Profil, section Promotions, puis « Créer ». Sélectionnez le médicament, le pourcentage de réduction et les dates de début et de fin de la promotion.",
-      },
-      {
-        question: 'Les promotions sont-elles automatiques ?',
-        answer: 'Non, vous devez les créer manuellement. N\'oubliez pas de définir les dates de début et fin pour que la promotion soit active uniquement pendant la période souhaitée. Les promotions expirées sont automatiquement désactivées.',
-      },
-    ],
-  },
-  {
     id: 'payments',
     title: 'Paiements mobile money',
     icon: <Wallet className="h-4 w-4 text-orange-600" />,
@@ -175,10 +160,6 @@ const FAQ_SECTIONS: FaqSection[] = [
         question: 'Comment mettre à jour les prix des médicaments ?',
         answer: 'Accédez à la fiche du médicament depuis la liste des stocks, puis modifiez le champ Prix. Les modifications sont enregistrées automatiquement. Vous pouvez aussi effectuer des ajustements en masse depuis le tableau de bord.',
       },
-      {
-        question: 'Comment fonctionnent les promotions sur les prix ?',
-        answer: "Créez une promotion depuis l'onglet Promotions en sélectionnant le médicament, le pourcentage de réduction et la période. Le prix remisé s'affichera automatiquement pour les patients pendant la durée de la promotion.",
-      },
     ],
   },
   {
@@ -189,10 +170,6 @@ const FAQ_SECTIONS: FaqSection[] = [
       {
         question: 'Comment fonctionne le suivi de livraison ?',
         answer: 'Chaque commande passe par des statuts clairs : En attente → Confirmée → Prêtée → Récupérée. Le patient peut suivre l\'avancement en temps réel depuis son application. Vous pouvez aussi envoyer des mises à jour via la messagerie.',
-      },
-      {
-        question: 'Comment les promotions attirent-elles plus de clients ?',
-        answer: 'Les promotions actives sont visibles par tous les patients lors de la recherche de médicaments. Un badge de réduction s\'affiche sur les médicaments en promotion, ce qui augmente la visibilité de votre pharmacie et attire davantage de clients.',
       },
     ],
   },

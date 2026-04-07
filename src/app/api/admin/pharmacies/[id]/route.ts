@@ -52,7 +52,6 @@ export async function GET(
           select: {
             orders: true,
             favorites: true,
-            promotions: true,
           },
         },
       },
@@ -167,7 +166,6 @@ export async function GET(
         lowStockCount,
         totalOrders: pharmacy._count.orders,
         totalFavorites: pharmacy._count.favorites,
-        totalPromotions: pharmacy._count.promotions,
         totalRevenue,
         monthlyRevenue: monthlyRevenue._sum.totalPrice || 0,
         averageRating: avgRating._avg.rating || 0,

@@ -89,7 +89,6 @@ export function ProfileView() {
   const NOTIF_STORAGE_KEY = 'pharmapp-notif-prefs';
   const defaultNotifSettings: NotificationSetting[] = [
     { id: 'order_updates', label: 'Mises à jour de commandes', description: 'Notifications pour les changements de statut', icon: ShoppingCart, enabled: true },
-    { id: 'promotions', label: 'Promotions', description: 'Offres spéciales et réductions', icon: Tag, enabled: true },
     { id: 'stock_alerts', label: 'Alertes stock', description: 'Quand un médicament recherché est disponible', icon: Bell, enabled: false },
     { id: 'news', label: 'Actualités', description: 'Nouvelles fonctionnalités et informations', icon: Info, enabled: false },
   ];

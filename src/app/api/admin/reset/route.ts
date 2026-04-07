@@ -61,10 +61,7 @@ export async function POST(request: NextRequest) {
     // 10. Medications
     const deletedMedications = await db.medication.deleteMany();
 
-    // 11. Promotions (references Pharmacy, Medication)
-    const deletedPromotions = await db.promotion.deleteMany();
-
-    // 12. Pharmacies
+    // 11. Pharmacies
     const deletedPharmacies = await db.pharmacy.deleteMany();
 
     // 13. Non-admin users
@@ -97,7 +94,6 @@ export async function POST(request: NextRequest) {
         stockHistory: deletedStockHistory.count,
         medications: deletedMedications.count,
         alternatives: deletedAlternatives.count,
-        promotions: deletedPromotions.count,
         pharmacies: deletedPharmacies.count,
         users: deletedUsers.count,
       },
