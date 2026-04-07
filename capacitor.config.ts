@@ -33,6 +33,12 @@ const config: CapacitorConfig = {
     StatusBar: {
       style: 'LIGHT',
     },
+    // Configuration de l'ActionBar (bouton retour Android)
+    ActionBar: {
+      title: 'Pharma CI',
+      backgroundColor: '#FF9800',
+      textColor: '#FFFFFF',
+    },
   },
 };
 

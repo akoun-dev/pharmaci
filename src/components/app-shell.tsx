@@ -68,7 +68,7 @@ import { AdminMedicationsView } from '@/components/views/admin/admin-medications
 import { AdminReviewsView } from '@/components/views/admin/admin-reviews-view';
 import { AdminAnalyticsView } from '@/components/views/admin/admin-analytics-view';
 import { AdminSettingsView } from '@/components/views/admin/admin-settings-view';
-import { StatusBar } from '@/lib/capacitor';
+import { StatusBar, App as CapacitorApp } from '@/lib/capacitor';
 
 type PatientTabKey = 'home' | 'search' | 'map' | 'favorites' | 'order-history' | 'notifications' | 'profile';
 type PharmacistTabKey = 'ph-dashboard' | 'ph-stock-list' | 'ph-orders' | 'ph-notifications' | 'ph-profile';
@@ -551,7 +551,7 @@ function MobileSidebarMenu({
 }
 
 export function AppShell() {
-  const { currentView, setCurrentView, isAuthenticated, currentUser, setCurrentUser, logout } = useAppStore();
+  const { currentView, setCurrentView, isAuthenticated, currentUser, setCurrentUser, logout, goBack } = useAppStore();
   const unreadCount = useGlobalNotificationCount();
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -594,6 +594,50 @@ export function AppShell() {
   useEffect(() => {
     StatusBar.applyAppStyle();
   }, []);
+
+  // Handle Android back button
+  useEffect(() => {
+    const setupBackButton = async () => {
+      const listener = await CapacitorApp.addListener('backButton', async ({ canGoBack }) => {
+        const { Haptics } = await import('@/lib/capacitor');
+        Haptics.light();
+
+        if (canGoBack) {
+          // Use the store's goBack function which manages view history
+          goBack();
+        } else {
+          // No back history, show app exit confirmation with ActionSheet
+          const { ActionSheet } = await import('@/lib/capacitor');
+          const action = await ActionSheet.show({
+            title: 'Quitter Pharma CI ?',
+            message: 'Êtes-vous sûr de vouloir quitter l\'application ?',
+            buttons: [
+              { title: 'Oui, quitter', style: 'destructive' },
+              { title: 'Annuler', style: 'cancel' },
+            ],
+          });
+
+          if (action === 0) {
+            // User confirmed exit
+            Haptics.medium();
+            await CapacitorApp.exitApp();
+          }
+        }
+      });
+
+      return listener;
+    };
+
+    let backButtonListener: { remove: () => void } | null = null;
+
+    setupBackButton().then((listener) => {
+      backButtonListener = listener;
+    });
+
+    return () => {
+      backButtonListener?.remove();
+    };
+  }, [goBack]);
 
   // Logout handler
   const handleLogout = useCallback(async () => {

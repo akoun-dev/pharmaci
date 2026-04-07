@@ -25,6 +25,11 @@
 		},
 		"StatusBar": {
 			"style": "LIGHT"
+		},
+		"ActionBar": {
+			"title": "Pharma CI",
+			"backgroundColor": "#FF9800",
+			"textColor": "#FFFFFF"
 		}
 	}
 }
