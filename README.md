@@ -33,6 +33,7 @@ Pharmaci est une application web moderne qui permet aux patients de trouver des 
   - [Comptes de démonstration](#comptes-de-démonstration)
   - [Développement](#développement)
     - [Scripts utiles](#scripts-utiles)
+    - [Mobile avec Capacitor](#mobile-avec-capacitor)
   - [Déploiement](#déploiement)
     - [Build de production](#build-de-production)
     - [Avec Docker](#avec-docker)
@@ -60,7 +61,6 @@ Pharmaci est une application web moderne qui permet aux patients de trouver des 
 - **Gestion des stocks** - Suivi en temps réel de l'inventaire
 - **Gestion des commandes** - Voir et traiter les commandes clients
 - **Tableau de bord** - Statistiques de vente et indicateurs
-- **Promotions** - Créer et gérer les offres spéciales
 - **Messagerie** - Communication avec les clients
 - **Profil** - Mettre à jour les informations de la pharmacie
 - **Historique des stocks** - Suivi des mouvements de stock
@@ -205,7 +205,6 @@ L'application utilise les modèles suivants :
 | `Review` | Avis et notes |
 | `Favorite` | Pharmacies favorites |
 | `StockHistory` | Historique des mouvements de stock |
-| `Promotion` | Offres promotionnelles |
 | `Message` | Messagerie entre utilisateurs |
 
 ## Structure du projet
@@ -301,7 +300,6 @@ pharmaci/
 | `/api/pharmacist/stocks/[id]` | PUT | Modifier un stock |
 | `/api/pharmacist/orders` | GET | Commandes de la pharmacie |
 | `/api/pharmacist/orders/[id]` | PUT | Traiter une commande |
-| `/api/pharmacist/promotions` | GET | Liste des promotions |
 | `/api/pharmacist/reviews` | GET | Avis de la pharmacie |
 | `/api/pharmacist/messages` | GET | Messages reçus |
 | `/api/pharmacist/profile` | GET/PUT | Profil de la pharmacie |
