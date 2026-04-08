@@ -30,7 +30,6 @@ import { openGoogleMaps } from '@/lib/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
 import { groupOrdersByPharmacy, type OrderGroup } from '@/lib/order-utils';
-import { downloadStyledQRCode } from '@/lib/qr-code-generator';
 
 interface OrderData {
   id: string;
@@ -183,24 +182,39 @@ export function OrderConfirmationView() {
     ? `PHARMACI-${order.id}-${order.verificationCode}`
     : '';
 
-  const handleDownloadQR = async () => {
-    if (!order?.verificationCode || !order?.id) {
-      toast.error('Impossible de télécharger le QR Code');
-      return;
-    }
+  const handleDownloadQR = () => {
+    const container = document.getElementById('order-qr-code');
+    if (!container) return;
 
-    try {
-      await downloadStyledQRCode({
-        value: qrValue,
-        verificationCode: order.verificationCode,
-        size: 400,
-        filename: `pharmaci-${order.verificationCode}`,
-      });
-      toast.success('QR Code téléchargé avec succès');
-    } catch (error) {
-      console.error('Erreur lors du téléchargement du QR code:', error);
+    const svg = container.querySelector('svg');
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = img.width * 2;
+      canvas.height = img.height * 2;
+      if (ctx) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        const pngUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `pharmaci-${order?.verificationCode || 'qr'}.png`;
+        link.href = pngUrl;
+        link.click();
+        toast.success('QR Code téléchargé');
+      }
+    };
+
+    img.onerror = () => {
       toast.error('Erreur lors de la génération du QR Code');
-    }
+    };
+
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
   };
 
   const handleCopyCode = () => {
@@ -326,52 +340,45 @@ export function OrderConfirmationView() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
           >
-            <Card className="border-teal-200 overflow-hidden shadow-lg">
-              <div className="bg-gradient-to-r from-teal-600 to-green-600 px-4 py-3 text-center">
+            <Card className="border-green-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-green-600 to-teal-600 px-4 py-3 text-center">
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <QrCode className="h-4 w-4 text-white/90" />
                   <p className="font-semibold text-sm text-white">
                     Code de vérification
                   </p>
                 </div>
-                <p className="text-xs text-white/90">
+                <p className="text-xs text-white">
                   Présentez ce QR code à la pharmacie pour récupérer votre commande
                 </p>
               </div>
               <CardContent className="p-6 flex flex-col items-center space-y-4">
-                {/* QR Code avec nouveau design */}
-                <div className="relative group">
-                  <div className="absolute -inset-3 bg-gradient-to-r from-teal-500 to-green-500 rounded-2xl opacity-20 group-hover:opacity-30 blur-xl transition-opacity" />
-                  <div className="relative bg-white p-4 rounded-xl shadow-md border-2 border-teal-100">
-                    <div id="order-qr-code">
-                      <QRCodeSVG
-                        value={qrValue}
-                        size={200}
-                        level="M"
-                        includeMargin={false}
-                        fgColor="#0f766e"
-                      />
-                    </div>
-                    {/* Indicateur visuel de croix médicale au centre */}
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full border-2 border-teal-500 flex items-center justify-center shadow-sm">
-                      <div className="w-4 h-4 bg-orange-500 rounded-sm" />
-                    </div>
+                {/* QR Code */}
+                <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+                  <div id="order-qr-code">
+                    <QRCodeSVG
+                      value={qrValue}
+                      size={180}
+                      level="M"
+                      includeMargin={false}
+                      fgColor="#065f46"
+                    />
                   </div>
                 </div>
 
                 {/* Verification code display */}
                 <div className="text-center space-y-2">
                   <div className="flex items-center justify-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-teal-600" />
-                    <span className="text-sm font-medium text-muted-foreground">Code de vérification :</span>
+                    <ShieldCheck className="h-4 w-4 text-amber-600" />
+                    <span className="text-sm font-medium text-muted-foreground">Code :</span>
                   </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-2xl font-bold tracking-[0.2em] text-teal-700 font-mono bg-teal-50 px-4 py-2 rounded-lg border border-teal-200">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-bold tracking-[0.3em] text-amber-700 font-mono">
                       {order.verificationCode}
                     </span>
                     <button
                       onClick={handleCopyCode}
-                      className="p-2 rounded-lg hover:bg-teal-50 text-muted-foreground hover:text-teal-600 transition-colors border border-transparent hover:border-teal-200"
+                      className="p-1.5 rounded-lg hover:bg-amber-50 text-muted-foreground hover:text-amber-600 transition-colors"
                     >
                       <Copy className="h-4 w-4" />
                     </button>
@@ -380,8 +387,9 @@ export function OrderConfirmationView() {
 
                 {/* Download button */}
                 <Button
+                  variant="outline"
                   onClick={handleDownloadQR}
-                  className="w-full max-w-xs h-11 bg-gradient-to-r from-teal-600 to-green-600 hover:from-teal-700 hover:to-green-700 text-white rounded-xl font-medium text-sm shadow-md hover:shadow-lg transition-all"
+                  className="w-full max-w-xs h-10 border-amber-200 text-amber-700 hover:bg-amber-50 text-sm rounded-xl"
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Télécharger le QR Code

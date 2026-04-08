@@ -1,1027 +1,1171 @@
-'use client';
+"use client"
 
-import { logger } from '@/lib/logger';
-import { fetcher } from '@/lib/fetcher';
-import { useEffect, useSyncExternalStore, useCallback, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { logger } from "@/lib/logger"
+import { fetcher } from "@/lib/fetcher"
+import { useEffect, useSyncExternalStore, useCallback, useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import {
-  Home,
-  Search,
-  Heart,
-  User,
-  Pill,
-  ClipboardList,
-  Package,
-  MessageCircle,
-  Bell,
-  Settings,
-  Tag,
-  LayoutDashboard,
-  Users,
-  Building2,
-  Star,
-  FlaskConical,
-  BarChart3,
-  ShieldCheck,
-  ShoppingCart,
-  Globe,
-  LogOut,
-  Menu,
-} from 'lucide-react';
-import { useCartStore } from '@/store/cart-store';
-import { useAppStore, View } from '@/store/app-store';
-import { useGlobalNotificationCount, refreshNotifications, resetGlobalNotificationCount } from '@/hooks/use-notifications-polling';
-import { NotificationsProvider } from '@/components/notifications-provider';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { AuthScreen } from '@/components/auth/auth-screen';
-import { HomeView } from '@/components/views/home-view';
-import { SearchView } from '@/components/views/search-view';
-import { MapView } from '@/components/views/map-view';
-import { PharmacyDetailView } from '@/components/views/pharmacy-detail-view';
-import { MedicationDetailView } from '@/components/views/medication-detail-view';
-import { ProfileView } from '@/components/views/profile-view';
-import { FavoritesView } from '@/components/views/favorites-view';
-import { PharmacyDashboardView } from '@/components/views/pharmacy-dashboard-view';
-import { CartView } from '@/components/views/cart-view';
-import { CartCheckoutView } from '@/components/views/cart-checkout-view';
-import { OrderConfirmationView } from '@/components/views/order-confirmation-view';
-import { OrderHistoryView } from '@/components/views/order-history-view';
-import { MyReviewsView } from '@/components/views/my-reviews-view';
-import { NotificationsView } from '@/components/views/notifications-view';
-import { PharmacistDashboardView } from '@/components/views/pharmacist/ph-dashboard-view';
-import { PharmacistStockListView } from '@/components/views/pharmacist/ph-stock-list-view';
-import { PharmacistStockDetailView } from '@/components/views/pharmacist/ph-stock-detail-view';
-import { PharmacistStockAddView } from '@/components/views/pharmacist/ph-stock-add-view';
-import { PharmacistOrdersView } from '@/components/views/pharmacist/ph-orders-view';
-import { PharmacistOrderDetailView } from '@/components/views/pharmacist/ph-order-detail-view';
-import { PharmacistProfileView } from '@/components/views/pharmacist/ph-profile-view';
-import { PharmacistNotificationsView } from '@/components/views/pharmacist/ph-notifications-view';
-import { PharmacistMessagesView } from '@/components/views/pharmacist/ph-messages-view';
-import { PharmacistSettingsView } from '@/components/views/pharmacist/ph-settings-view';
-import { PharmacistReportsView } from '@/components/views/pharmacist/ph-reports-view';
-import { PharmacistFaqView } from '@/components/views/pharmacist/ph-faq-view';
-import { AdminDashboardView } from '@/components/views/admin/admin-dashboard-view';
-import { AdminUsersView } from '@/components/views/admin/admin-users-view';
-import { AdminPharmaciesView } from '@/components/views/admin/admin-pharmacies-view';
-import { AdminOrdersView } from '@/components/views/admin/admin-orders-view';
-import { AdminMedicationsView } from '@/components/views/admin/admin-medications-view';
-import { AdminReviewsView } from '@/components/views/admin/admin-reviews-view';
-import { AdminAnalyticsView } from '@/components/views/admin/admin-analytics-view';
-import { AdminSettingsView } from '@/components/views/admin/admin-settings-view';
-import { StatusBar, App } from '@/lib/capacitor';
-import { exitApp, addListener as addAppListener } from '@/lib/capacitor/app';
+    Home,
+    Search,
+    Heart,
+    User,
+    Pill,
+    ClipboardList,
+    Package,
+    MessageCircle,
+    Bell,
+    Settings,
+    Tag,
+    LayoutDashboard,
+    Users,
+    Building2,
+    Star,
+    FlaskConical,
+    BarChart3,
+    ShieldCheck,
+    ShoppingCart,
+    Globe,
+    LogOut,
+    Menu,
+} from "lucide-react"
+import { useCartStore } from "@/store/cart-store"
+import { useAppStore, View } from "@/store/app-store"
+import {
+    useGlobalNotificationCount,
+    refreshNotifications,
+    resetGlobalNotificationCount,
+} from "@/hooks/use-notifications-polling"
+import { NotificationsProvider } from "@/components/notifications-provider"
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+} from "@/components/ui/sheet"
+import { AuthScreen } from "@/components/auth/auth-screen"
+import { HomeView } from "@/components/views/home-view"
+import { SearchView } from "@/components/views/search-view"
+import { MapView } from "@/components/views/map-view"
+import { PharmacyDetailView } from "@/components/views/pharmacy-detail-view"
+import { MedicationDetailView } from "@/components/views/medication-detail-view"
+import { ProfileView } from "@/components/views/profile-view"
+import { FavoritesView } from "@/components/views/favorites-view"
+import { PharmacyDashboardView } from "@/components/views/pharmacy-dashboard-view"
+import { CartView } from "@/components/views/cart-view"
+import { CartCheckoutView } from "@/components/views/cart-checkout-view"
+import { OrderConfirmationView } from "@/components/views/order-confirmation-view"
+import { OrderHistoryView } from "@/components/views/order-history-view"
+import { MyReviewsView } from "@/components/views/my-reviews-view"
+import { NotificationsView } from "@/components/views/notifications-view"
+import { PharmacistDashboardView } from "@/components/views/pharmacist/ph-dashboard-view"
+import { PharmacistStockListView } from "@/components/views/pharmacist/ph-stock-list-view"
+import { PharmacistStockDetailView } from "@/components/views/pharmacist/ph-stock-detail-view"
+import { PharmacistStockAddView } from "@/components/views/pharmacist/ph-stock-add-view"
+import { PharmacistOrdersView } from "@/components/views/pharmacist/ph-orders-view"
+import { PharmacistOrderDetailView } from "@/components/views/pharmacist/ph-order-detail-view"
+import { PharmacistProfileView } from "@/components/views/pharmacist/ph-profile-view"
+import { PharmacistNotificationsView } from "@/components/views/pharmacist/ph-notifications-view"
+import { PharmacistMessagesView } from "@/components/views/pharmacist/ph-messages-view"
+import { PharmacistSettingsView } from "@/components/views/pharmacist/ph-settings-view"
+import { PharmacistReportsView } from "@/components/views/pharmacist/ph-reports-view"
+import { PharmacistFaqView } from "@/components/views/pharmacist/ph-faq-view"
+import { AdminDashboardView } from "@/components/views/admin/admin-dashboard-view"
+import { AdminUsersView } from "@/components/views/admin/admin-users-view"
+import { AdminPharmaciesView } from "@/components/views/admin/admin-pharmacies-view"
+import { AdminOrdersView } from "@/components/views/admin/admin-orders-view"
+import { AdminMedicationsView } from "@/components/views/admin/admin-medications-view"
+import { AdminReviewsView } from "@/components/views/admin/admin-reviews-view"
+import { AdminAnalyticsView } from "@/components/views/admin/admin-analytics-view"
+import { AdminSettingsView } from "@/components/views/admin/admin-settings-view"
+import { StatusBar, App } from "@/lib/capacitor"
+import { exitApp, addListener as addAppListener } from "@/lib/capacitor/app"
 
-type PatientTabKey = 'home' | 'search' | 'map' | 'favorites' | 'order-history' | 'notifications' | 'profile';
-type PharmacistTabKey = 'ph-dashboard' | 'ph-stock-list' | 'ph-orders' | 'ph-notifications' | 'ph-profile';
-type AdminTabKey = 'admin-dashboard' | 'admin-users' | 'admin-pharmacies' | 'admin-orders' | 'admin-medications' | 'admin-reviews' | 'admin-analytics';
+type PatientTabKey =
+    | "home"
+    | "search"
+    | "map"
+    | "favorites"
+    | "order-history"
+    | "notifications"
+    | "profile"
+type PharmacistTabKey =
+    | "ph-dashboard"
+    | "ph-stock-list"
+    | "ph-orders"
+    | "ph-notifications"
+    | "ph-profile"
+type AdminTabKey =
+    | "admin-dashboard"
+    | "admin-users"
+    | "admin-pharmacies"
+    | "admin-orders"
+    | "admin-medications"
+    | "admin-reviews"
+    | "admin-analytics"
 
-const patientTabs: { key: PatientTabKey; label: string; icon: typeof Home }[] = [
-  { key: 'home', label: 'Accueil', icon: Home },
-  { key: 'search', label: 'Recherche', icon: Search },
-  { key: 'order-history', label: 'Mes commandes', icon: ClipboardList },
-  { key: 'map', label: 'Ma carte', icon: Globe },
-  { key: 'notifications', label: 'Notifications', icon: Bell },
-  { key: 'profile', label: 'Mon profil', icon: User },
-];
+const patientTabs: { key: PatientTabKey; label: string; icon: typeof Home }[] =
+    [
+        { key: "home", label: "Accueil", icon: Home },
+        { key: "search", label: "Recherche", icon: Search },
+        { key: "order-history", label: "Mes commandes", icon: ClipboardList },
+        { key: "map", label: "Ma carte", icon: Globe },
+        { key: "notifications", label: "Notifications", icon: Bell },
+        { key: "profile", label: "Mon profil", icon: User },
+    ]
 
-const pharmacistTabs: { key: PharmacistTabKey; label: string; icon: typeof Home }[] = [
-  { key: 'ph-dashboard', label: 'Accueil', icon: Home },
-  { key: 'ph-stock-list', label: 'Stocks', icon: Package },
-  { key: 'ph-orders', label: 'Commandes', icon: ClipboardList },
-  { key: 'ph-notifications', label: 'Alertes', icon: Bell },
-  { key: 'ph-profile', label: 'Profil', icon: User },
-];
+const pharmacistTabs: {
+    key: PharmacistTabKey
+    label: string
+    icon: typeof Home
+}[] = [
+    { key: "ph-dashboard", label: "Accueil", icon: Home },
+    { key: "ph-stock-list", label: "Stocks", icon: Package },
+    { key: "ph-orders", label: "Commandes", icon: ClipboardList },
+    { key: "ph-notifications", label: "Alertes", icon: Bell },
+    { key: "ph-profile", label: "Profil", icon: User },
+]
 
 const adminTabs: { key: AdminTabKey; label: string; icon: typeof Home }[] = [
-  { key: 'admin-dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
-  { key: 'admin-users', label: 'Utilisateurs', icon: Users },
-  { key: 'admin-pharmacies', label: 'Pharmacies', icon: Building2 },
-  { key: 'admin-orders', label: 'Commandes', icon: ClipboardList },
-  { key: 'admin-medications', label: 'Médicaments', icon: FlaskConical },
-  { key: 'admin-reviews', label: 'Avis', icon: Star },
-  { key: 'admin-analytics', label: 'Analyses', icon: BarChart3 },
-];
+    { key: "admin-dashboard", label: "Tableau de bord", icon: LayoutDashboard },
+    { key: "admin-users", label: "Utilisateurs", icon: Users },
+    { key: "admin-pharmacies", label: "Pharmacies", icon: Building2 },
+    { key: "admin-orders", label: "Commandes", icon: ClipboardList },
+    { key: "admin-medications", label: "Médicaments", icon: FlaskConical },
+    { key: "admin-reviews", label: "Avis", icon: Star },
+    { key: "admin-analytics", label: "Analyses", icon: BarChart3 },
+]
 
 const patientViewToTab: Partial<Record<View, PatientTabKey>> = {
-  home: 'home',
-  search: 'search',
-  map: 'map',
-  favorites: 'favorites',
-  profile: 'profile',
-  'pharmacy-detail': 'home',
-  'medication-detail': 'search',
-  'pharmacy-dashboard': 'profile',
-  'order-confirmation': 'order-history',
-  'order-history': 'order-history',
-  cart: 'search',
-  'cart-checkout': 'search',
-};
+    home: "home",
+    search: "search",
+    map: "map",
+    favorites: "favorites",
+    profile: "profile",
+    "pharmacy-detail": "home",
+    "medication-detail": "search",
+    "pharmacy-dashboard": "profile",
+    "order-confirmation": "order-history",
+    "order-history": "order-history",
+    cart: "search",
+    "cart-checkout": "search",
+}
 
 const pharmacistViewToTab: Partial<Record<View, PharmacistTabKey>> = {
-  'ph-dashboard': 'ph-dashboard',
-  'ph-stock-list': 'ph-stock-list',
-  'ph-stock-detail': 'ph-stock-list',
-  'ph-stock-add': 'ph-stock-list',
-  'ph-orders': 'ph-orders',
-  'ph-order-detail': 'ph-orders',
-  'ph-profile': 'ph-profile',
-  'ph-notifications': 'ph-notifications',
-  'ph-messages': 'ph-notifications',
-  'ph-settings': 'ph-profile',
-  'ph-reports': 'ph-dashboard',
-  'ph-faq': 'ph-profile',
-};
+    "ph-dashboard": "ph-dashboard",
+    "ph-stock-list": "ph-stock-list",
+    "ph-stock-detail": "ph-stock-list",
+    "ph-stock-add": "ph-stock-list",
+    "ph-orders": "ph-orders",
+    "ph-order-detail": "ph-orders",
+    "ph-profile": "ph-profile",
+    "ph-notifications": "ph-notifications",
+    "ph-messages": "ph-notifications",
+    "ph-settings": "ph-profile",
+    "ph-reports": "ph-dashboard",
+    "ph-faq": "ph-profile",
+}
 
 const adminViewToTab: Partial<Record<View, AdminTabKey>> = {
-  'admin-dashboard': 'admin-dashboard',
-  'admin-users': 'admin-users',
-  'admin-pharmacies': 'admin-pharmacies',
-  'admin-orders': 'admin-orders',
-  'admin-medications': 'admin-medications',
-  'admin-reviews': 'admin-reviews',
-  'admin-analytics': 'admin-analytics',
-  'admin-settings': 'admin-dashboard',
-};
+    "admin-dashboard": "admin-dashboard",
+    "admin-users": "admin-users",
+    "admin-pharmacies": "admin-pharmacies",
+    "admin-orders": "admin-orders",
+    "admin-medications": "admin-medications",
+    "admin-reviews": "admin-reviews",
+    "admin-analytics": "admin-analytics",
+    "admin-settings": "admin-dashboard",
+}
 
 const pharmacistSecondaryTabs = [
-  { key: 'ph-messages' as const, label: 'Messagerie', icon: MessageCircle },
-  { key: 'ph-settings' as const, label: 'Paramètres', icon: Settings },
-];
+    { key: "ph-messages" as const, label: "Messagerie", icon: MessageCircle },
+    { key: "ph-settings" as const, label: "Paramètres", icon: Settings },
+]
 
 const adminSecondaryTabs = [
-  { key: 'admin-medications' as const, label: 'Médicaments', icon: FlaskConical },
-  { key: 'admin-reviews' as const, label: 'Avis', icon: Star },
-  { key: 'admin-settings' as const, label: 'Paramètres', icon: Settings },
-];
+    {
+        key: "admin-medications" as const,
+        label: "Médicaments",
+        icon: FlaskConical,
+    },
+    { key: "admin-reviews" as const, label: "Avis", icon: Star },
+    { key: "admin-settings" as const, label: "Paramètres", icon: Settings },
+]
 
-const pharmacistViewMeta: Partial<Record<View, { title: string; description: string; badge: string }>> = {
-  'ph-dashboard': {
-    title: 'Pilotez votre pharmacie',
-    description: 'Suivez vos commandes, vos alertes et vos performances depuis un espace plus fluide et plus proche de l’expérience patient.',
-    badge: 'Vue d’ensemble',
-  },
-  'ph-stock-list': {
-    title: 'Gardez le stock sous contrôle',
-    description: 'Retrouvez rapidement les produits disponibles, les ruptures et les alertes d’expiration avec une lecture plus directe.',
-    badge: 'Stocks',
-  },
-  'ph-stock-detail': {
-    title: 'Consultez un produit en détail',
-    description: 'Vérifiez les quantités, les prix et l’historique de mise à jour sans quitter votre repère visuel principal.',
-    badge: 'Fiche stock',
-  },
-  'ph-stock-add': {
-    title: 'Ajoutez une nouvelle entrée',
-    description: 'Enregistrez un médicament ou mettez à jour une référence dans un cadre cohérent avec le reste de l’espace pharmacien.',
-    badge: 'Ajout stock',
-  },
-  'ph-orders': {
-    title: 'Traitez les commandes plus vite',
-    description: 'Gardez les commandes en attente, les vérifications et les retraits à portée de main dans une interface plus accueillante.',
-    badge: 'Commandes',
-  },
-  'ph-order-detail': {
-    title: 'Suivi de commande',
-    description: 'Consultez les informations client et les détails de préparation dans un écran plus lisible.',
-    badge: 'Détail commande',
-  },
-  'ph-notifications': {
-    title: 'Restez à jour',
-    description: 'Centralisez les alertes de commande, de stock et d’avis avec la même logique visuelle que côté patient.',
-    badge: 'Notifications',
-  },
-  'ph-profile': {
-    title: 'Présentez votre pharmacie',
-    description: 'Mettez à jour les informations visibles par les patients tout en gardant une expérience cohérente.',
-    badge: 'Profil',
-  },
-  'ph-messages': {
-    title: 'Échangez avec vos clients',
-    description: 'Retrouvez vos conversations, réponses et suivis depuis un espace mieux intégré au reste de l’application.',
-    badge: 'Messages',
-  },
-  'ph-settings': {
-    title: 'Ajustez votre espace',
-    description: 'Gérez vos préférences et vos réglages dans un habillage aligné avec la partie patient.',
-    badge: 'Réglages',
-  },
-  'ph-reports': {
-    title: 'Analysez votre activité',
-    description: 'Consultez vos rapports et exports dans un environnement plus doux et plus lisible.',
-    badge: 'Rapports',
-  },
-  'ph-faq': {
-    title: 'Accédez à l’aide',
-    description: 'Retrouvez les réponses utiles et les informations pratiques sans rupture visuelle.',
-    badge: 'Aide',
-  },
-};
+const pharmacistViewMeta: Partial<
+    Record<View, { title: string; description: string; badge: string }>
+> = {
+    "ph-dashboard": {
+        title: "Pilotez votre pharmacie",
+        description:
+            "Suivez vos commandes, vos alertes et vos performances depuis un espace plus fluide et plus proche de l’expérience patient.",
+        badge: "Vue d’ensemble",
+    },
+    "ph-stock-list": {
+        title: "Gardez le stock sous contrôle",
+        description:
+            "Retrouvez rapidement les produits disponibles, les ruptures et les alertes d’expiration avec une lecture plus directe.",
+        badge: "Stocks",
+    },
+    "ph-stock-detail": {
+        title: "Consultez un produit en détail",
+        description:
+            "Vérifiez les quantités, les prix et l’historique de mise à jour sans quitter votre repère visuel principal.",
+        badge: "Fiche stock",
+    },
+    "ph-stock-add": {
+        title: "Ajoutez une nouvelle entrée",
+        description:
+            "Enregistrez un médicament ou mettez à jour une référence dans un cadre cohérent avec le reste de l’espace pharmacien.",
+        badge: "Ajout stock",
+    },
+    "ph-orders": {
+        title: "Traitez les commandes plus vite",
+        description:
+            "Gardez les commandes en attente, les vérifications et les retraits à portée de main dans une interface plus accueillante.",
+        badge: "Commandes",
+    },
+    "ph-order-detail": {
+        title: "Suivi de commande",
+        description:
+            "Consultez les informations client et les détails de préparation dans un écran plus lisible.",
+        badge: "Détail commande",
+    },
+    "ph-notifications": {
+        title: "Restez à jour",
+        description:
+            "Centralisez les alertes de commande, de stock et d’avis avec la même logique visuelle que côté patient.",
+        badge: "Notifications",
+    },
+    "ph-profile": {
+        title: "Présentez votre pharmacie",
+        description:
+            "Mettez à jour les informations visibles par les patients tout en gardant une expérience cohérente.",
+        badge: "Profil",
+    },
+    "ph-messages": {
+        title: "Échangez avec vos clients",
+        description:
+            "Retrouvez vos conversations, réponses et suivis depuis un espace mieux intégré au reste de l’application.",
+        badge: "Messages",
+    },
+    "ph-settings": {
+        title: "Ajustez votre espace",
+        description:
+            "Gérez vos préférences et vos réglages dans un habillage aligné avec la partie patient.",
+        badge: "Réglages",
+    },
+    "ph-reports": {
+        title: "Analysez votre activité",
+        description:
+            "Consultez vos rapports et exports dans un environnement plus doux et plus lisible.",
+        badge: "Rapports",
+    },
+    "ph-faq": {
+        title: "Accédez à l’aide",
+        description:
+            "Retrouvez les réponses utiles et les informations pratiques sans rupture visuelle.",
+        badge: "Aide",
+    },
+}
 
-const adminViewMeta: Partial<Record<View, { title: string; description: string; badge: string }>> = {
-  'admin-dashboard': {
-    title: 'Pilotez toute la plateforme',
-    description: 'Gardez les utilisateurs, les pharmacies, les commandes et les tendances de Pharma CI dans un espace plus fluide et plus proche du langage visuel patient.',
-    badge: 'Vue d’ensemble',
-  },
-  'admin-users': {
-    title: 'Supervisez les comptes',
-    description: 'Retrouvez rapidement les patients, pharmaciens et administrateurs dans une interface plus claire, plus chaleureuse et plus simple à parcourir.',
-    badge: 'Utilisateurs',
-  },
-  'admin-pharmacies': {
-    title: 'Suivez le réseau de pharmacies',
-    description: 'Consultez les établissements, leur activité et leurs statuts clés avec des cartes et filtres plus cohérents avec le reste du produit.',
-    badge: 'Pharmacies',
-  },
-  'admin-orders': {
-    title: 'Gardez les commandes sous contrôle',
-    description: 'Filtrez, vérifiez et analysez les commandes de la plateforme avec une lecture plus directe et des actions plus visibles.',
-    badge: 'Commandes',
-  },
-  'admin-medications': {
-    title: 'Administrez le catalogue',
-    description: 'Centralisez les médicaments de la plateforme dans un espace unifié avec les mêmes codes visuels que l’interface patient.',
-    badge: 'Catalogue',
-  },
-  'admin-reviews': {
-    title: 'Surveillez la confiance',
-    description: 'Suivez les avis laissés sur la plateforme et intervenez plus vite grâce à des états plus lisibles.',
-    badge: 'Avis',
-  },
-  'admin-analytics': {
-    title: 'Lisez les signaux importants',
-    description: 'Consultez les performances et les tendances de la plateforme dans une présentation plus engageante.',
-    badge: 'Analyses',
-  },
-  'admin-settings': {
-    title: 'Réglez l’espace d’administration',
-    description: 'Ajustez les paramètres globaux sans quitter la même expérience visuelle que le reste du back-office.',
-    badge: 'Paramètres',
-  },
-};
+const adminViewMeta: Partial<
+    Record<View, { title: string; description: string; badge: string }>
+> = {
+    "admin-dashboard": {
+        title: "Pilotez toute la plateforme",
+        description:
+            "Gardez les utilisateurs, les pharmacies, les commandes et les tendances de Pharma CI dans un espace plus fluide et plus proche du langage visuel patient.",
+        badge: "Vue d’ensemble",
+    },
+    "admin-users": {
+        title: "Supervisez les comptes",
+        description:
+            "Retrouvez rapidement les patients, pharmaciens et administrateurs dans une interface plus claire, plus chaleureuse et plus simple à parcourir.",
+        badge: "Utilisateurs",
+    },
+    "admin-pharmacies": {
+        title: "Suivez le réseau de pharmacies",
+        description:
+            "Consultez les établissements, leur activité et leurs statuts clés avec des cartes et filtres plus cohérents avec le reste du produit.",
+        badge: "Pharmacies",
+    },
+    "admin-orders": {
+        title: "Gardez les commandes sous contrôle",
+        description:
+            "Filtrez, vérifiez et analysez les commandes de la plateforme avec une lecture plus directe et des actions plus visibles.",
+        badge: "Commandes",
+    },
+    "admin-medications": {
+        title: "Administrez le catalogue",
+        description:
+            "Centralisez les médicaments de la plateforme dans un espace unifié avec les mêmes codes visuels que l’interface patient.",
+        badge: "Catalogue",
+    },
+    "admin-reviews": {
+        title: "Surveillez la confiance",
+        description:
+            "Suivez les avis laissés sur la plateforme et intervenez plus vite grâce à des états plus lisibles.",
+        badge: "Avis",
+    },
+    "admin-analytics": {
+        title: "Lisez les signaux importants",
+        description:
+            "Consultez les performances et les tendances de la plateforme dans une présentation plus engageante.",
+        badge: "Analyses",
+    },
+    "admin-settings": {
+        title: "Réglez l’espace d’administration",
+        description:
+            "Ajustez les paramètres globaux sans quitter la même expérience visuelle que le reste du back-office.",
+        badge: "Paramètres",
+    },
+}
 
 function PatientViewRenderer() {
-  const { currentView } = useAppStore();
+    const { currentView } = useAppStore()
 
-  const views: Record<string, React.ReactNode> = {
-    home: <HomeView />,
-    search: <SearchView />,
-    map: <MapView />,
-    'pharmacy-detail': <PharmacyDetailView />,
-    'medication-detail': <MedicationDetailView />,
-    profile: <ProfileView />,
-    favorites: <FavoritesView />,
-    'pharmacy-dashboard': <PharmacyDashboardView />,
-    'order-confirmation': <OrderConfirmationView />,
-    'order-history': <OrderHistoryView />,
-    'my-reviews': <MyReviewsView />,
-    notifications: <NotificationsView />,
-    cart: <CartView />,
-    'cart-checkout': <CartCheckoutView />,
-  };
+    const views: Record<string, React.ReactNode> = {
+        home: <HomeView />,
+        search: <SearchView />,
+        map: <MapView />,
+        "pharmacy-detail": <PharmacyDetailView />,
+        "medication-detail": <MedicationDetailView />,
+        profile: <ProfileView />,
+        favorites: <FavoritesView />,
+        "pharmacy-dashboard": <PharmacyDashboardView />,
+        "order-confirmation": <OrderConfirmationView />,
+        "order-history": <OrderHistoryView />,
+        "my-reviews": <MyReviewsView />,
+        notifications: <NotificationsView />,
+        cart: <CartView />,
+        "cart-checkout": <CartCheckoutView />,
+    }
 
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={currentView}
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -10 }}
-        transition={{ duration: 0.2 }}
-      >
-        {views[currentView]}
-      </motion.div>
-    </AnimatePresence>
-  );
+    return (
+        <AnimatePresence mode="wait">
+            <motion.div
+                key={currentView}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+            >
+                {views[currentView]}
+            </motion.div>
+        </AnimatePresence>
+    )
 }
 
 function PharmacistViewRenderer() {
-  const { currentView } = useAppStore();
+    const { currentView } = useAppStore()
 
-  const views: Record<string, React.ReactNode> = {
-    'ph-dashboard': <PharmacistDashboardView />,
-    'ph-stock-list': <PharmacistStockListView />,
-    'ph-stock-detail': <PharmacistStockDetailView />,
-    'ph-stock-add': <PharmacistStockAddView />,
-    'ph-orders': <PharmacistOrdersView />,
-    'ph-order-detail': <PharmacistOrderDetailView />,
-    'ph-profile': <PharmacistProfileView />,
-    'ph-notifications': <PharmacistNotificationsView />,
-    'ph-messages': <PharmacistMessagesView />,
-    'ph-settings': <PharmacistSettingsView />,
-    'ph-reports': <PharmacistReportsView />,
-    'ph-faq': <PharmacistFaqView />,
-  };
+    const views: Record<string, React.ReactNode> = {
+        "ph-dashboard": <PharmacistDashboardView />,
+        "ph-stock-list": <PharmacistStockListView />,
+        "ph-stock-detail": <PharmacistStockDetailView />,
+        "ph-stock-add": <PharmacistStockAddView />,
+        "ph-orders": <PharmacistOrdersView />,
+        "ph-order-detail": <PharmacistOrderDetailView />,
+        "ph-profile": <PharmacistProfileView />,
+        "ph-notifications": <PharmacistNotificationsView />,
+        "ph-messages": <PharmacistMessagesView />,
+        "ph-settings": <PharmacistSettingsView />,
+        "ph-reports": <PharmacistReportsView />,
+        "ph-faq": <PharmacistFaqView />,
+    }
 
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={currentView}
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -10 }}
-        transition={{ duration: 0.2 }}
-      >
-        {views[currentView]}
-      </motion.div>
-    </AnimatePresence>
-  );
+    return (
+        <AnimatePresence mode="wait">
+            <motion.div
+                key={currentView}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+            >
+                {views[currentView]}
+            </motion.div>
+        </AnimatePresence>
+    )
 }
 
 function AdminViewRenderer() {
-  const { currentView } = useAppStore();
+    const { currentView } = useAppStore()
 
-  const views: Record<string, React.ReactNode> = {
-    'admin-dashboard': <AdminDashboardView />,
-    'admin-users': <AdminUsersView />,
-    'admin-pharmacies': <AdminPharmaciesView />,
-    'admin-orders': <AdminOrdersView />,
-    'admin-medications': <AdminMedicationsView />,
-    'admin-reviews': <AdminReviewsView />,
-    'admin-analytics': <AdminAnalyticsView />,
-    'admin-settings': <AdminSettingsView />,
-  };
+    const views: Record<string, React.ReactNode> = {
+        "admin-dashboard": <AdminDashboardView />,
+        "admin-users": <AdminUsersView />,
+        "admin-pharmacies": <AdminPharmaciesView />,
+        "admin-orders": <AdminOrdersView />,
+        "admin-medications": <AdminMedicationsView />,
+        "admin-reviews": <AdminReviewsView />,
+        "admin-analytics": <AdminAnalyticsView />,
+        "admin-settings": <AdminSettingsView />,
+    }
 
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={currentView}
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -10 }}
-        transition={{ duration: 0.2 }}
-      >
-        {views[currentView]}
-      </motion.div>
-    </AnimatePresence>
-  );
+    return (
+        <AnimatePresence mode="wait">
+            <motion.div
+                key={currentView}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+            >
+                {views[currentView]}
+            </motion.div>
+        </AnimatePresence>
+    )
 }
 
 function CartFloatingButton() {
-  const itemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0));
-  const setCurrentView = useAppStore((s) => s.setCurrentView);
+    const itemCount = useCartStore(s =>
+        s.items.reduce((sum, i) => sum + i.quantity, 0)
+    )
+    const setCurrentView = useAppStore(s => s.setCurrentView)
 
-  if (itemCount === 0) return null;
+    if (itemCount === 0) return null
 
-  return (
-    <button
-      onClick={() => setCurrentView('cart')}
-      className="fixed bottom-24 right-4 z-40 lg:hidden flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white rounded-full px-4 py-3 shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95"
-    >
-      <ShoppingCart className="h-5 w-5" />
-      <span className="text-sm font-semibold">{itemCount}</span>
-    </button>
-  );
+    return (
+        <button
+            onClick={() => setCurrentView("cart")}
+            className="fixed bottom-40 right-4 z-40 lg:hidden flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white rounded-full px-4 py-3 shadow-lg shadow-amber-600/30 transition-all duration-200 active:scale-95"
+        >
+            <ShoppingCart className="h-5 w-5" />
+            <span className="text-sm font-semibold">{itemCount}</span>
+        </button>
+    )
 }
 
 function CartSidebarButton() {
-  const itemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0));
-  const setCurrentView = useAppStore((s) => s.setCurrentView);
+    const itemCount = useCartStore(s =>
+        s.items.reduce((sum, i) => sum + i.quantity, 0)
+    )
+    const setCurrentView = useAppStore(s => s.setCurrentView)
 
-  return (
-    <button
-      onClick={() => setCurrentView('cart')}
-      className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative ${
-        'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
-      }`}
-    >
-      <div className="relative">
-        <ShoppingCart className="h-5 w-5" />
-        {itemCount > 0 && (
-          <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-            {itemCount > 9 ? '9+' : itemCount}
-          </span>
-        )}
-      </div>
-      Panier
-      {itemCount > 0 && (
-        <span className="ml-auto text-xs text-amber-600 font-medium">
-          {itemCount} article{itemCount > 1 ? 's' : ''}
-        </span>
-      )}
-    </button>
-  );
+    return (
+        <button
+            onClick={() => setCurrentView("cart")}
+            className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative ${"text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600"}`}
+        >
+            <div className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {itemCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                        {itemCount > 9 ? "9+" : itemCount}
+                    </span>
+                )}
+            </div>
+            Panier
+            {itemCount > 0 && (
+                <span className="ml-auto text-xs text-amber-600 font-medium">
+                    {itemCount} article{itemCount > 1 ? "s" : ""}
+                </span>
+            )}
+        </button>
+    )
 }
 
 type MobileNavItem = {
-  key: string;
-  label: string;
-  icon: typeof Home;
-};
+    key: string
+    label: string
+    icon: typeof Home
+}
 
 function MobileSidebarMenu({
-  sectionLabel,
-  currentLabel,
-  userName,
-  userEmail,
-  activeKey,
-  primaryItems,
-  secondaryItems = [],
-  onSelect,
-  onLogout,
-  showBadgeForKeys = [],
-  unreadCount = 0,
+    sectionLabel,
+    currentLabel,
+    userName,
+    userEmail,
+    activeKey,
+    primaryItems,
+    secondaryItems = [],
+    onSelect,
+    onLogout,
+    showBadgeForKeys = [],
+    unreadCount = 0,
 }: {
-  sectionLabel: string;
-  currentLabel: string;
-  userName?: string;
-  userEmail?: string;
-  activeKey: string;
-  primaryItems: MobileNavItem[];
-  secondaryItems?: MobileNavItem[];
-  onSelect: (key: string) => void;
-  onLogout: () => void;
-  showBadgeForKeys?: string[];
-  unreadCount?: number;
+    sectionLabel: string
+    currentLabel: string
+    userName?: string
+    userEmail?: string
+    activeKey: string
+    primaryItems: MobileNavItem[]
+    secondaryItems?: MobileNavItem[]
+    onSelect: (key: string) => void
+    onLogout: () => void
+    showBadgeForKeys?: string[]
+    unreadCount?: number
 }) {
-  const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
-  const handleSelect = (key: string) => {
-    setOpen(false);
-    onSelect(key);
-  };
+    const handleSelect = (key: string) => {
+        setOpen(false)
+        onSelect(key)
+    }
 
-  return (
-    <>
-      <div className="fixed inset-x-0 top-0 z-40 border-b border-amber-100 bg-white/95 backdrop-blur-md dark:border-amber-900/50 dark:bg-gray-950/95 lg:hidden">
-        <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
-          <button
-            onClick={() => setOpen(true)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-900/60 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-950/80"
-            aria-label={`Ouvrir le menu ${sectionLabel.toLowerCase()}`}
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <div className="min-w-0">
-            <p className="text-[11px] font-medium text-muted-foreground">{sectionLabel}</p>
-            <p className="truncate text-sm font-semibold text-foreground">{currentLabel}</p>
-          </div>
-        </div>
-      </div>
-
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="left"
-          className="w-[86vw] max-w-xs gap-0 border-r border-amber-100 bg-white p-0 dark:border-amber-900/50 dark:bg-gray-950"
-        >
-          <SheetHeader className="border-b border-amber-100 p-5 text-left dark:border-amber-900/50">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-600 overflow-hidden">
-                <img src="/logo.svg" alt="Pharma CI" className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <SheetTitle className="text-base">Pharma CI</SheetTitle>
-                <SheetDescription className="text-[11px]">{sectionLabel}</SheetDescription>
-              </div>
-            </div>
-          </SheetHeader>
-
-          <div className="mx-4 mt-4 rounded-xl bg-amber-50 p-3 dark:bg-amber-950/40">
-            <p className="truncate text-sm font-semibold text-amber-800 dark:text-amber-300">{userName}</p>
-            <p className="truncate text-[11px] text-amber-600 dark:text-amber-400">{userEmail}</p>
-          </div>
-
-          <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-            {primaryItems.map((tab) => {
-              const isActive = activeKey === tab.key;
-              const Icon = tab.icon;
-              const showBadge = showBadgeForKeys.includes(tab.key) && unreadCount > 0;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => handleSelect(tab.key)}
-                  className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300'
-                      : 'text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600 dark:hover:bg-amber-950/40 dark:hover:text-amber-300'
-                  }`}
-                >
-                  <div className="relative">
-                    <Icon className="h-5 w-5" />
-                    {showBadge && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </span>
-                    )}
-                  </div>
-                  {tab.label}
-                </button>
-              );
-            })}
-
-            {secondaryItems.length > 0 && (
-              <div className="mt-2 border-t border-amber-100 pt-2 dark:border-amber-900/50">
-                {secondaryItems.map((tab) => {
-                  const isActive = activeKey === tab.key;
-                  const Icon = tab.icon;
-                  return (
+    return (
+        <>
+            <div className="fixed inset-x-0 top-0 z-40 border-b border-amber-100 bg-white/95 backdrop-blur-md dark:border-amber-900/50 dark:bg-gray-950/95 lg:hidden">
+                <div className="mx-auto flex h-14 max-w-2xl items-center gap-3 px-4">
                     <button
-                      key={tab.key}
-                      onClick={() => handleSelect(tab.key)}
-                      className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                        isActive
-                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300'
-                          : 'text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600 dark:hover:bg-amber-950/40 dark:hover:text-amber-300'
-                      }`}
+                        onClick={() => setOpen(true)}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-900/60 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-950/80"
+                        aria-label={`Ouvrir le menu ${sectionLabel.toLowerCase()}`}
                     >
-                      <Icon className="h-5 w-5" />
-                      {tab.label}
+                        <Menu className="h-5 w-5" />
                     </button>
-                  );
-                })}
-              </div>
-            )}
-          </nav>
+                    <div className="min-w-0">
+                        <p className="text-[11px] font-medium text-muted-foreground">
+                            {sectionLabel}
+                        </p>
+                        <p className="truncate text-sm font-semibold text-foreground">
+                            {currentLabel}
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-          <div className="border-t border-amber-100 p-3 dark:border-amber-900/50">
-            <button
-              onClick={() => {
-                setOpen(false);
-                onLogout();
-              }}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
-            >
-              <LogOut className="h-5 w-5" />
-              Se déconnecter
-            </button>
-          </div>
-        </SheetContent>
-      </Sheet>
-    </>
-  );
+            <Sheet open={open} onOpenChange={setOpen}>
+                <SheetContent
+                    side="left"
+                    className="w-[86vw] max-w-xs gap-0 border-r border-amber-100 bg-white p-0 dark:border-amber-900/50 dark:bg-gray-950"
+                >
+                    <SheetHeader className="border-b border-amber-100 p-5 text-left dark:border-amber-900/50">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-600">
+                                <Pill className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <SheetTitle className="text-base">
+                                    Pharma CI
+                                </SheetTitle>
+                                <SheetDescription className="text-[11px]">
+                                    {sectionLabel}
+                                </SheetDescription>
+                            </div>
+                        </div>
+                    </SheetHeader>
+
+                    <div className="mx-4 mt-4 rounded-xl bg-amber-50 p-3 dark:bg-amber-950/40">
+                        <p className="truncate text-sm font-semibold text-amber-800 dark:text-amber-300">
+                            {userName}
+                        </p>
+                        <p className="truncate text-[11px] text-amber-600 dark:text-amber-400">
+                            {userEmail}
+                        </p>
+                    </div>
+
+                    <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+                        {primaryItems.map(tab => {
+                            const isActive = activeKey === tab.key
+                            const Icon = tab.icon
+                            const showBadge =
+                                showBadgeForKeys.includes(tab.key) &&
+                                unreadCount > 0
+                            return (
+                                <button
+                                    key={tab.key}
+                                    onClick={() => handleSelect(tab.key)}
+                                    className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                                        isActive
+                                            ? "bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300"
+                                            : "text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600 dark:hover:bg-amber-950/40 dark:hover:text-amber-300"
+                                    }`}
+                                >
+                                    <div className="relative">
+                                        <Icon className="h-5 w-5" />
+                                        {showBadge && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                                                {unreadCount > 9
+                                                    ? "9+"
+                                                    : unreadCount}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {tab.label}
+                                </button>
+                            )
+                        })}
+
+                        {secondaryItems.length > 0 && (
+                            <div className="mt-2 border-t border-amber-100 pt-2 dark:border-amber-900/50">
+                                {secondaryItems.map(tab => {
+                                    const isActive = activeKey === tab.key
+                                    const Icon = tab.icon
+                                    return (
+                                        <button
+                                            key={tab.key}
+                                            onClick={() =>
+                                                handleSelect(tab.key)
+                                            }
+                                            className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                                                isActive
+                                                    ? "bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300"
+                                                    : "text-muted-foreground hover:bg-amber-50/60 hover:text-amber-600 dark:hover:bg-amber-950/40 dark:hover:text-amber-300"
+                                            }`}
+                                        >
+                                            <Icon className="h-5 w-5" />
+                                            {tab.label}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        )}
+                    </nav>
+
+                    <div className="border-t border-amber-100 p-3 dark:border-amber-900/50">
+                        <button
+                            onClick={() => {
+                                setOpen(false)
+                                onLogout()
+                            }}
+                            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+                        >
+                            <LogOut className="h-5 w-5" />
+                            Se déconnecter
+                        </button>
+                    </div>
+                </SheetContent>
+            </Sheet>
+        </>
+    )
 }
 
 export function AppShell() {
-  const { currentView, setCurrentView, isAuthenticated, currentUser, setCurrentUser, logout, goBack } = useAppStore();
-  const unreadCount = useGlobalNotificationCount();
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
+    const {
+        currentView,
+        setCurrentView,
+        isAuthenticated,
+        currentUser,
+        setCurrentUser,
+        logout,
+        goBack,
+    } = useAppStore()
+    const unreadCount = useGlobalNotificationCount()
+    const mounted = useSyncExternalStore(
+        () => () => {},
+        () => true,
+        () => false
+    )
 
-  const isAdmin = currentUser?.role === 'admin';
-  const isPharmacist = currentUser?.role === 'pharmacist';
+    const isAdmin = currentUser?.role === "admin"
+    const isPharmacist = currentUser?.role === "pharmacist"
 
-  // Check session on mount
-  const checkSession = useCallback(async () => {
-    try {
-      const res = await fetcher('/api/auth/me');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.user) {
-          setCurrentUser({
-            id: data.user.id,
-            name: data.user.name,
-            email: data.user.email,
-            phone: data.user.phone,
-            role: data.user.role,
-            avatar: data.user.avatar,
-            city: data.user.city,
-            linkedPharmacyId: data.user.linkedPharmacyId || null,
-          });
+    // Check session on mount
+    const checkSession = useCallback(async () => {
+        try {
+            const res = await fetcher("/api/auth/me")
+            if (res.ok) {
+                const data = await res.json()
+                if (data.user) {
+                    setCurrentUser({
+                        id: data.user.id,
+                        name: data.user.name,
+                        email: data.user.email,
+                        phone: data.user.phone,
+                        role: data.user.role,
+                        avatar: data.user.avatar,
+                        city: data.user.city,
+                        linkedPharmacyId: data.user.linkedPharmacyId || null,
+                    })
+                }
+            }
+        } catch {
+            // Not authenticated — show auth screen
         }
-      }
-    } catch {
-      // Not authenticated — show auth screen
-    }
-  }, [setCurrentUser]);
+    }, [setCurrentUser])
 
-  useEffect(() => {
-    checkSession();
-  }, [checkSession]);
+    useEffect(() => {
+        checkSession()
+    }, [checkSession])
 
-  // Configure StatusBar on mount
-  useEffect(() => {
-    StatusBar.applyAppStyle();
-  }, []);
+    // Configure StatusBar on mount
+    useEffect(() => {
+        StatusBar.applyAppStyle()
+    }, [])
 
-  // Handle Android back button
-  useEffect(() => {
-    const setupBackButton = async () => {
-      const listener = await addAppListener('backButton', async ({ canGoBack }) => {
-        const { Haptics } = await import('@/lib/capacitor');
-        Haptics.light();
+    // Handle Android back button
+    useEffect(() => {
+        const setupBackButton = async () => {
+            const listener = await addAppListener(
+                "backButton",
+                async ({ canGoBack }) => {
+                    const { Haptics } = await import("@/lib/capacitor")
+                    Haptics.light()
 
-        if (canGoBack) {
-          // Use the store's goBack function which manages view history
-          goBack();
-        } else {
-          // No back history, show app exit confirmation with ActionSheet
-          const { ActionSheet } = await import('@/lib/capacitor');
-          const action = await ActionSheet.show({
-            title: 'Quitter Pharma CI ?',
-            message: 'Êtes-vous sûr de vouloir quitter l\'application ?',
-            buttons: [
-              { title: 'Oui, quitter', style: 'destructive' },
-              { title: 'Annuler', style: 'cancel' },
-            ],
-          });
+                    if (canGoBack) {
+                        // Use the store's goBack function which manages view history
+                        goBack()
+                    } else {
+                        // No back history, show app exit confirmation with ActionSheet
+                        const { ActionSheet } = await import("@/lib/capacitor")
+                        const action = await ActionSheet.show({
+                            title: "Quitter Pharma CI ?",
+                            message:
+                                "Êtes-vous sûr de vouloir quitter l'application ?",
+                            buttons: [
+                                { title: "Oui, quitter", style: "destructive" },
+                                { title: "Annuler", style: "cancel" },
+                            ],
+                        })
 
-          if (action === 0) {
-            // User confirmed exit
-            Haptics.medium();
-            await exitApp();
-          }
+                        if (action === 0) {
+                            // User confirmed exit
+                            Haptics.medium()
+                            await exitApp()
+                        }
+                    }
+                }
+            )
+
+            return listener
         }
-      });
 
-      return listener;
-    };
+        let backButtonListener: { remove: () => void } | null = null
 
-    let backButtonListener: { remove: () => void } | null = null;
+        setupBackButton().then(listener => {
+            backButtonListener = listener
+        })
 
-    setupBackButton().then((listener) => {
-      backButtonListener = listener;
-    });
+        return () => {
+            backButtonListener?.remove()
+        }
+    }, [goBack])
 
-    return () => {
-      backButtonListener?.remove();
-    };
-  }, [goBack]);
+    // Logout handler
+    const handleLogout = useCallback(async () => {
+        try {
+            await fetcher("/api/auth/logout", { method: "POST" })
+        } catch {
+            // Ignore network errors
+        }
+        logout()
+    }, [logout])
 
-  // Logout handler
-  const handleLogout = useCallback(async () => {
-    try {
-      await fetcher('/api/auth/logout', { method: 'POST' });
-    } catch {
-      // Ignore network errors
+    if (!mounted) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-600 flex items-center justify-center mx-auto mb-3 animate-pulse overflow-hidden">
+                        <Pill className="h-7 w-7 text-white" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                        Chargement...
+                    </p>
+                </div>
+            </div>
+        )
     }
-    logout();
-  }, [logout]);
 
-  if (!mounted) {
+    // Show auth screen if not authenticated
+    if (!isAuthenticated) {
+        return <AuthScreen />
+    }
+
+    // ═══════════════════════════════════════════
+    // ADMIN INTERFACE
+    // ═══════════════════════════════════════════
+    if (isAdmin) {
+        const activeTab = adminViewToTab[currentView] || "admin-dashboard"
+        const adminMobileItems: MobileNavItem[] = [
+            ...adminTabs,
+            { key: "admin-settings", label: "Paramètres", icon: Settings },
+        ]
+        const adminCurrentLabel =
+            adminMobileItems.find(item => item.key === currentView)?.label ||
+            adminTabs.find(item => item.key === activeTab)?.label ||
+            "Administration"
+        const adminActiveKey =
+            currentView === "admin-settings" ? "admin-settings" : activeTab
+
+        const handleTabClick = (key: AdminTabKey) => {
+            setCurrentView(key)
+        }
+
+        return (
+            <div className="app-view-background min-h-screen flex flex-col">
+                <MobileSidebarMenu
+                    sectionLabel="Espace admin"
+                    currentLabel={adminCurrentLabel}
+                    userName={currentUser?.name}
+                    userEmail={currentUser?.email}
+                    activeKey={adminActiveKey}
+                    primaryItems={adminTabs}
+                    secondaryItems={[
+                        {
+                            key: "admin-settings",
+                            label: "Paramètres",
+                            icon: Settings,
+                        },
+                    ]}
+                    onSelect={key => setCurrentView(key as View)}
+                    onLogout={handleLogout}
+                    showBadgeForKeys={[]}
+                    unreadCount={unreadCount}
+                />
+
+                <main className="flex-1 lg:overflow-y-auto pb-6 pt-16 lg:pb-0 lg:pt-0 lg:pl-64">
+                    <div className="h-full lg:overflow-y-auto">
+                        <AdminViewRenderer />
+                    </div>
+                </main>
+
+                <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-900/78 border-r border-gray-200/80 dark:border-gray-800/80 flex-col z-50">
+                    <div className="p-5 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-purple-600 flex items-center justify-center">
+                            <Pill className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="font-bold text-lg text-foreground">
+                                Pharma CI
+                            </h1>
+                            <p className="text-[10px] text-amber-600 font-medium">
+                                Administration
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mx-4 mb-4 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl">
+                        <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                            {currentUser?.name}
+                        </p>
+                        <p className="text-[11px] text-amber-600 dark:text-amber-400">
+                            {currentUser?.email}
+                        </p>
+                    </div>
+
+                    <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
+                        {adminTabs.map(tab => {
+                            const isActive = activeTab === tab.key
+                            const Icon = tab.icon
+                            return (
+                                <button
+                                    key={tab.key}
+                                    onClick={() => handleTabClick(tab.key)}
+                                    className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                        isActive
+                                            ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400"
+                                            : "text-muted-foreground hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-foreground"
+                                    }`}
+                                >
+                                    <Icon className="h-4.5 w-4.5" />
+                                    {tab.label}
+                                </button>
+                            )
+                        })}
+                        <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-800">
+                            <button
+                                onClick={() => setCurrentView("admin-settings")}
+                                className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                    currentView === "admin-settings"
+                                        ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400"
+                                        : "text-muted-foreground hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-foreground"
+                                }`}
+                            >
+                                <Settings className="h-4.5 w-4.5" />
+                                Paramètres
+                            </button>
+                        </div>
+                    </nav>
+
+                    <div className="px-3 mb-2">
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-all duration-200"
+                        >
+                            Se déconnecter
+                        </button>
+                    </div>
+
+                    <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+                        <p className="text-[10px] text-muted-foreground text-center">
+                            Pharma CI © 2025
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        )
+    }
+
+    // ═══════════════════════════════════════════
+    // PHARMACIST INTERFACE
+    // ═══════════════════════════════════════════
+    if (isPharmacist) {
+        const activeTab = pharmacistViewToTab[currentView] || "ph-dashboard"
+        const pharmacistCurrentLabel =
+            [...pharmacistTabs, ...pharmacistSecondaryTabs].find(
+                item => item.key === currentView
+            )?.label ||
+            pharmacistTabs.find(item => item.key === activeTab)?.label ||
+            "Espace pharmacien"
+        const pharmacistActiveKey =
+            pharmacistSecondaryTabs.find(item => item.key === currentView)
+                ?.key || activeTab
+
+        const handleTabClick = (key: PharmacistTabKey) => {
+            setCurrentView(key)
+        }
+
+        return (
+            <div className="app-view-background min-h-screen flex flex-col">
+                <MobileSidebarMenu
+                    sectionLabel="Espace pharmacien"
+                    currentLabel={pharmacistCurrentLabel}
+                    userName={currentUser?.name}
+                    userEmail={currentUser?.email}
+                    activeKey={pharmacistActiveKey}
+                    primaryItems={pharmacistTabs}
+                    secondaryItems={pharmacistSecondaryTabs}
+                    onSelect={key => setCurrentView(key as View)}
+                    onLogout={handleLogout}
+                    showBadgeForKeys={["ph-notifications"]}
+                    unreadCount={unreadCount}
+                />
+
+                <main className="flex-1 lg:overflow-y-auto pb-6 pt-16 lg:pb-0 lg:pt-0 lg:pl-64">
+                    <div className="h-full lg:overflow-y-auto">
+                        <PharmacistViewRenderer />
+                    </div>
+                </main>
+
+                {/* Sidebar navigation (desktop) */}
+                <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-950/76 border-r border-amber-100/80 dark:border-amber-900/50 flex-col z-50">
+                    <div className="p-6 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center">
+                            <Pill className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="font-bold text-lg text-foreground">
+                                Pharma CI
+                            </h1>
+                            <p className="text-[10px] text-muted-foreground">
+                                Espace Pharmacien
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mx-4 mb-4 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl">
+                        <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                            {currentUser?.name}
+                        </p>
+                        <p className="text-[11px] text-amber-600 dark:text-amber-400">
+                            {currentUser?.email}
+                        </p>
+                    </div>
+
+                    <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+                        {pharmacistTabs.map(tab => {
+                            const isActive = activeTab === tab.key
+                            const Icon = tab.icon
+                            const showBadge =
+                                tab.key === "ph-notifications" &&
+                                unreadCount > 0
+                            return (
+                                <button
+                                    key={tab.key}
+                                    onClick={() => handleTabClick(tab.key)}
+                                    className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                        isActive
+                                            ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400"
+                                            : "text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600"
+                                    }`}
+                                >
+                                    <div className="relative">
+                                        <Icon className="h-5 w-5" />
+                                        {showBadge && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                                                {unreadCount > 9
+                                                    ? "9+"
+                                                    : unreadCount}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {tab.label}
+                                </button>
+                            )
+                        })}
+                        <div className="pt-2 mt-2 border-t border-amber-100 dark:border-amber-900/50">
+                            <button
+                                onClick={() => setCurrentView("ph-messages")}
+                                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                    currentView === "ph-messages"
+                                        ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400"
+                                        : "text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600"
+                                }`}
+                            >
+                                <MessageCircle className="h-5 w-5" />
+                                Messagerie
+                            </button>
+                            <button
+                                onClick={() => setCurrentView("ph-settings")}
+                                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                    currentView === "ph-settings"
+                                        ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400"
+                                        : "text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600"
+                                }`}
+                            >
+                                <Settings className="h-5 w-5" />
+                                Paramètres
+                            </button>
+                        </div>
+                    </nav>
+
+                    <div className="px-3 mb-2">
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-all duration-200"
+                        >
+                            Se déconnecter
+                        </button>
+                    </div>
+
+                    <div className="p-4 border-t border-amber-100 dark:border-amber-900/50">
+                        <p className="text-[10px] text-muted-foreground text-center">
+                            Pharma CI © 2025
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        )
+    }
+
+    // ═══════════════════════════════════════════
+    // PATIENT INTERFACE
+    // ═══════════════════════════════════════════
+    const activeTab = patientViewToTab[currentView] || "home"
+
+    const handleTabClick = (key: PatientTabKey) => {
+        setCurrentView(key)
+    }
+
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="w-12 h-12 rounded-2xl bg-amber-600 flex items-center justify-center mx-auto mb-3 animate-pulse overflow-hidden">
-            <img src="/logo.svg" alt="Pharma CI" className="h-7 w-7 text-white" />
-          </div>
-          <p className="text-sm text-muted-foreground">Chargement...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show auth screen if not authenticated
-  if (!isAuthenticated) {
-    return <AuthScreen />;
-  }
-
-  // ═══════════════════════════════════════════
-  // ADMIN INTERFACE
-  // ═══════════════════════════════════════════
-  if (isAdmin) {
-    const activeTab = adminViewToTab[currentView] || 'admin-dashboard';
-    const adminMobileItems: MobileNavItem[] = [
-      ...adminTabs,
-      { key: 'admin-settings', label: 'Paramètres', icon: Settings },
-    ];
-    const adminCurrentLabel =
-      adminMobileItems.find((item) => item.key === currentView)?.label ||
-      adminTabs.find((item) => item.key === activeTab)?.label ||
-      'Administration';
-    const adminActiveKey = currentView === 'admin-settings' ? 'admin-settings' : activeTab;
-
-    const handleTabClick = (key: AdminTabKey) => {
-      setCurrentView(key);
-    };
-
-    return (
-      <div className="app-view-background min-h-screen flex flex-col">
-        <MobileSidebarMenu
-          sectionLabel="Espace admin"
-          currentLabel={adminCurrentLabel}
-          userName={currentUser?.name}
-          userEmail={currentUser?.email}
-          activeKey={adminActiveKey}
-          primaryItems={adminTabs}
-          secondaryItems={[{ key: 'admin-settings', label: 'Paramètres', icon: Settings }]}
-          onSelect={(key) => setCurrentView(key as View)}
-          onLogout={handleLogout}
-          showBadgeForKeys={[]}
-          unreadCount={unreadCount}
-        />
-
-        <main className="flex-1 overflow-y-auto pb-6 pt-16 lg:pb-0 lg:pt-0 lg:pl-64">
-          <AdminViewRenderer />
-        </main>
-
-        <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-900/78 border-r border-gray-200/80 dark:border-gray-800/80 flex-col z-50">
-          <div className="p-5 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-purple-600 flex items-center justify-center">
-              <img src="/logo.svg" alt="Pharma CI" className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg text-foreground">Pharma CI</h1>
-              <p className="text-[10px] text-amber-600 font-medium">Administration</p>
-            </div>
-          </div>
-
-          <div className="mx-4 mb-4 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl">
-            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">{currentUser?.name}</p>
-            <p className="text-[11px] text-amber-600 dark:text-amber-400">{currentUser?.email}</p>
-          </div>
-
-          <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
-            {adminTabs.map((tab) => {
-              const isActive = activeTab === tab.key;
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => handleTabClick(tab.key)}
-                  className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
-                      : 'text-muted-foreground hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-foreground'
-                  }`}
-                >
-                  <Icon className="h-4.5 w-4.5" />
-                  {tab.label}
-                </button>
-              );
-            })}
-            <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-800">
-              <button
-                onClick={() => setCurrentView('admin-settings')}
-                className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  currentView === 'admin-settings'
-                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
-                    : 'text-muted-foreground hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-foreground'
-                }`}
-              >
-                <Settings className="h-4.5 w-4.5" />
-                Paramètres
-              </button>
-            </div>
-          </nav>
-
-          <div className="px-3 mb-2">
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-all duration-200"
-            >
-              Se déconnecter
-            </button>
-          </div>
-
-          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-            <p className="text-[10px] text-muted-foreground text-center">
-              Pharma CI © 2025
-            </p>
-          </div>
-        </aside>
-      </div>
-    );
-  }
-
-  // ═══════════════════════════════════════════
-  // PHARMACIST INTERFACE
-  // ═══════════════════════════════════════════
-  if (isPharmacist) {
-    const activeTab = pharmacistViewToTab[currentView] || 'ph-dashboard';
-    const pharmacistCurrentLabel =
-      [...pharmacistTabs, ...pharmacistSecondaryTabs].find((item) => item.key === currentView)?.label ||
-      pharmacistTabs.find((item) => item.key === activeTab)?.label ||
-      'Espace pharmacien';
-    const pharmacistActiveKey =
-      pharmacistSecondaryTabs.find((item) => item.key === currentView)?.key || activeTab;
-
-    const handleTabClick = (key: PharmacistTabKey) => {
-      setCurrentView(key);
-    };
-
-    return (
-      <div className="app-view-background min-h-screen flex flex-col">
-        <MobileSidebarMenu
-          sectionLabel="Espace pharmacien"
-          currentLabel={pharmacistCurrentLabel}
-          userName={currentUser?.name}
-          userEmail={currentUser?.email}
-          activeKey={pharmacistActiveKey}
-          primaryItems={pharmacistTabs}
-          secondaryItems={pharmacistSecondaryTabs}
-          onSelect={(key) => setCurrentView(key as View)}
-          onLogout={handleLogout}
-          showBadgeForKeys={['ph-notifications']}
-          unreadCount={unreadCount}
-        />
-
-        <main className="flex-1 overflow-y-auto pb-6 pt-16 lg:pb-0 lg:pt-0 lg:pl-64">
-          <PharmacistViewRenderer />
-        </main>
-
-        {/* Sidebar navigation (desktop) */}
-        <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-950/76 border-r border-amber-100/80 dark:border-amber-900/50 flex-col z-50">
-          <div className="p-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center">
-              <img src="/logo.svg" alt="Pharma CI" className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg text-foreground">Pharma CI</h1>
-              <p className="text-[10px] text-muted-foreground">Espace Pharmacien</p>
-            </div>
-          </div>
-
-          <div className="mx-4 mb-4 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl">
-            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">{currentUser?.name}</p>
-            <p className="text-[11px] text-amber-600 dark:text-amber-400">{currentUser?.email}</p>
-          </div>
-
-          <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-            {pharmacistTabs.map((tab) => {
-              const isActive = activeTab === tab.key;
-              const Icon = tab.icon;
-              const showBadge = tab.key === 'ph-notifications' && unreadCount > 0;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => handleTabClick(tab.key)}
-                  className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
-                      : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
-                  }`}
-                >
-                  <div className="relative">
-                    <Icon className="h-5 w-5" />
-                    {showBadge && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </span>
-                    )}
-                  </div>
-                  {tab.label}
-                </button>
-              );
-            })}
-            <div className="pt-2 mt-2 border-t border-amber-100 dark:border-amber-900/50">
-              <button
-                onClick={() => setCurrentView('ph-messages')}
-                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  currentView === 'ph-messages'
-                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
-                    : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
-                }`}
-              >
-                <MessageCircle className="h-5 w-5" />
-                Messagerie
-              </button>
-              <button
-                onClick={() => setCurrentView('ph-settings')}
-                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  currentView === 'ph-settings'
-                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
-                    : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
-                }`}
-              >
-                <Settings className="h-5 w-5" />
-                Paramètres
-              </button>
-            </div>
-          </nav>
-
-          <div className="px-3 mb-2">
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-all duration-200"
-            >
-              Se déconnecter
-            </button>
-          </div>
-
-          <div className="p-4 border-t border-amber-100 dark:border-amber-900/50">
-            <p className="text-[10px] text-muted-foreground text-center">
-              Pharma CI © 2025
-            </p>
-          </div>
-        </aside>
-      </div>
-    );
-  }
-
-  // ═══════════════════════════════════════════
-  // PATIENT INTERFACE
-  // ═══════════════════════════════════════════
-  const activeTab = patientViewToTab[currentView] || 'home';
-
-  const handleTabClick = (key: PatientTabKey) => {
-    setCurrentView(key);
-  };
-
-  return (
-    <div className="app-view-background min-h-screen flex flex-col">
-      <main className="flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 pt-0 lg:pl-64">
-        <PatientViewRenderer />
-      </main>
-
-      {/* Cart floating button (mobile) */}
-      <CartFloatingButton />
-
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/82 dark:bg-gray-900/82 backdrop-blur-xl border-t border-amber-100/80 dark:border-amber-900/50 lg:hidden pb-safe">
-        <div className="flex items-center justify-around px-0.5 py-1 max-w-2xl mx-auto">
-          {patientTabs.map((tab) => {
-            const isActive = activeTab === tab.key;
-            const Icon = tab.icon;
-            const showBadge = tab.key === 'notifications' && unreadCount > 0;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => handleTabClick(tab.key)}
-                className={`flex flex-col items-center justify-center gap-0.5 px-0.5 sm:px-1 py-1.5 rounded-xl transition-all duration-200 min-w-0 flex-1 ${
-                  isActive
-                    ? 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50'
-                    : 'text-muted-foreground hover:text-amber-600'
-                }`}
-              >
-                <div className="relative">
-                  <Icon
-                    className={`h-[18px] sm:h-5 w-[18px] sm:w-5 transition-colors ${isActive ? 'text-amber-700 dark:text-amber-400' : ''}`}
-                  />
-                  {showBadge && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  )}
+        <div className="app-view-background min-h-screen flex flex-col">
+            <main className="flex-1 lg:overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 pt-0 lg:pl-64">
+                <div className="h-full overflow-y-auto lg:overflow-visible">
+                    <PatientViewRenderer />
                 </div>
-                <span className="text-[9px] sm:text-[10px] font-medium leading-tight truncate max-w-full">{tab.label}</span>
-                {isActive && (
-                  <div className="w-1 h-1 rounded-full bg-amber-600 -mt-0.5" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </nav>
+            </main>
 
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-950/76 border-r border-amber-100/80 dark:border-amber-900/50 flex-col z-50">
-        <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center overflow-hidden">
-            <img src="/logo.svg" alt="Pharma CI" className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="font-bold text-lg text-foreground">Pharma CI</h1>
-            <p className="text-[10px] text-muted-foreground">Côte d&apos;Ivoire</p>
-          </div>
-        </div>
+            {/* Cart floating button (mobile) */}
+            <CartFloatingButton />
 
-        <nav className="flex-1 px-3 space-y-1 mt-4">
-          {patientTabs.map((tab) => {
-            const isActive = activeTab === tab.key;
-            const Icon = tab.icon;
-            const showBadge = tab.key === 'notifications' && unreadCount > 0;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => handleTabClick(tab.key)}
-                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
-                    : 'text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600'
-                }`}
-              >
-                <div className="relative">
-                  <Icon className="h-5 w-5" />
-                  {showBadge && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  )}
+            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/82 dark:bg-gray-900/82 backdrop-blur-xl border-t border-amber-100/80 dark:border-amber-900/50 lg:hidden pb-safe">
+                <div className="flex items-center justify-around px-0.5 py-1 max-w-2xl mx-auto">
+                    {patientTabs.map(tab => {
+                        const isActive = activeTab === tab.key
+                        const Icon = tab.icon
+                        const showBadge =
+                            tab.key === "notifications" && unreadCount > 0
+                        return (
+                            <button
+                                key={tab.key}
+                                onClick={() => handleTabClick(tab.key)}
+                                className={`flex flex-col items-center justify-center gap-0.5 px-0.5 sm:px-1 py-1.5 rounded-xl transition-all duration-200 min-w-0 flex-1 ${
+                                    isActive
+                                        ? "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50"
+                                        : "text-muted-foreground hover:text-amber-600"
+                                }`}
+                            >
+                                <div className="relative">
+                                    <Icon
+                                        className={`h-[18px] sm:h-5 w-[18px] sm:w-5 transition-colors ${isActive ? "text-amber-700 dark:text-amber-400" : ""}`}
+                                    />
+                                    {showBadge && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full h-3.5 w-3.5 flex items-center justify-center">
+                                            {unreadCount > 9
+                                                ? "9+"
+                                                : unreadCount}
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="text-[9px] sm:text-[10px] font-medium leading-tight truncate max-w-full">
+                                    {tab.label}
+                                </span>
+                                {isActive && (
+                                    <div className="w-1 h-1 rounded-full bg-amber-600 -mt-0.5" />
+                                )}
+                            </button>
+                        )
+                    })}
                 </div>
-                {tab.label}
-              </button>
-            );
-          })}
-          <div className="pt-2 mt-2 border-t border-amber-100 dark:border-amber-900/50">
-            <CartSidebarButton />
-          </div>
-        </nav>
+            </nav>
 
-        <div className="px-3 mb-2">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-all duration-200"
-          >
-            Se déconnecter
-          </button>
-        </div>
+            <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white/78 backdrop-blur-xl dark:bg-gray-950/76 border-r border-amber-100/80 dark:border-amber-900/50 flex-col z-50">
+                <div className="p-6 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center">
+                        <Pill className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                        <h1 className="font-bold text-lg text-foreground">
+                            Pharma CI
+                        </h1>
+                        <p className="text-[10px] text-muted-foreground">
+                            Côte d&apos;Ivoire
+                        </p>
+                    </div>
+                </div>
 
-        <div className="p-4 border-t border-amber-100 dark:border-amber-900/50">
-          <p className="text-[10px] text-muted-foreground text-center">
-            Pharma CI © 2025
-          </p>
+                <nav className="flex-1 px-3 space-y-1 mt-4">
+                    {patientTabs.map(tab => {
+                        const isActive = activeTab === tab.key
+                        const Icon = tab.icon
+                        const showBadge =
+                            tab.key === "notifications" && unreadCount > 0
+                        return (
+                            <button
+                                key={tab.key}
+                                onClick={() => handleTabClick(tab.key)}
+                                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                    isActive
+                                        ? "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400"
+                                        : "text-muted-foreground hover:bg-amber-50/50 hover:text-amber-600"
+                                }`}
+                            >
+                                <div className="relative">
+                                    <Icon className="h-5 w-5" />
+                                    {showBadge && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                                            {unreadCount > 9
+                                                ? "9+"
+                                                : unreadCount}
+                                        </span>
+                                    )}
+                                </div>
+                                {tab.label}
+                            </button>
+                        )
+                    })}
+                    <div className="pt-2 mt-2 border-t border-amber-100 dark:border-amber-900/50">
+                        <CartSidebarButton />
+                    </div>
+                </nav>
+
+                <div className="px-3 mb-2">
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 transition-all duration-200"
+                    >
+                        Se déconnecter
+                    </button>
+                </div>
+
+                <div className="p-4 border-t border-amber-100 dark:border-amber-900/50">
+                    <p className="text-[10px] text-muted-foreground text-center">
+                        Pharma CI © 2025
+                    </p>
+                </div>
+            </aside>
         </div>
-      </aside>
-    </div>
-  );
+    )
 }
 
 // Envelopper l'app avec le NotificationsProvider pour le temps réel
 export function AppShellWithProvider() {
-  return (
-    <NotificationsProvider>
-      <AppShell />
-    </NotificationsProvider>
-  );
+    return (
+        <NotificationsProvider>
+            <AppShell />
+        </NotificationsProvider>
+    )
 }

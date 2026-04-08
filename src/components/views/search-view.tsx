@@ -306,7 +306,7 @@ export function SearchView() {
                       <CityFilter
                         value={selectedCity}
                         onChange={(value) => {
-                          setSelectedCity(value);
+                          setSelectedCity(value === '__all__' ? '' : value);
                           setSelectedCommune(''); // Reset commune when city changes
                         }}
                       />

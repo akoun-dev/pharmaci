@@ -26,7 +26,7 @@ export function ViewHeader({ title, icon, back, onBack, action }: ViewHeaderProp
   };
 
   return (
-    <div className="flex items-center gap-2 pt-1 pb-3">
+    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center gap-2 pt-1 pb-3">
       {back && (
         <button
           onClick={handleBack}

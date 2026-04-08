@@ -205,6 +205,27 @@ export function MedicationDetailView() {
     setCurrentView('pharmacy-detail');
   };
 
+  const addToCart = (pharmacy: AvailablePharmacy) => {
+    if (!medication) return;
+
+    const cart = useCartStore.getState();
+    cart.addItem({
+      pharmacyId: pharmacy.id,
+      pharmacyName: pharmacy.name,
+      pharmacyAddress: pharmacy.address,
+      pharmacyDistrict: pharmacy.district || '',
+      medicationId: medication.id,
+      medicationName: medication.commercialName,
+      medicationForm: medication.form || '',
+      price: pharmacy.price,
+      quantity: 1,
+      needsPrescription: pharmacy.needsPrescription,
+      stockId: pharmacy.stockId,
+      maxQuantity: pharmacy.quantity,
+    });
+    toast.success(`${medication.commercialName} ajouté au panier`);
+  };
+
   const openOrderDialog = (pharmacy: AvailablePharmacy) => {
     setOrderingPharmacy(pharmacy);
     setOrderQuantity(1);
@@ -310,9 +331,9 @@ export function MedicationDetailView() {
                   </Badge>
                 )}
                 {medication.needsPrescription && (
-                  <Badge variant="outline" className="text-xs border-amber-200 text-amber-700 bg-amber-50">
-                    <FileText className="h-3 w-3 mr-1" />
-                    Ordonnance
+                  <Badge className="text-xs px-3 py-1.5 bg-amber-600 text-white border-2 border-amber-800 font-bold shadow-md shadow-amber-600/30">
+                    <FileText className="h-4 w-4 mr-1.5" />
+                    Ordonnance requise
                   </Badge>
                 )}
                 {medication.activePrinciple && (
@@ -639,24 +660,37 @@ export function MedicationDetailView() {
                       {/* Separator */}
                       <div className="border-t border-amber-100/80 mb-2.5" />
 
-                      {/* Row 4: Price + Commander */}
-                      <div className="flex items-center justify-between gap-3">
+                      {/* Row 4: Price + Actions */}
+                      <div className="flex items-center justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-base text-amber-700">
                             {pharmacy.price.toLocaleString()} <span className="text-xs font-normal">FCFA</span>
                           </p>
                         </div>
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700 text-white text-xs h-9 px-4 flex-shrink-0"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openOrderDialog(pharmacy);
-                          }}
-                        >
-                          <ShoppingCart className="h-3.5 w-3.5 mr-1" />
-                          Commander
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            className="bg-amber-600 hover:bg-amber-700 text-white text-xs h-9 px-3 flex-shrink-0 shadow-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addToCart(pharmacy);
+                            }}
+                          >
+                            <ShoppingCart className="h-3.5 w-3.5 mr-1" />
+                            <span className="hidden sm:inline">Ajouter</span>
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700 text-white text-xs h-9 px-3 flex-shrink-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openOrderDialog(pharmacy);
+                            }}
+                          >
+                            <Package className="h-3.5 w-3.5 mr-1" />
+                            <span className="hidden sm:inline">Commander</span>
+                          </Button>
+                        </div>
                       </div>
 
                       {/* Row 5: Call + Navigate secondary actions */}
@@ -743,11 +777,13 @@ export function MedicationDetailView() {
             </div>
 
             {orderingPharmacy?.needsPrescription && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3 flex items-start gap-2">
-                <FileText className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-xs font-semibold text-amber-800">Ordonnance requise</p>
-                  <p className="text-[11px] text-amber-700 mt-0.5">Ce médicament nécessite une ordonnance. Présentez-vous à la pharmacie avec votre ordonnance.</p>
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-600 rounded-xl p-4 mb-4 flex items-start gap-3 shadow-md">
+                <div className="flex-shrink-0 bg-amber-600 rounded-full p-2.5 shadow-sm">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-amber-900 mb-1">📋 Ordonnance obligatoire</p>
+                  <p className="text-xs text-amber-800 leading-relaxed font-medium">Ce médicament nécessite une ordonnance médicale valide. Présentez-vous à la pharmacie avec votre ordonnance.</p>
                 </div>
               </div>
             )}

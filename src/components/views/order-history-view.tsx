@@ -342,16 +342,7 @@ export function OrderHistoryView() {
                   {orders.length}
                 </Badge>
               )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleScanQR}
-                disabled={scanningQR}
-                className="h-8 px-2 sm:px-3 text-xs border-green-200 text-green-700 hover:bg-green-50 dark:border-green-900/50 dark:text-green-200"
-              >
-                <Scan className="h-3.5 w-3.5 sm:mr-1.5" />
-                <span className="hidden sm:inline">Scanner QR</span>
-              </Button>
+              
             </div>
           }
         />

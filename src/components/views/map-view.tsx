@@ -368,14 +368,14 @@ export function MapView() {
         )}
 
         {/* Advanced Filters Panel */}
-        <div className="mb-3 space-y-2 rounded-xl border border-amber-100 bg-white p-3 dark:border-amber-900/50 dark:bg-gray-950/80">
+        <div className="mb-3 space-y-2 rounded-xl border border-amber-100 bg-white p-3 dark:border-amber-900/50 dark:bg-gray-950/80 relative z-[1001]">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs text-muted-foreground mb-1.5 block">Ville</label>
               <CityFilter
                 value={selectedCity}
                 onChange={(value) => {
-                  setSelectedCity(value);
+                  setSelectedCity(value === '__all__' ? '' : value);
                   setSelectedCommune(''); // Reset commune when city changes
                   fetchPharmacies(filter);
                 }}

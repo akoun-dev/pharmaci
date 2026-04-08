@@ -109,7 +109,7 @@ interface PharmaciesResponse {
 const PAGE_SIZE = 20;
 
 const CITIES = [
-  { value: '__all__', label: 'Toutes les villes' },
+  { value: '', label: 'Toutes les villes' },
   { value: 'Abidjan', label: 'Abidjan' },
   { value: 'Bouaké', label: 'Bouaké' },
   { value: 'San Pédro', label: 'San Pédro' },
@@ -120,7 +120,7 @@ const CITIES = [
 ];
 
 const GUARD_FILTERS = [
-  { value: '__all__', label: 'Tous' },
+  { value: '', label: 'Tous' },
   { value: 'true', label: 'En garde' },
   { value: 'false', label: 'Pas en garde' },
 ];

@@ -17,8 +17,6 @@ export { Haptics } from './haptics';
 export { ActionSheet } from './action-sheet';
 export { App } from './app';
 export { StatusBar } from './status-bar';
-export { PushNotifications } from './push-notifications';
-export { Cookies } from './cookies';
 
 // Vérification de la plateforme
 export const isNative = Capacitor.isNativePlatform();

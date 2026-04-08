@@ -144,7 +144,7 @@ interface CityFilterProps {
 export function CityFilter({ value, onChange, className }: CityFilterProps) {
   return (
     <div className={className}>
-      <Select value={value || '__all__'} onValueChange={(v) => onChange(v === '__all__' ? '' : v)}>
+      <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="h-10 text-sm border-amber-200 focus:border-amber-400">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <MapPin className="h-4 w-4 text-amber-600 flex-shrink-0" />
