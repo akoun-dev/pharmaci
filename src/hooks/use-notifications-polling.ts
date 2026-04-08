@@ -37,7 +37,15 @@ async function fetchNotifications(role?: string | null): Promise<NotificationDat
       : '/api/notifications?limit=50';
 
     const response = await fetch(endpoint);
-    if (!response.ok) return null;
+
+    // Ne pas logger les erreurs 401 (utilisateur non connecté)
+    if (response.status === 401) {
+      return null;
+    }
+
+    if (!response.ok) {
+      return null;
+    }
 
     const data = await response.json();
     const count = data.unreadCount || 0;
