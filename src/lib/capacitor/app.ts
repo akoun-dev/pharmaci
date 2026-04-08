@@ -19,16 +19,15 @@ export const isAppAvailable = (): boolean => {
 export const getAppInfo = async () => {
   if (!isAppAvailable()) {
     return {
-      name: 'Pharma CI',
       id: 'ci.pharmaci.app',
+      name: 'Pharma CI',
       build: 'web',
       version: '1.0.0',
     };
   }
 
   try {
-    const info = await CapacitorApp.getInfo();
-    return info;
+    return await CapacitorApp.getInfo();
   } catch (error) {
     console.warn('App info error:', error);
     return null;
@@ -38,12 +37,12 @@ export const getAppInfo = async () => {
 /**
  * Récupère l'URL de l'application
  */
-export const getAppLaunchUrl = async (): Promise<string | null> => {
+export const getLaunchUrl = async (): Promise<string | null> => {
   if (!isAppAvailable()) return null;
 
   try {
-    const { url } = await CapacitorApp.getLaunchUrl();
-    return url;
+    const result = await CapacitorApp.getLaunchUrl();
+    return result?.url ?? null;
   } catch (error) {
     console.warn('App launch url error:', error);
     return null;
@@ -51,30 +50,17 @@ export const getAppLaunchUrl = async (): Promise<string | null> => {
 };
 
 /**
- * Écouteur d'état de l'application
+ * Récupère l'état de l'application
  */
-export const addAppStateListener = (callback: (state: { isActive: boolean }) => void) => {
-  if (!isAppAvailable()) return { remove: () => {} };
+export const getState = async () => {
+  if (!isAppAvailable()) return { isActive: true };
 
-  return CapacitorApp.addListener('appStateChange', callback);
-};
-
-/**
- * Écouteur d'URL de lancement (deep link)
- */
-export const addAppUrlOpenListener = (callback: (data: { url: string }) => void) => {
-  if (!isAppAvailable()) return { remove: () => {} };
-
-  return CapacitorApp.addListener('appUrlOpen', callback);
-};
-
-/**
- * Écouteur de bouton retour (Android)
- */
-export const addBackButtonListener = (callback: (data: { canGoBack?: boolean }) => void) => {
-  if (!isAppAvailable()) return { remove: () => {} };
-
-  return CapacitorApp.addListener('backButton', callback);
+  try {
+    return await CapacitorApp.getState();
+  } catch (error) {
+    console.warn('App state error:', error);
+    return { isActive: true };
+  }
 };
 
 /**
@@ -91,10 +77,14 @@ export const minimizeApp = async (): Promise<void> => {
 };
 
 /**
- * Quitte l'application (si supporté)
+ * Quitte l'application (Android only, via back button)
+ * Note: iOS ne permet pas de quitter programmatiquement
  */
 export const exitApp = async (): Promise<void> => {
-  if (!isAppAvailable()) return;
+  if (!isAppAvailable()) {
+    console.warn('ExitApp not available on web');
+    return;
+  }
 
   try {
     await CapacitorApp.exitApp();
@@ -104,18 +94,38 @@ export const exitApp = async (): Promise<void> => {
 };
 
 /**
- * Raccourcis pour les événements
+ * Ajoute un écouteur pour le bouton retour (Android)
+ * @param event - Nom de l'événement ('backButton')
+ * @param callback - Fonction de rappel
  */
-export const AppEvents = {
-  onStateChange: addAppStateListener,
-  onUrlOpen: addAppUrlOpenListener,
-  onBackButton: addBackButtonListener,
+export const addListener = async (
+  event: 'backButton' | 'appStateChange' | 'appUrlOpen' | 'restoredResult' | 'activityResults' | 'onLoadActivityList' | 'onLoadIntent',
+  callback: (data: any) => void
+) => {
+  if (!isAppAvailable()) {
+    // Retourner un objet vide avec une fonction remove vide pour la compatibilité
+    return Promise.resolve({ remove: () => {} });
+  }
+
+  try {
+    // CapacitorApp.addListener has different signatures for different events
+    // We need to use type assertion for compatibility
+    const result = await (CapacitorApp.addListener as any)(event, callback);
+    return result;
+  } catch (error) {
+    console.error(`Add listener error for ${event}:`, error);
+    return { remove: () => {} };
+  }
 };
 
+/**
+ * Export de l'API
+ */
 export const App = {
   getInfo: getAppInfo,
-  getLaunchUrl: getAppLaunchUrl,
+  getLaunchUrl,
+  getState,
   minimize: minimizeApp,
   exit: exitApp,
-  ...AppEvents,
+  addListener,
 };

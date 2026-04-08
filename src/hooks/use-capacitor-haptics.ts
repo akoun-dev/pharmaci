@@ -3,7 +3,8 @@
  */
 
 import { useCallback } from 'react';
-import { Haptics as CapacitorHaptics, isHapticsAvailable } from '@/lib/capacitor';
+import { Haptics as CapacitorHaptics } from '@/lib/capacitor';
+import { isHapticsAvailable } from '@/lib/capacitor/haptics';
 
 /**
  * Hook pour utiliser les feedbacks vibreurs

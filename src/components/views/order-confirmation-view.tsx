@@ -179,7 +179,7 @@ export function OrderConfirmationView() {
   };
 
   const qrValue = order?.verificationCode
-    ? `PHARMAPP-${order.id}-${order.verificationCode}`
+    ? `PHARMACI-${order.id}-${order.verificationCode}`
     : '';
 
   const handleDownloadQR = () => {
@@ -203,7 +203,7 @@ export function OrderConfirmationView() {
         ctx.drawImage(img, 0, 0);
         const pngUrl = canvas.toDataURL('image/png');
         const link = document.createElement('a');
-        link.download = `pharmapp-${order?.verificationCode || 'qr'}.png`;
+        link.download = `pharmaci-${order?.verificationCode || 'qr'}.png`;
         link.href = pngUrl;
         link.click();
         toast.success('QR Code téléchargé');

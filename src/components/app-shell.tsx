@@ -68,7 +68,8 @@ import { AdminMedicationsView } from '@/components/views/admin/admin-medications
 import { AdminReviewsView } from '@/components/views/admin/admin-reviews-view';
 import { AdminAnalyticsView } from '@/components/views/admin/admin-analytics-view';
 import { AdminSettingsView } from '@/components/views/admin/admin-settings-view';
-import { StatusBar, App as CapacitorApp } from '@/lib/capacitor';
+import { StatusBar, App } from '@/lib/capacitor';
+import { exitApp, addListener as addAppListener } from '@/lib/capacitor/app';
 
 type PatientTabKey = 'home' | 'search' | 'map' | 'favorites' | 'order-history' | 'notifications' | 'profile';
 type PharmacistTabKey = 'ph-dashboard' | 'ph-stock-list' | 'ph-orders' | 'ph-notifications' | 'ph-profile';
@@ -598,7 +599,7 @@ export function AppShell() {
   // Handle Android back button
   useEffect(() => {
     const setupBackButton = async () => {
-      const listener = await CapacitorApp.addListener('backButton', async ({ canGoBack }) => {
+      const listener = await addAppListener('backButton', async ({ canGoBack }) => {
         const { Haptics } = await import('@/lib/capacitor');
         Haptics.light();
 
@@ -620,7 +621,7 @@ export function AppShell() {
           if (action === 0) {
             // User confirmed exit
             Haptics.medium();
-            await CapacitorApp.exitApp();
+            await exitApp();
           }
         }
       });

@@ -35,7 +35,7 @@ npm run dev
 
 | Rôle | Email | Mot de passe |
 |------|-------|--------------|
-| Admin | `admin@pharmapp.ci` | `demo1234` |
+| Admin | `admin@pharmaci.ci` | `demo1234` |
 | Pharmacien | `konan@pharmacie.ci` | `demo1234` |
 | Patient | `koffi@example.com` | `demo1234` |
 

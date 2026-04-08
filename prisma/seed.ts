@@ -615,7 +615,7 @@ async function seed() {
     db.user.create({ data: { name: "Aïcha Diallo", email: "aicha@example.com", phone: "+225 05 06 07 08 09", password: hashedPassword, role: "patient", city: "Bouaké", authProvider: "email" } }),
     db.user.create({ data: { name: "Dr. Konan", email: "konan@pharmacie.ci", phone: "+225 01 02 03 04 05", password: hashedPassword, role: "pharmacist", city: "Abidjan", authProvider: "email", notificationPreferences: '{"orders":true,"stock":true,"reviews":false,"messages":true}' } }),
     db.user.create({ data: { name: "Yaya Touré", email: "yaya@example.com", phone: "+225 07 65 43 21 09", password: hashedPassword, role: "patient", city: "Abidjan", authProvider: "email" } }),
-    db.user.create({ data: { name: "Admin Pharma", email: "admin@pharmapp.ci", phone: "+225 01 00 00 00 00", password: hashedPassword, role: "admin", city: "Abidjan", authProvider: "email" } }),
+    db.user.create({ data: { name: "Admin Pharma", email: "admin@pharmaci.ci", phone: "+225 01 00 00 00 00", password: hashedPassword, role: "admin", city: "Abidjan", authProvider: "email" } }),
   ]);
 
   // Seed pharmacies
@@ -834,7 +834,7 @@ async function seed() {
   console.log(`  Pharmacies: ${pharmacies.length}`);
   console.log(`  Medications: ${medications.length}`);
   console.log(`  Pharmacist: konan@pharmacie.ci → Pharmacie de la Paix`);
-  console.log(`  Admin: admin@pharmapp.ci → Password: demo1234`);
+  console.log(`  Admin: admin@pharmaci.ci → Password: demo1234`);
   console.log(`  Default password: demo1234`);
 
   // Add review replies for pharmacist's pharmacy

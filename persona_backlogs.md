@@ -396,7 +396,7 @@ médicaments et de pharmacies en Côte d'Ivoire.
 
 | Rôle           | Email                    | Mot de passe |
 |----------------|--------------------------|--------------|
-| Admin          | admin@pharmapp.ci        | demo1234     |
+| Admin          | admin@pharmaci.ci        | demo1234     |
 | Pharmacien     | konan@pharmacie.ci       | demo1234     |
 | Patient 1      | koffi.yao@example.com    | demo1234     |
 | Patient 2      | aicha.kone@example.com   | demo1234     |

@@ -3,7 +3,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { LocalNotifications as CapacitorNotifications, NotificationOptions } from '@/lib/capacitor';
+import { LocalNotifications as CapacitorNotifications } from '@/lib/capacitor';
+import type { NotificationOptions } from '@/lib/capacitor/local-notifications';
 import type { LocalNotificationSchema } from '@capacitor/local-notifications';
 import { toast } from 'sonner';
 

@@ -3,7 +3,8 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Camera as CapacitorCamera, CameraOptions } from '@/lib/capacitor';
+import { Camera as CapacitorCamera } from '@/lib/capacitor';
+import type { CameraOptions } from '@/lib/capacitor/camera';
 import { toast } from 'sonner';
 
 /**

@@ -16,8 +16,8 @@ function getJwtSecret(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-const COOKIE_NAME = 'pharmapp-session';
-const CSRF_COOKIE_NAME = 'pharmapp-csrf-token';
+const COOKIE_NAME = 'pharmaci-session';
+const CSRF_COOKIE_NAME = 'pharmaci-csrf-token';
 
 export interface JwtPayload {
   userId: string;

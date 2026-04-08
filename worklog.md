@@ -1,7 +1,7 @@
 ---
 Task ID: 3
 Agent: full-stack-developer
-Task: Build complete PharmApp CI application
+Task: Build complete Pharmaci CI application
 
 Work Log:
 - Updated globals.css with emerald green health theme (oklch color space)
@@ -39,7 +39,7 @@ Stage Summary:
 ---
 ## Task ID: r1-r4 - responsive-fix
 ### Work Task
-Fix ALL responsiveness issues in PharmApp CI, including medication detail view overflow, bottom nav safe area, home view sizing, and search view layout issues.
+Fix ALL responsiveness issues in Pharmaci CI, including medication detail view overflow, bottom nav safe area, home view sizing, and search view layout issues.
 
 ### Work Summary
 
@@ -144,7 +144,7 @@ Stage Summary:
 ---
 ## Task ID: responsive-fix-v2 - responsive-agent
 ### Work Task
-Fix ALL responsive issues across the PharmApp CI mobile-first app. The user reports "la responsivité n'est pas bonne" (responsiveness is not good).
+Fix ALL responsive issues across the Pharmaci CI mobile-first app. The user reports "la responsivité n'est pas bonne" (responsiveness is not good).
 
 ### Work Summary
 
@@ -255,7 +255,7 @@ All changes pass `npm run lint` with zero errors. Zero `max-w-lg mx-auto` remain
 ---
 ## Task ID: auth-system - auth-agent
 ### Work Task
-Implement a COMPLETE authentication system for PharmApp CI. The user MUST be logged in to access the app.
+Implement a COMPLETE authentication system for Pharmaci CI. The user MUST be logged in to access the app.
 
 ### Work Summary
 
@@ -264,12 +264,12 @@ Implement a COMPLETE authentication system for PharmApp CI. The user MUST be log
 1. **`src/lib/auth.ts`** — JWT Auth Utility (rewritten using `jose` instead of `jsonwebtoken`):
    - `signToken(payload)` — Signs JWT with HS256, 7-day expiry using `jose.SignJWT`
    - `verifyToken(token)` — Verifies JWT using `jose.jwtVerify`, returns `JwtPayload | null`
-   - `getSessionFromCookie(request)` — Reads `pharmapp-session` cookie from Request headers
+   - `getSessionFromCookie(request)` — Reads `pharmaci-session` cookie from Request headers
    - `createSessionCookie(token)` — Returns Set-Cookie header string with httpOnly, SameSite=lax, MaxAge=7d
    - `deleteSessionCookie()` — Returns Set-Cookie header to clear session
    - `hashPassword(password)` — bcryptjs hash with salt 10
    - `verifyPassword(password, hash)` — bcryptjs compare
-   - Cookie name: `pharmapp-session`
+   - Cookie name: `pharmaci-session`
    - JWT payload: `{ userId, email, role, provider }`
 
 2. **`src/app/api/auth/register/route.ts`** (POST) — User registration:
@@ -288,7 +288,7 @@ Implement a COMPLETE authentication system for PharmApp CI. The user MUST be log
    - Returns user object + token + session cookie
 
 5. **`src/app/api/auth/logout/route.ts`** (POST) — Logout:
-   - Clears `pharmapp-session` cookie via Set-Cookie header
+   - Clears `pharmaci-session` cookie via Set-Cookie header
 
 6. **`src/app/api/auth/me/route.ts`** (GET) — Current user session:
    - Reads session cookie, verifies JWT, fetches user from DB
@@ -299,7 +299,7 @@ Implement a COMPLETE authentication system for PharmApp CI. The user MUST be log
 
 8. **`src/components/auth/auth-screen.tsx`** — Full auth screen component:
    - Beautiful mobile-first design with emerald gradient header
-   - App logo "PharmApp CI" with "Côte d'Ivoire" subtitle
+   - App logo "Pharmaci CI" with "Côte d'Ivoire" subtitle
    - Two animated tabs: "Connexion" | "Inscription"
    - Login tab with 3 method selectors (Email, Téléphone, Google)
    - Email login: email + password fields with show/hide toggle + "Se connecter" button
@@ -348,7 +348,7 @@ Implement a COMPLETE authentication system for PharmApp CI. The user MUST be log
 
 #### Authentication Flow:
 1. App loads → `AppShell` calls `/api/auth/me` → 401 → shows `<AuthScreen />`
-2. User logs in (email/password) → API sets `pharmapp-session` cookie → `setCurrentUser()` in store
+2. User logs in (email/password) → API sets `pharmaci-session` cookie → `setCurrentUser()` in store
 3. App re-renders → `isAuthenticated=true` → shows `<ViewRenderer />` + nav
 4. On page refresh → cookie persists → `/api/auth/me` returns user → auto-login
 5. Logout → clears cookie + store → back to auth screen
@@ -715,7 +715,7 @@ Fix dashboard API/view data mismatch bug, create missing medications stocks API 
 
 4. **`src/components/views/admin/admin-settings-view.tsx`** (286 lines) — New admin settings view:
    - **Header**: Violet gradient banner with Settings icon and "Paramètres" title
-   - **App info section**: Card with app name (PharmApp CI), version (v1.0.0), environment (Production), region (Côte d'Ivoire)
+   - **App info section**: Card with app name (Pharmaci CI), version (v1.0.0), environment (Production), region (Côte d'Ivoire)
    - **Database stats section**: Fetches real stats from `/api/admin/dashboard` API, displays 4 stat blocks (users, pharmacies, medications, orders) in a 2×2/4×1 responsive grid with violet theme
    - **Admin account section**: Card showing admin name, email, phone from store currentUser, with Shield badge
    - **Danger zone**: Red-themed card with AlertDialog confirmation for "Réinitialiser les données" button (UI only, shows toast on confirm)
@@ -1010,7 +1010,7 @@ Replace the stub ph-promotions-view.tsx with a full implementation featuring pro
    - Form fields: Nom du médicament (Input), Pourcentage de réduction (number Input with % suffix), Date de début/fin (date Inputs in 2-col grid), Description (Textarea)
    - Validation: required medication, discount 1-100, valid date range (end > start)
    - "Créer la promotion" button with emerald-600 bg and loading spinner state
-   - On create: saves to localStorage `pharmapp-promotions`, shows success toast, refreshes list, collapses form
+   - On create: saves to localStorage `pharmaci-promotions`, shows success toast, refreshes list, collapses form
 
 3. **Section: Promotions actives** — Scrollable list (max-h-[500px]):
    - Loads from localStorage with demo fallback (Paracétamol 500mg -20%, Ibuprofène 400mg -15%)
@@ -1021,7 +1021,7 @@ Replace the stub ph-promotions-view.tsx with a full implementation featuring pro
    - Empty state: Package icon + "Créez votre première promotion ci-dessus !"
 
 4. **Section: Programme de fidélité**:
-   - Gradient card (emerald-600 → teal-600) with Award icon, "PharmApp Fidélité" title, description paragraph
+   - Gradient card (emerald-600 → teal-600) with Award icon, "Pharmaci Fidélité" title, description paragraph
    - 3 stats cards in grid-cols-3: Clients fidèles (156, emerald), Points distribués (12 500, amber), Récompenses échangées (23, blue)
    - Staggered scale animations on stat cards
 
@@ -1031,7 +1031,7 @@ Replace the stub ph-promotions-view.tsx with a full implementation featuring pro
 - shadcn/ui: Card, CardContent, Badge, Button, Input, Label, Textarea
 - Framer Motion: fadeInUp variants, AnimatePresence for form toggle and card list
 - Toast from sonner for create/delete feedback
-- localStorage key: `pharmapp-promotions`
+- localStorage key: `pharmaci-promotions`
 - `useState` lazy initializer for loading promotions (avoids useEffect + setState lint error)
 - `bun run lint` passes with zero errors
 
@@ -1155,7 +1155,7 @@ Rebuild the pharmacist profile view (ph-profile-view.tsx) from a stub placeholde
 ---
 ## Task ID: pharmacist-interface-main
 Agent: Main Coordinator
-Task: Build complete pharmacist interface for PharmApp CI
+Task: Build complete pharmacist interface for Pharmaci CI
 
 Work Log:
 - Updated Prisma schema: added linkedPharmacyId to User, StockHistory model, Notification model, Message model
@@ -1186,7 +1186,7 @@ Stage Summary:
 ---
 ## Task ID: apis-p2 - API Developer
 ### Work Task
-Create 8 new API routes for PharmApp CI: reports, promotions CRUD, review replies, password change, notification preferences, and export endpoints.
+Create 8 new API routes for Pharmaci CI: reports, promotions CRUD, review replies, password change, notification preferences, and export endpoints.
 
 ### Work Summary
 
@@ -1289,7 +1289,7 @@ Create 2 new pharmacist views: Reports & Analytics View (ph-reports-view.tsx) an
    - Each section has an icon, item count badge, and expandable Q&A cards
    - **Contact support section**: Card with gradient emerald-50 background
      - Phone: +225 01 02 03 04 05 (clickable tel: link)
-     - Email: support@pharmapp.ci (clickable mailto: link)
+     - Email: support@pharmaci.ci (clickable mailto: link)
      - "Envoyer un message" button → navigates to ph-messages view via setCurrentView
    - Empty search state with clear button
    - All text in French
@@ -1484,7 +1484,7 @@ Zero lint errors. Dev server compiles successfully.
 ---
 ## Task ID: 2a - middleware-agent
 ### Work Task
-Create Next.js middleware at `/home/z/my-project/src/middleware.ts` for JWT-based API route protection on the PharmApp CI application.
+Create Next.js middleware at `/home/z/my-project/src/middleware.ts` for JWT-based API route protection on the Pharmaci CI application.
 
 ### Work Summary
 
@@ -1493,7 +1493,7 @@ Create Next.js middleware at `/home/z/my-project/src/middleware.ts` for JWT-base
 
 #### Implementation Details:
 
-1. **JWT Verification**: Uses `jose.jwtVerify` (Edge-compatible) with the same secret as `src/lib/auth.ts`: `process.env.JWT_SECRET || 'pharmapp-ci-dev-secret-key-2025'`, encoded via `new TextEncoder().encode()`.
+1. **JWT Verification**: Uses `jose.jwtVerify` (Edge-compatible) with the same secret as `src/lib/auth.ts`: `process.env.JWT_SECRET || 'pharmaci-ci-dev-secret-key-2025'`, encoded via `new TextEncoder().encode()`.
 
 2. **Public Routes** (no auth required, passed through with `NextResponse.next()`):
    - `GET /api` — health check
@@ -1536,7 +1536,7 @@ Create Next.js middleware at `/home/z/my-project/src/middleware.ts` for JWT-base
 ---
 ## Task ID: 1a - auth-redesign
 ### Work Task
-Redesign the auth screen for PharmApp CI to support both Patient and Pharmacist registration with role selection, multi-step pharmacist registration form, and pharmacist login.
+Redesign the auth screen for Pharmaci CI to support both Patient and Pharmacist registration with role selection, multi-step pharmacist registration form, and pharmacist login.
 
 ### Work Summary
 
@@ -1684,7 +1684,7 @@ Add Promotion Editing + Real Loyalty Program: PUT API for promotions, edit dialo
    - Removed hardcoded stats (156 clients, 12 500 pts, 23 rewards)
    - Added "Bientôt disponible" amber badge next to section header
    - Made loyalty section collapsible using shadcn Collapsible (starts collapsed by default)
-   - Added Lock icon on the PharmApp Fidélité title to indicate coming-soon state
+   - Added Lock icon on the Pharmaci Fidélité title to indicate coming-soon state
    - Replaced hardcoded stats with informational note: "Les données seront disponibles après l'intégration complète"
    - Amber info banner with Lock icon explains the program is not yet available
    - Retained the emerald-teal gradient header and description text for future reference
@@ -1695,7 +1695,7 @@ All changes pass `npm run lint` with zero errors. App compiles successfully with
 ---
 ## Task ID: 3a
 ### Work Task
-Fix 4 critical UI bugs in PharmApp CI: Promotions icon, daily revenue toggle, order modal mobile, and notification mark-as-read.
+Fix 4 critical UI bugs in Pharmaci CI: Promotions icon, daily revenue toggle, order modal mobile, and notification mark-as-read.
 
 ### Work Summary
 
@@ -1747,7 +1747,7 @@ All changes pass `npm run lint` with zero errors. No regressions introduced.
 ---
 ## Task ID: 4b-delivery - delivery-developer
 ### Work Task
-Add delivery tracking and reservation features to PharmApp CI: delivery status in order detail, order type toggle, delivery status badges, and patient-side delivery info.
+Add delivery tracking and reservation features to Pharmaci CI: delivery status in order detail, order type toggle, delivery status badges, and patient-side delivery info.
 
 ### Work Summary
 
@@ -1961,7 +1961,7 @@ Agent: Main Agent (orchestrator)
 Task: Complete audit and implement all missing/partial features (35 items)
 
 Work Log:
-- Conducted comprehensive audit of entire PharmApp CI codebase
+- Conducted comprehensive audit of entire Pharmaci CI codebase
 - Identified 11 missing features, 17 partial implementations, 7 security issues
 - Implemented all items across 5 phases using parallel sub-agents
 
@@ -2105,7 +2105,7 @@ Stage Summary:
 - Patient side: QR code generated per order, displayed in confirmation + history, downloadable as PNG, copyable code
 - Pharmacist side: manual code input (primary), QR scanner via native BarcodeDetector (secondary), auto-verify on scan
 - 6-char verification codes: uppercase alphanumeric, no confusing chars (I/O/0/1), unique constraint in DB
-- QR payload format: `PHARMAPP-{orderId}-{code}` for reliable extraction
+- QR payload format: `PHARMACI-{orderId}-{code}` for reliable extraction
 - Verified orders show green ShieldCheck badge in pharmacist order list and detail
 - Already-verified codes return info message instead of error
 
@@ -2234,21 +2234,21 @@ Stage Summary:
 ---
 ## Task ID: admin-role-setup - setup-agent
 ### Work Task
-Update seed file and middleware to support the new admin role for PharmApp CI.
+Update seed file and middleware to support the new admin role for Pharmaci CI.
 
 ### Work Summary
 
 #### Files Modified:
 
 1. **`prisma/seed.ts`** — Added admin user to seed data:
-   - Added "Admin PharmApp" user as the 5th user (last in the array) with:
-     - Email: admin@pharmapp.ci
+   - Added "Admin Pharmaci" user as the 5th user (last in the array) with:
+     - Email: admin@pharmaci.ci
      - Phone: +225 01 00 00 00 00
      - Password: demo1234 (bcrypt hashed)
      - Role: "admin"
      - City: Abidjan
      - Auth provider: email
-   - Added console.log line showing admin credentials: `Admin: admin@pharmapp.ci → Password: demo1234`
+   - Added console.log line showing admin credentials: `Admin: admin@pharmaci.ci → Password: demo1234`
 
 2. **`src/middleware.ts`** — Added admin route protection:
    - Added `/api/admin/` route guard BEFORE the existing pharmacist check
@@ -2262,7 +2262,7 @@ Update seed file and middleware to support the new admin role for PharmApp CI.
 - Ran `npm run lint` — zero errors
 
 #### Admin Credentials:
-- admin@pharmapp.ci / demo1234
+- admin@pharmaci.ci / demo1234
 
 Zero lint errors. Database re-seeded with admin user.
 ---
@@ -2328,7 +2328,7 @@ Create the admin pharmacies management view at `src/components/views/admin/admin
 ---
 ## Task ID: admin-orders-view - frontend-developer
 ### Work Task
-Create the admin orders management view at `/home/z/my-project/src/components/views/admin/admin-orders-view.tsx` for PharmApp CI with violet/purple admin theme.
+Create the admin orders management view at `/home/z/my-project/src/components/views/admin/admin-orders-view.tsx` for Pharmaci CI with violet/purple admin theme.
 
 ### Work Summary
 
@@ -2417,7 +2417,7 @@ Create admin reviews management view at `/home/z/my-project/src/components/views
 
 ### Work Summary
 
-Created **`src/components/views/admin/admin-reviews-view.tsx`** — Complete admin reviews management view for PharmApp CI with violet/purple theme.
+Created **`src/components/views/admin/admin-reviews-view.tsx`** — Complete admin reviews management view for Pharmaci CI with violet/purple theme.
 
 #### Features Implemented:
 
@@ -2528,10 +2528,10 @@ Create the admin medications management view at `/home/z/my-project/src/componen
 ---
 Task ID: admin-panel
 Agent: Main Agent + 5 Sub-agents
-Task: Build complete admin interface for PharmApp CI with 360° platform view
+Task: Build complete admin interface for Pharmaci CI with 360° platform view
 
 Work Log:
-- Updated prisma/seed.ts: Added admin user (admin@pharmapp.ci / demo1234, role: "admin")
+- Updated prisma/seed.ts: Added admin user (admin@pharmaci.ci / demo1234, role: "admin")
 - Updated src/middleware.ts: Added /api/admin/ route protection (admin role check before pharmacist check)
 - Updated src/store/app-store.ts: Added 8 admin views to View type, admin role handling in goBack() and setCurrentUser()
 - Updated src/components/app-shell.tsx: Complete admin interface with violet/purple theme sidebar, mobile bottom nav, AdminViewRenderer
@@ -2564,7 +2564,7 @@ Stage Summary:
 - Violet/purple theme distinguishes admin from patient (emerald) and pharmacist (emerald)
 - 12 API endpoints with admin role protection
 - 7 frontend views with responsive design (mobile + desktop)
-- Admin credentials: admin@pharmapp.ci / demo1234
+- Admin credentials: admin@pharmaci.ci / demo1234
 - Zero lint errors, all APIs tested and working
 
 ---
@@ -2595,12 +2595,12 @@ Fix critical admin dashboard data mismatch, add missing API endpoint, create adm
 ### Verification
 - lint: zero errors
 - DB reseeded: 5 users, 10 pharmacies, 12 medications
-- Admin login: admin@pharmapp.ci / demo1234 — all API endpoints verified
+- Admin login: admin@pharmaci.ci / demo1234 — all API endpoints verified
 
 ---
 ## Task ID: bugfix-5-8 - bug-fix-agent
 ### Work Task
-Fix 4 critical bugs in PharmApp CI pharmacist interface: missing API routes (notifications settings, promotions), double res.json() in stock detail, incorrect status counters, and client-side-only filters.
+Fix 4 critical bugs in Pharmaci CI pharmacist interface: missing API routes (notifications settings, promotions), double res.json() in stock detail, incorrect status counters, and client-side-only filters.
 
 ### Work Summary
 
@@ -2644,7 +2644,7 @@ All changes pass `npm run lint` with zero errors (only pre-existing lint issues 
 ---
 ## Task ID: bugfix-15-16-17-18-24 - bugfix-agent
 ### Work Task
-Fix 5 medium bugs in PharmApp CI: Bug 15 (stats count), Bug 16 (notif persistence), Bug 17 (GPS race), Bug 18 (N+1 queries), Bug 24 (search debounce).
+Fix 5 medium bugs in Pharmaci CI: Bug 15 (stats count), Bug 16 (notif persistence), Bug 17 (GPS race), Bug 18 (N+1 queries), Bug 24 (search debounce).
 
 ### Work Summary
 
@@ -2653,7 +2653,7 @@ Fix 5 medium bugs in PharmApp CI: Bug 15 (stats count), Bug 16 (notif persistenc
 
 #### Bug 16 — Préférences notification patient non persistées
 **Status: Already fixed in codebase.** The `profile-view.tsx` already has:
-- `NOTIF_STORAGE_KEY = 'pharmapp-notif-prefs'` constant
+- `NOTIF_STORAGE_KEY = 'pharmaci-notif-prefs'` constant
 - `useState` initializer reading from `localStorage.getItem(NOTIF_STORAGE_KEY)`
 - `useEffect` persisting `notifSettings` to `localStorage` on every change
 No changes needed.
@@ -2677,7 +2677,7 @@ All changes pass `npm run lint` with zero errors (only pre-existing errors in da
 ---
 ## Task ID: admin-settings-reviews - fullstack-developer
 ### Work Task
-Improve Admin Settings (password change) and Admin Reviews (global distribution fix + reply feature) in PharmApp CI.
+Improve Admin Settings (password change) and Admin Reviews (global distribution fix + reply feature) in Pharmaci CI.
 
 ### Work Summary
 
@@ -2729,7 +2729,7 @@ All changes pass `npm run lint` with zero new errors. Dev server running cleanly
 ---
 ## Task ID: cart-views - frontend-developer
 ### Work Task
-Create two cart system view components: CartView (cart-view.tsx) and CartCheckoutView (cart-checkout-view.tsx) for the PharmApp CI pharmacy application.
+Create two cart system view components: CartView (cart-view.tsx) and CartCheckoutView (cart-checkout-view.tsx) for the Pharmaci CI pharmacy application.
 
 ### Work Summary
 

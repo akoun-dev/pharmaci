@@ -7,8 +7,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const COOKIE_NAME = 'pharmapp-session';
-const CSRF_COOKIE_NAME = 'pharmapp-csrf-token';
+const COOKIE_NAME = 'pharmaci-session';
+const CSRF_COOKIE_NAME = 'pharmaci-csrf-token';
 
 function getJwtSecret(): Uint8Array {
   const secret = process.env.JWT_SECRET;

@@ -76,7 +76,7 @@ Application mobile de recherche de pharmacies et médicaments en Côte d'Ivoire.
 
 **Action avec Pharma CI** :
 1. Il ajoute les 3 médicaments dans son panier
-2. Il valide sa commande et reçoit un code de vérification : `PHARMAPP-ABC123`
+* [ ] 2. Il valide sa commande et reçoit un code de vérification : `PHARMACI-ABC123`
 3. Il se présente à la pharmacie sur son chemin du travail
 4. Il montre son code QR, le pharmaciste scanne et lui remet les médicaments
 5. Temps total : 3 minutes
@@ -191,7 +191,7 @@ Application mobile de recherche de pharmacies et médicaments en Côte d'Ivoire.
 - D'autres clients s'impatientent
 
 **Avec Pharma CI** :
-- Le client montre son QR code ou donne son code : `PHARMAPP-XYZ789`
+- Le client montre son QR code ou donne son code : `PHARMACI-XYZ789`
 - Le pharmacien scanne ou tape le code
 - La commande apparaît instantanément avec tous les détails
 - Il remet les médicaments
@@ -333,17 +333,6 @@ Application mobile de recherche de pharmacies et médicaments en Côte d'Ivoire.
 
 ---
 
-## 📊 Statistiques Clés de la Plateforme
-
-| Métrique | Valeur |
-|----------|--------|
-| Utilisateurs actifs | 12 500+ |
-| Pharmacies inscrites | 450+ |
-| Médicaments référencés | 5 000+ |
-| Commandes mensuelles | 8 000+ |
-| Temps moyen de commande | 3 minutes |
-| Économie moyenne par utilisateur | 15 000 FCFA/an |
-| Pharmaciens utilisant la plateforme | 350+ |
 
 ---
 

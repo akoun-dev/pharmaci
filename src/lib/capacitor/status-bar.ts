@@ -128,7 +128,7 @@ export const applyAppStatusBarStyle = async (): Promise<void> => {
 export const addStatusBarListener = (callback: () => void) => {
   if (!isStatusBarAvailable()) return { remove: () => {} };
 
-  return CapacitorStatusBar.addListener('statusBarTap', callback);
+  return CapacitorStatusBar.addListener('statusBarTap' as any, callback);
 };
 
 /**

@@ -3,7 +3,7 @@
  * Documentation: https://capacitorjs.com/docs/apis/barcode-scanner
  */
 
-import { BarcodeScanner as CapacitorBarcodeScanner, ScanOption, ScanResult } from '@capacitor/barcode-scanner';
+import { CapacitorBarcodeScanner } from '@capacitor/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 
 /**
@@ -35,7 +35,6 @@ export type BarcodeFormat =
  * Options de scan
  */
 export interface ScanOptions {
-  formats?: BarcodeFormat[];
   text?: string;
 }
 
@@ -43,8 +42,8 @@ export interface ScanOptions {
  * Résultat du scan
  */
 export interface BarcodeScanResult {
-  format: BarcodeFormat;
-  content: string;
+  content?: string;
+  hasContent: boolean;
 }
 
 /**
@@ -56,8 +55,9 @@ export const checkPermissions = async (): Promise<{ camera: string }> => {
   }
 
   try {
-    const permissions = await CapacitorBarcodeScanner.checkPermissions();
-    return permissions;
+    // Le plugin BarcodeScanner n'a pas de méthode checkPermissions
+    // On assume que si le plugin est disponible, les permissions sont gérées automatiquement
+    return { camera: 'granted' };
   } catch (error) {
     console.error('Check barcode scanner permissions error:', error);
     return { camera: 'denied' };
@@ -73,51 +73,11 @@ export const requestPermissions = async (): Promise<{ camera: string }> => {
   }
 
   try {
-    const permissions = await CapacitorBarcodeScanner.requestPermissions();
-    return permissions;
+    // Le plugin BarcodeScanner gère les permissions automatiquement lors du scan
+    return { camera: 'granted' };
   } catch (error) {
     console.error('Request barcode scanner permissions error:', error);
     return { camera: 'denied' };
-  }
-};
-
-/**
- * Prépare l'interface de scan (arrière-plan de la caméra)
- * @param show - true pour afficher, false pour cacher
- */
-export const prepareScan = async (show: boolean): Promise<void> => {
-  if (!isBarcodeScannerAvailable()) {
-    console.warn('BarcodeScanner not available');
-    return;
-  }
-
-  try {
-    await CapacitorBarcodeScanner.prepare();
-    if (!show) {
-      await CapacitorBarcodeScanner.hideBackground();
-    } else {
-      await CapacitorBarcodeScanner.showBackground();
-    }
-  } catch (error) {
-    console.error('Prepare scan error:', error);
-    throw error;
-  }
-};
-
-/**
- * Arrête l'interface de scan
- */
-export const stopScan = async (): Promise<void> => {
-  if (!isBarcodeScannerAvailable()) {
-    console.warn('BarcodeScanner not available');
-    return;
-  }
-
-  try {
-    await CapacitorBarcodeScanner.stopScan();
-    await CapacitorBarcodeScanner.hideBackground();
-  } catch (error) {
-    console.error('Stop scan error:', error);
   }
 };
 
@@ -126,80 +86,36 @@ export const stopScan = async (): Promise<void> => {
  * @param options - Options de scan
  * @returns Le résultat du scan
  */
-export const scanBarcode = async (options: ScanOptions = {}): Promise<BarcodeScanResult> => {
+export const scan = async (options: ScanOptions = {}): Promise<BarcodeScanResult> => {
   if (!isBarcodeScannerAvailable()) {
     throw new Error('BarcodeScanner not available');
   }
 
   try {
-    // Préparer l'interface
-    await CapacitorBarcodeScanner.prepare();
-
-    // Configurer les options
-    const scanOptions: ScanOption = {
-      text: options.text ?? 'Placez le QR code dans le cadre',
-    };
-
-    // Démarrer le scan
-    const result: ScanResult = await CapacitorBarcodeScanner.startScan(scanOptions);
-
-    // Arrêter l'interface après le scan
-    await CapacitorBarcodeScanner.hideBackground();
+    const result = await CapacitorBarcodeScanner.scanBarcode({
+      hint: 17, // ALL_FORMATS - support both QR codes and barcodes
+      scanButton: false, // Pas de bouton de scan personnalisé
+      scanText: ' ', // Texte par défaut
+      scanInstructions: options.text ?? 'Placez le QR code dans le cadre',
+    });
 
     return {
-      format: result.format as BarcodeFormat,
-      content: result.content,
+      content: result.ScanResult || undefined,
+      hasContent: !!result.ScanResult,
     };
   } catch (error) {
     console.error('Scan barcode error:', error);
-    await CapacitorBarcodeScanner.hideBackground();
-    throw error;
-  }
-};
-
-/**
- * Scan un code avec retour d'arrière-plan personnalisé
- * @param callback - Fonction appelée quand un code est scanné
- * @param options - Options de scan
- */
-export const startScanWithCallback = async (
-  callback: (result: BarcodeScanResult) => void,
-  options: ScanOptions = {}
-): Promise<void> => {
-  if (!isBarcodeScannerAvailable()) {
-    throw new Error('BarcodeScanner not available');
-  }
-
-  try {
-    await CapacitorBarcodeScanner.prepare();
-
-    await CapacitorBarcodeScanner.startScan(
-      {
-        text: options.text ?? 'Placez le QR code dans le cadre',
-      },
-      (result) => {
-        callback({
-          format: result.format as BarcodeFormat,
-          content: result.content,
-        });
-        // Arrêter le scan après un résultat réussi
-        CapacitorBarcodeScanner.stopScan();
-        CapacitorBarcodeScanner.hideBackground();
-      }
-    );
-  } catch (error) {
-    console.error('Start scan with callback error:', error);
-    await CapacitorBarcodeScanner.hideBackground();
     throw error;
   }
 };
 
 /**
  * Vérifie si un code QR est valide pour l'application
- * Format attendu: PHARMAPP-{orderId}-{verificationCode}
+ * Format attendu: PHARMACI-{orderId}-{verificationCode}
  */
 export const isValidAppQRCode = (content: string): boolean => {
-  return /^PHARMAPP-[\w-]+-[A-Z0-9]+$/.test(content);
+  if (!content || typeof content !== 'string') return false;
+  return /^PHARMACI-[\w-]+-[A-Z0-9]+$/.test(content);
 };
 
 /**
@@ -208,7 +124,9 @@ export const isValidAppQRCode = (content: string): boolean => {
  * @returns orderId et verificationCode
  */
 export const parseOrderQRCode = (content: string): { orderId: string; verificationCode: string } | null => {
-  const match = content.match(/^PHARMAPP-([\w-]+)-([A-Z0-9]+)$/);
+  if (!content) return null;
+
+  const match = content.match(/^PHARMACI-([\w-]+)-([A-Z0-9]+)$/);
   if (!match) return null;
 
   return {
@@ -221,10 +139,7 @@ export const parseOrderQRCode = (content: string): { orderId: string; verificati
  * Export de l'API
  */
 export const BarcodeScanner = {
-  scan: scanBarcode,
-  scanWithCallback: startScanWithCallback,
-  prepare: prepareScan,
-  stop: stopScan,
+  scan,
   checkPermissions,
   requestPermissions,
   isValidAppQRCode,

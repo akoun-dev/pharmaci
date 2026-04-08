@@ -202,7 +202,7 @@ export function OrderHistoryView() {
         ctx.drawImage(img, 0, 0);
         const pngUrl = canvas.toDataURL('image/png');
         const link = document.createElement('a');
-        link.download = `pharmapp-${selectedOrder.verificationCode}.png`;
+        link.download = `pharmaci-${selectedOrder.verificationCode}.png`;
         link.href = pngUrl;
         link.click();
         toast.success('QR Code téléchargé');
@@ -264,7 +264,7 @@ export function OrderHistoryView() {
     Haptics.medium();
     const result = await scanQRCode({ text: 'Placez le QR code de votre commande dans le cadre' });
 
-    if (result) {
+    if (result && result.content) {
       // Vérifier si c'est un QR code de commande valide
       const orderData = parseQRCodeContent(result.content);
 
@@ -305,8 +305,8 @@ export function OrderHistoryView() {
   };
 
   const parseQRCodeContent = (content: string): { orderId: string } | null => {
-    // Format: PHARMAPP-{orderId}-{verificationCode}
-    const match = content.match(/^PHARMAPP-([\w-]+)-([A-Z0-9]+)$/);
+    // Format: PHARMACI-{orderId}-{verificationCode}
+    const match = content.match(/^PHARMACI-([\w-]+)-([A-Z0-9]+)$/);
     if (!match) return null;
 
     return {
@@ -315,7 +315,7 @@ export function OrderHistoryView() {
   };
 
   const qrValue = selectedOrder?.verificationCode
-    ? `PHARMAPP-${selectedOrder.id}-${selectedOrder.verificationCode}`
+    ? `PHARMACI-${selectedOrder.id}-${selectedOrder.verificationCode}`
     : '';
 
   if (loading) {

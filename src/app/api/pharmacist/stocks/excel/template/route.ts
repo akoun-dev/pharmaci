@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': 'attachment; filename="modele_import_pharmapp.xlsx"',
+        'Content-Disposition': 'attachment; filename="modele_import_pharmaci.xlsx"',
       },
     });
   } catch (error) {

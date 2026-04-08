@@ -86,7 +86,7 @@ export function ProfileView() {
   const [passwordSaving, setPasswordSaving] = useState(false);
 
   // Notification settings
-  const NOTIF_STORAGE_KEY = 'pharmapp-notif-prefs';
+  const NOTIF_STORAGE_KEY = 'pharmaci-notif-prefs';
   const defaultNotifSettings: NotificationSetting[] = [
     { id: 'order_updates', label: 'Mises à jour de commandes', description: 'Notifications pour les changements de statut', icon: ShoppingCart, enabled: true },
     { id: 'stock_alerts', label: 'Alertes stock', description: 'Quand un médicament recherché est disponible', icon: Bell, enabled: false },

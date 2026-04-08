@@ -170,7 +170,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
       // Persist preference
       try {
-        localStorage.setItem('pharmapp-dark-mode', JSON.stringify(newDarkMode));
+        localStorage.setItem('pharmaci-dark-mode', JSON.stringify(newDarkMode));
       } catch {
         // Ignore storage errors
       }
@@ -183,7 +183,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         document.documentElement.classList.toggle('dark', enabled);
       }
       try {
-        localStorage.setItem('pharmapp-dark-mode', JSON.stringify(enabled));
+        localStorage.setItem('pharmaci-dark-mode', JSON.stringify(enabled));
       } catch {
         // Ignore storage errors
       }
@@ -220,7 +220,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       // Restore dark mode preference from localStorage
       let darkMode = false;
       try {
-        const stored = localStorage.getItem('pharmapp-dark-mode');
+        const stored = localStorage.getItem('pharmaci-dark-mode');
         if (stored !== null) {
           darkMode = JSON.parse(stored);
         }

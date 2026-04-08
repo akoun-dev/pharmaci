@@ -3,7 +3,8 @@
  */
 
 import { useState, useCallback } from 'react';
-import { BarcodeScanner as CapacitorBarcodeScanner, BarcodeScanResult } from '@/lib/capacitor';
+import { BarcodeScanner as CapacitorBarcodeScanner } from '@/lib/capacitor';
+import type { BarcodeScanResult } from '@/lib/capacitor/barcode-scanner';
 import { toast } from 'sonner';
 
 /**
@@ -43,15 +44,6 @@ export function useCapacitorBarcode() {
     }
   }, []);
 
-  const stop = useCallback(async () => {
-    try {
-      await CapacitorBarcodeScanner.stop();
-      setScanning(false);
-    } catch (error) {
-      console.error('Stop scan error:', error);
-    }
-  }, []);
-
   const isValidOrderQR = useCallback((content: string) => {
     return CapacitorBarcodeScanner.isValidAppQRCode(content);
   }, []);
@@ -66,7 +58,6 @@ export function useCapacitorBarcode() {
     checkPermissions,
     requestPermissions,
     scan,
-    stop,
     isValidOrderQR,
     parseOrderQR,
   };

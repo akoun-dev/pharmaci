@@ -88,8 +88,8 @@ Le fichier `.env` est déjà configuré pour le développement. Voici les variab
 DATABASE_URL=file:/home/akoun-dev/Documents/PROJETS/AUTRES/Apps/pharmaci/prisma/db/custom.db
 
 # Authentification JWT
-JWT_SECRET=pharmapp-ci-dev-secret-key-2025
-CSRF_SECRET=pharmapp-ci-csrf-secret-key-2025
+JWT_SECRET=pharmaci-ci-dev-secret-key-2025
+CSRF_SECRET=pharmaci-ci-csrf-secret-key-2025
 
 # Environnement
 NODE_ENV=development
@@ -176,7 +176,7 @@ Utilisez les comptes de démonstration créés par les seeds :
 
 | Rôle | Email | Mot de passe |
 |------|-------|--------------|
-| **Admin** | `admin@pharmapp.ci` | `demo1234` |
+| **Admin** | `admin@pharmaci.ci` | `demo1234` |
 | **Pharmacien** | `konan@pharmacie.ci` | `demo1234` |
 | **Patient** | `koffi@example.com` | `demo1234` |
 
@@ -246,7 +246,7 @@ DATABASE_URL=file:/chemin/absolu/vers/projet/prisma/db/custom.db
 **Solution :** Ajoutez la variable manquante dans votre fichier `.env` :
 
 ```env
-CSRF_SECRET=pharmapp-ci-csrf-secret-key-2025
+CSRF_SECRET=pharmaci-ci-csrf-secret-key-2025
 ```
 
 ### Problème : Le port 3000 est déjà utilisé

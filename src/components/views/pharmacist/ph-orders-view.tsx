@@ -254,19 +254,9 @@ export function PharmacistOrdersView() {
     setCurrentView('ph-order-detail');
   };
 
-  // ── Scanner cleanup ──
+  // ── Scanner cleanup (no-op with Capacitor plugin) ──
   const cleanupScanner = useCallback(() => {
-    if (scanIntervalRef.current) {
-      clearInterval(scanIntervalRef.current);
-      scanIntervalRef.current = null;
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
+    // No-op - Capacitor BarcodeScanner handles cleanup internally
   }, []);
 
   useEffect(() => {
@@ -321,9 +311,9 @@ export function PharmacistOrdersView() {
         text: 'Placez le QR code de la commande dans le cadre'
       });
 
-      if (result) {
+      if (result && result.content) {
         const content = result.content;
-        const match = content.match(/PHARMAPP-[a-zA-Z0-9]+-([A-Z2-9]{6})$/);
+        const match = content.match(/PHARMACI-[a-zA-Z0-9]+-([A-Z2-9]{6})$/);
 
         if (match) {
           setScanMode(false);
@@ -751,32 +741,11 @@ export function PharmacistOrdersView() {
               </button>
             </div>
 
-            {/* Camera view */}
-            {scanMode && (
-              <div className="relative bg-black rounded-xl overflow-hidden aspect-[4/3]">
-                <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
-                {!streamRef.current && !scanError && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white/70 space-y-2">
-                    <Camera className="h-8 w-8" />
-                    <p className="text-xs">Démarrage de la caméra...</p>
-                  </div>
-                )}
-                {verifying && (
-                  <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
-                    <Loader2 className="h-8 w-8 text-white animate-spin" />
-                    <p className="text-xs text-white">Vérification en cours...</p>
-                  </div>
-                )}
-                {streamRef.current && !verifying && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-48 h-48 border-2 border-white/50 rounded-2xl">
-                      <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-amber-400 rounded-tl-xl -translate-x-[1px] -translate-y-[1px]" />
-                      <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-amber-400 rounded-tr-xl translate-x-[1px] -translate-y-[1px]" />
-                      <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-amber-400 rounded-bl-xl -translate-x-[1px] translate-y-[1px]" />
-                      <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-amber-400 rounded-br-xl translate-x-[1px] translate-y-[1px]" />
-                    </div>
-                  </div>
-                )}
+            {/* Camera scan loading/error state */}
+            {scanMode && scanningQR && (
+              <div className="flex flex-col items-center gap-3 py-6">
+                <Loader2 className="h-8 w-8 text-green-600 animate-spin" />
+                <p className="text-sm text-muted-foreground">Ouverture du scanner...</p>
               </div>
             )}
 
@@ -787,10 +756,10 @@ export function PharmacistOrdersView() {
               </div>
             )}
 
-            {scanMode && !scanError && streamRef.current && (
+            {scanMode && !scanError && !scanningQR && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground justify-center">
                 <Smartphone className="h-3.5 w-3.5" />
-                <span>Pointez la caméra vers le QR code du patient</span>
+                <span>Le scanner natif va s'ouvrir</span>
               </div>
             )}
 

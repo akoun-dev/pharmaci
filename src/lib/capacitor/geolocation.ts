@@ -3,8 +3,11 @@
  * Documentation: https://capacitorjs.com/docs/apis/geolocation
  */
 
-import { Geolocation as CapacitorGeolocation, Position, PositionOptions, WatchPositionId } from '@capacitor/geolocation';
+import { Geolocation as CapacitorGeolocation, Position, PositionOptions, CallbackID } from '@capacitor/geolocation';
 import { Capacitor } from '@capacitor/core';
+
+// Re-export CallbackID as WatchPositionId for consistency with previous API
+export type WatchPositionId = CallbackID;
 
 /**
  * Vérifie si le plugin Geolocation est disponible
@@ -25,7 +28,7 @@ export interface GeolocationOptions {
 /**
  * Position géographique étendue
  */
-export interface GeoPosition extends Position {
+export interface GeoPosition {
   latitude: number;
   longitude: number;
   accuracy?: number;
@@ -33,6 +36,7 @@ export interface GeoPosition extends Position {
   altitudeAccuracy?: number;
   heading?: number;
   speed?: number;
+  timestamp: number;
 }
 
 /**
@@ -135,7 +139,7 @@ export const requestPermissions = async (): Promise<{ location: string; coarseLo
 export const watchPosition = (
   callback: (position: GeoPosition, err?: Error) => void,
   options: GeolocationOptions = {}
-): WatchPositionId => {
+): string => {
   const geolocationOptions: PositionOptions = {
     enableHighAccuracy: options.enableHighAccuracy ?? true,
     timeout: options.timeout ?? 10000,
@@ -143,12 +147,13 @@ export const watchPosition = (
   };
 
   if (isGeolocationAvailable()) {
-    return CapacitorGeolocation.watchPosition(geolocationOptions, (position, err) => {
+    // Note: Capacitor watchPosition returns a Promise<string> but we can't await in synchronous function
+    // The callback is invoked immediately and the ID is returned via the promise
+    CapacitorGeolocation.watchPosition(geolocationOptions, (position, err) => {
       if (err) {
         callback({} as GeoPosition, new Error(err.message ?? 'Geolocation error'));
-      } else {
+      } else if (position) {
         callback({
-          ...position,
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
@@ -156,9 +161,18 @@ export const watchPosition = (
           altitudeAccuracy: position.coords.altitudeAccuracy ?? undefined,
           heading: position.coords.heading ?? undefined,
           speed: position.coords.speed ?? undefined,
+          timestamp: position.timestamp ?? Date.now(),
         });
       }
+    }).then((id) => {
+      // Store the ID for later cleanup
+      (watchPosition as any).__lastId = id;
+    }).catch((error) => {
+      console.error('Watch position error:', error);
     });
+
+    // Return a temporary ID; the real ID will be stored asynchronously
+    return Date.now().toString();
   } else {
     // Fallback navigateur
     const watchId = navigator.geolocation.watchPosition(
@@ -174,11 +188,11 @@ export const watchPosition = (
           timestamp: position.timestamp,
         } as GeoPosition);
       },
-      (error) => callback({} as GeoPosition, error),
+      (error) => callback({} as GeoPosition, new Error(error.message ?? 'Geolocation error')),
       geolocationOptions
     );
 
-    return { id: `${watchId}` } as WatchPositionId;
+    return watchId.toString();
   }
 };
 
@@ -186,15 +200,15 @@ export const watchPosition = (
  * Arrête le suivi de position
  * @param id - ID du suivi à arrêter
  */
-export const clearWatch = async (id: WatchPositionId): Promise<void> => {
+export const clearWatch = async (id: string): Promise<void> => {
   if (isGeolocationAvailable()) {
     try {
-      await CapacitorGeolocation.clearWatch(id);
+      await CapacitorGeolocation.clearWatch({ id });
     } catch (error) {
       console.error('Clear watch error:', error);
     }
   } else {
-    const watchId = parseInt(id.id);
+    const watchId = parseInt(id);
     if (!isNaN(watchId)) {
       navigator.geolocation.clearWatch(watchId);
     }

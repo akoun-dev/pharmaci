@@ -7,10 +7,22 @@ import {
   LocalNotifications as CapacitorLocalNotifications,
   LocalNotificationSchema,
   ScheduleOptions,
-  ActionTypeId,
-  ActionGroup,
 } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+
+/**
+ * Interface pour le groupe d'actions de notification
+ */
+interface ActionGroup {
+  id: string;
+  actions: Array<{
+    id: string;
+    title: string;
+    destructive?: boolean;
+    requiresAuthentication?: boolean;
+    foreground?: boolean;
+  }>;
+}
 
 /**
  * Vérifie si le plugin LocalNotifications est disponible
@@ -147,7 +159,13 @@ export const cancelAllNotifications = async (): Promise<void> => {
   }
 
   try {
-    await CapacitorLocalNotifications.cancelAll();
+    // Get all scheduled notifications and cancel them
+    const pending = await CapacitorLocalNotifications.getPending();
+    if (pending.notifications.length > 0) {
+      await CapacitorLocalNotifications.cancel({
+        notifications: pending.notifications.map(n => ({ id: n.id })),
+      });
+    }
   } catch (error) {
     console.error('Cancel all notifications error:', error);
   }
@@ -179,7 +197,7 @@ export const getDeliveredNotifications = async (): Promise<LocalNotificationSche
   }
 
   try {
-    const result = await CapacitorLocalNotifications.getDelivered();
+    const result = await CapacitorLocalNotifications.getDeliveredNotifications();
     return result.notifications ?? [];
   } catch (error) {
     console.error('Get delivered notifications error:', error);
@@ -215,25 +233,27 @@ export const createActionGroup = async (
     requiresAuthentication?: boolean;
     foreground?: boolean;
   }>
-): Promise<ActionTypeId | null> => {
+): Promise<string | null> => {
   if (!isLocalNotificationsAvailable()) {
     return null;
   }
 
   try {
-    const actionGroup: ActionGroup = {
-      id,
-      actions: actions.map(action => ({
-        id: action.id,
-        title: action.title,
-        destructive: action.destructive ?? false,
-        requiresAuthentication: action.requiresAuthentication ?? false,
-        foreground: action.foreground ?? false,
-      })),
-    };
-
-    await CapacitorLocalNotifications.createActionGroup(actionGroup);
-    return { id };
+    await CapacitorLocalNotifications.registerActionTypes({
+      types: [
+        {
+          id,
+          actions: actions.map(action => ({
+            id: action.id,
+            title: action.title,
+            destructive: action.destructive ?? false,
+            requiresAuthentication: action.requiresAuthentication ?? false,
+            foreground: action.foreground ?? false,
+          })),
+        },
+      ],
+    });
+    return id;
   } catch (error) {
     console.error('Create action group error:', error);
     return null;

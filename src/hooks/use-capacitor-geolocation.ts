@@ -3,9 +3,9 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Geolocation as CapacitorGeolocation, GeoPosition, GeolocationOptions } from '@/lib/capacitor';
+import { Geolocation as CapacitorGeolocation } from '@/lib/capacitor';
+import type { GeoPosition, GeolocationOptions } from '@/lib/capacitor/geolocation';
 import { toast } from 'sonner';
-import { WatchPositionId } from '@capacitor/geolocation';
 
 /**
  * Hook pour utiliser la géolocalisation
@@ -14,7 +14,7 @@ export function useCapacitorGeolocation() {
   const [loading, setLoading] = useState(false);
   const [position, setPosition] = useState<GeoPosition | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [watchId, setWatchId] = useState<WatchPositionId | null>(null);
+  const [watchId, setWatchId] = useState<string | null>(null);
 
   const checkPermissions = useCallback(async () => {
     const perms = await CapacitorGeolocation.checkPermissions();

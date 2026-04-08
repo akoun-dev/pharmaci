@@ -53,7 +53,7 @@ export const showActionSheet = async (options: ShowActionSheetOptions): Promise<
     const capacitorOptions: ActionSheetOptions = {
       title: options.title,
       message: options.message,
-      buttons: options.buttons.map(btn => ({
+      options: options.buttons.map(btn => ({
         title: btn.title,
         icon: btn.icon,
         style: btn.style ? buttonStyleMap[btn.style] : ActionSheetButtonStyle.Default,

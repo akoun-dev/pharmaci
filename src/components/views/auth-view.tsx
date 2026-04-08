@@ -59,7 +59,7 @@ export function AuthView() {
             setLoading(false);
             return;
           }
-          localStorage.setItem('pharmapp-token', data.token);
+          localStorage.setItem('pharmaci-token', data.token);
           setCurrentUser(data.user);
           return;
         }
@@ -125,7 +125,7 @@ export function AuthView() {
         return;
       }
 
-      localStorage.setItem('pharmapp-token', data.token);
+      localStorage.setItem('pharmaci-token', data.token);
       setCurrentUser(data.user);
     } catch {
       setError('Erreur de connexion au serveur');

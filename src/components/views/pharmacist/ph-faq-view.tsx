@@ -379,10 +379,10 @@ export function PharmacistFaqView() {
                 <div className="min-w-0">
                   <p className="text-xs text-muted-foreground">Email</p>
                   <a
-                    href="mailto:support@pharmapp.ci"
+                    href="mailto:support@pharmaci.ci"
                     className="text-sm font-medium text-orange-700 hover:text-orange-800"
                   >
-                    support@pharmapp.ci
+                    support@pharmaci.ci
                   </a>
                 </div>
               </div>

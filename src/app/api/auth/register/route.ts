@@ -197,7 +197,7 @@ export async function POST(request: Request) {
         data: {
           name: name.trim(),
           phone: normalizedPhone,
-          email: `phone-${normalizedPhone.replace(/[^0-9]/g, '')}@pharmapp.local`,
+          email: `phone-${normalizedPhone.replace(/[^0-9]/g, '')}@pharmaci.local`,
           authProvider: 'phone',
           role: 'patient',
           otpCode,
