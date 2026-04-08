@@ -1,7 +1,7 @@
 'use client';
 
 import { logger } from '@/lib/logger';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Geolocation as CapacitorGeolocation } from '@/lib/capacitor';
 import { isNative } from '@/lib/capacitor';
 
@@ -15,9 +15,18 @@ export type UserLocation = {
 
 export type LocationStatus = 'idle' | 'loading' | 'granted' | 'denied' | 'fallback';
 
-export function useUserLocation() {
+interface UseUserLocationOptions {
+  /** Request location automatically on mount */
+  autoRequest?: boolean;
+  /** Delay before auto-requesting (ms) */
+  delay?: number;
+}
+
+export function useUserLocation(options: UseUserLocationOptions = {}) {
+  const { autoRequest = false, delay = 1000 } = options;
   const [location, setLocation] = useState<UserLocation>({ lat: DEFAULT_LAT, lng: DEFAULT_LNG });
-  const [status, setStatus] = useState<LocationStatus>('fallback');
+  const [status, setStatus] = useState<LocationStatus>('idle');
+  const hasAutoRequested = useRef(false);
 
   const requestLocation = useCallback(async () => {
     setStatus('loading');
@@ -57,6 +66,18 @@ export function useUserLocation() {
       setStatus('denied');
     }
   }, []);
+
+  // Auto-request location on mount if enabled
+  useEffect(() => {
+    if (autoRequest && !hasAutoRequested.current) {
+      hasAutoRequested.current = true;
+      const timer = setTimeout(() => {
+        requestLocation();
+      }, delay);
+
+      return () => clearTimeout(timer);
+    }
+  }, [autoRequest, delay, requestLocation]);
 
   return { location, status, requestLocation };
 }

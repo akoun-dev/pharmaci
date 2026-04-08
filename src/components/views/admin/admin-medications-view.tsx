@@ -75,8 +75,6 @@ interface MedicationData {
   form: string;
   needsPrescription: boolean;
   description: string;
-  dosage: string;
-  sideEffects: string;
   createdAt: string;
   pharmacyCount: number;
   orderCount: number;
@@ -213,8 +211,6 @@ interface CreateForm {
   form: string;
   needsPrescription: boolean;
   description: string;
-  dosage: string;
-  sideEffects: string;
   pathology: string;
 }
 
@@ -226,8 +222,6 @@ const EMPTY_FORM: CreateForm = {
   form: '',
   needsPrescription: false,
   description: '',
-  dosage: '',
-  sideEffects: '',
   pathology: '',
 };
 
@@ -369,8 +363,6 @@ export function AdminMedicationsView() {
       form: selectedMed.form,
       needsPrescription: selectedMed.needsPrescription,
       description: selectedMed.description,
-      dosage: selectedMed.dosage,
-      sideEffects: selectedMed.sideEffects,
       pathology: selectedMed.pathology,
     });
     setIsEditing(true);
@@ -405,8 +397,6 @@ export function AdminMedicationsView() {
           form: editForm.form || undefined,
           needsPrescription: editForm.needsPrescription,
           description: editForm.description.trim() || undefined,
-          dosage: editForm.dosage.trim() || undefined,
-          sideEffects: editForm.sideEffects.trim() || undefined,
           pathology: editForm.pathology.trim() || undefined,
         }),
       });
@@ -426,8 +416,6 @@ export function AdminMedicationsView() {
         form: editForm.form,
         needsPrescription: editForm.needsPrescription,
         description: editForm.description.trim(),
-        dosage: editForm.dosage.trim(),
-        sideEffects: editForm.sideEffects.trim(),
         pathology: editForm.pathology.trim(),
       };
 
@@ -511,8 +499,6 @@ export function AdminMedicationsView() {
           form: createForm.form || undefined,
           needsPrescription: createForm.needsPrescription,
           description: createForm.description.trim() || undefined,
-          dosage: createForm.dosage.trim() || undefined,
-          sideEffects: createForm.sideEffects.trim() || undefined,
           pathology: createForm.pathology.trim() || undefined,
         }),
       });
@@ -982,30 +968,6 @@ export function AdminMedicationsView() {
                       rows={3}
                     />
                   </div>
-
-                  {/* Dosage */}
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-medium">Dosage</Label>
-                    <Input
-                      value={editForm.dosage}
-                      onChange={(e) => setEditForm((f) => ({ ...f, dosage: e.target.value }))}
-                      className="h-10 text-sm border-amber-200 focus:border-amber-400"
-                    />
-                  </div>
-
-                  {/* Side effects */}
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-medium flex items-center gap-1">
-                      <AlertTriangle className="h-3 w-3 text-amber-500" />
-                      Effets secondaires
-                    </Label>
-                    <Textarea
-                      value={editForm.sideEffects}
-                      onChange={(e) => setEditForm((f) => ({ ...f, sideEffects: e.target.value }))}
-                      className="text-sm border-amber-200 focus:border-amber-400 min-h-[60px]"
-                      rows={2}
-                    />
-                  </div>
                 </>
               ) : (
                 /* ── VIEW MODE ── */
@@ -1074,12 +1036,6 @@ export function AdminMedicationsView() {
                         </p>
                       </div>
                     )}
-                    {selectedMed.dosage && (
-                      <div>
-                        <p className="text-[11px] text-muted-foreground">Dosage</p>
-                        <p className="text-sm font-medium truncate">{selectedMed.dosage}</p>
-                      </div>
-                    )}
                   </div>
 
                   {/* Description */}
@@ -1088,19 +1044,6 @@ export function AdminMedicationsView() {
                       <p className="text-[11px] text-muted-foreground mb-1">Description</p>
                       <div className="bg-gray-50 rounded-lg p-3">
                         <p className="text-sm">{selectedMed.description}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Side effects */}
-                  {selectedMed.sideEffects && (
-                    <div>
-                      <p className="text-[11px] text-muted-foreground mb-1 flex items-center gap-1">
-                        <AlertTriangle className="h-3 w-3" />
-                        Effets secondaires
-                      </p>
-                      <div className="bg-amber-50 border border-amber-100 rounded-lg p-3">
-                        <p className="text-sm text-amber-900">{selectedMed.sideEffects}</p>
                       </div>
                     </div>
                   )}
@@ -1444,36 +1387,6 @@ export function AdminMedicationsView() {
                 }
                 className="text-sm border-amber-200 focus:border-amber-400 min-h-[80px]"
                 rows={3}
-              />
-            </div>
-
-            {/* Dosage */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Dosage</Label>
-              <Input
-                placeholder="Ex: 500mg, 3 fois/jour"
-                value={createForm.dosage}
-                onChange={(e) =>
-                  setCreateForm((f) => ({ ...f, dosage: e.target.value }))
-                }
-                className="h-10 text-sm border-amber-200 focus:border-amber-400"
-              />
-            </div>
-
-            {/* Side effects */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3 text-amber-500" />
-                Effets secondaires
-              </Label>
-              <Textarea
-                placeholder="Liste des effets secondaires..."
-                value={createForm.sideEffects}
-                onChange={(e) =>
-                  setCreateForm((f) => ({ ...f, sideEffects: e.target.value }))
-                }
-                className="text-sm border-amber-200 focus:border-amber-400 min-h-[60px]"
-                rows={2}
               />
             </div>
           </div>

@@ -16,9 +16,11 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PharmacyCard } from '@/components/pharmacy-card';
 import { ViewHeader } from '@/components/view-header';
+import { CityFilter, CommuneSelector } from '@/components/commune-selector';
 import { useAppStore } from '@/store/app-store';
 import { useUserLocation } from '@/hooks/use-user-location';
 import { openGoogleMaps, haversineDistance, formatDistance } from '@/lib/navigation';
+import { extractCityFromCommune } from '@/lib/communes';
 
 type MapFilter = 'all' | 'guard' | '24h';
 type SortMode = 'distance' | 'rating';
@@ -29,12 +31,13 @@ const MAP_HEIGHT = 300;
 
 export function MapView() {
   const { selectPharmacy, setCurrentView, currentUserId } = useAppStore();
-  const { location, status, requestLocation } = useUserLocation();
+  const { location, status, requestLocation } = useUserLocation({ autoRequest: true, delay: 1000 });
   const [pharmacies, setPharmacies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<MapFilter>('all');
   const [sortMode, setSortMode] = useState<SortMode>('distance');
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedCommune, setSelectedCommune] = useState('');
   const [mapReady, setMapReady] = useState(false);
   const [locating, setLocating] = useState(false);
   const [locateRequested, setLocateRequested] = useState(false);
@@ -53,6 +56,13 @@ export function MapView() {
       let url = `/api/pharmacies?limit=50${uidParam}`;
       if (f === 'guard') url += '&isGuard=true';
       if (f === '24h') url += '&is24h=true';
+      // Ajouter les filtres de ville et commune
+      const cityFilter = selectedCommune ? extractCityFromCommune(selectedCommune) : selectedCity;
+      if (cityFilter) url += `&city=${encodeURIComponent(cityFilter)}`;
+      if (selectedCommune) {
+        const communeName = selectedCommune.split(',')[0]?.trim();
+        if (communeName) url += `&district=${encodeURIComponent(communeName)}`;
+      }
       const res = await fetch(url);
       const data = await res.json();
       // L'API retourne { items: [...], pagination: {...} }
@@ -62,7 +72,7 @@ export function MapView() {
     } finally {
       setLoading(false);
     }
-  }, [currentUserId]);
+  }, [currentUserId, selectedCity, selectedCommune]);
 
   useEffect(() => {
     fetchPharmacies('all');
@@ -329,11 +339,63 @@ export function MapView() {
           {selectedCity && (
             <Badge
               className="ml-auto cursor-pointer self-center gap-1 bg-amber-100 text-xs text-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
-              onClick={() => setSelectedCity(null)}
+              onClick={() => {
+                setSelectedCity('');
+                setSelectedCommune('');
+              }}
             >
               {selectedCity} ✕
             </Badge>
           )}
+        </div>
+
+        {/* City and Commune Filters */}
+        {(selectedCity || selectedCommune) && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {selectedCommune && (
+              <Badge className="gap-1 bg-green-100 text-xs text-green-700 dark:bg-green-950/40 dark:text-green-200">
+                <MapPin className="h-3 w-3" />
+                {selectedCommune.split(',')[0]?.trim()}
+                <button
+                  onClick={() => setSelectedCommune('')}
+                  className="ml-1 hover:bg-green-200 rounded-full p-0.5"
+                >
+                  ✕
+                </button>
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* Advanced Filters Panel */}
+        <div className="mb-3 space-y-2 rounded-xl border border-amber-100 bg-white p-3 dark:border-amber-900/50 dark:bg-gray-950/80">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-muted-foreground mb-1.5 block">Ville</label>
+              <CityFilter
+                value={selectedCity}
+                onChange={(value) => {
+                  setSelectedCity(value);
+                  setSelectedCommune(''); // Reset commune when city changes
+                  fetchPharmacies(filter);
+                }}
+              />
+            </div>
+
+            {selectedCity && (
+              <div>
+                <label className="text-xs text-muted-foreground mb-1.5 block">Commune / Quartier</label>
+                <CommuneSelector
+                  value={selectedCommune}
+                  onChange={(value) => {
+                    setSelectedCommune(value);
+                    fetchPharmacies(filter);
+                  }}
+                  placeholder={`Sélectionner une commune à ${selectedCity}`}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Leaflet Map */}

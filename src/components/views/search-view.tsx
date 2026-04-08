@@ -11,9 +11,11 @@ import { SearchBar } from '@/components/search-bar';
 import { PharmacyCard } from '@/components/pharmacy-card';
 import { MedicationCard } from '@/components/medication-card';
 import { ViewHeader } from '@/components/view-header';
+import { CityFilter, CommuneSelector } from '@/components/commune-selector';
 import { useAppStore } from '@/store/app-store';
 import { useUserLocation } from '@/hooks/use-user-location';
 import { haversineDistance } from '@/lib/navigation';
+import { extractCityFromCommune } from '@/lib/communes';
 
 const CATEGORIES = [
   'Antalgique',
@@ -40,7 +42,7 @@ export function SearchView() {
     currentUserId,
   } = useAppStore();
 
-  const { location, status, requestLocation } = useUserLocation();
+  const { location, status, requestLocation } = useUserLocation({ autoRequest: true, delay: 1500 });
 
   const [tab, setTab] = useState<'medications' | 'pharmacies'>('medications');
   const [results, setResults] = useState<any[]>([]);
@@ -48,6 +50,7 @@ export function SearchView() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
+  const [selectedCommune, setSelectedCommune] = useState('');
   const [isGuardOnly, setIsGuardOnly] = useState(false);
   const [nearMe, setNearMe] = useState(false);
 
@@ -63,7 +66,14 @@ export function SearchView() {
       } else {
         const params = new URLSearchParams();
         if (searchQuery) params.set('q', searchQuery);
-        if (selectedCity) params.set('city', selectedCity);
+        // Utiliser la ville extraite de la commune sélectionnée ou la ville sélectionnée
+        const cityFilter = selectedCommune ? extractCityFromCommune(selectedCommune) : selectedCity;
+        if (cityFilter) params.set('city', cityFilter);
+        if (selectedCommune) {
+          // Ajouter le paramètre district pour un filtrage plus précis
+          const communeName = selectedCommune.split(',')[0]?.trim();
+          if (communeName) params.set('district', communeName);
+        }
         if (isGuardOnly) params.set('isGuard', 'true');
         if (currentUserId) params.set('userId', currentUserId);
         url = `/api/pharmacies?${params.toString()}`;
@@ -78,7 +88,7 @@ export function SearchView() {
     } finally {
       setLoading(false);
     }
-  }, [tab, searchQuery, selectedCategory, selectedCity, isGuardOnly, currentUserId]);
+  }, [tab, searchQuery, selectedCategory, selectedCity, selectedCommune, isGuardOnly, currentUserId]);
 
   useEffect(() => {
     const timer = setTimeout(fetchResults, 300);
@@ -98,11 +108,12 @@ export function SearchView() {
   const clearFilters = () => {
     setSelectedCategory('');
     setSelectedCity('');
+    setSelectedCommune('');
     setIsGuardOnly(false);
     setNearMe(false);
   };
 
-  const hasActiveFilters = selectedCategory || selectedCity || isGuardOnly || nearMe;
+  const hasActiveFilters = selectedCategory || selectedCity || selectedCommune || isGuardOnly || nearMe;
 
   // Sort pharmacies by distance when "near me" is active
   const displayResults = useMemo(() => {
@@ -292,25 +303,26 @@ export function SearchView() {
                   <>
                     <div>
                       <label className="text-xs text-muted-foreground mb-1.5 block">Ville</label>
-                      <div className="flex flex-wrap gap-1.5">
-                        {CITIES.map((city) => (
-                          <Badge
-                            key={city}
-                            variant={selectedCity === city ? 'default' : 'outline'}
-                            className={
-                              selectedCity === city
-                                ? 'cursor-pointer bg-green-600 text-white dark:bg-green-500 dark:text-green-950'
-                                : 'cursor-pointer border-amber-200 text-green-700 hover:bg-amber-50 dark:border-amber-900/50 dark:text-amber-300 dark:hover:bg-white/5'
-                            }
-                            onClick={() =>
-                              setSelectedCity(selectedCity === city ? '' : city)
-                            }
-                          >
-                            {city}
-                          </Badge>
-                        ))}
-                      </div>
+                      <CityFilter
+                        value={selectedCity}
+                        onChange={(value) => {
+                          setSelectedCity(value);
+                          setSelectedCommune(''); // Reset commune when city changes
+                        }}
+                      />
                     </div>
+
+                    {selectedCity && (
+                      <div>
+                        <label className="text-xs text-muted-foreground mb-1.5 block">Commune / Quartier</label>
+                        <CommuneSelector
+                          value={selectedCommune}
+                          onChange={setSelectedCommune}
+                          placeholder={`Sélectionner une commune à ${selectedCity}`}
+                        />
+                      </div>
+                    )}
+
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setIsGuardOnly(!isGuardOnly)}
@@ -340,10 +352,17 @@ export function SearchView() {
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedCategory('')} />
               </Badge>
             )}
-            {selectedCity && (
+            {selectedCity && !selectedCommune && (
               <Badge className="gap-1 bg-amber-100 text-xs text-green-700 dark:bg-amber-950/40 dark:text-amber-200">
                 {selectedCity}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedCity('')} />
+              </Badge>
+            )}
+            {selectedCommune && (
+              <Badge className="gap-1 bg-green-100 text-xs text-green-700 dark:bg-green-950/40 dark:text-green-200">
+                <MapPin className="h-3 w-3" />
+                {selectedCommune.split(',')[0]?.trim()}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedCommune('')} />
               </Badge>
             )}
             {isGuardOnly && (

@@ -7,12 +7,8 @@ import {
   Pill,
   FileText,
   MapPin,
-  ChevronDown,
-  ChevronUp,
-  AlertCircle,
   ShieldCheck,
   Clock,
-  Info,
   SlidersHorizontal,
   ArrowUpDown,
   ShoppingCart,
@@ -48,8 +44,6 @@ interface MedicationDetail {
   form?: string;
   needsPrescription: boolean;
   description?: string;
-  dosage?: string;
-  sideEffects?: string;
   genericAlternatives: Alternative[];
   availablePharmacies: AvailablePharmacy[];
 }
@@ -107,8 +101,6 @@ export function MedicationDetailView() {
 
   const [medication, setMedication] = useState<MedicationDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showDosage, setShowDosage] = useState(false);
-  const [showSideEffects, setShowSideEffects] = useState(false);
 
   // Filters & sort
   const [sortBy, setSortBy] = useState<SortMode>('distance');
@@ -353,52 +345,6 @@ export function MedicationDetailView() {
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {medication.description}
                 </p>
-              )}
-
-              {/* Dosage */}
-              {medication.dosage && (
-                <div>
-                  <button
-                    onClick={() => setShowDosage(!showDosage)}
-                    className="flex items-center justify-between w-full text-sm font-medium text-foreground"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Info className="h-4 w-4 text-amber-600" />
-                      Posologie
-                    </div>
-                    {showDosage ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-                  </button>
-                  <AnimatePresence>
-                    {showDosage && (
-                      <motion.p initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="text-sm text-muted-foreground mt-2 pl-6 overflow-hidden">
-                        {medication.dosage}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
-
-              {/* Side effects */}
-              {medication.sideEffects && (
-                <div>
-                  <button
-                    onClick={() => setShowSideEffects(!showSideEffects)}
-                    className="flex items-center justify-between w-full text-sm font-medium text-foreground"
-                  >
-                    <div className="flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-amber-600" />
-                      Effets secondaires
-                    </div>
-                    {showSideEffects ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-                  </button>
-                  <AnimatePresence>
-                    {showSideEffects && (
-                      <motion.p initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="text-sm text-muted-foreground mt-2 pl-6 overflow-hidden">
-                        {medication.sideEffects}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </div>
               )}
             </CardContent>
           </Card>
