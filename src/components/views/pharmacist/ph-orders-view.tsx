@@ -446,13 +446,6 @@ export function PharmacistOrdersView() {
                     Suivez les commandes actives, repérez celles à préparer et lancez la vérification client sans quitter votre page.
                   </p>
                 </div>
-                <Button
-                  onClick={openVerifyDialog}
-                  className="bg-green-600 hover:bg-green-700 text-white sm:min-w-[190px]"
-                >
-                  <ShieldCheck className="h-4 w-4 mr-2" />
-                  Vérifier un code
-                </Button>
               </div>
 
               <div className="grid grid-cols-3 gap-2 mt-4">

@@ -1,7 +1,7 @@
 {
 	"appId": "ci.pharmaci.app",
 	"appName": "Pharma CI",
-	"webDir": "public",
+	"webDir": ".next/standalone",
 	"server": {
 		"url": "http://62.84.185.143:3000/",
 		"cleartext": true
