@@ -5,7 +5,7 @@ const serverUrl = process.env.CAPACITOR_SERVER_URL?.trim() || "http://62.84.185.
 const config: CapacitorConfig = {
   appId: 'ci.pharmaci.app',
   appName: 'Pharma CI',
-  webDir: 'public',
+  webDir: '.next/standalone',
   server: serverUrl
     ? {
         url: serverUrl || "http://62.84.185.143:3000",
