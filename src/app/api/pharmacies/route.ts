@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { q, city, isGuard, is24h } = validatedParams.data;
+    const { q, city, district, isGuard, is24h } = validatedParams.data;
 
     // Validate pagination parameters
     const pagination = paginationSchema.safeParse({
@@ -46,6 +46,9 @@ export async function GET(request: NextRequest) {
     }
     if (city) {
       where.city = city;
+    }
+    if (district) {
+      where.district = district;
     }
     if (isGuard === 'true') {
       where.isGuard = true;

@@ -1,6 +1,6 @@
 /**
  * Données des communes et quartiers de Côte d'Ivoire
- * Utilisé pour la recherche et le filtrage des pharmacies
+ * Basé sur les districts des pharmacies dans la base de données
  */
 
 export interface Commune {
@@ -15,59 +15,243 @@ export interface CityWithCommunes {
 }
 
 /**
- * Liste des communes par ville
+ * Liste des communes par ville (districts tels que définis dans les seeds)
  */
 export const COMMUNES_BY_CITY: Record<string, string[]> = {
   'Abidjan': [
-    'Cocody',
-    'Yopougon',
-    'Plateau',
-    'Treichville',
-    'Marcory',
-    'Adjamé',
-    'Attecoubé',
     'Abobo',
+    'Adjamé',
+    'Angre',
+    'Attécoubé',
     'Bingerville',
-    'Songon',
+    'Cocody',
+    'Koumassi',
+    'Macoria',
+    'Marcory',
+    'Plateau',
+    'Port-Bouet',
     'Riviera',
-    'M'pouto',
-    'Zone 4',
-    'Zone 3',
+    'Riviera 3',
+    'Songon',
+    'Treichville',
+    'Yopougon',
   ],
   'Bouaké': [
-    'Centre ville',
-    'Zone industrielle',
+    'Centre-ville',
     'Kennedy',
     'Jean Gonal',
     'Ahougnansou',
-    'Broukro',
   ],
   'San Pedro': [
-    'Centre ville',
-    'Zone industrielle',
-    'Cité Sicogi',
-    'Grand-Béréby',
+    'Centre-ville',
   ],
   'Korhogo': [
-    'Centre ville',
-    'Kombolokoura',
-    'Sirimandjougou',
+    'Korhogo',
   ],
   'Yamoussoukro': [
-    'Centre ville',
-    'Cité administrative',
-    'Zone industrielle',
+    'Yamoussoukro',
   ],
   'Daloa': [
-    'Centre ville',
-    'Lobou',
-    'Gapia',
+    'Daloa',
   ],
   'Man': [
-    'Centre ville',
-    'Yatou',
-    'Gbapleu',
+    'Man',
   ],
+  'Abengourou': [
+    'Abengourou',
+  ],
+  'Bondoukou': [
+    'Bondoukou',
+  ],
+  'Dimbokro': [
+    'Dimbokro',
+  ],
+  'Séguéla': [
+    'Séguéla',
+  ],
+  'Touba': [
+    'Touba',
+  ],
+  'Ferkessedougou': [
+    'Ferkessedougou',
+  ],
+  'Grand-Bassam': [
+    'Grand-Bassam',
+  ],
+  'Sinématiali': [
+    'Sinématiali',
+  ],
+  'Katiola': [
+    'Katiola',
+  ],
+  'Béoumi': [
+    'Béoumi',
+  ],
+  'Sakassou': [
+    'Sakassou',
+  ],
+  'Daoukro': [
+    'Daoukro',
+  ],
+  'Bongouanou': [
+    'Bongouanou',
+  ],
+  'M\'bahiakro': [
+    'M\'bahiakro',
+  ],
+  'Koun-Fao': [
+    'Koun-Fao',
+  ],
+  'Tiapoum': [
+    'Tiapoum',
+  ],
+  'Alépé': [
+    'Alépé',
+  ],
+  'Adzopé': [
+    'Adzopé',
+  ],
+  'Yakassé-Feyassé': [
+    'Yakassé-Feyassé',
+  ],
+  'Mafféré': [
+    'Mafféré',
+  ],
+  'Agboville': [
+    'Agboville',
+  ],
+  'Tiassalé': [
+    'Tiassalé',
+  ],
+  'Taabo': [
+    'Taabo',
+  ],
+  'Sinfra': [
+    'Sinfra',
+  ],
+  'Issia': [
+    'Issia',
+  ],
+  'Divo': [
+    'Divo',
+  ],
+  'Lakota': [
+    'Lakota',
+  ],
+  'Gagnoa': [
+    'Gagnoa',
+  ],
+  'Oumé': [
+    'Oumé',
+  ],
+  'Vavoua': [
+    'Vavoua',
+  ],
+  'Danané': [
+    'Danané',
+  ],
+  'Zouan-Hounien': [
+    'Zouan-Hounien',
+  ],
+  'Binhoué': [
+    'Binhoué',
+  ],
+  'Toulépleu': [
+    'Toulépleu',
+  ],
+  'Grain-Blé': [
+    'Grain-Blé',
+  ],
+  'Guiglo': [
+    'Guiglo',
+  ],
+  'Taï': [
+    'Taï',
+  ],
+  'Zuénoula': [
+    'Zuénoula',
+  ],
+  'Kong': [
+    'Kong',
+  ],
+  'Boundiali': [
+    'Boundiali',
+  ],
+  'Tengréla': [
+    'Tengréla',
+  ],
+  'Kaniasso': [
+    'Kaniasso',
+  ],
+  'Madinani': [
+    'Madinani',
+  ],
+  'Minignan': [
+    'Minignan',
+  ],
+  'Odienné': [
+    'Odienné',
+  ],
+  'Biankouman': [
+    'Biankouman',
+  ],
+  'Kouibly': [
+    'Kouably',
+  ],
+  'Folon': [
+    'Folon',
+  ],
+  'Koro': [
+    'Koro',
+  ],
+  'Bougouba': [
+    'Bougouba',
+  ],
+  'Koutouba': [
+    'Koutouba',
+  ],
+  'Dabakala': [
+    'Dabakala',
+  ],
+  'Mankono': [
+    'Mankono',
+  ],
+  'Bouaflé': [
+    'Bouaflé',
+  ],
+  'Bocanda': [
+    'Bocanda',
+  ],
+  'Tiébissou': [
+    'Tiébissou',
+  ],
+  'N\'Zérékoré': [
+    'N\'Zérékoré',
+  ],
+  // Villes supplémentaires pour couvrir tous les districts dans les seeds
+  'Aboisso': ['Aboisso'],
+  'Adiaké': ['Adiaké'],
+  'Adiatté': ['Adiatté'],
+  'Anyama': ['Anyama'],
+  'Assinie': ['Assinie'],
+  'Bangolo': ['Bangolo'],
+  'Bongouanou': ['Bongouanou'],
+  'Bouna': ['Bouna'],
+  'Dabou': ['Dabou'],
+  'Doropo': ['Doropo'],
+  'Duékoué': ['Duékoué'],
+  'Facobly': ['Facobly'],
+  'Ferkessédougou': ['Ferkessédougou'],
+  'Jacqueville': ['Jacqueville'],
+  'Kani': ['Kani'],
+  'Lakota': ['Lakota'],
+  'Niakaramandougou': ['Niakaramandougou'],
+  'Odienne': ['Odienne'],
+  'Ouaninou': ['Ouaninou'],
+  'Sinématiali': ['Sinématiali'],
+  'Tanda': ['Tanda'],
+  'Tingréla': ['Tingréla'],
+  'Transua': ['Transua'],
 };
 
 /**
@@ -107,3 +291,8 @@ export function extractCommuneName(communeString: string): string {
   const parts = communeString.split(',').map(s => s.trim());
   return parts[0];
 }
+
+/**
+ * Liste des villes uniques
+ */
+export const ALL_CITIES = Object.keys(COMMUNES_BY_CITY).sort();
