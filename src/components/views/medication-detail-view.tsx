@@ -649,6 +649,11 @@ export function MedicationDetailView() {
                         <span className="text-xs text-muted-foreground flex items-center gap-0.5">
                           <Package className="h-3 w-3" />
                           Stock: {pharmacy.quantity}
+                          {pharmacy.quantity < 20 && (
+                            <Badge className="ml-1 bg-red-100 text-red-700 text-[10px] px-1">
+                              Stock bas
+                            </Badge>
+                          )}
                         </span>
                         {isCheapest && savings > 0 && (
                           <span className="text-[10px] text-amber-600 font-medium">

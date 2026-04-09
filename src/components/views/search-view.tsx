@@ -3,7 +3,7 @@
 import { logger } from '@/lib/logger';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Pill, Building2, SlidersHorizontal, X, MapPin, LocateFixed, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Search, Pill, Building2, SlidersHorizontal, X, MapPin, LocateFixed, AlertTriangle, ShieldCheck, PackageCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -53,6 +53,7 @@ export function SearchView() {
   const [selectedCommune, setSelectedCommune] = useState('');
   const [isGuardOnly, setIsGuardOnly] = useState(false);
   const [nearMe, setNearMe] = useState(false);
+  const [inStockOnly, setInStockOnly] = useState(false);
 
   const fetchResults = useCallback(async () => {
     setLoading(true);
@@ -62,6 +63,7 @@ export function SearchView() {
         const params = new URLSearchParams();
         if (searchQuery) params.set('q', searchQuery);
         if (selectedCategory) params.set('category', selectedCategory);
+        if (inStockOnly) params.set('inStock', 'true');
         url = `/api/medications?${params.toString()}`;
       } else {
         const params = new URLSearchParams();
@@ -88,7 +90,7 @@ export function SearchView() {
     } finally {
       setLoading(false);
     }
-  }, [tab, searchQuery, selectedCategory, selectedCity, selectedCommune, isGuardOnly, currentUserId]);
+  }, [tab, searchQuery, selectedCategory, selectedCity, selectedCommune, isGuardOnly, nearMe, currentUserId, inStockOnly]);
 
   useEffect(() => {
     const timer = setTimeout(fetchResults, 300);
@@ -111,9 +113,10 @@ export function SearchView() {
     setSelectedCommune('');
     setIsGuardOnly(false);
     setNearMe(false);
+    setInStockOnly(false);
   };
 
-  const hasActiveFilters = selectedCategory || selectedCity || selectedCommune || isGuardOnly || nearMe;
+  const hasActiveFilters = selectedCategory || selectedCity || selectedCommune || isGuardOnly || nearMe || inStockOnly;
 
   // Sort pharmacies by distance when "near me" is active
   const displayResults = useMemo(() => {
@@ -197,6 +200,23 @@ export function SearchView() {
             >
               <LocateFixed className="h-3.5 w-3.5 mr-1" />
               Près de moi
+            </Button>
+          )}
+
+          {/* "En stock" button — only in medications tab */}
+          {tab === 'medications' && (
+            <Button
+              variant={inStockOnly ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setInStockOnly(!inStockOnly)}
+              className={
+                inStockOnly
+                  ? 'bg-green-600 hover:bg-green-700 text-white text-xs'
+                  : 'border-green-600 text-green-700 text-xs'
+              }
+            >
+              <PackageCheck className="h-3.5 w-3.5 mr-1" />
+              En stock
             </Button>
           )}
 
@@ -369,6 +389,13 @@ export function SearchView() {
               <Badge className="gap-1 bg-amber-100 text-xs text-green-700 dark:bg-amber-950/40 dark:text-amber-200">
                 Garde
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setIsGuardOnly(false)} />
+              </Badge>
+            )}
+            {inStockOnly && tab === 'medications' && (
+              <Badge className="gap-1 bg-green-100 text-xs text-green-700 dark:bg-green-950/40 dark:text-green-200">
+                <PackageCheck className="h-3 w-3" />
+                En stock
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setInStockOnly(false)} />
               </Badge>
             )}
             {nearMe && (

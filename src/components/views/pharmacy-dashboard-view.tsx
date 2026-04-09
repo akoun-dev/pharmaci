@@ -24,6 +24,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAppStore } from '@/store/app-store';
 import { ViewHeader } from '@/components/view-header';
 import { toast } from 'sonner';
+import { useCapacitorNotifications } from '@/hooks/use-capacitor-notifications';
+import { useLowStockAlert } from '@/hooks/use-low-stock-alert';
 
 export function PharmacyDashboardView() {
   const {
@@ -35,6 +37,9 @@ export function PharmacyDashboardView() {
   const [stocks, setStocks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // Hook pour les alertes de stock bas
+  useLowStockAlert();
 
   const fetchPharmacies = useCallback(async () => {
     try {
@@ -82,8 +87,22 @@ export function PharmacyDashboardView() {
           ...updates,
         }),
       });
+      
       if (res.ok) {
         toast.success('Stock mis à jour');
+
+        // Vérifier si le stock passe sous le seuil critique
+        const updatedQuantity = updates.quantity || stock.quantity;
+        if (updatedQuantity > 0 && updatedQuantity < LOW_STOCK_THRESHOLD && !stock.lowStockAlertSent) {
+          await scheduleLowStockNotification(stock.medication.name, updatedQuantity);
+          // Marquer comme notifié (à implémenter côté backend)
+          await fetch(`/api/pharmacies/${selectedPharmacyId}/stocks/${stock.id}/alert`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lowStockAlertSent: true }),
+          });
+        }
+
         fetchStocks();
       } else {
         toast.error('Erreur de mise à jour');
@@ -101,6 +120,26 @@ export function PharmacyDashboardView() {
   const inStockCount = stocks.filter((s) => s.inStock).length;
   const outOfStockCount = stocks.filter((s) => !s.inStock).length;
   const lowStockCount = stocks.filter((s) => s.inStock && s.quantity < 20).length;
+  const { schedule: scheduleNotification } = useCapacitorNotifications();
+
+  // Seuil de stock bas
+  const LOW_STOCK_THRESHOLD = 20;
+
+  // Fonction pour programmer une notification de stock bas
+  const scheduleLowStockNotification = async (medicationName: string, quantity: number) => {
+    try {
+      await scheduleNotification({
+        title: '⚠️ Alerte Stock Bas',
+        body: `${medicationName} : il ne reste que ${quantity} unités en stock !`,
+        largeBody: `Le médicament ${medicationName} a atteint le seuil critique de stock. Il ne reste que ${quantity} unités. Veuillez passer une commande de réapprovisionnement rapidement.`,
+        schedule: {
+          at: new Date(Date.now() + 5 * 60 * 1000), // Dans 5 minutes
+        }
+      });
+    } catch (error) {
+      console.error('Failed to schedule notification:', error);
+    }
+  };
 
   return (
     <div className="pb-4">
@@ -162,11 +201,11 @@ export function PharmacyDashboardView() {
         {/* Low stock alerts */}
         {lowStockCount > 0 && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-4">
-            <Card className="border-amber-200 bg-amber-50 dark:border-amber-900/60 dark:bg-amber-950/30">
+            <Card className="border-red-200 bg-red-50 dark:border-red-900/60 dark:bg-red-950/30">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-600" />
-                  <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                  <span className="text-sm font-medium text-red-800 dark:text-red-200">
                     Alertes stock bas ({lowStockCount})
                   </span>
                 </div>
@@ -176,8 +215,8 @@ export function PharmacyDashboardView() {
                     .slice(0, 3)
                     .map((s) => (
                       <div key={s.id} className="flex items-center justify-between text-xs">
-                        <span className="text-amber-700 dark:text-amber-200">{s.medication.name}</span>
-                        <Badge variant="outline" className="border-amber-300 text-[10px] text-amber-700 dark:border-amber-800 dark:text-amber-200">
+                        <span className="text-red-700 dark:text-red-200">{s.medication.name}</span>
+                        <Badge variant="outline" className="border-red-300 text-[10px] text-red-700 dark:border-red-800 dark:text-red-200">
                           {s.quantity} unités
                         </Badge>
                       </div>
@@ -230,6 +269,11 @@ export function PharmacyDashboardView() {
                           ) : (
                             <Badge className="h-4 bg-red-100 px-1.5 text-[10px] text-red-700 dark:bg-red-950/40 dark:text-red-200">
                               Rupture
+                            </Badge>
+                          )}
+                          {stock.inStock && stock.quantity < 20 && (
+                            <Badge className="h-4 bg-red-100 px-1.5 text-[10px] text-red-700 dark:bg-red-950/40 dark:text-red-200">
+                              Stock bas
                             </Badge>
                           )}
                         </div>

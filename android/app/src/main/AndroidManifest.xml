@@ -47,6 +47,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        
+        <!-- LiteRT-LM GPU/NPU native libraries -->
+        <uses-native-library android:name="libvndksupport.so" android:required="false"/>
+        <uses-native-library android:name="libOpenCL.so" android:required="false"/>
 
         <!-- Trigger Google Play services to install the backported photo picker module -->
         <!-- Required for Camera plugin on Android 11-12 devices without native Photo Picker -->

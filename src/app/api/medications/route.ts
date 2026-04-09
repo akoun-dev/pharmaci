@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
       q: searchParams.get('q') || undefined,
       category: searchParams.get('category') || undefined,
       pathology: searchParams.get('pathology') || undefined,
+      inStock: searchParams.get('inStock') || undefined,
     });
 
     if (!validatedParams.success) {
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { q, category, pathology } = validatedParams.data;
+    const { q, category, pathology, inStock } = validatedParams.data;
 
     // Validate pagination parameters
     const pagination = paginationSchema.safeParse({
@@ -49,6 +50,13 @@ export async function GET(request: NextRequest) {
     }
     if (pathology) {
       where.pathology = { contains: pathology };
+    }
+
+    // Handle inStock filter - only include medications with at least one pharmacy having stock
+    if (inStock === 'true') {
+      where.stocks = {
+        some: { inStock: true },
+      };
     }
 
     // If count=true, return only the total count

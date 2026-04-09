@@ -27,6 +27,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { RatingStars } from '@/components/rating-stars';
 import { useAppStore } from '@/store/app-store';
+import { useCartStore } from '@/store/cart-store';
 import { toast } from 'sonner';
 import { openGoogleMaps, openWaze, PAYMENT_LABELS } from '@/lib/navigation';
 

@@ -118,6 +118,7 @@ export const searchParamsSchema = z.object({
   is24h: z.enum(['true', 'false']).optional(),
   category: z.string().max(50).optional(),
   pathology: z.string().max(100).optional(),
+  inStock: z.enum(['true', 'false']).optional(),
 });
 
 export type SearchParams = z.infer<typeof searchParamsSchema>;

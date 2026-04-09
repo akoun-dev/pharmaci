@@ -121,6 +121,7 @@ model PharmacyMedication {
   quantity           Int      @default(0)
   needsPrescription  Boolean  @default(false)
   expirationDate     DateTime?
+  lowStockAlertSent  Boolean  @default(false)
   updatedAt          DateTime @updatedAt
 
   pharmacy   Pharmacy   @relation(fields: [pharmacyId], references: [id])
