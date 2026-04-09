@@ -4,13 +4,19 @@
 	"webDir": ".next/standalone",
 	"server": {
 		"url": "http://62.84.185.143:3000/",
-		"cleartext": true
+		"cleartext": true,
+		"androidScheme": "https"
 	},
 	"plugins": {
+		"WebView": {
+			"overrideUserAgent": "PharmaCI-App",
+			"allowFileAccessFromFileURLs": true,
+			"allowUniversalAccessFromFileURLs": true
+		},
 		"LocalNotifications": {
 			"smallIcon": "ic_stat_icon_config_sample",
 			"iconColor": "#FF9800",
-			"sound": "beep.wav"
+			"sound": "beep.mp3"
 		},
 		"Camera": {
 			"permissions": [
@@ -30,6 +36,22 @@
 			"title": "Pharma CI",
 			"backgroundColor": "#FF9800",
 			"textColor": "#FFFFFF"
+		},
+		"SplashScreen": {
+			"launchShowDuration": 3000,
+			"launchAutoHide": true,
+			"launchFadeOutDuration": 3000,
+			"backgroundColor": "#ffffffff",
+			"androidSplashResourceName": "splash",
+			"androidScaleType": "CENTER_CROP",
+			"showSpinner": true,
+			"androidSpinnerStyle": "large",
+			"iosSpinnerStyle": "small",
+			"spinnerColor": "#999999",
+			"splashFullScreen": true,
+			"splashImmersive": true,
+			"layoutName": "launch_screen",
+			"useDialog": true
 		}
 	}
 }

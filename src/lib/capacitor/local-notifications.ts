@@ -106,7 +106,7 @@ export const scheduleNotification = async (options: NotificationOptions): Promis
       body: options.body,
       largeBody: options.largeBody,
       summaryText: options.summaryText,
-      sound: options.sound ?? 'beep.wav',
+      sound: options.sound ?? 'beep.mp3',
       smallIcon: 'ic_stat_icon_config_sample',
       iconColor: options.iconColor ?? '#FF9800',
       schedule: options.schedule ? {
@@ -295,7 +295,7 @@ export const notifyOrderReady = async (orderId: string, pharmacyName: string): P
     title: 'Commande prête !',
     body: `Votre commande chez ${pharmacyName} est prête à être récupérée.`,
     largeBody: `Passez à la pharmacie muni de votre code de vérification pour récupérer votre commande.`,
-    sound: 'beep.wav',
+    sound: 'beep.mp3',
     extra: { type: 'order_ready', orderId },
   });
 };
@@ -308,7 +308,7 @@ export const notifyStockAlert = async (medicationName: string, quantity: number)
     title: 'Alerte stock',
     body: `${medicationName} - Stock faible (${quantity} unités)`,
     largeBody: `Le stock de ${medicationName} est bas. Pensez à réapprovisionner.`,
-    sound: 'beep.wav',
+    sound: 'beep.mp3',
     extra: { type: 'stock_alert', medication: medicationName },
   });
 };
@@ -320,7 +320,7 @@ export const notifyMedicationReminder = async (medicationName: string): Promise<
   return scheduleNotification({
     title: 'Rappel médicament',
     body: `N'oubliez pas de prendre : ${medicationName}`,
-    sound: 'beep.wav',
+    sound: 'beep.mp3',
     extra: { type: 'medication_reminder', medication: medicationName },
   });
 };
@@ -332,7 +332,7 @@ export const notifyPromotion = async (title: string, message: string): Promise<n
   return scheduleNotification({
     title,
     body: message,
-    sound: 'beep.wav',
+    sound: 'beep.mp3',
     extra: { type: 'promotion' },
   });
 };

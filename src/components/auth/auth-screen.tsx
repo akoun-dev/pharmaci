@@ -371,7 +371,7 @@ export function AuthScreen() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Green gradient header */}
-      <div className="bg-gradient-to-r from-green-600 to-teal-600 px-6 pt-12 pb-10 rounded-b-[2rem]">
+      <div className="bg-gradient-to-r from-amber-600 to-amber-600 px-6 pt-12 pb-10 rounded-b-[2rem]">
         <div className="max-w-md mx-auto text-center">
           <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-4">
             <Pill className="h-9 w-9 text-white" />
@@ -421,7 +421,7 @@ export function AuthScreen() {
                         }}
                         className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
                           loginMethod === 'phone'
-                            ? 'bg-white text-green-700 shadow-sm'
+                            ? 'bg-white text-amber-700 shadow-sm'
                             : 'text-muted-foreground'
                         }`}
                       >
@@ -507,7 +507,7 @@ export function AuthScreen() {
                         Pas encore de compte ?{' '}
                         <button
                           onClick={handleGoToRegister}
-                          className="text-green-600 hover:text-green-700 font-medium"
+                          className="text-amber-600 hover:text-amber-700 font-medium"
                         >
                           Créer un compte
                         </button>
@@ -583,7 +583,7 @@ export function AuthScreen() {
                         }}
                         className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
                           registerMethod === 'email'
-                            ? 'bg-white text-green-700 shadow-sm'
+                            ? 'bg-white text-amber-700 shadow-sm'
                             : 'text-muted-foreground'
                         }`}
                       >
@@ -597,7 +597,7 @@ export function AuthScreen() {
                         }}
                         className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
                           registerMethod === 'phone'
-                            ? 'bg-white text-green-700 shadow-sm'
+                            ? 'bg-white text-amber-700 shadow-sm'
                             : 'text-muted-foreground'
                         }`}
                       >
