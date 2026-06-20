@@ -1,0 +1,193 @@
+// PHARMACI - Prisma schema
+// Application de recherche de médicaments et de pharmacies pour la Côte d'Ivoire
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ===================== USER =====================
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  phone        String?
+  password     String
+  name         String
+  role         String   @default("PATIENT") // PATIENT | PHARMACIST | ADMIN
+  address      String?
+  city         String?
+  district     String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  orders       Order[]
+  reviews      Review[]
+  favorites    Favorite[]
+  messagesSent     Message[]      @relation("MessageSender")
+  messagesReceived Message[]      @relation("MessageReceiver")
+  pharmacy         Pharmacy?
+}
+
+// ===================== PHARMACY =====================
+model Pharmacy {
+  id           String   @id @default(cuid())
+  name         String
+  ownerId      String   @unique
+  owner        User     @relation(fields: [ownerId], references: [id])
+  address      String
+  city         String
+  district     String?
+  latitude     Float
+  longitude    Float
+  phone        String
+  email        String?
+  openingTime  String   @default("08:00")
+  closingTime  String   @default("20:00")
+  isOpen24h    Boolean  @default(false)
+  isOnGuard    Boolean  @default(false) // Pharmacie de garde
+  isVerified   Boolean  @default(true)
+  imageUrl     String?
+  rating       Float    @default(0)
+  reviewCount  Int      @default(0)
+  services     String   @default("") // CSV: vaccination,conseil,livraison
+  payments     String   @default("") // CSV: mobile_money,cash,card
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  medications  PharmacyMedication[]
+  orders       Order[]
+  reviews      Review[]
+  favorites    Favorite[]
+  stockHistory StockHistory[]
+}
+
+// ===================== MEDICATION =====================
+model Medication {
+  id              String   @id @default(cuid())
+  name            String
+  activeIngredient String
+  category        String   @default("Autre") // Antalgiques, Antibiotiques, etc.
+  dosage          String
+  form            String   @default("Comprimé") // Comprimé, Sirop, Injectable, etc.
+  description     String   @default("")
+  prescriptionRequired Boolean @default(false)
+  imageUrl        String?
+  sideEffects     String   @default("")
+  contraindications String @default("")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  pharmacyStocks  PharmacyMedication[]
+  orderItems      OrderItem[]
+}
+
+// ===================== PHARMACY MEDICATION (STOCK) =====================
+model PharmacyMedication {
+  id           String   @id @default(cuid())
+  pharmacyId   String
+  medicationId String
+  price        Int      // Prix en FCFA
+  stock        Int      @default(0)
+  lowStockThreshold Int @default(10)
+  expiryDate   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  pharmacy     Pharmacy   @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  medication   Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@unique([pharmacyId, medicationId])
+}
+
+// ===================== ORDER =====================
+model Order {
+  id            String   @id @default(cuid())
+  code          String   @unique // ex: PHARMACI-ABC123
+  userId        String
+  pharmacyId    String
+  status        String   @default("PENDING") // PENDING | CONFIRMED | READY | PICKED_UP | CANCELLED
+  totalAmount   Int      // Total en FCFA
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id])
+  pharmacy      Pharmacy @relation(fields: [pharmacyId], references: [id])
+  items         OrderItem[]
+}
+
+// ===================== ORDER ITEM =====================
+model OrderItem {
+  id           String   @id @default(cuid())
+  orderId      String
+  medicationId String
+  quantity     Int
+  unitPrice    Int
+  totalPrice   Int
+
+  order        Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  medication   Medication @relation(fields: [medicationId], references: [id])
+}
+
+// ===================== REVIEW =====================
+model Review {
+  id           String   @id @default(cuid())
+  userId       String
+  pharmacyId   String
+  rating       Int      // 1-5
+  comment      String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id])
+  pharmacy     Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pharmacyId])
+}
+
+// ===================== FAVORITE =====================
+model Favorite {
+  id           String   @id @default(cuid())
+  userId       String
+  pharmacyId   String
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id])
+  pharmacy     Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pharmacyId])
+}
+
+// ===================== MESSAGE =====================
+model Message {
+  id           String   @id @default(cuid())
+  senderId     String
+  receiverId   String
+  content      String
+  isRead       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  sender       User     @relation("MessageSender", fields: [senderId], references: [id])
+  receiver     User     @relation("MessageReceiver", fields: [receiverId], references: [id])
+}
+
+// ===================== STOCK HISTORY =====================
+model StockHistory {
+  id           String   @id @default(cuid())
+  pharmacyId   String
+  medicationId String
+  changeType   String   // ADD | REMOVE | UPDATE
+  quantity     Int
+  note         String?
+  createdAt    DateTime @default(now())
+
+  pharmacy     Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+}
