@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/app/logo";
-import { PharmacyCard } from "@/components/app/pharmacy-card";
+import { PharmacyCard, PharmacyCardCompact } from "@/components/app/pharmacy-card";
 import { useAppStore } from "@/lib/store";
 import { pharmacyApi, medicationApi, type Pharmacy, type Medication } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -274,9 +274,9 @@ export function HomeScreen() {
         </div>
       </div>
 
-      {/* Pharmacies de garde */}
-      <div className="px-4 pt-5">
-        <div className="flex items-center justify-between">
+      {/* Pharmacies de garde - horizontal carousel */}
+      <section className="pt-5">
+        <div className="flex items-center justify-between px-4">
           <h2 className="text-base font-bold text-foreground flex items-center gap-1.5">
             <Clock className="h-4 w-4 text-primary" />
             Pharmacies de Garde
@@ -289,17 +289,17 @@ export function HomeScreen() {
           </button>
         </div>
         {loading ? (
-          <div className="flex h-32 items-center justify-center">
+          <div className="flex h-40 items-center justify-center">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
         ) : guardPharmacies.length === 0 ? (
-          <div className="mt-2 rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+          <div className="mx-4 mt-2 rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
             Aucune pharmacie de garde pour le moment.
           </div>
         ) : (
-          <div className="mt-3 space-y-3">
+          <div className="h-carousel h-carousel-edge mt-3 pb-1">
             {guardPharmacies.map((p) => (
-              <PharmacyCard
+              <PharmacyCardCompact
                 key={p.id}
                 pharmacy={p}
                 onClick={() => navigate("pharmacy-detail", { id: p.id })}
@@ -307,11 +307,11 @@ export function HomeScreen() {
             ))}
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Popular medications */}
-      <div className="px-4 pt-5 pb-6">
-        <div className="flex items-center justify-between">
+      {/* Popular medications - horizontal carousel */}
+      <section className="pt-5 pb-6">
+        <div className="flex items-center justify-between px-4">
           <h2 className="text-base font-bold text-foreground flex items-center gap-1.5">
             <Pill className="h-4 w-4 text-primary" />
             Médicaments populaires
@@ -324,16 +324,16 @@ export function HomeScreen() {
           </button>
         </div>
         {loading ? (
-          <div className="flex h-32 items-center justify-center">
+          <div className="flex h-40 items-center justify-center">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="no-scrollbar mt-3 flex gap-3 overflow-x-auto pb-1">
+          <div className="h-carousel h-carousel-edge mt-3 pb-1">
             {popularMeds.map((m) => (
               <button
                 key={m.id}
                 onClick={() => navigate("medication-detail", { id: m.id })}
-                className="flex w-36 shrink-0 flex-col gap-2 rounded-2xl border border-border bg-card p-3 text-left transition-all hover:border-primary/40 hover:shadow-sm"
+                className="flex w-36 flex-col gap-2 rounded-2xl border border-border bg-card p-3 text-left transition-all hover:border-primary/40 hover:shadow-sm"
               >
                 <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <Pill className="h-7 w-7" />
@@ -353,7 +353,7 @@ export function HomeScreen() {
             ))}
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

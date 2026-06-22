@@ -206,3 +206,78 @@ export function PharmacyCard({
     </div>
   );
 }
+
+// Compact pharmacy card for horizontal carousels
+export function PharmacyCardCompact({
+  pharmacy,
+  userLat,
+  userLng,
+  onClick,
+}: {
+  pharmacy: Pharmacy;
+  userLat?: number;
+  userLng?: number;
+  onClick?: () => void;
+}) {
+  const distance =
+    userLat != null && userLng != null
+      ? haversineDistance(userLat, userLng, pharmacy.latitude, pharmacy.longitude)
+      : null;
+
+  return (
+    <div
+      onClick={onClick}
+      className="flex w-64 shrink-0 cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-primary/40 hover:shadow-md"
+    >
+      {pharmacy.imageUrl ? (
+        <div className="relative h-24 w-full overflow-hidden">
+          <img
+            src={pharmacy.imageUrl}
+            alt={pharmacy.name}
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          <div className="absolute left-2 top-2">
+            <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} />
+          </div>
+          <h3 className="absolute bottom-1.5 left-2 right-2 truncate text-sm font-bold text-white drop-shadow">
+            {pharmacy.name}
+          </h3>
+        </div>
+      ) : (
+        <div className="relative flex h-20 items-center justify-center bg-primary/10">
+          <span className="text-2xl font-bold text-primary">
+            {pharmacy.name.charAt(0)}
+          </span>
+          <div className="absolute left-2 top-2">
+            <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} />
+          </div>
+        </div>
+      )}
+      <div className="space-y-1.5 p-2.5">
+        {!pharmacy.imageUrl && (
+          <h3 className="truncate text-sm font-bold text-foreground">{pharmacy.name}</h3>
+        )}
+        <div className="flex items-center gap-1.5">
+          <StarRating rating={pharmacy.rating} showNumber />
+          <span className="text-[11px] text-muted-foreground">
+            ({pharmacy.reviewCount})
+          </span>
+        </div>
+        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+          <MapPin className="h-3 w-3 shrink-0 text-primary/70" />
+          <span className="truncate">
+            {pharmacy.district || pharmacy.city}
+            {distance != null && (
+              <span className="ml-1 font-medium text-foreground">
+                • {formatDistance(distance)}
+              </span>
+            )}
+          </span>
+        </div>
+        <ServiceBadges services={pharmacy.services} compact />
+      </div>
+    </div>
+  );
+}

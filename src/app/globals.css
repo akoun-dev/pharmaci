@@ -140,13 +140,40 @@
   background: oklch(0.75 0.04 145);
 }
 
-/* Hide scrollbar for horizontal filter chips */
+/* Hide scrollbar for horizontal filter chips & carousels */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Horizontal carousel: smooth touch scrolling + snap */
+.h-carousel {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-padding-left: 1rem;
+  scrollbar-width: none;
+}
+.h-carousel::-webkit-scrollbar {
+  display: none;
+}
+.h-carousel > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+/* Edge bleed: allow first/last items to have padding so cards don't touch screen edges */
+.h-carousel-edge {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: -1rem;
+  margin-right: -1rem;
 }
 
 /* Leaflet map container */

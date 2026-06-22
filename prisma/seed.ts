@@ -174,17 +174,46 @@ async function main() {
     },
   ];
 
+  // Create a dedicated pharmacist user for each pharmacy (ownerId is unique)
+  const pharmacistNames = [
+    "Dr. Aya Traoré", "Dr. Mamadou Diallo", "Dr. Fatou Coulibaly",
+    "Dr. Ibrahim Bamba", "Dr. Aminata Touré", "Dr. Sékou Diabaté",
+    "Dr. Boubacar Sangaré",
+  ];
+  const extraPharmacists = [];
+  const pharmaPwd = await bcrypt.hash("pharma123", 10);
+  for (let i = 0; i < pharmacistNames.length; i++) {
+    const email = `pharma${i + 1}@pharmaci.ci`;
+    const u = await prisma.user.upsert({
+      where: { email },
+      update: {},
+      create: {
+        email,
+        password: pharmaPwd,
+        name: pharmacistNames[i],
+        role: "PHARMACIST",
+        phone: `+225 07 1${i} ${20 + i} ${30 + i} ${40 + i}`,
+        city: "Abidjan",
+      },
+    });
+    extraPharmacists.push(u);
+  }
+
   const createdPharmacies = [];
   for (let i = 0; i < pharmacies.length; i++) {
     const p = pharmacies[i];
-    // First pharmacy owned by our pharmacist, others owned by admin for demo
-    const ownerId = i === 0 ? pharmacist.id : admin.id;
-    const pharmacy = await prisma.pharmacy.upsert({
-      where: { ownerId },
-      update: {},
-      create: { ...p, ownerId },
-    });
-    createdPharmacies.push(pharmacy);
+    // First pharmacy owned by our main pharmacist demo account, others by dedicated pharmacists
+    const ownerId = i === 0 ? pharmacist.id : extraPharmacists[i - 1].id;
+    // Use name as a pseudo-unique key for idempotency via findFirst + create
+    const existing = await prisma.pharmacy.findFirst({ where: { name: p.name } });
+    if (existing) {
+      createdPharmacies.push(existing);
+    } else {
+      const pharmacy = await prisma.pharmacy.create({
+        data: { ...p, ownerId },
+      });
+      createdPharmacies.push(pharmacy);
+    }
   }
 
   // ---------- MEDICATIONS ----------
