@@ -69,6 +69,16 @@ function Recenter({ center }: { center: [number, number] | null }) {
   return null;
 }
 
+// Force Leaflet to recalculate its size after mount/layout
+function ResizeFix() {
+  const map = useMap();
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 200);
+    return () => clearTimeout(t);
+  }, [map]);
+  return null;
+}
+
 export function MapScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const pushToast = useAppStore((s) => s.pushToast);
@@ -118,7 +128,7 @@ export function MapScreen() {
   }
 
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <AppHeader title="Carte des pharmacies" />
       {/* Filter */}
       <div className="flex items-center justify-between border-b border-border/60 bg-card px-4 py-2.5">
@@ -142,7 +152,7 @@ export function MapScreen() {
       </div>
 
       {/* Map */}
-      <div className="relative flex-1">
+      <div className="relative min-h-0 flex-1">
         {loading ? (
           <div className="flex h-full items-center justify-center">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -160,6 +170,7 @@ export function MapScreen() {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            <ResizeFix />
             <Recenter center={recenterTo} />
             {userPos && (
               <Marker position={userPos} icon={userIcon}>
@@ -190,7 +201,7 @@ export function MapScreen() {
 
         {/* Selected pharmacy card overlay */}
         {selected && (
-          <div className="absolute inset-x-3 bottom-3 z-[1000] animate-fade-in-up">
+          <div className="absolute inset-x-3 bottom-4 z-[1000] animate-fade-in-up">
             <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
               <div className="flex items-start gap-3 p-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">

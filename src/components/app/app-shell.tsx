@@ -135,14 +135,13 @@ function AppShell() {
     );
   }
 
-  // Logged in: mobile app shell with bottom nav
+  // Logged in: mobile app shell with bottom nav (always visible)
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
-      <main className="flex flex-1 flex-col">
+      <main className="flex min-h-0 flex-1 flex-col">
         <ScreenRouter />
       </main>
-      {/* Hide bottom nav on map screen (full screen map) */}
-      {!(nav.tab === "map" && nav.view === "map") && <BottomNav />}
+      <BottomNav />
       <ToastHost />
     </div>
   );
