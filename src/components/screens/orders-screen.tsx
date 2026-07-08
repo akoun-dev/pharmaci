@@ -23,6 +23,7 @@ import {
 } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 const STATUS_FILTERS = [
@@ -82,7 +83,7 @@ export function OrdersScreen() {
 
   return (
     <div className="flex flex-col">
-      <AppHeader title="Mes commandes" />
+      <AppHeader title="Mes commandes" showCart />
       {!user && (
         <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
           <ClipboardList className="h-12 w-12 text-muted-foreground/40" />
@@ -141,8 +142,22 @@ export function OrdersScreen() {
           {/* Orders list */}
           <div className="flex-1 space-y-3 px-4 pt-3 pb-6">
             {loading ? (
-              <div className="flex h-40 items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="rounded-2xl border border-border bg-card p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-20 rounded-full" />
+                        <Skeleton className="h-4 w-40 rounded-full" />
+                        <Skeleton className="h-3 w-32 rounded-full" />
+                      </div>
+                      <div className="space-y-2 text-right">
+                        <Skeleton className="h-5 w-20 rounded-full" />
+                        <Skeleton className="h-3 w-12 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : orders.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">

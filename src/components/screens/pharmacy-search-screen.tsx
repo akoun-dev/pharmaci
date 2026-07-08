@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Search, Loader2, AlertCircle, MapPin } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { Search, Loader2, AlertCircle, MapPin, Mic } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/lib/store";
 import { pharmacyApi, type Pharmacy } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
@@ -13,31 +14,59 @@ export function PharmacySearchScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const params = useAppStore((s) => s.nav.params);
   const addRecentSearch = useAppStore((s) => s.addRecentSearch);
+  const pushToast = useAppStore((s) => s.pushToast);
 
   const [search, setSearch] = useState(params.q || "");
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   // Filters
+  const [openNow, setOpenNow] = useState(false);
   const [openOnly, setOpenOnly] = useState(false);
   const [guardOnly, setGuardOnly] = useState(false);
   const [vaccinationOnly, setVaccinationOnly] = useState(false);
 
   useEffect(() => {
-    void load();
-  }, [search, openOnly, guardOnly, vaccinationOnly]);
+    const timer = setTimeout(() => void load(), 300);
+    return () => clearTimeout(timer);
+  }, [search, openNow, openOnly, guardOnly, vaccinationOnly]);
+
+  function isOpenNow(p: Pharmacy): boolean {
+    if (p.isOpen24h) return true;
+    if (!p.openingTime || !p.closingTime) return false;
+    const now = new Date();
+    const mins = now.getHours() * 60 + now.getMinutes();
+    const [openH, openM] = p.openingTime.split(":").map(Number);
+    const [closeH, closeM] = p.closingTime.split(":").map(Number);
+    const openMins = openH * 60 + openM;
+    const closeMins = closeH * 60 + closeM;
+    return mins >= openMins && mins <= closeMins;
+  }
+
+  const filteredPharmacies = useMemo(() => {
+    if (!openNow) return pharmacies;
+    return pharmacies.filter(isOpenNow);
+  }, [pharmacies, openNow]);
 
   async function load() {
     setLoading(true);
+    setPage(1);
     try {
       const res = await pharmacyApi.list({
         search: search.trim() || undefined,
         onGuard: guardOnly || undefined,
         open24h: openOnly || undefined,
         service: vaccinationOnly ? "vaccination" : undefined,
-        limit: 50,
+        page: 1,
+        limit: 15,
       });
       setPharmacies(res.pharmacies);
+      setTotal(res.total);
+      setTotalPages(res.totalPages);
       if (search.trim()) addRecentSearch(search.trim());
     } catch {
       // ignore
@@ -46,9 +75,31 @@ export function PharmacySearchScreen() {
     }
   }
 
+  async function loadMore() {
+    if (loadingMore || page >= totalPages) return;
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    try {
+      const res = await pharmacyApi.list({
+        search: search.trim() || undefined,
+        onGuard: guardOnly || undefined,
+        open24h: openOnly || undefined,
+        service: vaccinationOnly ? "vaccination" : undefined,
+        page: nextPage,
+        limit: 15,
+      });
+      setPharmacies((prev) => [...prev, ...res.pharmacies]);
+      setPage(nextPage);
+    } catch {
+      // ignore
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
   return (
     <div className="flex flex-col">
-      <AppHeader title="Recherche pharmacie" showBack />
+      <AppHeader title="Recherche pharmacie" showBack showCart />
       <div className="px-4 pt-3">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -56,14 +107,40 @@ export function PharmacySearchScreen() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Nom, ville, quartier..."
-            className="h-11 rounded-xl border-primary/20 bg-primary/5 pl-9"
+            className="h-11 rounded-xl border-primary/20 bg-primary/5 pl-9 pr-12"
             autoFocus
           />
+          <button
+            onClick={() => {
+              if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+                pushToast("Parlez maintenant...", "info");
+                const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = "fr-FR";
+                recognition.onresult = (event: any) => {
+                  const transcript = event.results[0][0].transcript;
+                  setSearch(transcript);
+                };
+                recognition.start();
+              } else {
+                pushToast("Reconnaissance vocale non disponible.", "error");
+              }
+            }}
+            className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+            aria-label="Recherche vocale"
+          >
+            <Mic className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
       {/* Filter chips */}
       <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pt-3 pb-1">
+        <FilterChip
+          active={openNow}
+          onClick={() => setOpenNow((v) => !v)}
+          label="Ouvert maintenant"
+        />
         <FilterChip
           active={openOnly}
           onClick={() => setOpenOnly((v) => !v)}
@@ -82,24 +159,57 @@ export function PharmacySearchScreen() {
         />
       </div>
 
-      <div className="flex-1 space-y-3 px-4 pt-3 pb-6">
+      <div className="px-4 pt-2">
+        <p className="text-xs text-muted-foreground">
+          {loading ? "Recherche..." : `${filteredPharmacies.length} résultat${filteredPharmacies.length > 1 ? "s" : ""}`}
+        </p>
+      </div>
+
+      <div className="flex-1 space-y-3 px-4 pt-2 pb-6">
         {loading ? (
-          <div className="flex h-40 items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="overflow-hidden rounded-2xl border border-border bg-card">
+                <Skeleton className="h-32 w-full" />
+                <div className="space-y-2 p-3">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-24 rounded-full" />
+                    <Skeleton className="h-4 w-12 rounded-full" />
+                  </div>
+                  <Skeleton className="h-3 w-48 rounded-full" />
+                  <Skeleton className="h-3 w-36 rounded-full" />
+                  <div className="flex gap-2 pt-1">
+                    <Skeleton className="h-9 flex-1 rounded-lg" />
+                    <Skeleton className="h-9 flex-1 rounded-lg" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        ) : pharmacies.length === 0 ? (
+        ) : filteredPharmacies.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
             <AlertCircle className="h-10 w-10 text-muted-foreground/50" />
             <p className="text-sm text-muted-foreground">Aucune pharmacie trouvée.</p>
           </div>
         ) : (
-          pharmacies.map((p) => (
-            <PharmacyCard
-              key={p.id}
-              pharmacy={p}
-              onClick={() => navigate("pharmacy-detail", { id: p.id })}
-            />
-          ))
+          <>
+            {filteredPharmacies.map((p) => (
+              <PharmacyCard
+                key={p.id}
+                pharmacy={p}
+                onClick={() => navigate("pharmacy-detail", { id: p.id })}
+              />
+            ))}
+            {page < totalPages && (
+              <button
+                onClick={loadMore}
+                disabled={loadingMore}
+                className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 active:bg-muted/50"
+              >
+                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin" /> : "Voir plus"}
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -158,11 +268,20 @@ export function GuardPharmaciesScreen() {
 
   return (
     <div className="flex flex-col">
-      <AppHeader title="Pharmacies de garde" showBack />
+      <AppHeader title="Pharmacies de garde" showBack showCart />
       <div className="flex-1 space-y-3 px-4 pt-3 pb-6">
         {loading ? (
-          <div className="flex h-40 items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="overflow-hidden rounded-2xl border border-border bg-card">
+                <Skeleton className="h-32 w-full" />
+                <div className="space-y-2 p-3">
+                  <Skeleton className="h-4 w-32 rounded-full" />
+                  <Skeleton className="h-3 w-48 rounded-full" />
+                  <Skeleton className="h-3 w-36 rounded-full" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : pharmacies.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">

@@ -1,6 +1,6 @@
 "use client";
 
-import { Star, MapPin, Clock, Phone, Navigation, ShieldCheck, Truck, CreditCard, Syringe } from "lucide-react";
+import { Star, MapPin, Clock, Phone, Navigation, ShieldCheck, Truck, CreditCard, Syringe, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Pharmacy } from "@/lib/api";
 import { formatDistance, haversineDistance } from "@/lib/api";
@@ -212,11 +212,13 @@ export function PharmacyCardCompact({
   pharmacy,
   userLat,
   userLng,
+  isFavorite,
   onClick,
 }: {
   pharmacy: Pharmacy;
   userLat?: number;
   userLng?: number;
+  isFavorite?: boolean;
   onClick?: () => void;
 }) {
   const distance =
@@ -241,6 +243,11 @@ export function PharmacyCardCompact({
           <div className="absolute left-2 top-2">
             <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} />
           </div>
+          {isFavorite && (
+            <div className="absolute right-2 top-2">
+              <Heart className="h-4 w-4 text-red-500 drop-shadow" fill="currentColor" />
+            </div>
+          )}
           <h3 className="absolute bottom-1.5 left-2 right-2 truncate text-sm font-bold text-white drop-shadow">
             {pharmacy.name}
           </h3>
@@ -253,6 +260,11 @@ export function PharmacyCardCompact({
           <div className="absolute left-2 top-2">
             <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} />
           </div>
+          {isFavorite && (
+            <div className="absolute right-2 top-2">
+              <Heart className="h-4 w-4 text-red-500" fill="currentColor" />
+            </div>
+          )}
         </div>
       )}
       <div className="space-y-1.5 p-2.5">
@@ -277,6 +289,14 @@ export function PharmacyCardCompact({
           </span>
         </div>
         <ServiceBadges services={pharmacy.services} compact />
+        <a
+          href={`tel:${pharmacy.phone}`}
+          onClick={(e) => e.stopPropagation()}
+          className="mt-1 flex items-center justify-center gap-1 rounded-lg bg-blue-50 py-1.5 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-100"
+        >
+          <Phone className="h-3 w-3" />
+          Appeler
+        </a>
       </div>
     </div>
   );

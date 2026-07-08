@@ -18,11 +18,14 @@ import {
   KeyRound,
   Building2,
 } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { authApi, pharmacyApi, type Pharmacy } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Switch } from "@/components/ui/switch";
 
 export function ProfileScreen() {
   const user = useAppStore((s) => s.user);
@@ -30,6 +33,7 @@ export function ProfileScreen() {
   const logout = useAppStore((s) => s.logout);
   const navigate = useAppStore((s) => s.navigate);
   const pushToast = useAppStore((s) => s.pushToast);
+  const { theme, setTheme } = useTheme();
 
   const [favorites, setFavorites] = useState<Pharmacy[]>([]);
   const [loadingFav, setLoadingFav] = useState(false);
@@ -51,6 +55,7 @@ export function ProfileScreen() {
   }
 
   async function handleLogout() {
+    if (!confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) return;
     try {
       await authApi.logout();
     } catch {
@@ -63,7 +68,7 @@ export function ProfileScreen() {
   if (!user) {
     return (
       <div className="flex flex-col">
-        <AppHeader title="Profil" />
+        <AppHeader title="Profil" showCart />
         <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
             <UserIcon className="h-8 w-8" />
@@ -90,11 +95,12 @@ export function ProfileScreen() {
     <div className="flex flex-col">
       <AppHeader
         title="Profil"
+        showCart
         rightSlot={
           <button
-            onClick={() => navigate("settings")}
+            onClick={() => navigate("edit-profile")}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
-            aria-label="Paramètres"
+            aria-label="Modifier le profil"
           >
             <Settings className="h-4 w-4" />
           </button>
@@ -222,7 +228,21 @@ export function ProfileScreen() {
           <MenuRow
             icon={HelpCircle}
             label="Aide & support"
-            onClick={() => pushToast("Contactez-nous à support@pharmaci.ci", "info")}
+            onClick={() => navigate("help")}
+          />
+        </div>
+
+        {/* Dark mode toggle */}
+        <div className="mt-4 flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
+              {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            </div>
+            <span className="text-sm font-medium text-foreground">Mode sombre</span>
+          </div>
+          <Switch
+            checked={theme === "dark"}
+            onCheckedChange={(v) => setTheme(v ? "dark" : "light")}
           />
         </div>
 

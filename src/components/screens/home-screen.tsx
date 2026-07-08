@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Search,
   MapPin,
@@ -9,31 +9,22 @@ import {
   Clock,
   Sparkles,
   Pill,
-  Stethoscope,
-  HeartPulse,
-  Baby,
-  Eye,
-  Bone,
-  ShieldPlus,
   Loader2,
+  ShoppingCart,
+  Mic,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/app/logo";
-import { PharmacyCard, PharmacyCardCompact } from "@/components/app/pharmacy-card";
+import { PharmacyCardCompact } from "@/components/app/pharmacy-card";
 import { useAppStore } from "@/lib/store";
 import { pharmacyApi, medicationApi, type Pharmacy, type Medication } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn, categoryColor, CATEGORY_COLORS } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CATEGORIES = [
   { id: "Tous", label: "Tous", icon: Sparkles },
-  { id: "Antalgiques", label: "Antalgiques", icon: Pill },
-  { id: "Antibiotiques", label: "Antibiotiques", icon: ShieldPlus },
-  { id: "Antipaludéens", label: "Antipaludéens", icon: HeartPulse },
-  { id: "Vitamines", label: "Vitamines", icon: Stethoscope },
-  { id: "Pansements", label: "Pansements", icon: Baby },
-  { id: "Antihistaminiques", label: "Antihistaminiques", icon: Eye },
-  { id: "Gastro-entérologie", label: "Gastro", icon: Bone },
 ];
 
 export function HomeScreen() {
@@ -43,33 +34,136 @@ export function HomeScreen() {
   const pushToast = useAppStore((s) => s.pushToast);
   const addRecentSearch = useAppStore((s) => s.addRecentSearch);
   const recentSearches = useAppStore((s) => s.recentSearches);
+  const cartCount = useAppStore((s) => s.cartCount());
+  const cart = useAppStore((s) => s.cart);
+  const recentlyViewed = useAppStore((s) => s.recentlyViewed);
 
   const [searchMode, setSearchMode] = useState<"medications" | "pharmacies">("medications");
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("Tous");
+  const [categories, setCategories] = useState<string[]>([]);
   const [guardPharmacies, setGuardPharmacies] = useState<Pharmacy[]>([]);
   const [popularMeds, setPopularMeds] = useState<Medication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [location, setLocation] = useState("Abidjan, Cocody Riviera");
+
+
+  // Suggestion state
+  const [medSuggestions, setMedSuggestions] = useState<Medication[]>([]);
+  const [pharmSuggestions, setPharmSuggestions] = useState<Pharmacy[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestLoading, setSuggestLoading] = useState(false);
+  const [focusedIdx, setFocusedIdx] = useState(-1);
+  const inputRef = useRef<HTMLDivElement>(null);
+  const suggestRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     void loadInitial();
   }, []);
 
+  // Fetch suggestions when typing
+  useEffect(() => {
+    if (!search.trim()) return;
+    const timer = setTimeout(() => void fetchSuggestions(), 150);
+    return () => clearTimeout(timer);
+  }, [search, searchMode]);
+
+  // Clear suggestions when switching mode
+  useEffect(() => {
+    setShowSuggestions(false);
+    setMedSuggestions([]);
+    setPharmSuggestions([]);
+    setFocusedIdx(-1);
+  }, [searchMode]);
+
+  // Click outside to close suggestions
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        suggestRef.current && !suggestRef.current.contains(e.target as Node) &&
+        inputRef.current && !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   async function loadInitial() {
     setLoading(true);
     try {
-      const [guardRes, medsRes] = await Promise.all([
+      const [guardRes, medsRes, catRes, favRes] = await Promise.all([
         pharmacyApi.list({ onGuard: true, limit: 4 }),
         medicationApi.list({ limit: 6 }),
+        medicationApi.categories(),
+        user ? pharmacyApi.favorites() : Promise.resolve({ pharmacies: [] }),
       ]);
       setGuardPharmacies(guardRes.pharmacies);
       setPopularMeds(medsRes.medications);
+      setCategories(catRes.categories);
+      if (favRes) setFavoriteIds(new Set((favRes as { pharmacies: Pharmacy[] }).pharmacies.map((p) => p.id)));
     } catch {
       // ignore
     } finally {
       setLoading(false);
     }
+  }
+
+  function suggestionCount() {
+    return searchMode === "medications" ? medSuggestions.length : pharmSuggestions.length;
+  }
+
+  async function fetchSuggestions() {
+    const q = search.trim();
+    if (!q) { setMedSuggestions([]); setPharmSuggestions([]); setShowSuggestions(false); return; }
+    setSuggestLoading(true);
+    try {
+      if (searchMode === "medications") {
+        const res = await medicationApi.list({ search: q, limit: 8 });
+        setMedSuggestions(res.medications);
+        setShowSuggestions(res.medications.length > 0);
+      } else {
+        const res = await pharmacyApi.list({ search: q, limit: 8 });
+        setPharmSuggestions(res.pharmacies);
+        setShowSuggestions(res.pharmacies.length > 0);
+      }
+      setFocusedIdx(-1);
+    } catch {
+      setMedSuggestions([]);
+      setPharmSuggestions([]);
+    } finally {
+      setSuggestLoading(false);
+    }
+  }
+
+  function handleSelectSuggestion(item: Medication | Pharmacy) {
+    setShowSuggestions(false);
+    if ("activeIngredient" in item) {
+      setSearch(item.name);
+      addRecentSearch(item.name);
+      navigate("medication-detail", { id: item.id });
+    } else {
+      setSearch(item.name);
+      addRecentSearch(item.name);
+      navigate("pharmacy-detail", { id: item.id });
+    }
+  }
+
+  function handleSearchKeyDown(e: React.KeyboardEvent) {
+    const count = suggestionCount();
+    if (showSuggestions && count > 0) {
+      if (e.key === "ArrowDown") { e.preventDefault(); setFocusedIdx((p) => (p < count - 1 ? p + 1 : 0)); return; }
+      if (e.key === "ArrowUp") { e.preventDefault(); setFocusedIdx((p) => (p > 0 ? p - 1 : count - 1)); return; }
+      if (e.key === "Enter" && focusedIdx >= 0) {
+        e.preventDefault();
+        const items = searchMode === "medications" ? medSuggestions : pharmSuggestions;
+        if (items[focusedIdx]) handleSelectSuggestion(items[focusedIdx]);
+        return;
+      }
+      if (e.key === "Escape") { setShowSuggestions(false); return; }
+    }
+    if (e.key === "Enter") handleSearch();
   }
 
   function handleSearch() {
@@ -89,6 +183,18 @@ export function HomeScreen() {
       <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-border/60 bg-card/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <Logo size="sm" />
         <div className="flex-1" />
+        <button
+          onClick={() => navigate("cart")}
+          className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+          aria-label="Panier"
+        >
+          <ShoppingCart className="h-4 w-4" />
+          {cartCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+              {cartCount}
+            </span>
+          )}
+        </button>
         <button
           onClick={() => pushToast("Aucune nouvelle notification.", "info")}
           className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
@@ -134,40 +240,130 @@ export function HomeScreen() {
         </div>
       </div>
 
-      {/* Search bar */}
+      {/* Search bar */}      
       <div className="px-4 pt-3">
-        <div className="relative">
+        <div className="relative" ref={inputRef}>
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            onChange={(e) => { setSearch(e.target.value); setShowSuggestions(true); }}
+            onFocus={() => { if (suggestionCount() > 0) setShowSuggestions(true); }}
+            onKeyDown={handleSearchKeyDown}
             placeholder={
               searchMode === "medications"
                 ? "Rechercher un médicament..."
                 : "Rechercher une pharmacie..."
             }
-            className="h-11 rounded-xl border-primary/20 bg-primary/5 pl-9"
+            className="h-11 rounded-xl border-primary/20 bg-primary/5 pl-9 pr-12"
           />
+          <button
+            onClick={() => {
+              if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+                pushToast("Parlez maintenant...", "info");
+                const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = "fr-FR";
+                recognition.onresult = (event: any) => {
+                  const transcript = event.results[0][0].transcript;
+                  setSearch(transcript);
+                  addRecentSearch(transcript);
+                  navigate(
+                    searchMode === "medications" ? "medication-search" : "pharmacy-search",
+                    { q: transcript }
+                  );
+                };
+                recognition.start();
+              } else {
+                pushToast("Reconnaissance vocale non disponible.", "error");
+              }
+            }}
+            className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+            aria-label="Recherche vocale"
+          >
+            <Mic className="h-4 w-4" />
+          </button>
+          {/* Suggestions dropdown */}
+          {showSuggestions && (
+            <div
+              ref={suggestRef}
+              className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-xl border border-border bg-card shadow-lg"
+            >
+              {suggestLoading ? (
+                <div className="flex items-center gap-2 px-3 py-2.5">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Suggestions...</span>
+                </div>
+              ) : searchMode === "medications" ? (
+                medSuggestions.map((m, i) => (
+                  <button
+                    key={m.id}
+                    onMouseDown={(e) => { e.preventDefault(); handleSelectSuggestion(m); }}
+                    className={cn(
+                      "flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors",
+                      i === focusedIdx ? "bg-primary/10" : "hover:bg-muted/50"
+                    )}
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Pill className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">{m.name}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        {m.activeIngredient} • {m.dosage} • {m.form}
+                      </p>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                      {m.category}
+                    </span>
+                  </button>
+                ))
+              ) : (
+                pharmSuggestions.map((p, i) => (
+                  <button
+                    key={p.id}
+                    onMouseDown={(e) => { e.preventDefault(); handleSelectSuggestion(p); }}
+                    className={cn(
+                      "flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors",
+                      i === focusedIdx ? "bg-primary/10" : "hover:bg-muted/50"
+                    )}
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <MapPin className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">{p.name}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        {p.address}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {p.isOnGuard && (
+                        <span className="rounded-full bg-orange-100 px-1.5 py-0.5 text-[9px] font-bold text-orange-700">
+                          Garde
+                        </span>
+                      )}
+                      <span className="flex items-center gap-0.5 text-[11px] text-amber-600">
+                        ★ {p.rating.toFixed(1)}
+                      </span>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Category chips */}
+      {/* Filter chips */}
       {searchMode === "medications" && (
         <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pt-3 pb-1">
-          {CATEGORIES.map((cat) => {
-            const active = category === cat.id;
+          {[...CATEGORIES, ...categories.map((c) => ({ id: c, label: c, icon: Pill }))].map((cat) => {
             const Icon = cat.icon;
             return (
               <button
                 key={cat.id}
-                onClick={() => setCategory(cat.id)}
-                className={cn(
-                  "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
-                  active
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                )}
+                onClick={() => navigate("medication-search", { category: cat.id })}
+                className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/40"
               >
                 <Icon className="h-3.5 w-3.5" />
                 {cat.label}
@@ -176,6 +372,7 @@ export function HomeScreen() {
           })}
         </div>
       )}
+
 
       {/* Recent searches (only if any and not searching) */}
       {recentSearches.length > 0 && !search && (
@@ -238,6 +435,34 @@ export function HomeScreen() {
         </div>
       </div>
 
+      {/* Cart banner */}
+      <AnimatePresence>
+        {cart.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="px-4 pt-3"
+          >
+            <button
+              onClick={() => navigate("cart")}
+              className="flex w-full items-center gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-3 text-left transition-all hover:bg-primary/10"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <ShoppingCart className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-foreground">Reprendre mon panier</p>
+                <p className="text-xs text-muted-foreground">
+                  {cart.length} article{cart.length > 1 ? "s" : ""} · {cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0).toLocaleString()} FCFA
+                </p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Location section */}
       <div className="px-4 pt-4">
         <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
@@ -289,25 +514,74 @@ export function HomeScreen() {
           </button>
         </div>
         {loading ? (
-          <div className="flex h-40 items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          <div className="h-carousel px-4 mt-3 pb-1">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex w-64 shrink-0 flex-col gap-2 rounded-2xl border border-border bg-card p-2.5">
+                <Skeleton className="h-20 w-full rounded-xl" />
+                <Skeleton className="h-4 w-36 rounded-full" />
+                <Skeleton className="h-3 w-24 rounded-full" />
+                <Skeleton className="h-3 w-20 rounded-full" />
+              </div>
+            ))}
           </div>
         ) : guardPharmacies.length === 0 ? (
           <div className="mx-4 mt-2 rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
             Aucune pharmacie de garde pour le moment.
           </div>
         ) : (
-          <div className="h-carousel h-carousel-edge mt-3 pb-1">
+          <div className="h-carousel px-4 mt-3 pb-1">
             {guardPharmacies.map((p) => (
               <PharmacyCardCompact
                 key={p.id}
                 pharmacy={p}
+                isFavorite={favoriteIds.has(p.id)}
                 onClick={() => navigate("pharmacy-detail", { id: p.id })}
               />
             ))}
           </div>
         )}
       </section>
+
+      {/* Recently viewed */}
+      {recentlyViewed.length > 0 && (
+        <section className="pt-5 pb-2">
+          <div className="flex items-center justify-between px-4">
+            <h2 className="flex items-center gap-1.5 text-base font-bold text-foreground">
+              <Clock className="h-4 w-4 text-primary" />
+              Récemment consultés
+            </h2>
+            <button
+              onClick={() => navigate("medication-search", { q: "" })}
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              Voir tout
+            </button>
+          </div>
+          <div className="h-carousel px-4 pt-3 pb-1">
+            {recentlyViewed.map((m) => {
+              const colors = CATEGORY_COLORS[m.category as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.Autre;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => navigate("medication-detail", { id: m.id })}
+                  className="flex w-36 shrink-0 flex-col gap-2 rounded-2xl border border-border bg-card p-3 text-left transition-all hover:border-primary/40 hover:shadow-sm"
+                >
+                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Pill className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
+                      {m.name}
+                    </h3>
+                    <span className={cn("mt-0.5 inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium", colors.bg, colors.text)}>{m.category}</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">{m.dosage} · {m.form}</p>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Popular medications - horizontal carousel */}
       <section className="pt-5 pb-6">
@@ -324,11 +598,17 @@ export function HomeScreen() {
           </button>
         </div>
         {loading ? (
-          <div className="flex h-40 items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          <div className="h-carousel px-4 mt-3 pb-1">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex w-36 shrink-0 flex-col gap-2 rounded-2xl border border-border bg-card p-3">
+                <Skeleton className="h-14 w-14 rounded-xl" />
+                <Skeleton className="h-4 w-full rounded-full" />
+                <Skeleton className="h-3 w-16 rounded-full" />
+              </div>
+            ))}
           </div>
         ) : (
-          <div className="h-carousel h-carousel-edge mt-3 pb-1">
+          <div className="h-carousel px-4 mt-3 pb-1">
             {popularMeds.map((m) => (
               <button
                 key={m.id}
@@ -342,7 +622,7 @@ export function HomeScreen() {
                   <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
                     {m.name}
                   </h3>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{m.category}</p>
+                  <span className={cn("mt-0.5 inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium", categoryColor(m.category).bg, categoryColor(m.category).text)}>{m.category}</span>
                 </div>
                 {m.prescriptionRequired && (
                   <span className="inline-flex w-fit items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">

@@ -168,13 +168,7 @@
   scroll-snap-align: start;
   flex-shrink: 0;
 }
-/* Edge bleed: allow first/last items to have padding so cards don't touch screen edges */
-.h-carousel-edge {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  margin-left: -1rem;
-  margin-right: -1rem;
-}
+/* Edge bleed: padding is now applied via px-4 on the carousel */
 
 /* Leaflet map container */
 .leaflet-container {
@@ -186,6 +180,15 @@
 }
 
 /* Animations */
+@keyframes cartPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.animate-cart-pop {
+  animation: cartPop 0.3s ease-out;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;

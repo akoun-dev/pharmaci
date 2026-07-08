@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useAppStore } from "@/lib/store";
 import { authApi } from "@/lib/api";
 import { ToastHost } from "@/components/app/toast-host";
 import { BottomNav } from "@/components/app/bottom-nav";
+import { ErrorBoundary } from "@/components/app/error-boundary";
 import { AuthScreen } from "@/components/screens/auth-screen";
+import { OnboardingScreen } from "@/components/screens/onboarding-screen";
 import { HomeScreen } from "@/components/screens/home-screen";
 import { MedicationSearchScreen } from "@/components/screens/medication-search-screen";
 import { MedicationDetailScreen } from "@/components/screens/medication-detail-screen";
@@ -16,7 +18,9 @@ import { OrdersScreen } from "@/components/screens/orders-screen";
 import { CartScreen, CheckoutScreen } from "@/components/screens/cart-screen";
 import { OrderDetailScreen } from "@/components/screens/order-detail-screen";
 import { ProfileScreen } from "@/components/screens/profile-screen";
+import { HelpScreen } from "@/components/screens/help-screen";
 import { EditProfileScreen, ChangePasswordScreen } from "@/components/screens/edit-profile-screen";
+import { PageTransition } from "@/components/app/page-transition";
 import { Loader2 } from "lucide-react";
 
 // Dynamically import MapScreen (react-leaflet requires window)
@@ -35,53 +39,63 @@ const MapScreen = dynamic(
 function ScreenRouter() {
   const tab = useAppStore((s) => s.nav.tab);
   const view = useAppStore((s) => s.nav.view);
+  const params = useAppStore((s) => s.nav.params);
+  const navKey = `${tab}-${view}-${JSON.stringify(params)}`;
+
+  let screen: ReactNode;
 
   // Home tab views
   if (tab === "home") {
     switch (view) {
       case "medication-search":
-        return <MedicationSearchScreen />;
+        screen = <MedicationSearchScreen />;
+        break;
       case "medication-detail":
-        return <MedicationDetailScreen />;
+        screen = <MedicationDetailScreen />;
+        break;
       case "pharmacy-search":
-        return <PharmacySearchScreen />;
+        screen = <PharmacySearchScreen />;
+        break;
       case "guard-pharmacies":
-        return <GuardPharmaciesScreen />;
+        screen = <GuardPharmaciesScreen />;
+        break;
       case "pharmacy-detail":
-        return <PharmacyDetailScreen />;
+        screen = <PharmacyDetailScreen />;
+        break;
       case "cart":
-        return <CartScreen />;
+        screen = <CartScreen />;
+        break;
       case "checkout":
-        return <CheckoutScreen />;
+        screen = <CheckoutScreen />;
+        break;
       default:
-        return <HomeScreen />;
+        screen = <HomeScreen />;
     }
+  } else if (tab === "cart") {
+    if (view === "checkout") screen = <CheckoutScreen />;
+    else screen = <CartScreen />;
+  } else if (tab === "map") {
+    if (view === "pharmacy-detail") screen = <PharmacyDetailScreen />;
+    else if (view === "cart") screen = <CartScreen />;
+    else if (view === "checkout") screen = <CheckoutScreen />;
+    else screen = <MapScreen />;
+  } else if (tab === "orders") {
+    if (view === "order-detail") screen = <OrderDetailScreen />;
+    else if (view === "cart") screen = <CartScreen />;
+    else if (view === "checkout") screen = <CheckoutScreen />;
+    else if (view === "pharmacy-detail") screen = <PharmacyDetailScreen />;
+    else screen = <OrdersScreen />;
+  } else if (tab === "profile") {
+    if (view === "edit-profile") screen = <EditProfileScreen />;
+    else if (view === "change-password") screen = <ChangePasswordScreen />;
+    else if (view === "help") screen = <HelpScreen />;
+    else if (view === "pharmacy-detail") screen = <PharmacyDetailScreen />;
+    else screen = <ProfileScreen />;
+  } else {
+    screen = <HomeScreen />;
   }
 
-  // Map tab
-  if (tab === "map") {
-    if (view === "pharmacy-detail") return <PharmacyDetailScreen />;
-    return <MapScreen />;
-  }
-
-  // Orders tab
-  if (tab === "orders") {
-    if (view === "order-detail") return <OrderDetailScreen />;
-    if (view === "cart") return <CartScreen />;
-    if (view === "checkout") return <CheckoutScreen />;
-    if (view === "pharmacy-detail") return <PharmacyDetailScreen />;
-    return <OrdersScreen />;
-  }
-
-  // Profile tab
-  if (tab === "profile") {
-    if (view === "edit-profile") return <EditProfileScreen />;
-    if (view === "change-password") return <ChangePasswordScreen />;
-    if (view === "pharmacy-detail") return <PharmacyDetailScreen />;
-    return <ProfileScreen />;
-  }
-
-  return <HomeScreen />;
+  return <PageTransition navKey={navKey}>{screen}</PageTransition>;
 }
 
 function AppShell() {
@@ -89,6 +103,9 @@ function AppShell() {
   const user = useAppStore((s) => s.user);
   const setUser = useAppStore((s) => s.setUser);
   const nav = useAppStore((s) => s.nav);
+  const onboardingDone = useAppStore((s) => s.onboardingDone);
+  const setOnboardingDone = useAppStore((s) => s.setOnboardingDone);
+  const guestMode = useAppStore((s) => s.guestMode);
 
   useEffect(() => {
     void (async () => {
@@ -126,7 +143,11 @@ function AppShell() {
     );
   }
 
-  if (!user) {
+  if (!onboardingDone) {
+    return <OnboardingScreen onDone={setOnboardingDone} />;
+  }
+
+  if (!user && !guestMode) {
     return (
       <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
         <AuthScreen />
@@ -135,11 +156,13 @@ function AppShell() {
     );
   }
 
-  // Logged in: mobile app shell with bottom nav (always visible)
+  // Logged in or guest mode: mobile app shell with bottom nav (always visible)
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <main className="flex min-h-0 flex-1 flex-col">
-        <ScreenRouter />
+        <ErrorBoundary>
+          <ScreenRouter />
+        </ErrorBoundary>
       </main>
       <BottomNav />
       <ToastHost />

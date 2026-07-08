@@ -14,6 +14,8 @@ import {
   Copy,
   FileText,
   X,
+  ShoppingCart,
+  RefreshCw,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import {
@@ -38,6 +40,7 @@ export function OrderDetailScreen() {
   const params = useAppStore((s) => s.nav.params);
   const navigate = useAppStore((s) => s.navigate);
   const pushToast = useAppStore((s) => s.pushToast);
+  const addToCart = useAppStore((s) => s.addToCart);
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -92,6 +95,27 @@ export function OrderDetailScreen() {
     if (!order) return;
     navigator.clipboard.writeText(order.code);
     pushToast("Code copié !", "success");
+  }
+
+  function handleReorder() {
+    if (!order || !order.items) return;
+    const pharmacyName = order.pharmacy?.name || "Pharmacie";
+    for (const item of order.items) {
+      if (!item.medication) continue;
+      addToCart({
+        medicationId: item.medicationId,
+        medicationName: item.medication.name,
+        medicationDosage: item.medication.dosage,
+        medicationForm: item.medication.form,
+        pharmacyId: order.pharmacyId,
+        pharmacyName,
+        unitPrice: item.unitPrice,
+        quantity: item.quantity,
+        prescriptionRequired: item.medication.prescriptionRequired,
+      });
+    }
+    pushToast(`${order.items.length} article(s) ajouté(s) au panier !`, "success");
+    navigate("cart");
   }
 
   if (loading) {
@@ -274,6 +298,22 @@ export function OrderDetailScreen() {
           </div>
         )}
 
+        {/* Prescription reminder */}
+        {order.items?.some((i) => i.medication?.prescriptionRequired) && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3">
+            <div className="flex gap-2">
+              <FileText className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+              <div className="text-xs text-amber-800">
+                <p className="font-semibold">Ordonnance obligatoire</p>
+                <p className="mt-0.5">
+                  Certains médicaments de cette commande nécessitent une ordonnance.
+                  Veuillez la présenter au pharmacien lors du retrait.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Items */}
         <div className="rounded-2xl border border-border bg-card">
           <div className="border-b border-border/60 px-3 py-2.5">
@@ -325,6 +365,17 @@ export function OrderDetailScreen() {
             </h3>
             <p className="mt-1 text-sm text-foreground">{order.notes}</p>
           </div>
+        )}
+
+        {/* Re-order button */}
+        {order.items && order.items.length > 0 && (
+          <Button
+            onClick={handleReorder}
+            className="h-10 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+          >
+            <RefreshCw className="mr-1.5 h-4 w-4" />
+            Tout re-commander ({order.items.length})
+          </Button>
         )}
 
         {/* Cancel button */}

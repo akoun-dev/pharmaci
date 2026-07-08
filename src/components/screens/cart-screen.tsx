@@ -11,9 +11,10 @@ import {
   AlertCircle,
   CheckCircle2,
   FileText,
+  User,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
-import { orderApi, formatFCFA } from "@/lib/api";
+import { orderApi, formatFCFA, type Order } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,7 +36,7 @@ export function CartScreen() {
   }, {});
 
   async function handleCheckout() {
-    // For demo: create one order per pharmacy
+    navigator.vibrate?.(10);
     navigate("checkout");
   }
 
@@ -182,6 +183,8 @@ export function CartScreen() {
 // ---------- Checkout screen ----------
 export function CheckoutScreen() {
   const navigate = useAppStore((s) => s.navigate);
+  const user = useAppStore((s) => s.user);
+  const guestMode = useAppStore((s) => s.guestMode);
   const cart = useAppStore((s) => s.cart);
   const cartTotal = useAppStore((s) => s.cartTotal());
   const clearCart = useAppStore((s) => s.clearCart);
@@ -200,7 +203,7 @@ export function CheckoutScreen() {
     setLoading(true);
     try {
       // Create one order per pharmacy
-      const created = [];
+      const created: Order[] = [];
       for (const [pharmacyId, items] of pharmacyEntries) {
         const res = await orderApi.create({
           pharmacyId,
@@ -225,6 +228,31 @@ export function CheckoutScreen() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (!user && guestMode) {
+    return (
+      <div className="flex flex-col">
+        <AppHeader title="Commande" showBack />
+        <div className="flex flex-col items-center justify-center gap-4 px-6 py-16 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <User className="h-8 w-8" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold text-foreground">Connexion requise</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Créez un compte ou connectez-vous pour finaliser votre commande.
+            </p>
+          </div>
+          <Button
+            onClick={() => useAppStore.getState().setGuestMode(false)}
+            className="mt-2 rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground"
+          >
+            Se connecter / S'inscrire
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   if (cart.length === 0) {

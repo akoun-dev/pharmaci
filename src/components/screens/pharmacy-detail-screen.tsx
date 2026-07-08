@@ -14,6 +14,8 @@ import {
   ShoppingCart,
   Navigation,
   MessageSquare,
+  Minus,
+  Plus,
   Syringe,
   ShieldCheck,
   Truck,
@@ -35,6 +37,7 @@ import {
 import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { StarRating, ServiceBadges, StatusBadge } from "@/components/app/pharmacy-card";
 import { cn } from "@/lib/utils";
 
@@ -61,6 +64,7 @@ export function PharmacyDetailScreen() {
   const [favLoading, setFavLoading] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [showAddReview, setShowAddReview] = useState(false);
+  const [medQty, setMedQty] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!params.id) return;
@@ -69,7 +73,8 @@ export function PharmacyDetailScreen() {
 
   useEffect(() => {
     if (!params.id) return;
-    void loadMedications();
+    const timer = setTimeout(() => void loadMedications(), 300);
+    return () => clearTimeout(timer);
   }, [params.id, search]);
 
   async function load() {
@@ -129,6 +134,7 @@ export function PharmacyDetailScreen() {
 
   function handleAddToCart(pm: PharmacyMedication) {
     if (!pharmacy) return;
+    const qty = medQty[pm.id] || 1;
     if (pm.medication.prescriptionRequired) {
       pushToast("Médicament sur ordonnance — présentez-la en pharmacie.", "info");
     }
@@ -140,16 +146,16 @@ export function PharmacyDetailScreen() {
       pharmacyId: pharmacy.id,
       pharmacyName: pharmacy.name,
       unitPrice: pm.price,
-      quantity: 1,
+      quantity: qty,
       prescriptionRequired: pm.medication.prescriptionRequired,
     });
-    pushToast(`${pm.medication.name} ajouté au panier.`, "success");
+    pushToast(`${pm.medication.name} ×${qty} ajouté au panier.`, "success");
   }
 
   if (loading) {
     return (
       <div className="flex flex-col">
-        <AppHeader title="Pharmacie" showBack />
+        <AppHeader title="Pharmacie" showBack showCart />
         <div className="flex h-64 items-center justify-center">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
@@ -160,7 +166,7 @@ export function PharmacyDetailScreen() {
   if (!pharmacy) {
     return (
       <div className="flex flex-col">
-        <AppHeader title="Pharmacie" showBack />
+        <AppHeader title="Pharmacie" showBack showCart />
         <div className="flex h-64 flex-col items-center justify-center gap-3 text-center">
           <AlertCircle className="h-10 w-10 text-muted-foreground/50" />
           <p className="text-sm text-muted-foreground">Pharmacie introuvable.</p>
@@ -179,6 +185,7 @@ export function PharmacyDetailScreen() {
       <AppHeader
         title={pharmacy.name}
         showBack
+        showCart
         rightSlot={
           <button
             onClick={toggleFavorite}
@@ -302,7 +309,13 @@ export function PharmacyDetailScreen() {
         {/* Action buttons */}
         <div className="mt-4 grid grid-cols-2 gap-2">
           <Button
-            onClick={() => setTab("map")}
+            onClick={() => {
+              if (pharmacy) {
+                setTab("map", { focusLat: String(pharmacy.latitude), focusLng: String(pharmacy.longitude) });
+              } else {
+                setTab("map");
+              }
+            }}
             className="h-10 rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
             <Navigation className="mr-1.5 h-4 w-4" />
@@ -334,7 +347,24 @@ export function PharmacyDetailScreen() {
         </div>
 
         <div className="mt-3 space-y-2 pb-4">
-          {medications.length === 0 ? (
+          {loading ? (
+            <div className="space-y-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
+                  <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
+                  <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-4 w-36 rounded-full" />
+                    <Skeleton className="h-3 w-24 rounded-full" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-4 w-16 rounded-full" />
+                      <Skeleton className="h-3 w-12 rounded-full" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-8 w-8 rounded-lg" />
+                </div>
+              ))}
+            </div>
+          ) : medications.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
               Aucun médicament trouvé.
             </div>
@@ -369,13 +399,32 @@ export function PharmacyDetailScreen() {
                   </div>
                 </div>
                 {pm.stock > 0 && (
-                  <Button
-                    size="sm"
-                    onClick={() => handleAddToCart(pm)}
-                    className="h-8 shrink-0 rounded-lg bg-primary px-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
-                  >
-                    <ShoppingCart className="h-3.5 w-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 rounded-md border border-border bg-background">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setMedQty((q) => ({ ...q, [pm.id]: Math.max(1, (q[pm.id] || 1) - 1) })); }}
+                        className="flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground"
+                      >
+                        <Minus className="h-3 w-3" />
+                      </button>
+                      <span className="min-w-[1.5ch] text-center text-xs font-semibold tabular-nums text-foreground">
+                        {medQty[pm.id] || 1}
+                      </span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setMedQty((q) => ({ ...q, [pm.id]: Math.min(pm.stock, (q[pm.id] || 1) + 1) })); }}
+                        className="flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => handleAddToCart(pm)}
+                      className="h-8 shrink-0 rounded-lg bg-primary px-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+                    >
+                      <ShoppingCart className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 )}
               </div>
             ))

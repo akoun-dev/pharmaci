@@ -19,7 +19,7 @@ export interface AuthUser {
 }
 
 // Navigation tabs
-export type MainTab = "home" | "map" | "orders" | "profile";
+export type MainTab = "home" | "map" | "cart" | "orders" | "profile";
 
 // Cart item
 export interface CartItem {
@@ -54,7 +54,7 @@ interface AppState {
 
   // Navigation
   nav: NavState;
-  setTab: (tab: MainTab) => void;
+  setTab: (tab: MainTab, params?: Record<string, string>) => void;
   navigate: (view: string, params?: Record<string, string>) => void;
   goBack: () => void;
   canGoBack: () => boolean;
@@ -69,10 +69,26 @@ interface AppState {
   cartTotal: () => number;
   cartCount: () => number;
 
+  // Onboarding
+  onboardingDone: boolean;
+  setOnboardingDone: () => void;
+
+  // Guest mode
+  guestMode: boolean;
+  setGuestMode: (v: boolean) => void;
+
+  // Recently viewed medications
+  recentlyViewed: { id: string; name: string; category: string; dosage: string; form: string }[];
+  addRecentlyViewed: (med: { id: string; name: string; category: string; dosage: string; form: string }) => void;
+
   // Recent searches
   recentSearches: string[];
   addRecentSearch: (term: string) => void;
   clearRecentSearches: () => void;
+
+  // User position (lat, lng)
+  userPosition: [number, number] | null;
+  setUserPosition: (pos: [number, number]) => void;
 
   // Toast trigger (simple in-memory)
   toastQueue: { id: number; message: string; type: "success" | "error" | "info" }[];
@@ -99,10 +115,10 @@ export const useAppStore = create<AppState>()(
 
       // ---------- Navigation ----------
       nav: defaultNav,
-      setTab: (tab) =>
-        set((state) => ({
-          nav: { tab, view: tab, params: {}, history: [] },
-        })),
+  setTab: (tab, params = {}) =>
+    set((state) => ({
+      nav: { tab, view: tab, params, history: [] },
+    })),
       navigate: (view, params = {}) =>
         set((state) => {
           const current = state.nav;
@@ -174,6 +190,22 @@ export const useAppStore = create<AppState>()(
         get().cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0),
       cartCount: () => get().cart.reduce((sum, item) => sum + item.quantity, 0),
 
+      // ---------- Onboarding ----------
+      onboardingDone: false,
+      setOnboardingDone: () => set({ onboardingDone: true }),
+
+      // ---------- Guest mode ----------
+      guestMode: false,
+      setGuestMode: (v) => set({ guestMode: v }),
+
+      // ---------- Recently viewed ----------
+      recentlyViewed: [],
+      addRecentlyViewed: (med) =>
+        set((state) => {
+          const filtered = state.recentlyViewed.filter((m) => m.id !== med.id);
+          return { recentlyViewed: [med, ...filtered].slice(0, 10) };
+        }),
+
       // ---------- Recent searches ----------
       recentSearches: [],
       addRecentSearch: (term) =>
@@ -186,6 +218,10 @@ export const useAppStore = create<AppState>()(
           return { recentSearches: [trimmed, ...filtered].slice(0, 8) };
         }),
       clearRecentSearches: () => set({ recentSearches: [] }),
+
+      // ---------- User Position ----------
+      userPosition: null,
+      setUserPosition: (pos) => set({ userPosition: pos }),
 
       // ---------- Toasts ----------
       toastQueue: [],
@@ -208,6 +244,10 @@ export const useAppStore = create<AppState>()(
         user: state.user,
         cart: state.cart,
         recentSearches: state.recentSearches,
+        recentlyViewed: state.recentlyViewed,
+        guestMode: state.guestMode,
+        userPosition: state.userPosition,
+        onboardingDone: state.onboardingDone,
       }),
     }
   )

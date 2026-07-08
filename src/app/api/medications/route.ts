@@ -51,18 +51,31 @@ export async function GET(req: NextRequest) {
 
     const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
-    const [medications, total] = await Promise.all([
-      db.medication.findMany({
-        where,
-        orderBy: { name: "asc" },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
+    const medications = await db.medication.findMany({
+      where,
+      orderBy: { name: "asc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    // Fetch min price for each medication
+    const medIds = medications.map((m) => m.id);
+    const priceAggs = await db.pharmacyMedication.groupBy({
+      by: ["medicationId"],
+      where: { medicationId: { in: medIds }, stock: { gt: 0 } },
+      _min: { price: true },
+    });
+    const priceMap = new Map(priceAggs.map((p) => [p.medicationId, p._min.price]));
+
+    const [total] = await Promise.all([
       db.medication.count({ where }),
     ]);
 
     return NextResponse.json({
-      medications,
+      medications: medications.map((m) => ({
+        ...m,
+        minPrice: priceMap.get(m.id) ?? null,
+      })),
       total,
       page,
       totalPages: Math.ceil(total / limit),

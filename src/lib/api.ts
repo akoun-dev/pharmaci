@@ -39,6 +39,7 @@ export interface Medication {
   imageUrl: string | null;
   sideEffects: string;
   contraindications: string;
+  minPrice: number | null;
 }
 
 export interface Pharmacy {
