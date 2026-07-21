@@ -90,6 +90,10 @@ interface AppState {
   userPosition: [number, number] | null;
   setUserPosition: (pos: [number, number]) => void;
 
+  // Notifications
+  notificationCount: number;
+  setNotificationCount: (count: number) => void;
+
   // Toast trigger (simple in-memory)
   toastQueue: { id: number; message: string; type: "success" | "error" | "info" }[];
   pushToast: (message: string, type?: "success" | "error" | "info") => void;
@@ -223,6 +227,10 @@ export const useAppStore = create<AppState>()(
       userPosition: null,
       setUserPosition: (pos) => set({ userPosition: pos }),
 
+      // ---------- Notifications ----------
+      notificationCount: 0,
+      setNotificationCount: (count) => set({ notificationCount: count }),
+
       // ---------- Toasts ----------
       toastQueue: [],
       pushToast: (message, type = "info") =>
@@ -248,6 +256,7 @@ export const useAppStore = create<AppState>()(
         guestMode: state.guestMode,
         userPosition: state.userPosition,
         onboardingDone: state.onboardingDone,
+        notificationCount: state.notificationCount,
       }),
     }
   )

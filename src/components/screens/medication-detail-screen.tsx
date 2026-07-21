@@ -123,9 +123,17 @@ export function MedicationDetailScreen() {
       <div className="px-4 pt-4">
         <div className="rounded-2xl border border-border bg-card p-4">
           <div className="flex items-start gap-3">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Pill className="h-8 w-8" />
-            </div>
+            {medication.imageUrl ? (
+              <img
+                src={medication.imageUrl}
+                alt={medication.name}
+                className="h-16 w-16 shrink-0 rounded-2xl object-cover"
+              />
+            ) : (
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Pill className="h-8 w-8" />
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
                 <h1 className="text-lg font-bold text-foreground">{medication.name}</h1>

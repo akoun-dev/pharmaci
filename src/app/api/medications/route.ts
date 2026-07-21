@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search")?.trim() || "";
     const category = searchParams.get("category")?.trim() || "";
+    const sort = searchParams.get("sort")?.trim() || "name";
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
 
@@ -51,9 +52,16 @@ export async function GET(req: NextRequest) {
 
     const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
+    let orderBy: Record<string, string>;
+    if (sort === "popular") {
+      orderBy = { orderItems: { _count: "desc" } };
+    } else {
+      orderBy = { name: "asc" };
+    }
+
     const medications = await db.medication.findMany({
       where,
-      orderBy: { name: "asc" },
+      orderBy,
       skip: (page - 1) * limit,
       take: limit,
     });

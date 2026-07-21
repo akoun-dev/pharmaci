@@ -9,6 +9,7 @@ const updateProfileSchema = z.object({
   address: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
   district: z.string().optional().nullable(),
+  avatarUrl: z.string().optional().nullable(),
 });
 
 async function requireAuth() {
@@ -41,7 +42,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const { name, phone, address, city, district } = parsed.data;
+    const { name, phone, address, city, district, avatarUrl } = parsed.data;
 
     // Build update data with only provided fields
     const updateData: Record<string, unknown> = {};
@@ -50,6 +51,7 @@ export async function PUT(request: NextRequest) {
     if (address !== undefined) updateData.address = address;
     if (city !== undefined) updateData.city = city;
     if (district !== undefined) updateData.district = district;
+    if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
 
     const updatedUser = await db.user.update({
       where: { id: user.id },

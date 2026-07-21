@@ -1,0 +1,32 @@
+{
+  "name": "Pharmaci - Médicaments & Pharmacies",
+  "short_name": "Pharmaci",
+  "description": "Trouvez des pharmacies de garde, vérifiez la disponibilité des médicaments et gérez vos ordonnances en Côte d'Ivoire.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Rechercher un médicament",
+      "short_name": "Recherche",
+      "description": "Rechercher un médicament par nom ou principe actif",
+      "url": "/"
+    },
+    {
+      "name": "Mes commandes",
+      "short_name": "Commandes",
+      "description": "Voir mes commandes en cours",
+      "url": "/"
+    }
+  ]
+}

@@ -1,13 +1,22 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Search, Pill, Loader2, AlertCircle, Mic } from "lucide-react";
+import {
+  Search,
+  Pill,
+  Loader2,
+  Mic,
+  ArrowUpDown,
+  TrendingDown,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/lib/store";
 import { medicationApi, type Medication, formatFCFA } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
 import { cn, categoryColor } from "@/lib/utils";
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export function MedicationSearchScreen() {
   const navigate = useAppStore((s) => s.navigate);
@@ -24,6 +33,14 @@ export function MedicationSearchScreen() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [sort, setSort] = useState<"name" | "popular">("name");
+  const [showSortMenu, setShowSortMenu] = useState(false);
+
+  const { isListening, startListening } = useSpeechRecognition({
+    onResult: (transcript) => {
+      setSearch(transcript);
+    },
+  });
 
   const [suggestions, setSuggestions] = useState<Medication[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -35,7 +52,7 @@ export function MedicationSearchScreen() {
   useEffect(() => {
     const timer = setTimeout(() => void load(), 300);
     return () => clearTimeout(timer);
-  }, [search, category]);
+  }, [search, category, sort]);
 
   useEffect(() => {
     if (!search.trim() || showSuggestions) {
@@ -112,6 +129,7 @@ export function MedicationSearchScreen() {
         medicationApi.list({
           search: search.trim() || undefined,
           category: category !== "Tous" ? category : undefined,
+          sort: sort !== "name" ? sort : undefined,
           page: 1,
           limit: 20,
         }),
@@ -137,6 +155,7 @@ export function MedicationSearchScreen() {
       const res = await medicationApi.list({
         search: search.trim() || undefined,
         category: category !== "Tous" ? category : undefined,
+        sort: sort !== "name" ? sort : undefined,
         page: nextPage,
         limit: 20,
       });
@@ -172,25 +191,12 @@ export function MedicationSearchScreen() {
             autoFocus
           />
           <button
-            onClick={() => {
-              if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-                pushToast("Parlez maintenant...", "info");
-                const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-                const recognition = new SpeechRecognition();
-                recognition.lang = "fr-FR";
-                recognition.onresult = (event: any) => {
-                  const transcript = event.results[0][0].transcript;
-                  setSearch(transcript);
-                };
-                recognition.start();
-              } else {
-                pushToast("Reconnaissance vocale non disponible.", "error");
-              }
-            }}
-            className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+            onClick={startListening}
+            disabled={isListening}
+            className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
             aria-label="Recherche vocale"
           >
-            <Mic className="h-4 w-4" />
+            <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
           </button>
           {/* Suggestions dropdown */}
           {showSuggestions && (
@@ -257,10 +263,46 @@ export function MedicationSearchScreen() {
         })}
       </div>
 
-      <div className="px-4 pt-3">
-        <p className="text-xs text-muted-foreground">
-          {loading ? "Recherche..." : `${total} résultat${total > 1 ? "s" : ""} trouvé${total > 1 ? "s" : ""}`}
-        </p>
+      {/* Sort controls */}
+      <div className="relative px-4 pt-2">
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            {loading ? "Recherche..." : `${total} résultat${total > 1 ? "s" : ""} trouvé${total > 1 ? "s" : ""}`}
+          </p>
+          <div className="relative">
+            <button
+              onClick={() => setShowSortMenu(!showSortMenu)}
+              className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40"
+            >
+              <ArrowUpDown className="h-3 w-3" />
+              {sort === "name" ? "Nom" : "Populaire"}
+            </button>
+            {showSortMenu && (
+              <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+                <button
+                  onClick={() => { setSort("name"); setShowSortMenu(false); }}
+                  className={cn(
+                    "flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors",
+                    sort === "name" ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <ArrowUpDown className="h-3 w-3" />
+                  Par nom
+                </button>
+                <button
+                  onClick={() => { setSort("popular"); setShowSortMenu(false); }}
+                  className={cn(
+                    "flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors",
+                    sort === "popular" ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  <TrendingDown className="h-3 w-3" />
+                  Plus populaires
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 space-y-2 px-4 pt-2 pb-6">
@@ -281,12 +323,12 @@ export function MedicationSearchScreen() {
             ))}
           </div>
         ) : medications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-            <AlertCircle className="h-10 w-10 text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground">
-              Aucun médicament trouvé. Essayez une autre recherche.
-            </p>
-          </div>
+          <EmptyState
+            icon={Search}
+            title="Aucun médicament trouvé"
+            description="Essayez une autre recherche ou modifiez vos filtres."
+            action={search.trim() ? { label: "Effacer la recherche", onClick: () => setSearch("") } : undefined}
+          />
         ) : (
           <>
             {medications.map((m) => (

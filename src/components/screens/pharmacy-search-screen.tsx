@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Search, Loader2, AlertCircle, MapPin, Mic } from "lucide-react";
+import { Search, Loader2, MapPin, Mic } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/lib/store";
@@ -9,6 +9,8 @@ import { pharmacyApi, type Pharmacy } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
 import { PharmacyCard, ServiceBadges } from "@/components/app/pharmacy-card";
 import { cn } from "@/lib/utils";
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export function PharmacySearchScreen() {
   const navigate = useAppStore((s) => s.navigate);
@@ -23,6 +25,12 @@ export function PharmacySearchScreen() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+
+  const { isListening, startListening } = useSpeechRecognition({
+    onResult: (transcript) => {
+      setSearch(transcript);
+    },
+  });
 
   // Filters
   const [openNow, setOpenNow] = useState(false);
@@ -111,25 +119,12 @@ export function PharmacySearchScreen() {
             autoFocus
           />
           <button
-            onClick={() => {
-              if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-                pushToast("Parlez maintenant...", "info");
-                const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-                const recognition = new SpeechRecognition();
-                recognition.lang = "fr-FR";
-                recognition.onresult = (event: any) => {
-                  const transcript = event.results[0][0].transcript;
-                  setSearch(transcript);
-                };
-                recognition.start();
-              } else {
-                pushToast("Reconnaissance vocale non disponible.", "error");
-              }
-            }}
-            className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+            onClick={startListening}
+            disabled={isListening}
+            className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
             aria-label="Recherche vocale"
           >
-            <Mic className="h-4 w-4" />
+            <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
           </button>
         </div>
       </div>
@@ -187,10 +182,11 @@ export function PharmacySearchScreen() {
             ))}
           </div>
         ) : filteredPharmacies.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-            <AlertCircle className="h-10 w-10 text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground">Aucune pharmacie trouvée.</p>
-          </div>
+          <EmptyState
+            icon={Search}
+            title="Aucune pharmacie trouvée"
+            description="Essayez une autre recherche ou modifiez vos filtres."
+          />
         ) : (
           <>
             {filteredPharmacies.map((p) => (
@@ -284,10 +280,11 @@ export function GuardPharmaciesScreen() {
             ))}
           </div>
         ) : pharmacies.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-            <AlertCircle className="h-10 w-10 text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground">Aucune pharmacie de garde.</p>
-          </div>
+          <EmptyState
+            icon={Search}
+            title="Aucune pharmacie de garde"
+            description="Il n'y a pas de pharmacie de garde actuellement. Revenez plus tard."
+          />
         ) : (
           pharmacies.map((p) => (
             <PharmacyCard

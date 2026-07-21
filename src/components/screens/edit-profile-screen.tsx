@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   User,
   Mail,
@@ -14,6 +14,7 @@ import {
   Eye,
   EyeOff,
   Lock,
+  Camera,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { authApi } from "@/lib/api";
@@ -35,6 +36,34 @@ export function EditProfileScreen() {
   const [city, setCity] = useState(user?.city || "");
   const [district, setDistrict] = useState(user?.district || "");
   const [loading, setLoading] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      pushToast("Veuillez sélectionner une image.", "error");
+      return;
+    }
+    setUploadingPhoto(true);
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const res = await authApi.updateProfile({ avatarUrl: base64 });
+      setUser({ ...user!, ...res.user });
+      pushToast("Photo de profil mise à jour.", "success");
+    } catch {
+      pushToast("Erreur lors de l'upload de la photo.", "error");
+    } finally {
+      setUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   async function handleSave() {
     if (name.trim().length < 2) {
@@ -75,17 +104,33 @@ export function EditProfileScreen() {
         {/* Avatar */}
         <div className="flex flex-col items-center">
           <div className="relative">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoUpload}
+            />
             <Avatar className="h-24 w-24 border-4 border-primary/20">
-              <AvatarFallback className="bg-primary/10 text-2xl font-bold text-primary">
-                {initials}
-              </AvatarFallback>
+              {user.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user.name} className="h-full w-full rounded-full object-cover" />
+              ) : (
+                <AvatarFallback className="bg-primary/10 text-2xl font-bold text-primary">
+                  {initials}
+                </AvatarFallback>
+              )}
             </Avatar>
             <button
-              onClick={() => pushToast("Upload de photo bientôt disponible.", "info")}
-              className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md hover:bg-primary/90"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingPhoto}
+              className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md hover:bg-primary/90 disabled:opacity-50"
               aria-label="Changer la photo"
             >
-              <User className="h-4 w-4" />
+              {uploadingPhoto ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Camera className="h-4 w-4" />
+              )}
             </button>
           </div>
           <h2 className="mt-3 text-lg font-bold text-foreground">{user.name}</h2>

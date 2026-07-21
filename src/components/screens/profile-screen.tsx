@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   User as UserIcon,
   Mail,
@@ -8,15 +8,10 @@ import {
   MapPin,
   Heart,
   ChevronRight,
-  Settings,
   LogOut,
-  Bell,
-  Shield,
-  HelpCircle,
   Edit3,
   Loader2,
-  KeyRound,
-  Building2,
+  Camera,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
@@ -37,6 +32,8 @@ export function ProfileScreen() {
 
   const [favorites, setFavorites] = useState<Pharmacy[]>([]);
   const [loadingFav, setLoadingFav] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) void loadFavorites();
@@ -63,6 +60,32 @@ export function ProfileScreen() {
     }
     logout();
     pushToast("Déconnecté avec succès.", "info");
+  }
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      pushToast("Veuillez sélectionner une image.", "error");
+      return;
+    }
+    setUploadingPhoto(true);
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const res = await authApi.updateProfile({ avatarUrl: base64 });
+      setUser(res.user);
+      pushToast("Photo de profil mise à jour.", "success");
+    } catch {
+      pushToast("Erreur lors de l'upload de la photo.", "error");
+    } finally {
+      setUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   }
 
   if (!user) {
@@ -93,28 +116,41 @@ export function ProfileScreen() {
 
   return (
     <div className="flex flex-col">
-      <AppHeader
-        title="Profil"
-        showCart
-        rightSlot={
-          <button
-            onClick={() => navigate("edit-profile")}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
-            aria-label="Modifier le profil"
-          >
-            <Settings className="h-4 w-4" />
-          </button>
-        }
-      />
+      <AppHeader title="Profil" showCart />
 
       {/* Profile header */}
       <div className="px-4 pt-4">
         <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
-          <Avatar className="h-16 w-16 border-2 border-primary/30">
-            <AvatarFallback className="bg-primary/10 text-lg font-bold text-primary">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoUpload}
+            />
+            <Avatar className="h-16 w-16 border-2 border-primary/30">
+              {user.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user.name} className="h-full w-full rounded-full object-cover" />
+              ) : (
+                <AvatarFallback className="bg-primary/10 text-lg font-bold text-primary">
+                  {initials}
+                </AvatarFallback>
+              )}
+            </Avatar>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingPhoto}
+              className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition-colors hover:bg-primary/90 disabled:opacity-50"
+              aria-label="Changer la photo"
+            >
+              {uploadingPhoto ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Camera className="h-3.5 w-3.5" />
+              )}
+            </button>
+          </div>
           <div className="flex-1 min-w-0">
             <h2 className="truncate text-lg font-bold text-foreground">{user.name}</h2>
             <p className="text-xs text-muted-foreground">
@@ -204,36 +240,9 @@ export function ProfileScreen() {
         )}
       </div>
 
-      {/* Menu */}
-      <div className="px-4 pt-5 pb-6">
-        <h3 className="mb-1.5 px-1 text-xs font-semibold uppercase text-muted-foreground">
-          Compte
-        </h3>
-        <div className="divide-y divide-border/60 rounded-2xl border border-border bg-card">
-          <MenuRow
-            icon={Bell}
-            label="Notifications"
-            onClick={() => pushToast("Aucune nouvelle notification.", "info")}
-          />
-          <MenuRow
-            icon={KeyRound}
-            label="Changer le mot de passe"
-            onClick={() => navigate("change-password")}
-          />
-          <MenuRow
-            icon={Shield}
-            label="Confidentialité"
-            onClick={() => pushToast("Vos données sont cryptées et confidentielles.", "info")}
-          />
-          <MenuRow
-            icon={HelpCircle}
-            label="Aide & support"
-            onClick={() => navigate("help")}
-          />
-        </div>
-
-        {/* Dark mode toggle */}
-        <div className="mt-4 flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
+      {/* Dark mode toggle */}
+      <div className="px-4 pt-5">
+        <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
               {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
@@ -287,25 +296,4 @@ function InfoRow({
   );
 }
 
-function MenuRow({
-  icon: Icon,
-  label,
-  onClick,
-}: {
-  icon: typeof Mail;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex w-full items-center gap-3 p-3 text-left hover:bg-muted/50"
-    >
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-        <Icon className="h-4 w-4" />
-      </div>
-      <span className="flex-1 text-sm font-medium text-foreground">{label}</span>
-      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-    </button>
-  );
-}
+

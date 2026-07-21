@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/app/logo";
+import { ForgotPasswordModal } from "@/components/app/forgot-password-modal";
 import { authApi } from "@/lib/api";
 import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ export function AuthScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // form state
   const [email, setEmail] = useState("");
@@ -178,7 +180,7 @@ export function AuthScreen() {
                   <button
                     type="button"
                     className="text-xs font-medium text-primary hover:underline"
-                    onClick={() => pushToast("Contactez le support pour réinitialiser votre mot de passe.", "info")}
+                    onClick={() => setShowForgotPassword(true)}
                   >
                     Mot de passe oublié ?
                   </button>
@@ -317,6 +319,10 @@ export function AuthScreen() {
           </button>
         </div>
       </div>
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <ForgotPasswordModal onClose={() => setShowForgotPassword(false)} />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowLeft, Bell, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Bell, ShoppingCart, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useAppStore } from "@/lib/store";
 import { Logo } from "@/components/app/logo";
 import { cn } from "@/lib/utils";
@@ -10,7 +11,6 @@ interface AppHeaderProps {
   showBack?: boolean;
   showLogo?: boolean;
   showCart?: boolean;
-  showNotification?: boolean;
   onNotificationClick?: () => void;
   rightSlot?: React.ReactNode;
   className?: string;
@@ -21,7 +21,6 @@ export function AppHeader({
   showBack = false,
   showLogo = false,
   showCart = false,
-  showNotification = false,
   onNotificationClick,
   rightSlot,
   className,
@@ -31,6 +30,8 @@ export function AppHeader({
   const pushToast = useAppStore((s) => s.pushToast);
   const navigate = useAppStore((s) => s.navigate);
   const cartCount = useAppStore((s) => s.cartCount());
+  const notificationCount = useAppStore((s) => s.notificationCount);
+  const { theme, setTheme } = useTheme();
 
   return (
     <header
@@ -50,12 +51,19 @@ export function AppHeader({
       )}
       {showLogo && <Logo size="sm" />}
       {title && (
-        <h1 className="flex-1 truncate text-base font-semibold text-foreground">
+        <h1 className="truncate text-base font-semibold text-foreground">
           {title}
         </h1>
       )}
-      {!title && !showLogo && <div className="flex-1" />}
+      <div className="flex-1" />
       {rightSlot}
+      <button
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+        aria-label="Basculer le mode sombre"
+      >
+        {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      </button>
       {showCart && (
         <button
           onClick={() => navigate("cart")}
@@ -73,15 +81,20 @@ export function AppHeader({
           )}
         </button>
       )}
-      {showNotification && (
-        <button
-          onClick={onNotificationClick || (() => pushToast("Aucune nouvelle notification.", "info"))}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
-          aria-label="Notifications"
-        >
-          <Bell className="h-4 w-4" />
-        </button>
-      )}
+      <button
+        onClick={onNotificationClick || (() => {
+          navigate("notifications");
+        })}
+        className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+        aria-label="Notifications"
+      >
+        <Bell className="h-4 w-4" />
+        {notificationCount > 0 && (
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm animate-cart-pop">
+            {notificationCount > 9 ? "9+" : notificationCount}
+          </span>
+        )}
+      </button>
     </header>
   );
 }

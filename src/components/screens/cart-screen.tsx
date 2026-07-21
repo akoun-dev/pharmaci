@@ -19,6 +19,7 @@ import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export function CartScreen() {
   const navigate = useAppStore((s) => s.navigate);
@@ -44,15 +45,13 @@ export function CartScreen() {
     return (
       <div className="flex flex-col">
         <AppHeader title="Mon panier" showBack />
-        <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-          <ShoppingBag className="h-12 w-12 text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground">Votre panier est vide.</p>
-          <Button
-            onClick={() => useAppStore.getState().setTab("home")}
-            className="mt-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            Rechercher un médicament
-          </Button>
+        <div className="px-4 pt-8">
+          <EmptyState
+            icon={ShoppingBag}
+            title="Votre panier est vide"
+            description="Ajoutez des médicaments depuis la recherche pour commencer."
+            action={{ label: "Rechercher un médicament", onClick: () => useAppStore.getState().setTab("home") }}
+          />
         </div>
       </div>
     );
@@ -259,9 +258,12 @@ export function CheckoutScreen() {
     return (
       <div className="flex flex-col">
         <AppHeader title="Commande" showBack />
-        <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-          <AlertCircle className="h-10 w-10 text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground">Panier vide.</p>
+        <div className="px-4 pt-8">
+          <EmptyState
+            icon={ShoppingBag}
+            title="Panier vide"
+            description="Ajoutez des articles depuis la recherche."
+          />
         </div>
       </div>
     );

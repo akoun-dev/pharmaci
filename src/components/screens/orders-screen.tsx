@@ -4,12 +4,10 @@ import { useEffect, useState } from "react";
 import {
   ClipboardList,
   Loader2,
-  AlertCircle,
   Package,
   Clock,
   CheckCircle2,
   XCircle,
-  QrCode,
   ChevronRight,
   ShoppingBag,
 } from "lucide-react";
@@ -22,9 +20,9 @@ import {
   formatDate,
 } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const STATUS_FILTERS = [
   { id: "ALL", label: "Toutes" },
@@ -85,11 +83,12 @@ export function OrdersScreen() {
     <div className="flex flex-col">
       <AppHeader title="Mes commandes" showCart />
       {!user && (
-        <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-          <ClipboardList className="h-12 w-12 text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground">
-            Connectez-vous pour voir vos commandes.
-          </p>
+        <div className="px-4 pt-8">
+          <EmptyState
+            icon={ClipboardList}
+            title="Connectez-vous"
+            description="Connectez-vous pour voir vos commandes."
+          />
         </div>
       )}
 
@@ -160,16 +159,12 @@ export function OrdersScreen() {
                 ))}
               </div>
             ) : orders.length === 0 ? (
-              <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-                <ClipboardList className="h-10 w-10 text-muted-foreground/40" />
-                <p className="text-sm text-muted-foreground">Aucune commande.</p>
-                <Button
-                  onClick={() => useAppStore.getState().setTab("home")}
-                  className="mt-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  Commander un médicament
-                </Button>
-              </div>
+              <EmptyState
+                icon={ClipboardList}
+                title="Aucune commande"
+                description="Commencez par rechercher un médicament et passez votre première commande."
+                action={{ label: "Commander un médicament", onClick: () => useAppStore.getState().setTab("home") }}
+              />
             ) : (
               orders.map((o) => (
                 <button

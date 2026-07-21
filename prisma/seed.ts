@@ -228,6 +228,7 @@ async function main() {
       prescriptionRequired: false,
       sideEffects: "Nausées, allergies rares, atteinte hépatique en cas de surdosage",
       contraindications: "Insuffisance hépatique sévère, allergie au paracétamol",
+      imageUrl: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200",
     },
     {
       name: "Ibuprofène 400mg",
@@ -239,6 +240,7 @@ async function main() {
       prescriptionRequired: false,
       sideEffects: "Troubles digestifs, brûlures d'estomac",
       contraindications: "Ulcère gastrique, insuffisance rénale sévère, grossesse 3e trimestre",
+      imageUrl: "https://images.unsplash.com/photo-1550572017-edd951b55104?w=200",
     },
     {
       name: "Amoxicilline 500mg",
@@ -250,6 +252,7 @@ async function main() {
       prescriptionRequired: true,
       sideEffects: "Nausées, diarrhée, réactions allergiques",
       contraindications: "Allergie aux pénicillines",
+      imageUrl: "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=200",
     },
     {
       name: "Co-artem (Artéméther+Luméfantrine)",
@@ -261,6 +264,7 @@ async function main() {
       prescriptionRequired: true,
       sideEffects: "Maux de tête, vertiges, troubles digestifs",
       contraindications: "Hypersensibilité connue, premier trimestre de grossesse",
+      imageUrl: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=200",
     },
     {
       name: "Aspirine 500mg (ASA)",
@@ -272,6 +276,7 @@ async function main() {
       prescriptionRequired: false,
       sideEffects: "Saignements, troubles digestifs",
       contraindications: "Enfant < 16 ans (syndrome de Reye), ulcère, troubles de la coagulation",
+      imageUrl: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200",
     },
     {
       name: "Métronidazole 500mg",
@@ -283,6 +288,7 @@ async function main() {
       prescriptionRequired: true,
       sideEffects: "Goût métallique, nausées, prise d'alcool déconseillée",
       contraindications: "Premier trimestre de grossesse, prise d'alcool",
+      imageUrl: "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=200",
     },
     {
       name: "Coton hydrophile 100g",
@@ -294,6 +300,7 @@ async function main() {
       prescriptionRequired: false,
       sideEffects: "",
       contraindications: "",
+      imageUrl: "https://images.unsplash.com/photo-1583946096379-c5a927339909?w=200",
     },
     {
       name: "Vitamine C 1000mg",
@@ -305,6 +312,7 @@ async function main() {
       prescriptionRequired: false,
       sideEffects: "Troubles digestifs à haute dose",
       contraindications: "Lithiase rénale oxalique",
+      imageUrl: "https://images.unsplash.com/photo-1580281657520-9c2a50d8d33e?w=200",
     },
     {
       name: "Sérum physiologique 500ml",
@@ -316,6 +324,7 @@ async function main() {
       prescriptionRequired: false,
       sideEffects: "",
       contraindications: "",
+      imageUrl: "https://images.unsplash.com/photo-1576675784201-0e3b5b5d5c5b?w=200",
     },
     {
       name: "Cétirizine 10mg",
@@ -327,6 +336,7 @@ async function main() {
       prescriptionRequired: false,
       sideEffects: "Somnolence, sécheresse buccale",
       contraindications: "Insuffisance rénale sévère",
+      imageUrl: "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=200",
     },
     {
       name: "Oméprazole 20mg",
@@ -338,6 +348,7 @@ async function main() {
       prescriptionRequired: true,
       sideEffects: "Maux de tête, troubles digestifs",
       contraindications: "Hypersensibilité",
+      imageUrl: "https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=200",
     },
     {
       name: "Doliprane Sirop 2.4%",
@@ -349,6 +360,7 @@ async function main() {
       prescriptionRequired: false,
       sideEffects: "Allergies rares",
       contraindications: "Insuffisance hépatique",
+      imageUrl: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200",
     },
   ];
 

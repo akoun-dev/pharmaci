@@ -20,6 +20,8 @@ import { OrderDetailScreen } from "@/components/screens/order-detail-screen";
 import { ProfileScreen } from "@/components/screens/profile-screen";
 import { HelpScreen } from "@/components/screens/help-screen";
 import { EditProfileScreen, ChangePasswordScreen } from "@/components/screens/edit-profile-screen";
+import { NotificationsScreen } from "@/components/screens/notifications-screen";
+import { NotificationDetailScreen } from "@/components/screens/notification-detail-screen";
 import { PageTransition } from "@/components/app/page-transition";
 import { Loader2 } from "lucide-react";
 
@@ -44,6 +46,12 @@ function ScreenRouter() {
 
   let screen: ReactNode;
 
+  // Notifications views (accessible from any tab)
+  if (view === "notifications") {
+    screen = <NotificationsScreen />;
+  } else if (view === "notification-detail") {
+    screen = <NotificationDetailScreen />;
+  } else
   // Home tab views
   if (tab === "home") {
     switch (view) {

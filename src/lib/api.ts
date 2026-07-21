@@ -129,6 +129,7 @@ export const authApi = {
     address?: string;
     city?: string;
     district?: string;
+    avatarUrl?: string;
   }) => api.put<{ user: AuthUser }>("/api/auth/update-profile", data),
   changePassword: (currentPassword: string, newPassword: string) =>
     api.put<{ success: boolean }>("/api/auth/change-password", {
@@ -145,10 +146,11 @@ export interface PharmacyWithPrice {
   pmId: string;
 }
 export const medicationApi = {
-  list: (params?: { search?: string; category?: string; page?: number; limit?: number }) => {
+  list: (params?: { search?: string; category?: string; sort?: string; page?: number; limit?: number }) => {
     const q = new URLSearchParams();
     if (params?.search) q.set("search", params.search);
     if (params?.category) q.set("category", params.category);
+    if (params?.sort) q.set("sort", params.sort);
     if (params?.page) q.set("page", String(params.page));
     if (params?.limit) q.set("limit", String(params.limit));
     return api.get<{
@@ -290,6 +292,29 @@ export function haversineDistance(
 export function formatDistance(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   return `${km.toFixed(1)} km`;
+}
+
+// Generate a personalized notification message for an order status change
+export function notificationMessage(
+  status: Order["status"],
+  pharmacyName: string,
+  code: string
+): string {
+  const pharmacy = pharmacyName || "la pharmacie";
+  switch (status) {
+    case "PENDING":
+      return `Commande #${code} créée chez ${pharmacy} — en attente de confirmation`;
+    case "CONFIRMED":
+      return `${pharmacy} a confirmé votre commande #${code} — elle sera bientôt prête`;
+    case "READY":
+      return `Votre commande #${code} est prête chez ${pharmacy} ! Venez la récupérer`;
+    case "PICKED_UP":
+      return `Vous avez récupéré votre commande #${code} chez ${pharmacy} — merci !`;
+    case "CANCELLED":
+      return `Commande #${code} annulée chez ${pharmacy}`;
+    default:
+      return `Mise à jour de la commande #${code} chez ${pharmacy}`;
+  }
 }
 
 // Order status labels and colors

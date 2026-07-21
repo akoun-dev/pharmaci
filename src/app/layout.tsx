@@ -28,6 +28,22 @@ export const metadata: Metadata = {
     "Pharmaci",
   ],
   authors: [{ name: "Pharmaci" }],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Pharmaci",
+  },
+  icons: [
+    { rel: "icon", url: "/logo.svg", type: "image/svg+xml" },
+    { rel: "apple-touch-icon", url: "/icon-192.png" },
+  ],
+  openGraph: {
+    type: "website",
+    title: "Pharmaci - Médicaments & Pharmacies",
+    description:
+      "Trouvez des pharmacies de garde et médicaments en Côte d'Ivoire",
+  },
 };
 
 export const viewport: Viewport = {

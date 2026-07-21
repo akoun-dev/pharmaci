@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import {
   Search,
   MapPin,
-  Bell,
   ChevronRight,
   Clock,
   Sparkles,
@@ -12,16 +11,27 @@ import {
   Loader2,
   ShoppingCart,
   Mic,
+  Camera,
+  Locate,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/app/logo";
+import { AppHeader } from "@/components/app/app-header";
 import { PharmacyCardCompact } from "@/components/app/pharmacy-card";
 import { useAppStore } from "@/lib/store";
-import { pharmacyApi, medicationApi, type Pharmacy, type Medication } from "@/lib/api";
+import {
+  pharmacyApi,
+  medicationApi,
+  orderApi,
+  notificationMessage,
+  type Pharmacy,
+  type Medication,
+} from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, categoryColor, CATEGORY_COLORS } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
+import { useBarcodeScanner } from "@/hooks/use-barcode-scanner";
 
 const CATEGORIES = [
   { id: "Tous", label: "Tous", icon: Sparkles },
@@ -46,6 +56,38 @@ export function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [location, setLocation] = useState("Abidjan, Cocody Riviera");
+  const [showScanner, setShowScanner] = useState(false);
+
+  // Speech recognition
+  const { isListening, isSupported: speechSupported, startListening } = useSpeechRecognition({
+    onResult: (transcript) => {
+      setSearch(transcript);
+      addRecentSearch(transcript);
+      navigate(
+        searchMode === "medications" ? "medication-search" : "pharmacy-search",
+        { q: transcript }
+      );
+    },
+  });
+
+  // Barcode scanner
+  const {
+    isScanning,
+    isSupported: barcodeSupported,
+    startScanning: startBarcodeScan,
+    stopScanning: stopBarcodeScan,
+    videoRef,
+    canvasRef,
+  } = useBarcodeScanner({
+    onDetect: (code) => {
+      setSearch(code);
+      addRecentSearch(code);
+      navigate("medication-search", { q: code });
+      setShowScanner(false);
+    },
+  });
+
+  const prevOrders = useRef<Map<string, string>>(new Map());
 
 
   // Suggestion state
@@ -59,6 +101,19 @@ export function HomeScreen() {
 
   useEffect(() => {
     void loadInitial();
+
+    function onFocus() { void loadInitial(); }
+    window.addEventListener("focus", onFocus);
+
+    // Poll for order updates every 30s
+    const pollInterval = setInterval(() => {
+      if (user) void checkNotifications();
+    }, 30000);
+
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      clearInterval(pollInterval);
+    };
   }, []);
 
   // Fetch suggestions when typing
@@ -90,12 +145,42 @@ export function HomeScreen() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  async function checkNotifications() {
+    if (!user) return;
+    try {
+      const res = await orderApi.list();
+      const active = res.orders.filter(
+        (o) => o.status === "PENDING" || o.status === "CONFIRMED" || o.status === "READY"
+      );
+
+      // Detect new orders or status changes since last check
+      if (prevOrders.current.size > 0) {
+        const oldMap = prevOrders.current;
+        for (const order of active) {
+          const prevStatus = oldMap.get(order.id);
+          if (!prevStatus || prevStatus !== order.status) {
+            pushToast(
+              notificationMessage(order.status, order.pharmacy?.name || "Pharmacie", order.code),
+              "info"
+            );
+          }
+        }
+      }
+
+      // Update ref with current id→status map for next comparison
+      prevOrders.current = new Map(active.map((o) => [o.id, o.status]));
+      useAppStore.getState().setNotificationCount(active.length);
+    } catch {
+      // ignore silently
+    }
+  }
+
   async function loadInitial() {
     setLoading(true);
     try {
       const [guardRes, medsRes, catRes, favRes] = await Promise.all([
         pharmacyApi.list({ onGuard: true, limit: 4 }),
-        medicationApi.list({ limit: 6 }),
+        medicationApi.list({ sort: "popular", limit: 6 }),
         medicationApi.categories(),
         user ? pharmacyApi.favorites() : Promise.resolve({ pharmacies: [] }),
       ]);
@@ -103,6 +188,8 @@ export function HomeScreen() {
       setPopularMeds(medsRes.medications);
       setCategories(catRes.categories);
       if (favRes) setFavoriteIds(new Set((favRes as { pharmacies: Pharmacy[] }).pharmacies.map((p) => p.id)));
+      // Check notifications in parallel
+      void checkNotifications();
     } catch {
       // ignore
     } finally {
@@ -180,29 +267,7 @@ export function HomeScreen() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-border/60 bg-card/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-        <Logo size="sm" />
-        <div className="flex-1" />
-        <button
-          onClick={() => navigate("cart")}
-          className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
-          aria-label="Panier"
-        >
-          <ShoppingCart className="h-4 w-4" />
-          {cartCount > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
-              {cartCount}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => pushToast("Aucune nouvelle notification.", "info")}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
-          aria-label="Notifications"
-        >
-          <Bell className="h-4 w-4" />
-        </button>
-      </header>
+      <AppHeader title="Pharmaci" showCart />
 
       {/* Greeting */}
       <div className="px-4 pt-4">
@@ -256,32 +321,25 @@ export function HomeScreen() {
             }
             className="h-11 rounded-xl border-primary/20 bg-primary/5 pl-9 pr-12"
           />
-          <button
-            onClick={() => {
-              if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-                pushToast("Parlez maintenant...", "info");
-                const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-                const recognition = new SpeechRecognition();
-                recognition.lang = "fr-FR";
-                recognition.onresult = (event: any) => {
-                  const transcript = event.results[0][0].transcript;
-                  setSearch(transcript);
-                  addRecentSearch(transcript);
-                  navigate(
-                    searchMode === "medications" ? "medication-search" : "pharmacy-search",
-                    { q: transcript }
-                  );
-                };
-                recognition.start();
-              } else {
-                pushToast("Reconnaissance vocale non disponible.", "error");
-              }
-            }}
-            className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
-            aria-label="Recherche vocale"
-          >
-            <Mic className="h-4 w-4" />
-          </button>
+          <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
+            {barcodeSupported && (
+              <button
+                onClick={() => setShowScanner(true)}
+                className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                aria-label="Scanner un code-barres"
+              >
+                <Camera className="h-4 w-4" />
+              </button>
+            )}
+            <button
+              onClick={startListening}
+              disabled={isListening}
+              className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+              aria-label="Recherche vocale"
+            >
+              <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
+            </button>
+          </div>
           {/* Suggestions dropdown */}
           {showSuggestions && (
             <div
@@ -480,12 +538,19 @@ export function HomeScreen() {
               if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                   (pos) => {
-                    setLocation(
-                      `${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)}`
-                    );
-                    pushToast("Position mise à jour.", "success");
+                    const { latitude, longitude } = pos.coords;
+                    setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+                    useAppStore.getState().setUserPosition([latitude, longitude]);
+                    pushToast("Position mise à jour avec précision.", "success");
                   },
-                  () => pushToast("Impossible d'obtenir votre position.", "error")
+                  (err) => {
+                    const msg =
+                      err.code === err.PERMISSION_DENIED
+                        ? "Localisation refusée. Activez-la dans les paramètres."
+                        : "Impossible d'obtenir votre position.";
+                    pushToast(msg, "error");
+                  },
+                  { enableHighAccuracy: true, timeout: 10000 }
                 );
               } else {
                 pushToast("Géolocalisation non disponible.", "error");
@@ -493,8 +558,8 @@ export function HomeScreen() {
             }}
             className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
           >
-            Modifier
-            <ChevronRight className="h-3.5 w-3.5" />
+            <Locate className="h-3.5 w-3.5" />
+            Localiser
           </button>
         </div>
       </div>
@@ -566,9 +631,13 @@ export function HomeScreen() {
                   onClick={() => navigate("medication-detail", { id: m.id })}
                   className="flex w-36 shrink-0 flex-col gap-2 rounded-2xl border border-border bg-card p-3 text-left transition-all hover:border-primary/40 hover:shadow-sm"
                 >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Pill className="h-7 w-7" />
-                  </div>
+                  {m.imageUrl ? (
+                    <img src={m.imageUrl} alt={m.name} className="h-14 w-14 rounded-xl object-cover" />
+                  ) : (
+                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <Pill className="h-7 w-7" />
+                    </div>
+                  )}
                   <div>
                     <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
                       {m.name}
@@ -634,6 +703,47 @@ export function HomeScreen() {
           </div>
         )}
       </section>
+      {/* Barcode scanner overlay */}
+      {showScanner && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black" onClick={() => { stopBarcodeScan(); setShowScanner(false); }}>
+          <div className="relative flex flex-1 flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between bg-black/80 p-4">
+              <h2 className="text-base font-bold text-white">Scanner un code-barres</h2>
+              <button
+                onClick={() => { stopBarcodeScan(); setShowScanner(false); }}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white"
+                aria-label="Fermer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="relative flex flex-1 items-center justify-center">
+              <video
+                ref={videoRef}
+                className="absolute inset-0 h-full w-full object-cover"
+                playsInline
+              />
+              <canvas ref={canvasRef} className="hidden" />
+              {/* Scan frame */}
+              <div className="relative z-10">
+                <div className="h-56 w-56 rounded-2xl border-2 border-white/60">
+                  <div className="absolute left-0 top-0 h-6 w-6 border-l-2 border-t-2 border-primary" />
+                  <div className="absolute right-0 top-0 h-6 w-6 border-r-2 border-t-2 border-primary" />
+                  <div className="absolute bottom-0 left-0 h-6 w-6 border-b-2 border-l-2 border-primary" />
+                  <div className="absolute bottom-0 right-0 h-6 w-6 border-b-2 border-r-2 border-primary" />
+                </div>
+                <div className="absolute left-1/2 top-1/2 h-0.5 w-48 -translate-x-1/2 -translate-y-1/2 animate-pulse bg-primary" />
+              </div>
+              {isScanning && (
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full bg-white/20 px-4 py-2 text-sm text-white backdrop-blur">
+                  Recherche de code-barres...
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
