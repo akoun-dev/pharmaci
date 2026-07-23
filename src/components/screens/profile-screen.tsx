@@ -207,7 +207,8 @@ export function ProfileScreen() {
         </div>
       </div>
 
-      {/* Favorites */}
+      {/* Favorites — patients only */}
+      {user.role === "PATIENT" && (
       <div className="px-4 pt-5">
         <div className="flex items-center justify-between">
           <h3 className="flex items-center gap-1.5 text-sm font-bold text-foreground">
@@ -249,6 +250,7 @@ export function ProfileScreen() {
           </div>
         )}
       </div>
+      )}
 
       {/* Dark mode toggle */}
       <div className="px-4 pt-5">
