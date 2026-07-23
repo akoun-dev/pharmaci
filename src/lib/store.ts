@@ -19,7 +19,7 @@ export interface AuthUser {
 }
 
 // Navigation tabs
-export type MainTab = "home" | "map" | "cart" | "orders" | "profile";
+export type MainTab = "home" | "map" | "cart" | "orders" | "profile" | "pharmacist" | "admin";
 
 // Cart item
 export interface CartItem {

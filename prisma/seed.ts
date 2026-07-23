@@ -27,10 +27,10 @@ async function main() {
   });
 
   const pharmacist = await prisma.user.upsert({
-    where: { email: "pharmacien@pharmaci.ci" },
+    where: { email: "pharma@pharmaci.ci" },
     update: {},
     create: {
-      email: "pharmacien@pharmaci.ci",
+      email: "pharma@pharmaci.ci",
       password: pharmacistPassword,
       name: "Koffi Yao",
       role: "PHARMACIST",
@@ -572,7 +572,7 @@ async function main() {
 
   console.log("✅ Seed completed!");
   console.log("   Patient:  patient@pharmaci.ci / patient123");
-  console.log("   Pharmacist: pharmacien@pharmaci.ci / pharma123");
+  console.log("   Pharmacist: pharma@pharmaci.ci / pharma123");
   console.log("   Admin:    admin@pharmaci.ci / admin123");
 }
 

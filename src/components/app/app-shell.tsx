@@ -23,9 +23,18 @@ import { EditProfileScreen, ChangePasswordScreen } from "@/components/screens/ed
 import { NotificationsScreen } from "@/components/screens/notifications-screen";
 import { NotificationDetailScreen } from "@/components/screens/notification-detail-screen";
 import { PageTransition } from "@/components/app/page-transition";
+import { PharmacistDashboardScreen } from "@/components/screens/pharmacist-dashboard-screen";
+import { PharmacistStockScreen } from "@/components/screens/pharmacist-stock-screen";
+import { PharmacistPharmacyScreen } from "@/components/screens/pharmacist-pharmacy-screen";
+import { PharmacistOrdersScreen } from "@/components/screens/pharmacist-orders-screen";
+import { AdminDashboardScreen } from "@/components/screens/admin-dashboard-screen";
+import { AdminUsersScreen } from "@/components/screens/admin-users-screen";
+import { AdminPharmaciesScreen } from "@/components/screens/admin-pharmacies-screen";
+import { AdminOrdersScreen } from "@/components/screens/admin-orders-screen";
+import { MessagesScreen } from "@/components/screens/messages-screen";
+import { ChatScreen } from "@/components/screens/chat-screen";
 import { Loader2 } from "lucide-react";
 
-// Dynamically import MapScreen (react-leaflet requires window)
 const MapScreen = dynamic(
   () => import("@/components/screens/map-screen").then((m) => m.MapScreen),
   {
@@ -42,6 +51,7 @@ function ScreenRouter() {
   const tab = useAppStore((s) => s.nav.tab);
   const view = useAppStore((s) => s.nav.view);
   const params = useAppStore((s) => s.nav.params);
+  const user = useAppStore((s) => s.user);
   const navKey = `${tab}-${view}-${JSON.stringify(params)}`;
 
   let screen: ReactNode;
@@ -51,24 +61,36 @@ function ScreenRouter() {
     screen = <NotificationsScreen />;
   } else if (view === "notification-detail") {
     screen = <NotificationDetailScreen />;
-  } else
-  // Home tab views
-  if (tab === "home") {
+  } else if (view === "messages") {
+    screen = <MessagesScreen />;
+  } else if (view === "chat") {
+    screen = <ChatScreen />;
+  } else if (view === "pharmacist-stock") {
+    screen = <PharmacistStockScreen />;
+  } else if (view === "pharmacist-pharmacy") {
+    screen = <PharmacistPharmacyScreen />;
+  } else if (view === "pharmacist-order-detail") {
+    screen = <OrderDetailScreen />;
+  } else if (view === "admin-users") {
+    screen = <AdminUsersScreen />;
+  } else if (view === "admin-pharmacies") {
+    screen = <AdminPharmaciesScreen />;
+  } else if (view === "admin-orders") {
+    screen = <AdminOrdersScreen />;
+  } else if (view === "medication-detail") {
+    screen = <MedicationDetailScreen />;
+  } else if (view === "pharmacy-detail") {
+    screen = <PharmacyDetailScreen />;
+  } else if (tab === "home") {
     switch (view) {
       case "medication-search":
         screen = <MedicationSearchScreen />;
-        break;
-      case "medication-detail":
-        screen = <MedicationDetailScreen />;
         break;
       case "pharmacy-search":
         screen = <PharmacySearchScreen />;
         break;
       case "guard-pharmacies":
         screen = <GuardPharmaciesScreen />;
-        break;
-      case "pharmacy-detail":
-        screen = <PharmacyDetailScreen />;
         break;
       case "cart":
         screen = <CartScreen />;
@@ -83,16 +105,20 @@ function ScreenRouter() {
     if (view === "checkout") screen = <CheckoutScreen />;
     else screen = <CartScreen />;
   } else if (tab === "map") {
-    if (view === "pharmacy-detail") screen = <PharmacyDetailScreen />;
-    else if (view === "cart") screen = <CartScreen />;
+    if (view === "cart") screen = <CartScreen />;
     else if (view === "checkout") screen = <CheckoutScreen />;
     else screen = <MapScreen />;
   } else if (tab === "orders") {
-    if (view === "order-detail") screen = <OrderDetailScreen />;
+    if (view === "order-detail" || view === "pharmacist-order-detail") screen = <OrderDetailScreen />;
     else if (view === "cart") screen = <CartScreen />;
     else if (view === "checkout") screen = <CheckoutScreen />;
-    else if (view === "pharmacy-detail") screen = <PharmacyDetailScreen />;
+    else if (user?.role === "PHARMACIST") screen = <PharmacistOrdersScreen />;
     else screen = <OrdersScreen />;
+  } else if (tab === "pharmacist") {
+    if (view === "pharmacist-pharmacy") screen = <PharmacistPharmacyScreen />;
+    else screen = <PharmacistDashboardScreen />;
+  } else if (tab === "admin") {
+    screen = <AdminDashboardScreen />;
   } else if (tab === "profile") {
     if (view === "edit-profile") screen = <EditProfileScreen />;
     else if (view === "change-password") screen = <ChangePasswordScreen />;
@@ -110,7 +136,7 @@ function AppShell() {
   const [booting, setBooting] = useState(true);
   const user = useAppStore((s) => s.user);
   const setUser = useAppStore((s) => s.setUser);
-  const nav = useAppStore((s) => s.nav);
+  const setTab = useAppStore((s) => s.setTab);
   const onboardingDone = useAppStore((s) => s.onboardingDone);
   const setOnboardingDone = useAppStore((s) => s.setOnboardingDone);
   const guestMode = useAppStore((s) => s.guestMode);
@@ -124,6 +150,11 @@ function AppShell() {
             ...res.user,
             pharmacyId: res.user.pharmacy?.id || null,
           });
+          if (res.user.role === "PHARMACIST") {
+            setTab("pharmacist");
+          } else if (res.user.role === "ADMIN") {
+            setTab("admin");
+          }
         }
       } catch {
         // not logged in
@@ -131,7 +162,7 @@ function AppShell() {
         setBooting(false);
       }
     })();
-  }, [setUser]);
+  }, [setUser, setTab]);
 
   if (booting) {
     return (
@@ -164,7 +195,6 @@ function AppShell() {
     );
   }
 
-  // Logged in or guest mode: mobile app shell with bottom nav (always visible)
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <main className="flex min-h-0 flex-1 flex-col">

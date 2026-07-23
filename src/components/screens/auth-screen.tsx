@@ -12,6 +12,7 @@ import {
   Phone,
   Loader2,
   ChevronLeft,
+  UserX,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,9 +84,15 @@ export function AuthScreen() {
   return (
     <div className="flex min-h-dvh flex-col bg-gradient-to-b from-primary/5 via-background to-background">
       {/* Top section with logo */}
-      <div className="flex flex-col items-center justify-center pt-12 pb-6">
+      <div className="relative flex flex-col items-center justify-center pt-12 pb-2">
+        <button
+          onClick={() => useAppStore.getState().setGuestMode(true)}
+          className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground shadow-sm transition-colors hover:bg-muted/60 hover:text-foreground"
+        >
+          Mode visiteur
+        </button>
         <Logo size="lg" />
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground">
           Votre santé, à portée de main
         </p>
       </div>
@@ -293,30 +300,6 @@ export function AuthScreen() {
               {mode === "login" ? "S'inscrire" : "Se connecter"}
             </button>
           </p>
-        </div>
-
-        {/* Demo credentials helper */}
-        {mode === "login" && (
-          <div className="mx-auto mt-4 w-full max-w-md">
-            <button
-              onClick={fillDemo}
-              className="w-full rounded-xl border border-dashed border-primary/40 bg-primary/5 px-4 py-2.5 text-xs text-muted-foreground transition-colors hover:bg-primary/10"
-            >
-              <span className="font-semibold text-primary">Compte démo :</span>{" "}
-              patient@pharmaci.ci / patient123 — cliquez pour pré-remplir
-            </button>
-          </div>
-        )}
-
-        {/* Guest mode */}
-        <div className="mx-auto mt-3 w-full max-w-md">
-          <button
-            onClick={() => useAppStore.getState().setGuestMode(true)}
-            className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-xs text-muted-foreground transition-colors hover:bg-muted/50"
-          >
-            <span className="font-semibold text-foreground">Continuer sans compte</span>{" "}
-            — navigation libre, connexion requise pour commander
-          </button>
         </div>
       </div>
       {/* Forgot Password Modal */}

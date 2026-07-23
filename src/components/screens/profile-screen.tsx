@@ -12,6 +12,7 @@ import {
   Edit3,
   Loader2,
   Camera,
+  LogIn,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
@@ -102,6 +103,15 @@ export function ProfileScreen() {
               Connectez-vous pour accéder à votre profil, vos commandes et favoris.
             </p>
           </div>
+          <button
+            onClick={() => {
+              useAppStore.setState({ user: null, guestMode: false, nav: { tab: "home", view: "home", params: {}, history: [] }, cart: [] });
+            }}
+            className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+          >
+            <LogIn className="h-4 w-4" />
+            Se connecter
+          </button>
         </div>
       </div>
     );
