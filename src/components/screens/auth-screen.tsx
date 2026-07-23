@@ -39,7 +39,14 @@ export function AuthScreen() {
   const [phone, setPhone] = useState("");
 
   const setUser = useAppStore((s) => s.setUser);
+  const setTab = useAppStore((s) => s.setTab);
   const pushToast = useAppStore((s) => s.pushToast);
+
+  function redirectByRole(role: string) {
+    if (role === "PHARMACIST") setTab("pharmacist");
+    else if (role === "ADMIN") setTab("admin");
+    else setTab("home");
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,6 +56,7 @@ export function AuthScreen() {
       if (mode === "login") {
         const { user } = await authApi.login(email, password);
         setUser(user);
+        redirectByRole(user.role);
         pushToast(`Bienvenue, ${user.name} !`, "success");
       } else {
         if (name.trim().length < 2) {
@@ -65,6 +73,7 @@ export function AuthScreen() {
           role: "PATIENT",
         });
         setUser(user);
+        redirectByRole(user.role);
         pushToast(`Compte créé avec succès !`, "success");
       }
     } catch (err) {
