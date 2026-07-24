@@ -26,6 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/empty-state";
+import { GuestPrompt } from "@/components/ui/guest-prompt";
 
 const STATUS_FILTERS = [
   { id: "ALL", label: "Toutes" },
@@ -39,6 +40,7 @@ const STATUS_FILTERS = [
 export function OrdersScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const user = useAppStore((s) => s.user);
+  const guestMode = useAppStore((s) => s.guestMode);
   const cart = useAppStore((s) => s.cart);
   const cartTotal = useAppStore((s) => s.cartTotal());
   const notificationCount = useAppStore((s) => s.notificationCount);
@@ -109,7 +111,15 @@ export function OrdersScreen() {
   return (
     <div className="flex flex-col">
       <AppHeader title="Mes commandes" showCart />
-      {!user && (
+      {!user && guestMode && (
+        <GuestPrompt
+          icon={ClipboardList}
+          title="Connexion requise"
+          description="Connectez-vous pour suivre vos commandes et consulter votre historique."
+        />
+      )}
+
+      {!user && !guestMode && (
         <div className="px-4 pt-8">
           <EmptyState
             icon={ClipboardList}

@@ -23,10 +23,12 @@ import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { GuestPrompt } from "@/components/ui/guest-prompt";
 
 export function NotificationsScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const user = useAppStore((s) => s.user);
+  const guestMode = useAppStore((s) => s.guestMode);
   const setNotificationCount = useAppStore((s) => s.setNotificationCount);
 
   const [orders, setOrders] = useState<Order[]>([]);
@@ -83,7 +85,15 @@ export function NotificationsScreen() {
         showCart
       />
 
-      {!user && (
+      {!user && guestMode && (
+        <GuestPrompt
+          icon={Bell}
+          title="Connexion requise"
+          description="Connectez-vous pour recevoir les notifications sur vos commandes en temps réel."
+        />
+      )}
+
+      {!user && !guestMode && (
         <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
           <Bell className="h-12 w-12 text-muted-foreground/40" />
           <p className="text-sm text-muted-foreground">

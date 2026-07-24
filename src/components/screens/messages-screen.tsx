@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { GuestPrompt } from "@/components/ui/guest-prompt";
 
 interface Conversation {
   otherUser: {
@@ -99,6 +100,21 @@ export function MessagesScreen() {
     setShowNewChat(false);
     setSearchQuery("");
     navigate("chat", { userId });
+  }
+
+  const guestMode = useAppStore((s) => s.guestMode);
+
+  if (!user && guestMode) {
+    return (
+      <div className="flex flex-col h-full">
+        <AppHeader title="Messages" showBack />
+        <GuestPrompt
+          icon={MessageSquare}
+          title="Connexion requise"
+          description="Connectez-vous pour accéder à vos messages et discuter avec les pharmacies."
+        />
+      </div>
+    );
   }
 
   return (
