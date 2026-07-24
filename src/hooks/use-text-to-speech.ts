@@ -3,37 +3,26 @@
 import { useState, useCallback, useRef } from "react";
 import { useAppStore } from "@/lib/store";
 
-interface UseTextToSpeechOptions {
-  lang?: string;
-  rate?: number;
-  pitch?: number;
-}
-
 interface UseTextToSpeechReturn {
   isSpeaking: boolean;
-  speak: (text: string) => void;
+  speak: (text: string) => Promise<void>;
   stop: () => void;
-  speakWithPiper: (text: string) => Promise<void>;
 }
 
 /**
- * Hook TTS (Text-to-Speech) avec double engine :
- * 1. Piper (open-source, local, qualité supérieure)
- * 2. Web Speech API (browser, gratuit, fallback)
+ * Hook TTS (Text-to-Speech) — Piper open-source uniquement.
+ * Envoie le texte au serveur /api/tts, joue l'audio retourné.
  */
-export function useTextToSpeech(
-  options: UseTextToSpeechOptions = {}
-): UseTextToSpeechReturn {
-  const { lang = "fr-FR", rate = 1.0, pitch = 1.0 } = options;
+export function useTextToSpeech(): UseTextToSpeechReturn {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const pushToast = useAppStore((s) => s.pushToast);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const stop = useCallback(() => {
-    if (utteranceRef.current) {
-      window.speechSynthesis.cancel();
-      utteranceRef.current = null;
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
     }
     if (abortRef.current) {
       abortRef.current.abort();
@@ -42,41 +31,7 @@ export function useTextToSpeech(
     setIsSpeaking(false);
   }, []);
 
-  // Mode 1 : Web Speech API (browser, instant, gratuit)
   const speak = useCallback(
-    (text: string) => {
-      if (!text.trim()) return;
-      stop();
-
-      if (!("speechSynthesis" in window)) {
-        // Fallback : utiliser Piper via le serveur
-        void speakWithPiper(text);
-        return;
-      }
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
-      utterance.rate = rate;
-      utterance.pitch = pitch;
-
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => {
-        setIsSpeaking(false);
-        utteranceRef.current = null;
-      };
-      utterance.onerror = () => {
-        setIsSpeaking(false);
-        utteranceRef.current = null;
-      };
-
-      utteranceRef.current = utterance;
-      window.speechSynthesis.speak(utterance);
-    },
-    [lang, rate, pitch, stop]
-  );
-
-  // Mode 2 : Piper TTS (open-source, serveur local)
-  const speakWithPiper = useCallback(
     async (text: string) => {
       if (!text.trim()) return;
       stop();
@@ -89,33 +44,34 @@ export function useTextToSpeech(
         const res = await fetch("/api/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, lang: lang.split("-")[0] }),
+          body: JSON.stringify({ text }),
           signal: controller.signal,
         });
 
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          throw new Error(data.error || "Erreur TTS");
+          throw new Error(data.error || "Erreur Piper TTS");
         }
 
         const audioBlob = await res.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
+        audioRef.current = audio;
 
         await new Promise<void>((resolve, reject) => {
           audio.onended = () => {
             URL.revokeObjectURL(audioUrl);
             resolve();
           };
-          audio.onerror = (e) => {
+          audio.onerror = () => {
             URL.revokeObjectURL(audioUrl);
-            reject(e);
+            reject(new Error("Erreur de lecture audio"));
           };
-          audio.play();
+          audio.play().catch(reject);
         });
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
-          const msg = err instanceof Error ? err.message : "Erreur Piper TTS";
+          const msg = err instanceof Error ? err.message : "Erreur TTS";
           pushToast(msg, "error");
         }
       } finally {
@@ -123,8 +79,8 @@ export function useTextToSpeech(
         abortRef.current = null;
       }
     },
-    [lang, stop, pushToast]
+    [stop, pushToast]
   );
 
-  return { isSpeaking, speak, stop, speakWithPiper };
+  return { isSpeaking, speak, stop };
 }
