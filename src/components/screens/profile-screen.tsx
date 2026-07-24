@@ -273,7 +273,7 @@ export function ProfileScreen() {
                 className="rounded-2xl border border-border bg-card p-3 text-left transition-colors hover:border-primary/40"
               >
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10 text-blue-500">
                     <Package className="h-4 w-4" />
                   </div>
                   <div>
@@ -284,7 +284,7 @@ export function ProfileScreen() {
               </button>
               <div className="rounded-2xl border border-border bg-card p-3">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/10 text-green-500">
                     <CreditCard className="h-4 w-4" />
                   </div>
                   <div>
@@ -361,7 +361,7 @@ export function ProfileScreen() {
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 py-3 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-red-500/20 bg-red-500/10 py-3 text-sm font-semibold text-red-500 transition-colors hover:bg-red-500/20"
         >
           <LogOut className="h-4 w-4" />
           Se déconnecter

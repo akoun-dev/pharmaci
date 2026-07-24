@@ -217,7 +217,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
               </div>
             </div>
             {error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-500">
                 {error}
               </div>
             )}
@@ -242,12 +242,12 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
         {step === "code" && (
           <div className="space-y-4">
             {devCode && (
-              <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
-                <p className="text-xs font-semibold text-blue-800">Mode développement</p>
-                <p className="mt-1 font-mono text-lg font-bold tracking-widest text-blue-700">
+              <div className="rounded-xl border border-blue-500/20 bg-blue-500/10 p-3">
+                <p className="text-xs font-semibold text-blue-500">Mode développement</p>
+                <p className="mt-1 font-mono text-lg font-bold tracking-widest text-blue-500">
                   {devCode}
                 </p>
-                <p className="mt-1 text-[11px] text-blue-600">
+                <p className="mt-1 text-[11px] text-blue-500/80">
                   Ce code est affiché car vous êtes en mode développement.
                   En production, il sera envoyé par email.
                 </p>
@@ -271,7 +271,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
               </div>
             </div>
             {error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-500">
                 {error}
               </div>
             )}
@@ -331,7 +331,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
               </div>
             </div>
             {error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-500">
                 {error}
               </div>
             )}
@@ -355,7 +355,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
         {/* Step: Success */}
         {step === "success" && (
           <div className="flex flex-col items-center py-4 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500">
               <CheckCircle2 className="h-8 w-8" />
             </div>
             <h3 className="mt-4 text-lg font-bold text-foreground">

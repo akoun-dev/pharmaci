@@ -248,7 +248,7 @@ export function ChatScreen() {
 
       {/* Connection indicator */}
       {connectionLost && (
-        <div className="flex items-center justify-center gap-1.5 bg-amber-50 py-1.5 text-[11px] font-medium text-amber-700">
+        <div className="flex items-center justify-center gap-1.5 bg-amber-500/10 py-1.5 text-[11px] font-medium text-amber-500">
           <WifiOff className="h-3 w-3" />
           Connexion perdue — reconnexion automatique...
           <button
@@ -256,14 +256,14 @@ export function ChatScreen() {
               setConnectionLost(false);
               if (otherId) loadConversation(otherId);
             }}
-            className="ml-2 underline hover:text-amber-900"
+            className="ml-2 underline hover:text-amber-400"
           >
             Réessayer
           </button>
         </div>
       )}
       {isConnected && !loading && messages.length > 0 && (
-        <div className="flex items-center justify-center gap-1.5 bg-green-50 py-0.5 text-[10px] font-medium text-green-600">
+        <div className="flex items-center justify-center gap-1.5 bg-green-500/10 py-0.5 text-[10px] font-medium text-green-500">
           <Wifi className="h-3 w-3" />
           Connecté en temps réel
         </div>

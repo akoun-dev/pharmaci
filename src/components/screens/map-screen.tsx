@@ -346,7 +346,7 @@ export function MapScreen() {
                     {selected.address}
                   </p>
                   <div className="mt-1 flex items-center gap-2 text-xs">
-                    <span className="flex items-center gap-0.5 text-amber-600">
+                    <span className="flex items-center gap-0.5 text-amber-500">
                       <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
                       <span className="font-semibold text-foreground">{selected.rating.toFixed(1)}</span>
                     </span>
@@ -358,7 +358,7 @@ export function MapScreen() {
                     )}
                   </div>
                   {selected.isOnGuard && (
-                    <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-bold text-orange-700">
+                    <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[10px] font-bold text-orange-500">
                       <Clock className="h-3 w-3" />
                       Pharmacie de garde
                     </span>
@@ -368,7 +368,7 @@ export function MapScreen() {
               <div className="grid grid-cols-3 gap-1.5 border-t border-border p-2">
                 <a
                   href={`tel:${selected.phone}`}
-                  className="flex items-center justify-center gap-1 rounded-lg bg-blue-50 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100"
+                  className="flex items-center justify-center gap-1 rounded-lg bg-blue-500/10 py-2 text-xs font-semibold text-blue-500 hover:bg-blue-500/20"
                 >
                   <Phone className="h-3.5 w-3.5" />
                   Appeler
@@ -429,7 +429,7 @@ export function MapScreen() {
                           {p.name}
                         </h4>
                         {p.isOnGuard && (
-                          <span className="shrink-0 rounded bg-orange-100 px-1 py-0.5 text-[9px] font-bold text-orange-700">
+                          <span className="shrink-0 rounded bg-orange-500/10 px-1 py-0.5 text-[9px] font-bold text-orange-500">
                             Garde
                           </span>
                         )}
@@ -440,7 +440,7 @@ export function MapScreen() {
                       <p className="text-xs font-bold text-primary">
                         {dist !== null ? formatDistance(dist) : "—"}
                       </p>
-                      <p className="flex items-center gap-0.5 text-[10px] text-amber-600">
+                      <p className="flex items-center gap-0.5 text-[10px] text-amber-500">
                         <Star className="h-3 w-3 fill-amber-500" />
                         {p.rating.toFixed(1)}
                       </p>

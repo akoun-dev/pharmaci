@@ -218,7 +218,7 @@ export function OrderDetailScreen() {
               })}
             </div>
           ) : (
-            <div className="mt-3 flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            <div className="mt-3 flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-500">
               <XCircle className="h-4 w-4" />
               Cette commande a été annulée.
             </div>
@@ -280,7 +280,7 @@ export function OrderDetailScreen() {
             <div className="mt-2 grid grid-cols-2 gap-2 border-t border-border/60 pt-2">
               <a
                 href={`tel:${order.pharmacy.phone}`}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-blue-50 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100"
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-blue-500/10 py-2 text-xs font-semibold text-blue-500 hover:bg-blue-500/20"
               >
                 <Phone className="h-3.5 w-3.5" />
                 Appeler
@@ -300,10 +300,10 @@ export function OrderDetailScreen() {
 
         {/* Prescription reminder */}
         {order.items?.some((i) => i.medication?.prescriptionRequired) && (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3">
+          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-3">
             <div className="flex gap-2">
-              <FileText className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
-              <div className="text-xs text-amber-800">
+              <FileText className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+              <div className="text-xs text-amber-500/80">
                 <p className="font-semibold">Ordonnance obligatoire</p>
                 <p className="mt-0.5">
                   Certains médicaments de cette commande nécessitent une ordonnance.
@@ -335,7 +335,7 @@ export function OrderDetailScreen() {
                     {item.quantity} × {formatFCFA(item.unitPrice)}
                   </p>
                   {item.medication?.prescriptionRequired && (
-                    <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
+                    <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-500">
                       <FileText className="h-2.5 w-2.5" />
                       Ordonnance
                     </span>
@@ -384,7 +384,7 @@ export function OrderDetailScreen() {
             onClick={handleCancel}
             disabled={cancelling}
             variant="outline"
-            className="h-10 w-full rounded-xl border-red-300 text-sm font-semibold text-red-600 hover:bg-red-50"
+            className="h-10 w-full rounded-xl border-red-500/30 text-sm font-semibold text-red-500 hover:bg-red-500/10"
           >
             {cancelling ? (
               <Loader2 className="h-4 w-4 animate-spin" />

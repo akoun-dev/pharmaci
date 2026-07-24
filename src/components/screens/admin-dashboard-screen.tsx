@@ -68,9 +68,9 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  PATIENT: "bg-blue-100 text-blue-700",
-  PHARMACIST: "bg-green-100 text-green-700",
-  ADMIN: "bg-purple-100 text-purple-700",
+  PATIENT: "bg-blue-500/10 text-blue-500",
+  PHARMACIST: "bg-green-500/10 text-green-500",
+  ADMIN: "bg-purple-500/10 text-purple-500",
 };
 
 export function AdminDashboardScreen() {
@@ -242,7 +242,7 @@ export function AdminDashboardScreen() {
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
-                  <Users className="h-5 w-5 text-blue-600" />
+                  <Users className="h-5 w-5 text-blue-500" />
                 </div>
                 <div className="text-left">
                   <p className="font-medium text-sm">Utilisateurs</p>
@@ -274,7 +274,7 @@ export function AdminDashboardScreen() {
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
-                  <ClipboardList className="h-5 w-5 text-amber-600" />
+                  <ClipboardList className="h-5 w-5 text-amber-500" />
                 </div>
                 <div className="text-left">
                   <p className="font-medium text-sm">Commandes</p>

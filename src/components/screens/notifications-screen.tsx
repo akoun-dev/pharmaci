@@ -176,11 +176,11 @@ export function NotificationsScreen() {
                     <div
                       className={cn(
                         "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-                        o.status === "PENDING" && "bg-amber-100",
-                        o.status === "CONFIRMED" && "bg-blue-100",
-                        o.status === "READY" && "bg-green-100",
-                        o.status === "CANCELLED" && "bg-red-100",
-                        o.status === "PICKED_UP" && "bg-gray-100"
+                        o.status === "PENDING" && "bg-amber-500/10",
+                        o.status === "CONFIRMED" && "bg-blue-500/10",
+                        o.status === "READY" && "bg-green-500/10",
+                        o.status === "CANCELLED" && "bg-red-500/10",
+                        o.status === "PICKED_UP" && "bg-muted"
                       )}
                     >
                       {statusIcon(o.status)}

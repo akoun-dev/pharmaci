@@ -304,7 +304,7 @@ export function HomeScreen() {
 
       {/* Offline banner */}
       {!isOnline && (
-        <div className="flex items-center justify-center gap-1.5 bg-amber-50 px-4 py-1.5 text-xs font-medium text-amber-700">
+        <div className="flex items-center justify-center gap-1.5 bg-amber-500/10 px-4 py-1.5 text-xs font-medium text-amber-500">
           <WifiOff className="h-3 w-3" />
           Mode hors ligne — certaines fonctionnalités peuvent être limitées
         </div>
@@ -448,11 +448,11 @@ export function HomeScreen() {
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
                       {p.isOnGuard && (
-                        <span className="rounded-full bg-orange-100 px-1.5 py-0.5 text-[9px] font-bold text-orange-700">
+                        <span className="rounded-full bg-orange-500/10 px-1.5 py-0.5 text-[9px] font-bold text-orange-500">
                           Garde
                         </span>
                       )}
-                      <span className="flex items-center gap-0.5 text-[11px] text-amber-600">
+                      <span className="flex items-center gap-0.5 text-[11px] text-amber-500">
                         ★ {p.rating.toFixed(1)}
                       </span>
                     </div>
@@ -746,7 +746,7 @@ export function HomeScreen() {
                   <span className={cn("mt-0.5 inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium", categoryColor(m.category).bg, categoryColor(m.category).text)}>{m.category}</span>
                 </div>
                 {m.prescriptionRequired && (
-                  <span className="inline-flex w-fit items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                  <span className="inline-flex w-fit items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-500">
                     Sur ordonnance
                   </span>
                 )}

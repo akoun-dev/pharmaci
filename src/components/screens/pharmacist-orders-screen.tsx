@@ -182,9 +182,9 @@ export function PharmacistOrdersScreen() {
   function getNextAction(status: string) {
     switch (status) {
       case "PENDING":
-        return { label: "Confirmer", status: "CONFIRMED", icon: CheckCircle, color: "text-blue-600" };
+        return { label: "Confirmer", status: "CONFIRMED", icon: CheckCircle, color: "text-blue-500" };
       case "CONFIRMED":
-        return { label: "Prête", status: "READY", icon: Package, color: "text-green-600" };
+        return { label: "Prête", status: "READY", icon: Package, color: "text-green-500" };
       default:
         return null;
     }
@@ -333,7 +333,7 @@ export function PharmacistOrdersScreen() {
                       <button
                         onClick={() => handleUpdateStatus(order.id, "CANCELLED")}
                         disabled={updatingId === order.id}
-                        className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+                        className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-red-500 hover:bg-red-500/10"
                       >
                         <XCircle className="h-3 w-3" />
                         Refuser
@@ -354,14 +354,14 @@ export function PharmacistOrdersScreen() {
             <DialogTitle>Confirmer l&apos;action</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-3 py-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10 text-amber-500">
               <AlertTriangle className="h-6 w-6" />
             </div>
             <p className="text-sm text-center font-medium text-foreground">
               {confirmAction?.label}
             </p>
             {confirmAction?.newStatus === "CANCELLED" && (
-              <p className="text-xs text-center text-red-600">
+              <p className="text-xs text-center text-red-500">
                 Les stocks seront remis à jour automatiquement.
               </p>
             )}

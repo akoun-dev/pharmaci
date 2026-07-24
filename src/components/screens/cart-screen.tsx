@@ -68,7 +68,7 @@ export function CartScreen() {
               clearCart();
               pushToast("Panier vidé.", "info");
             }}
-            className="flex h-9 items-center rounded-full px-3 text-xs font-medium text-red-500 hover:bg-red-50"
+            className="flex h-9 items-center rounded-full px-3 text-xs font-medium text-red-500 hover:bg-red-500/10"
           >
             Vider
           </button>
@@ -101,7 +101,7 @@ export function CartScreen() {
                       {item.medicationDosage} • {item.medicationForm}
                     </p>
                     {item.prescriptionRequired && (
-                      <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
+                      <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-500">
                         <FileText className="h-2.5 w-2.5" />
                         Ordonnance
                       </span>
@@ -336,10 +336,10 @@ export function CheckoutScreen() {
         </div>
 
         {/* Info */}
-        <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+        <div className="rounded-xl border border-blue-500/20 bg-blue-500/10 p-3">
           <div className="flex gap-2">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
-            <div className="text-xs text-blue-800">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+            <div className="text-xs text-blue-500/80">
               <p className="font-semibold">Comment ça marche ?</p>
               <p className="mt-0.5">
                 Une commande distincte est créée par pharmacie. Vous recevrez un

@@ -365,7 +365,7 @@ export function MedicationDetailScreen() {
                         {p.pharmacy.address}
                       </p>
                       <div className="mt-1 flex items-center gap-2 text-xs">
-                        <span className="flex items-center gap-0.5 text-amber-600">
+                        <span className="flex items-center gap-0.5 text-amber-500">
                           ★ <span className="font-semibold text-foreground">{p.pharmacy.rating.toFixed(1)}</span>
                         </span>
                         <span className="text-muted-foreground">({p.pharmacy.reviewCount})</span>

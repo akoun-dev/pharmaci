@@ -511,23 +511,23 @@ export function PharmacistStockScreen() {
               <p className="text-sm font-bold text-foreground">{summary.total}</p>
               <p className="text-[9px] text-muted-foreground">Total</p>
             </div>
-            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 px-2 py-1.5 text-center">
-              <p className="text-sm font-bold text-amber-600">{summary.lowStock}</p>
+            <div className="rounded-lg bg-amber-500/10 px-2 py-1.5 text-center">
+              <p className="text-sm font-bold text-amber-500">{summary.lowStock}</p>
               <p className="text-[9px] text-muted-foreground">Stock bas</p>
             </div>
-            <div className="rounded-lg bg-orange-50 dark:bg-orange-950/30 px-2 py-1.5 text-center">
-              <p className="text-sm font-bold text-orange-600">{summary.expiringSoon}</p>
+            <div className="rounded-lg bg-orange-500/10 px-2 py-1.5 text-center">
+              <p className="text-sm font-bold text-orange-500">{summary.expiringSoon}</p>
               <p className="text-[9px] text-muted-foreground">Bientôt</p>
             </div>
-            <div className="rounded-lg bg-red-50 dark:bg-red-950/30 px-2 py-1.5 text-center">
-              <p className="text-sm font-bold text-red-600">{summary.expired}</p>
+            <div className="rounded-lg bg-red-500/10 px-2 py-1.5 text-center">
+              <p className="text-sm font-bold text-red-500">{summary.expired}</p>
               <p className="text-[9px] text-muted-foreground">Expirés</p>
             </div>
           </div>
         )}
 
         {lowStockOnly && (
-          <p className="text-xs text-amber-600 mb-3 flex items-center gap-1">
+          <p className="text-xs text-amber-500 mb-3 flex items-center gap-1">
             <AlertTriangle className="h-3 w-3" />
             Affichage des médicaments en stock bas uniquement
           </p>
@@ -550,9 +550,9 @@ export function PharmacistStockScreen() {
                 key={item.id}
                 className={cn(
                   "rounded-xl border bg-card p-3 transition-all",
-                  item.isLowStock && "border-amber-300 bg-amber-50 dark:bg-amber-950/20",
-                  item.isExpired && "border-red-300 bg-red-50 dark:bg-red-950/20",
-                  item.isExpiringSoon && !item.isExpired && "border-orange-300 bg-orange-50 dark:bg-orange-950/20"
+                  item.isLowStock && "border-amber-500/30 bg-amber-500/5",
+                  item.isExpired && "border-red-500/30 bg-red-500/5",
+                  item.isExpiringSoon && !item.isExpired && "border-orange-500/30 bg-orange-500/5"
                 )}
               >
                 <div className="flex items-start justify-between">
@@ -578,7 +578,7 @@ export function PharmacistStockScreen() {
                     </button>
                     <button
                       onClick={() => setDeleteId(item.id)}
-                      className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-red-50"
+                      className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-red-500/10"
                     >
                       <Trash2 className="h-3.5 w-3.5 text-red-500" />
                     </button>
@@ -596,7 +596,7 @@ export function PharmacistStockScreen() {
                     >
                       <Minus className="h-3 w-3" />
                     </button>
-                    <span className={cn("font-semibold min-w-[3ch] text-center", item.isLowStock ? "text-amber-600" : "text-green-600")}>
+                    <span className={cn("font-semibold min-w-[3ch] text-center", item.isLowStock ? "text-amber-500" : "text-green-500")}>
                       {item.stock}
                     </span>
                     <button
@@ -611,7 +611,7 @@ export function PharmacistStockScreen() {
                   {item.expiryDate && (
                     <span className={cn(
                       "flex items-center gap-0.5",
-                      item.isExpired ? "text-red-600 font-semibold" : item.isExpiringSoon ? "text-orange-600 font-semibold" : "text-muted-foreground"
+                      item.isExpired ? "text-red-500 font-semibold" : item.isExpiringSoon ? "text-orange-500 font-semibold" : "text-muted-foreground"
                     )}>
                       <CalendarClock className="h-3 w-3" />
                       {new Date(item.expiryDate).toLocaleDateString("fr-FR")}
@@ -715,7 +715,7 @@ export function PharmacistStockScreen() {
               {historyItems.map((h) => (
                 <div key={h.id} className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2 text-xs">
                   <div>
-                    <span className={cn("font-semibold", h.changeType === "ADD" ? "text-green-600" : "text-red-600")}>
+                    <span className={cn("font-semibold", h.changeType === "ADD" ? "text-green-500" : "text-red-500")}>
                       {h.changeType === "ADD" ? "+" : "-"}{h.quantity}
                     </span>
                     {h.note && <span className="text-muted-foreground ml-1">— {h.note}</span>}
@@ -770,15 +770,15 @@ export function PharmacistStockScreen() {
               {importResult.success ? (
                 <>
                   <div className="flex flex-col items-center gap-2 py-2">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10 text-green-500">
                       <CheckCircle2 className="h-6 w-6" />
                     </div>
-                    <p className="text-sm font-semibold text-green-700">Import terminé avec succès !</p>
+                    <p className="text-sm font-semibold text-green-500">Import terminé avec succès !</p>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                    <div className="rounded-lg bg-green-50 p-2">
-                      <p className="text-lg font-bold text-green-700">{importResult.details?.totalRows || 0}</p>
-                      <p className="text-green-600">Lignes lues</p>
+                    <div className="rounded-lg bg-green-500/10 p-2">
+                      <p className="text-lg font-bold text-green-500">{importResult.details?.totalRows || 0}</p>
+                      <p className="text-green-500/80">Lignes lues</p>
                     </div>
                     <div className="rounded-lg bg-primary/10 p-2">
                       <p className="text-lg font-bold text-primary">{importResult.details?.imported || 0}</p>
@@ -788,17 +788,17 @@ export function PharmacistStockScreen() {
                 </>
               ) : (
                 <div className="flex flex-col items-center gap-2 py-2">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-red-500">
                     <XCircle className="h-6 w-6" />
                   </div>
-                  <p className="text-sm font-semibold text-red-700">Échec de l&apos;import</p>
+                  <p className="text-sm font-semibold text-red-500">Échec de l&apos;import</p>
                 </div>
               )}
               {importResult.errors && importResult.errors.length > 0 && (
-                <div className="max-h-40 overflow-y-auto rounded-lg border border-amber-200 bg-amber-50 p-2">
-                  <p className="mb-1 text-xs font-semibold text-amber-800">Détails des erreurs :</p>
+                <div className="max-h-40 overflow-y-auto rounded-lg border border-amber-500/20 bg-amber-500/10 p-2">
+                  <p className="mb-1 text-xs font-semibold text-amber-500">Détails des erreurs :</p>
                   {importResult.errors.map((err, i) => (
-                    <p key={i} className="text-[11px] text-amber-700 leading-relaxed">• {err}</p>
+                    <p key={i} className="text-[11px] text-amber-500/80 leading-relaxed">• {err}</p>
                   ))}
                 </div>
               )}

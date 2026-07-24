@@ -96,22 +96,22 @@ export function NotificationDetailScreen() {
         <div
           className={cn(
             "overflow-hidden rounded-2xl border p-5",
-            order.status === "PENDING" && "border-amber-200 bg-amber-50",
-            order.status === "CONFIRMED" && "border-blue-200 bg-blue-50",
-            order.status === "READY" && "border-green-200 bg-green-50",
-            isCancelled && "border-red-200 bg-red-50",
-            isPickedUp && "border-gray-200 bg-gray-50"
+            order.status === "PENDING" && "border-amber-500/20 bg-amber-500/5",
+            order.status === "CONFIRMED" && "border-blue-500/20 bg-blue-500/5",
+            order.status === "READY" && "border-green-500/20 bg-green-500/5",
+            isCancelled && "border-red-500/20 bg-red-500/5",
+            isPickedUp && "border-border bg-muted/50"
           )}
         >
           <div className="flex items-start gap-3">
             <div
               className={cn(
                 "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl",
-                order.status === "PENDING" && "bg-amber-100 text-amber-600",
-                order.status === "CONFIRMED" && "bg-blue-100 text-blue-600",
-                order.status === "READY" && "bg-green-100 text-green-600",
-                isCancelled && "bg-red-100 text-red-600",
-                isPickedUp && "bg-gray-100 text-gray-500"
+                order.status === "PENDING" && "bg-amber-500/10 text-amber-500",
+                order.status === "CONFIRMED" && "bg-blue-500/10 text-blue-500",
+                order.status === "READY" && "bg-green-500/10 text-green-500",
+                isCancelled && "bg-red-500/10 text-red-500",
+                isPickedUp && "bg-muted text-muted-foreground"
               )}
             >
               {order.status === "PENDING" && <Clock className="h-6 w-6" />}
@@ -183,7 +183,7 @@ export function NotificationDetailScreen() {
 
         {/* Cancelled notice */}
         {isCancelled && (
-          <div className="flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="flex items-center gap-2 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-500">
             <XCircle className="h-5 w-5 shrink-0" />
             <p className="font-medium">Cette commande a été annulée.</p>
           </div>
@@ -191,7 +191,7 @@ export function NotificationDetailScreen() {
 
         {/* Picked up notice */}
         {isPickedUp && (
-          <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+          <div className="flex items-center gap-2 rounded-2xl border border-border bg-muted/50 p-4 text-sm text-muted-foreground">
             <CheckCircle2 className="h-5 w-5 shrink-0" />
             <p className="font-medium">Vous avez récupéré cette commande.</p>
           </div>
@@ -220,7 +220,7 @@ export function NotificationDetailScreen() {
             <div className="mt-3 grid grid-cols-2 gap-2">
               <a
                 href={`tel:${order.pharmacy.phone}`}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-blue-50 py-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-100"
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-blue-500/10 py-2.5 text-xs font-semibold text-blue-500 hover:bg-blue-500/20"
               >
                 <Phone className="h-3.5 w-3.5" />
                 Appeler

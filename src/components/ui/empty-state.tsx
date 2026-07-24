@@ -22,16 +22,16 @@ const variantStyles = {
     description: "text-muted-foreground",
   },
   error: {
-    container: "border-red-200 bg-red-50/50",
-    icon: "text-red-400",
-    title: "text-red-800",
-    description: "text-red-600",
+    container: "border-red-500/20 bg-red-500/5",
+    icon: "text-red-500",
+    title: "text-red-500",
+    description: "text-red-500/80",
   },
   warning: {
-    container: "border-amber-200 bg-amber-50/50",
-    icon: "text-amber-400",
-    title: "text-amber-800",
-    description: "text-amber-600",
+    container: "border-amber-500/20 bg-amber-500/5",
+    icon: "text-amber-500",
+    title: "text-amber-500",
+    description: "text-amber-500/80",
   },
 };
 

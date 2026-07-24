@@ -89,20 +89,20 @@ export function StatusBadge({
 }) {
   if (isOnGuard) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-bold text-orange-700">
+      <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[11px] font-bold text-orange-500">
         DE GARDE
       </span>
     );
   }
   if (isOpen24h) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-bold text-green-700">
+      <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-[11px] font-bold text-green-500">
         <Clock className="h-3 w-3" /> 24/7
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-bold text-green-700">
+    <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-[11px] font-bold text-green-500">
       OUVERT
     </span>
   );
@@ -185,7 +185,7 @@ export function PharmacyCard({
             <a
               href={`tel:${pharmacy.phone}`}
               onClick={(e) => e.stopPropagation()}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-50 py-2 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-100"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-500/10 py-2 text-xs font-semibold text-blue-500 transition-colors hover:bg-blue-500/20"
             >
               <Phone className="h-3.5 w-3.5" />
               Appeler
@@ -292,7 +292,7 @@ export function PharmacyCardCompact({
         <a
           href={`tel:${pharmacy.phone}`}
           onClick={(e) => e.stopPropagation()}
-          className="mt-1 flex items-center justify-center gap-1 rounded-lg bg-blue-50 py-1.5 text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-100"
+          className="mt-1 flex items-center justify-center gap-1 rounded-lg bg-blue-500/10 py-1.5 text-xs font-semibold text-blue-500 transition-colors hover:bg-blue-500/20"
         >
           <Phone className="h-3 w-3" />
           Appeler

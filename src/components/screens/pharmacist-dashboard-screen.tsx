@@ -70,11 +70,11 @@ interface PharmacistStats {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-amber-100 text-amber-700",
-  CONFIRMED: "bg-blue-100 text-blue-700",
-  READY: "bg-green-100 text-green-700",
-  PICKED_UP: "bg-gray-100 text-gray-600",
-  CANCELLED: "bg-red-100 text-red-700",
+  PENDING: "bg-amber-500/10 text-amber-500",
+  CONFIRMED: "bg-blue-500/10 text-blue-500",
+  READY: "bg-green-500/10 text-green-500",
+  PICKED_UP: "bg-muted text-muted-foreground",
+  CANCELLED: "bg-red-500/10 text-red-500",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -207,7 +207,7 @@ export function PharmacistDashboardScreen() {
                   </div>
                   <p className="text-2xl font-bold">{formatFCFA(stats.revenue)}</p>
                   {period !== "all" && (
-                    <p className="text-xs text-green-600">
+                    <p className="text-xs text-green-500">
                       +{formatFCFA(stats.revenueMonth)} sur la période
                     </p>
                   )}
@@ -222,13 +222,13 @@ export function PharmacistDashboardScreen() {
                   </div>
                   <p className="text-2xl font-bold">{stats.stock.inStock}</p>
                   {stats.stock.lowStock > 0 && (
-                    <p className="text-xs text-amber-600 flex items-center gap-1">
+                    <p className="text-xs text-amber-500 flex items-center gap-1">
                       <AlertTriangle className="h-3 w-3" />
                       {stats.stock.lowStock} en rupture
                     </p>
                   )}
                   {(stats.stock.expired > 0 || stats.stock.expiringSoon > 0) && (
-                    <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
+                    <p className="text-xs text-red-500 flex items-center gap-1 mt-0.5">
                       <Clock className="h-3 w-3" />
                       {stats.stock.expired} expiré(s) · {stats.stock.expiringSoon} bientôt
                     </p>
@@ -313,7 +313,7 @@ export function PharmacistDashboardScreen() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
-                      <Building2 className="h-5 w-5 text-blue-600" />
+                      <Building2 className="h-5 w-5 text-blue-500" />
                     </div>
                     <div className="text-left">
                       <p className="font-medium text-sm">Ma pharmacie</p>

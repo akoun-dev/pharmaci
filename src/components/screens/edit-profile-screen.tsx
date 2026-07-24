@@ -239,9 +239,9 @@ export function EditProfileScreen() {
         </div>
 
         {/* Security note */}
-        <div className="flex gap-2 rounded-xl border border-green-200 bg-green-50 p-3">
-          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
-          <p className="text-xs text-green-800">
+        <div className="flex gap-2 rounded-xl border border-green-500/20 bg-green-500/10 p-3">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
+          <p className="text-xs text-green-500/80">
             Vos informations personnelles sont cryptées et ne sont jamais partagées sans votre consentement explicite.
           </p>
         </div>

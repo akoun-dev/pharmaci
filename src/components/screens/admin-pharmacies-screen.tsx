@@ -187,16 +187,16 @@ export function AdminPharmaciesScreen() {
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-sm truncate">{p.name}</p>
                       {p.isVerified ? (
-                        <Badge className="text-[10px] px-1.5 py-0 bg-green-100 text-green-700">
+                        <Badge className="text-[10px] px-1.5 py-0 bg-green-500/10 text-green-500">
                           <CheckCircle className="h-3 w-3 mr-0.5" /> Vérifiée
                         </Badge>
                       ) : (
-                        <Badge className="text-[10px] px-1.5 py-0 bg-amber-100 text-amber-700">
+                        <Badge className="text-[10px] px-1.5 py-0 bg-amber-500/10 text-amber-500">
                           Non vérifiée
                         </Badge>
                       )}
                       {p.isOnGuard && (
-                        <Badge className="text-[10px] px-1.5 py-0 bg-blue-100 text-blue-700">Garde</Badge>
+                        <Badge className="text-[10px] px-1.5 py-0 bg-blue-500/10 text-blue-500">Garde</Badge>
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">{p.address}, {p.city}</p>
@@ -221,8 +221,8 @@ export function AdminPharmaciesScreen() {
                     className={cn(
                       "flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                       p.isVerified
-                        ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                        : "bg-green-50 text-green-700 hover:bg-green-100"
+                        ? "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+                        : "bg-green-500/10 text-green-500 hover:bg-green-500/20"
                     )}
                   >
                     {p.isVerified ? (

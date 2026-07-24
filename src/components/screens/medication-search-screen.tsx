@@ -236,7 +236,7 @@ export function MedicationSearchScreen() {
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
                       {m.minPrice != null && (
-                        <span className="text-[10px] font-semibold text-green-600">{formatFCFA(m.minPrice)}</span>
+                        <span className="text-[10px] font-semibold text-green-500">{formatFCFA(m.minPrice)}</span>
                       )}
                       <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                         {m.category}
@@ -275,7 +275,7 @@ export function MedicationSearchScreen() {
           className={cn(
             "shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all flex items-center gap-1",
             prescriptionOnly
-              ? "border-amber-500 bg-amber-50 text-amber-700"
+              ? "border-amber-500 bg-amber-500/10 text-amber-500"
               : "border-border bg-card text-muted-foreground hover:border-primary/40"
           )}
         >
@@ -373,12 +373,12 @@ export function MedicationSearchScreen() {
                       {m.category}
                     </span>
                     {m.prescriptionRequired && (
-                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                      <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-500">
                         Sur ordonnance
                       </span>
                     )}
                     {m.minPrice != null && (
-                      <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-700">
+                      <span className="rounded-full bg-green-500/10 px-2 py-0.5 text-[10px] font-semibold text-green-500">
                         À partir de {formatFCFA(m.minPrice)}
                       </span>
                     )}

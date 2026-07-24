@@ -44,11 +44,11 @@ interface OrderResult {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-amber-100 text-amber-700 border-amber-200",
-  CONFIRMED: "bg-blue-100 text-blue-700 border-blue-200",
-  READY: "bg-green-100 text-green-700 border-green-200",
-  PICKED_UP: "bg-gray-100 text-gray-600 border-gray-200",
-  CANCELLED: "bg-red-100 text-red-700 border-red-200",
+  PENDING: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+  CONFIRMED: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+  READY: "bg-green-500/10 text-green-500 border-green-500/20",
+  PICKED_UP: "bg-muted text-muted-foreground border-border",
+  CANCELLED: "bg-red-500/10 text-red-500 border-red-500/20",
 };
 
 const NEXT_ACTIONS: Record<string, { label: string; status: string; icon: typeof CheckCircle; color: string }> = {
@@ -227,10 +227,10 @@ export function ScanOrderScreen() {
         {/* Error */}
         {error && !loading && (
           <div className="flex flex-col items-center py-12 text-center">
-            <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+            <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10">
               <XCircle className="h-7 w-7 text-red-500" />
             </div>
-            <p className="text-sm font-medium text-red-600">{error}</p>
+            <p className="text-sm font-medium text-red-500">{error}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               Vérifiez le code et réessayez
             </p>
@@ -369,21 +369,21 @@ export function ScanOrderScreen() {
             )}
 
             {order.status === "PICKED_UP" && (
-              <div className="rounded-xl bg-green-50 border border-green-200 p-4 text-center">
-                <CheckCircle className="mx-auto mb-2 h-8 w-8 text-green-600" />
-                <p className="text-sm font-medium text-green-700">
+              <div className="rounded-xl bg-green-500/10 border border-green-500/20 p-4 text-center">
+                <CheckCircle className="mx-auto mb-2 h-8 w-8 text-green-500" />
+                <p className="text-sm font-medium text-green-500">
                   Commande récupérée
                 </p>
-                <p className="text-xs text-green-600">
+                <p className="text-xs text-green-500/80">
                   Cette commande est terminée
                 </p>
               </div>
             )}
 
             {order.status === "CANCELLED" && (
-              <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-center">
+              <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-center">
                 <XCircle className="mx-auto mb-2 h-8 w-8 text-red-500" />
-                <p className="text-sm font-medium text-red-600">
+                <p className="text-sm font-medium text-red-500">
                   Commande annulée
                 </p>
               </div>

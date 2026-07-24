@@ -278,7 +278,7 @@ function AppShell() {
 
   if (!user && !guestMode) {
     return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background md:max-w-lg lg:max-w-xl">
         <AuthScreen />
         <ToastHost />
       </div>
@@ -286,7 +286,7 @@ function AppShell() {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background md:max-w-lg lg:max-w-xl">
       <main className="flex min-h-0 flex-1 flex-col">
         <ErrorBoundary>
           <ScreenRouter />
