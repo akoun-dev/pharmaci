@@ -109,10 +109,6 @@ export function BottomNav() {
     } else {
       setTab(id as MainTab);
     }
-    if (id === "orders") {
-      setNotificationCount(0);
-      setPendingOrders(0);
-    }
   }
 
   function isActive(id: string) {
@@ -124,13 +120,9 @@ export function BottomNav() {
 
   // Show pending count for pharmacist on orders tab
   const showOrdersBadge =
-    (tab === "orders" && notificationCount > 0) ||
-    (user?.role === "PHARMACIST" && pendingOrders > 0);
+    user?.role === "PHARMACIST" && pendingOrders > 0;
 
-  const ordersBadgeCount =
-    user?.role === "PHARMACIST"
-      ? Math.max(notificationCount, pendingOrders)
-      : notificationCount;
+  const ordersBadgeCount = pendingOrders;
 
   return (
     <nav className="sticky bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">

@@ -39,13 +39,16 @@ export function AdminOrdersScreen() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({
+    "": 0, PENDING: 0, CONFIRMED: 0, READY: 0, PICKED_UP: 0, CANCELLED: 0,
+  });
 
   useEffect(() => {
     void loadOrders();
   }, [activeTab, page]);
 
   useEffect(() => {
-    const t = setTimeout(() => { setPage(1); void loadOrders(); }, 300);
+    const t = setTimeout(() => setPage(1), 300);
     return () => clearTimeout(t);
   }, [searchQuery]);
 
@@ -67,8 +70,14 @@ export function AdminOrdersScreen() {
       }
       setTotal(res.total);
       setTotalPages(res.totalPages);
-    } catch {
-      // ignore
+      if (page === 1 && !activeTab) {
+        setStatusCounts((prev) => ({ ...prev, "": res.total }));
+      }
+      if (page === 1 && activeTab) {
+        setStatusCounts((prev) => ({ ...prev, [activeTab]: res.total }));
+      }
+    } catch (err) {
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -112,7 +121,7 @@ export function AdminOrdersScreen() {
                   : "bg-muted text-muted-foreground"
               )}
             >
-              {tab.label}
+              {tab.label} ({statusCounts[tab.value] ?? 0})
             </button>
           ))}
         </div>

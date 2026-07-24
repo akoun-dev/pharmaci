@@ -10,13 +10,25 @@ import {
   Loader2,
   ChevronRight,
   Star,
+  AlertTriangle,
 } from "lucide-react";
 import { AppHeader } from "@/components/app/app-header";
+import { DashboardSkeleton } from "@/components/app/dashboard-skeleton";
 import { useAppStore } from "@/lib/store";
 import { api, formatFCFA, ORDER_STATUS } from "@/lib/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface AdminStats {
   users: { total: number; patients: number; pharmacists: number; admins: number };
@@ -64,8 +76,12 @@ const ROLE_COLORS: Record<string, string> = {
 export function AdminDashboardScreen() {
   const user = useAppStore((s) => s.user);
   const navigate = useAppStore((s) => s.navigate);
+  const pushToast = useAppStore((s) => s.pushToast);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     void loadStats();
@@ -73,11 +89,14 @@ export function AdminDashboardScreen() {
 
   async function loadStats() {
     setLoading(true);
+    setError(false);
     try {
       const res = await api.get<AdminStats>("/api/admin/stats");
       setStats(res);
-    } catch {
-      // ignore
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erreur de chargement des statistiques";
+      pushToast(msg, "error");
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -85,8 +104,27 @@ export function AdminDashboardScreen() {
 
   if (loading) {
     return (
-      <div className="flex h-dvh items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      <div className="flex flex-col">
+        <AppHeader title="Administration" />
+        <DashboardSkeleton />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col h-dvh items-center justify-center gap-4 px-6 text-center">
+        <AlertTriangle className="h-12 w-12 text-red-500" />
+        <div>
+          <p className="text-sm font-semibold text-foreground">Erreur de chargement</p>
+          <p className="text-xs text-muted-foreground mt-1">Impossible de charger les statistiques.</p>
+        </div>
+        <button
+          onClick={() => void loadStats()}
+          className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+        >
+          Réessayer
+        </button>
       </div>
     );
   }

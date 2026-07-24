@@ -130,7 +130,19 @@ function ScreenRouter() {
     else if (view === "pharmacy-detail") screen = <PharmacyDetailScreen />;
     else screen = <ProfileScreen />;
   } else {
-    screen = <HomeScreen />;
+    screen = (
+      <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
+        <p className="text-4xl font-bold text-muted-foreground/30">404</p>
+        <p className="mt-2 text-sm font-medium text-foreground">Page non trouvée</p>
+        <p className="mt-1 text-xs text-muted-foreground">Cette page n&apos;existe pas ou n&apos;est plus disponible.</p>
+        <button
+          onClick={() => useAppStore.getState().setTab("home")}
+          className="mt-4 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+        >
+          Retour à l&apos;accueil
+        </button>
+      </div>
+    );
   }
 
   return <PageTransition navKey={navKey}>{screen}</PageTransition>;

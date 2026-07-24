@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Search, Loader2, MessageSquare, Send } from "lucide-react";
+import { Search, Loader2, MessageSquare, Pencil } from "lucide-react";
 import { AppHeader } from "@/components/app/app-header";
 import { useAppStore } from "@/lib/store";
 import { api, formatRelative } from "@/lib/api";
@@ -40,6 +40,7 @@ interface UserSearchResult {
 export function MessagesScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const user = useAppStore((s) => s.user);
+  const pushToast = useAppStore((s) => s.pushToast);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNewChat, setShowNewChat] = useState(false);
@@ -63,9 +64,11 @@ export function MessagesScreen() {
     if (!silent) setLoading(true);
     try {
       const res = await api.get<{ conversations: Conversation[] }>("/api/messages");
-      setConversations(res.conversations);
-    } catch {
-      // ignore
+      setConversations(res.conversations.sort(
+        (a, b) => new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime()
+      ));
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement des conversations", "error");
     } finally {
       setLoading(false);
     }
@@ -84,7 +87,8 @@ export function MessagesScreen() {
         `/api/users/search?q=${encodeURIComponent(searchQuery)}&limit=10`
       );
       setSearchResults(res.users);
-    } catch {
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de recherche", "error");
       setSearchResults([]);
     } finally {
       setSearching(false);
@@ -106,8 +110,9 @@ export function MessagesScreen() {
           <button
             onClick={() => setShowNewChat(true)}
             className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted"
+            aria-label="Nouvelle conversation"
           >
-            <Send className="h-4 w-4" />
+            <Pencil className="h-4 w-4" />
           </button>
         }
       />
@@ -131,15 +136,20 @@ export function MessagesScreen() {
             </Button>
           </div>
         ) : (
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-border" role="listbox" aria-label="Conversations">
             {conversations.map((conv) => (
               <button
                 key={conv.otherUser.id}
+                role="option"
                 onClick={() => openChat(conv.otherUser.id)}
                 className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-accent"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary shrink-0">
-                  {conv.otherUser.name.charAt(0).toUpperCase()}
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary shrink-0 overflow-hidden">
+                  {conv.otherUser.avatarUrl ? (
+                    <img src={conv.otherUser.avatarUrl} alt={conv.otherUser.name} className="h-full w-full object-cover" />
+                  ) : (
+                    conv.otherUser.name.charAt(0).toUpperCase()
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">

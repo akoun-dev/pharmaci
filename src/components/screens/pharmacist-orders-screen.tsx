@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Loader2,
   ChevronRight,
@@ -62,6 +62,9 @@ export function PharmacistOrdersScreen() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({
+    "": 0, PENDING: 0, CONFIRMED: 0, READY: 0, PICKED_UP: 0, CANCELLED: 0,
+  });
 
   // Search
   const [search, setSearch] = useState("");
@@ -76,6 +79,20 @@ export function PharmacistOrdersScreen() {
     newStatus: string;
     label: string;
   } | null>(null);
+
+  const sortMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (sortMenuRef.current && !sortMenuRef.current.contains(e.target as Node)) {
+        setShowSortMenu(false);
+      }
+    }
+    if (showSortMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showSortMenu]);
 
   useEffect(() => {
     void loadOrders();
@@ -112,8 +129,19 @@ export function PharmacistOrdersScreen() {
       });
 
       setOrders(filtered);
-    } catch {
-      // ignore
+
+      // Update status counts (fetch all statuses if on "all" tab)
+      if (!activeTab) {
+        const counts: Record<string, number> = { "": filtered.length, PENDING: 0, CONFIRMED: 0, READY: 0, PICKED_UP: 0, CANCELLED: 0 };
+        for (const o of res.orders) {
+          if (counts[o.status] !== undefined) counts[o.status]++;
+        }
+        setStatusCounts(counts);
+      } else {
+        setStatusCounts((prev) => ({ ...prev, [activeTab]: filtered.length }));
+      }
+    } catch (err) {
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
     }
@@ -182,10 +210,12 @@ export function PharmacistOrdersScreen() {
 
         {/* Status tabs + sort */}
         <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto no-scrollbar">
-          <div className="flex gap-1 overflow-x-auto no-scrollbar flex-1">
+          <div className="flex gap-1 overflow-x-auto no-scrollbar flex-1" role="tablist">
             {TABS.map((tab) => (
               <button
                 key={tab.value}
+                role="tab"
+                aria-selected={activeTab === tab.value}
                 onClick={() => setActiveTab(tab.value)}
                 className={cn(
                   "whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
@@ -194,20 +224,22 @@ export function PharmacistOrdersScreen() {
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
                 )}
               >
-                {tab.label}
+                {tab.label} {statusCounts[tab.value] > 0 ? `(${statusCounts[tab.value]})` : ""}
               </button>
             ))}
           </div>
           <div className="relative">
             <button
               onClick={() => setShowSortMenu(!showSortMenu)}
+              aria-expanded={showSortMenu}
+              aria-label="Trier les commandes"
               className="flex h-8 items-center gap-1 rounded-lg border border-border bg-card px-2 text-[11px] font-medium text-muted-foreground hover:border-primary/40"
             >
               <ArrowUpDown className="h-3 w-3" />
               {sortBy === "date" ? "Date" : sortBy === "amount" ? "Montant" : "Patient"}
             </button>
             {showSortMenu && (
-              <div className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+              <div ref={sortMenuRef} className="absolute right-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
                 {["date", "amount", "patient"].map((opt) => (
                   <button
                     key={opt}

@@ -57,16 +57,20 @@ export function AdminUsersScreen() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UserItem | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [roleCounts, setRoleCounts] = useState({ PATIENT: 0, PHARMACIST: 0, ADMIN: 0 });
+  const [showRoleMenu, setShowRoleMenu] = useState<string | null>(null);
+  const [roleTarget, setRoleTarget] = useState<{ user: UserItem; role: string } | null>(null);
 
   useEffect(() => {
     void loadUsers();
   }, [roleFilter, page]);
 
   useEffect(() => {
-    const t = setTimeout(() => { setPage(1); void loadUsers(); }, 300);
+    const t = setTimeout(() => setPage(1), 300);
     return () => clearTimeout(t);
   }, [search]);
 
@@ -88,8 +92,18 @@ export function AdminUsersScreen() {
       }
       setTotal(res.total);
       setTotalPages(res.totalPages);
-    } catch {
-      // ignore
+      // Compute role counts from current data (approximate from first page)
+      if (page === 1 && !roleFilter) {
+        const counts = { PATIENT: 0, PHARMACIST: 0, ADMIN: 0 };
+        for (const u of res.users) {
+          if (counts[u.role as keyof typeof counts] !== undefined) {
+            counts[u.role as keyof typeof counts]++;
+          }
+        }
+        setRoleCounts(counts);
+      }
+    } catch (err) {
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -106,6 +120,7 @@ export function AdminUsersScreen() {
     if (!deleteId) return;
     try {
       await api.del(`/api/admin/users?id=${deleteId}`);
+      useAppStore.getState().pushToast("Utilisateur supprimé", "success");
       setDeleteId(null);
       void loadUsers();
     } catch (err) {
@@ -116,10 +131,14 @@ export function AdminUsersScreen() {
     }
   }
 
-  async function toggleRole(user: UserItem) {
-    const newRole = user.role === "PATIENT" ? "PHARMACIST" : "PATIENT";
+  async function confirmToggleRole() {
+    if (!roleTarget) return;
+    const { user, role } = roleTarget;
+    setRoleTarget(null);
     try {
-      await api.put(`/api/admin/users?id=${user.id}`, { role: newRole });
+      await api.put(`/api/admin/users?id=${user.id}`, { role });
+      useAppStore.getState().pushToast(`Rôle modifié pour ${user.name}`, "success");
+      setShowRoleMenu(null);
       void loadUsers();
     } catch (err) {
       useAppStore.getState().pushToast(
@@ -150,10 +169,10 @@ export function AdminUsersScreen() {
         {/* Role tabs */}
         <div className="flex gap-1 mb-3 overflow-x-auto no-scrollbar">
           {[
-            { value: "", label: "Tous" },
-            { value: "PATIENT", label: "Patients" },
-            { value: "PHARMACIST", label: "Pharmaciens" },
-            { value: "ADMIN", label: "Admins" },
+            { value: "", label: "Tous", count: total },
+            { value: "PATIENT", label: "Patients", count: roleCounts.PATIENT },
+            { value: "PHARMACIST", label: "Pharmaciens", count: roleCounts.PHARMACIST },
+            { value: "ADMIN", label: "Admins", count: roleCounts.ADMIN },
           ].map((tab) => (
             <button
               key={tab.value}
@@ -165,7 +184,7 @@ export function AdminUsersScreen() {
                   : "bg-muted text-muted-foreground"
               )}
             >
-              {tab.label}
+              {tab.label} ({tab.count})
             </button>
           ))}
         </div>
@@ -207,15 +226,34 @@ export function AdminUsersScreen() {
                     )}
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowRoleMenu(showRoleMenu === u.id ? null : u.id)}
+                        className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-muted"
+                        title="Changer le rôle"
+                      >
+                        <Shield className="h-3.5 w-3.5 text-muted-foreground" />
+                      </button>
+                      {showRoleMenu === u.id && (
+                        <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+                          {["PATIENT", "PHARMACIST", "ADMIN"].map((role) => (
+                            <button
+                              key={role}
+                              onClick={() => { if (u.role !== role) setRoleTarget({ user: u, role }); setShowRoleMenu(null); }}
+                              className={cn(
+                                "flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors hover:bg-muted/50",
+                                u.role === role && "bg-primary/10 text-primary font-medium"
+                              )}
+                            >
+                              {ROLE_LABELS[role]}
+                              {u.role === role && " ✓"}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <button
-                      onClick={() => void toggleRole(u)}
-                      className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-muted"
-                      title="Changer le rôle"
-                    >
-                      <Shield className="h-3.5 w-3.5 text-muted-foreground" />
-                    </button>
-                    <button
-                      onClick={() => setDeleteId(u.id)}
+                      onClick={() => { setDeleteId(u.id); setDeleteTarget(u); }}
                       className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-red-50"
                     >
                       <Trash2 className="h-3.5 w-3.5 text-red-500" />
@@ -243,11 +281,18 @@ export function AdminUsersScreen() {
         )}
       </div>
 
-      <Dialog open={!!deleteId} onOpenChange={(v) => { if (!v) setDeleteId(null); }}>
+      <Dialog open={!!deleteId} onOpenChange={(v) => { if (!v) { setDeleteId(null); setDeleteTarget(null); } }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Supprimer cet utilisateur ?</DialogTitle>
           </DialogHeader>
+          {deleteTarget && (
+            <div className="rounded-lg bg-muted/50 p-3 text-sm">
+              <p className="font-semibold text-foreground">{deleteTarget.name}</p>
+              <p className="text-xs text-muted-foreground">{deleteTarget.email}</p>
+              <p className="text-xs text-muted-foreground">{ROLE_LABELS[deleteTarget.role]}</p>
+            </div>
+          )}
           <p className="text-sm text-muted-foreground">
             Cette action est irréversible.
           </p>
@@ -257,6 +302,23 @@ export function AdminUsersScreen() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!roleTarget} onOpenChange={(v) => { if (!v) setRoleTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Changer le rôle ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Le rôle de <strong>{roleTarget?.user.name}</strong> sera changé de{" "}
+              <strong>{ROLE_LABELS[roleTarget?.user.role || ""]}</strong> vers{" "}
+              <strong>{ROLE_LABELS[roleTarget?.role || ""]}</strong>.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void confirmToggleRole()}>Confirmer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -15,6 +15,16 @@ import { api } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface PharmacyItem {
   id: string;
@@ -40,13 +50,15 @@ export function AdminPharmaciesScreen() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [verifiedCounts, setVerifiedCounts] = useState({ all: 0, verified: 0, unverified: 0 });
+  const [verifyTarget, setVerifyTarget] = useState<PharmacyItem | null>(null);
 
   useEffect(() => {
     void loadPharmacies();
   }, [verifiedFilter, page]);
 
   useEffect(() => {
-    const t = setTimeout(() => { setPage(1); void loadPharmacies(); }, 300);
+    const t = setTimeout(() => setPage(1), 300);
     return () => clearTimeout(t);
   }, [search]);
 
@@ -68,8 +80,17 @@ export function AdminPharmaciesScreen() {
       }
       setTotal(res.total);
       setTotalPages(res.totalPages);
-    } catch {
-      // ignore
+      if (page === 1 && !verifiedFilter) {
+        setVerifiedCounts((prev) => ({ ...prev, all: res.total }));
+      }
+      if (page === 1 && verifiedFilter === "true") {
+        setVerifiedCounts((prev) => ({ ...prev, verified: res.total }));
+      }
+      if (page === 1 && verifiedFilter === "false") {
+        setVerifiedCounts((prev) => ({ ...prev, unverified: res.total }));
+      }
+    } catch (err) {
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -82,11 +103,18 @@ export function AdminPharmaciesScreen() {
     setPage((p) => p + 1);
   }
 
-  async function toggleVerified(pharmacy: PharmacyItem) {
+  async function confirmToggleVerified() {
+    if (!verifyTarget) return;
+    const pharmacy = verifyTarget;
+    setVerifyTarget(null);
     try {
       await api.put(`/api/admin/pharmacies?id=${pharmacy.id}`, {
         isVerified: !pharmacy.isVerified,
       });
+      useAppStore.getState().pushToast(
+        pharmacy.isVerified ? "Vérification retirée" : "Pharmacie vérifiée",
+        "success"
+      );
       void loadPharmacies();
     } catch (err) {
       useAppStore.getState().pushToast(
@@ -115,9 +143,9 @@ export function AdminPharmaciesScreen() {
 
         <div className="flex gap-1 mb-3 overflow-x-auto no-scrollbar">
           {[
-            { value: "", label: "Toutes" },
-            { value: "true", label: "Vérifiées" },
-            { value: "false", label: "Non vérifiées" },
+            { value: "", label: "Toutes", count: verifiedCounts.all },
+            { value: "true", label: "Vérifiées", count: verifiedCounts.verified },
+            { value: "false", label: "Non vérifiées", count: verifiedCounts.unverified },
           ].map((tab) => (
             <button
               key={tab.value}
@@ -129,7 +157,7 @@ export function AdminPharmaciesScreen() {
                   : "bg-muted text-muted-foreground"
               )}
             >
-              {tab.label}
+              {tab.label} ({tab.count})
             </button>
           ))}
         </div>
@@ -189,7 +217,7 @@ export function AdminPharmaciesScreen() {
 
                 <div className="flex items-center gap-2 mt-2">
                   <button
-                    onClick={() => void toggleVerified(p)}
+                    onClick={() => setVerifyTarget(p)}
                     className={cn(
                       "flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                       p.isVerified
@@ -219,6 +247,27 @@ export function AdminPharmaciesScreen() {
         </>
         )}
       </div>
+
+      <AlertDialog open={!!verifyTarget} onOpenChange={(v) => { if (!v) setVerifyTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {verifyTarget?.isVerified ? "Retirer la vérification ?" : "Vérifier cette pharmacie ?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {verifyTarget?.isVerified
+                ? `La pharmacie « ${verifyTarget?.name} » ne sera plus marquée comme vérifiée.`
+                : `La pharmacie « ${verifyTarget?.name} » sera marquée comme vérifiée et apparaîtra comme fiable pour les patients.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void confirmToggleVerified()}>
+              {verifyTarget?.isVerified ? "Retirer" : "Vérifier"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

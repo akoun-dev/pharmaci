@@ -143,8 +143,8 @@ export function MedicationSearchScreen() {
       setTotalPages(res.totalPages);
       setCategories(catRes.categories);
       if (search.trim()) addRecentSearch(search.trim());
-    } catch {
-      // ignore
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
     }
@@ -165,8 +165,8 @@ export function MedicationSearchScreen() {
       });
       setMedications((prev) => [...prev, ...res.medications]);
       setPage(nextPage);
-    } catch {
-      // ignore
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoadingMore(false);
     }
@@ -217,6 +217,8 @@ export function MedicationSearchScreen() {
                 suggestions.map((m, i) => (
                   <button
                     key={m.id}
+                    role="option"
+                    aria-selected={i === focusedIdx}
                     onMouseDown={(e) => { e.preventDefault(); handleSelect(m); }}
                     className={cn(
                       "flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors",
@@ -254,6 +256,7 @@ export function MedicationSearchScreen() {
             <button
               key={cat}
               onClick={() => setCategory(cat)}
+              aria-pressed={active}
               className={cn(
                 "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
                 active
@@ -268,6 +271,7 @@ export function MedicationSearchScreen() {
         {/* Prescription filter */}
         <button
           onClick={() => setPrescriptionOnly((v) => !v)}
+          aria-pressed={prescriptionOnly}
           className={cn(
             "shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all flex items-center gap-1",
             prescriptionOnly
@@ -289,6 +293,8 @@ export function MedicationSearchScreen() {
           <div className="relative">
             <button
               onClick={() => setShowSortMenu(!showSortMenu)}
+              aria-expanded={showSortMenu}
+              aria-label="Trier les résultats"
               className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40"
             >
               <ArrowUpDown className="h-3 w-3" />

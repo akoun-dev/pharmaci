@@ -84,8 +84,8 @@ export function PharmacySearchScreen() {
       setTotal(res.total);
       setTotalPages(res.totalPages);
       if (search.trim()) addRecentSearch(search.trim());
-    } catch {
-      // ignore
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
     }
@@ -107,8 +107,8 @@ export function PharmacySearchScreen() {
       });
       setPharmacies((prev) => [...prev, ...res.pharmacies]);
       setPage(nextPage);
-    } catch {
-      // ignore
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoadingMore(false);
     }
@@ -172,6 +172,8 @@ export function PharmacySearchScreen() {
           <div className="relative">
             <button
               onClick={() => setShowSortMenu(!showSortMenu)}
+              aria-expanded={showSortMenu}
+              aria-label="Trier les résultats"
               className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40"
             >
               <ArrowUpDown className="h-3 w-3" />
@@ -280,6 +282,7 @@ function FilterChip({
   return (
     <button
       onClick={onClick}
+      aria-pressed={active}
       className={cn(
         "shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all",
         active
@@ -309,8 +312,8 @@ export function GuardPharmaciesScreen() {
     try {
       const res = await pharmacyApi.list({ onGuard: true, limit: 50 });
       setPharmacies(res.pharmacies);
-    } catch {
-      // ignore
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement des pharmacies de garde", "error");
     } finally {
       setLoading(false);
     }

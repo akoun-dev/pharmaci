@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Search,
   Plus,
@@ -22,8 +22,11 @@ import {
   Clock,
   FlaskConical,
   History,
+  MoreVertical,
+  Boxes,
 } from "lucide-react";
 import { AppHeader } from "@/components/app/app-header";
+import { DashboardSkeleton } from "@/components/app/dashboard-skeleton";
 import { useAppStore } from "@/lib/store";
 import { api, formatFCFA, medicationApi, pharmacistStockApi, type Medication } from "@/lib/api";
 import { Input } from "@/components/ui/input";
@@ -107,10 +110,20 @@ export function PharmacistStockScreen() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const sortMenuRef = useRef<HTMLDivElement>(null);
 
+  // Overflow menu (export / import / print)
+  const [showActionsMenu, setShowActionsMenu] = useState(false);
+  const actionsMenuRef = useRef<HTMLDivElement>(null);
+
+  // Add-modal medication search
+  const [medSearch, setMedSearch] = useState("");
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (sortMenuRef.current && !sortMenuRef.current.contains(e.target as Node)) {
         setShowSortMenu(false);
+      }
+      if (actionsMenuRef.current && !actionsMenuRef.current.contains(e.target as Node)) {
+        setShowActionsMenu(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -135,7 +148,9 @@ export function PharmacistStockScreen() {
     try {
       const res = await medicationApi.categories();
       setCategories(res.categories);
-    } catch {}
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement des catégories", "error");
+    }
   }
 
   async function loadStocks() {
@@ -150,8 +165,8 @@ export function PharmacistStockScreen() {
       q.set("order", sortOrder);
       const res = await api.get<{ stocks: StockItem[] }>(`/api/pharmacist/stock?${q.toString()}`);
       setStocks(res.stocks);
-    } catch {
-      // ignore
+    } catch (err) {
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
     }
@@ -160,6 +175,7 @@ export function PharmacistStockScreen() {
   async function openAddModal() {
     setShowAddModal(true);
     setSelectedMedId("");
+    setMedSearch("");
     setAddPrice("");
     setAddStock("");
     setAddThreshold("10");
@@ -167,7 +183,9 @@ export function PharmacistStockScreen() {
     try {
       const res = await medicationApi.list({ limit: 100 });
       setMedications(res.medications);
-    } catch {}
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement des médicaments", "error");
+    }
   }
 
   async function handleAdd() {
@@ -184,7 +202,7 @@ export function PharmacistStockScreen() {
       setShowAddModal(false);
       void loadStocks();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Erreur");
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur lors de l'ajout", "error");
     } finally {
       setSaving(false);
     }
@@ -203,7 +221,7 @@ export function PharmacistStockScreen() {
       setEditingStock(null);
       void loadStocks();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Erreur");
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur lors de la modification", "error");
     } finally {
       setSaving(false);
     }
@@ -216,18 +234,30 @@ export function PharmacistStockScreen() {
       setDeleteId(null);
       void loadStocks();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Erreur");
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur lors de la suppression", "error");
     }
   }
 
-  // Quick adjust +1/-1
-  async function quickAdjust(stockId: string, currentStock: number, delta: number) {
+  // Quick adjust +1/-1 — with undo via toast
+  async function quickAdjust(stockId: string, currentStock: number, delta: number, medName: string) {
     const newStock = Math.max(0, currentStock + delta);
     try {
       await api.put(`/api/pharmacist/stock/${stockId}`, { stock: newStock });
       pushToast(
-        delta > 0 ? `+${delta} unité(s) ajoutée(s)` : `${delta} unité(s) retirée(s)`,
-        "success"
+        delta > 0 ? `+${delta} · ${medName}` : `${delta} · ${medName}`,
+        "success",
+        {
+          actionLabel: "Annuler",
+          onAction: async () => {
+            try {
+              await api.put(`/api/pharmacist/stock/${stockId}`, { stock: currentStock });
+              pushToast(`${medName} restauré à ${currentStock}`, "info");
+              void loadStocks();
+            } catch {
+              pushToast("Impossible d'annuler", "error");
+            }
+          },
+        }
       );
       void loadStocks();
     } catch (err) {
@@ -243,7 +273,8 @@ export function PharmacistStockScreen() {
         `/api/pharmacist/stock/history?medicationId=${item.medicationId}`
       );
       setHistoryItems(res.history || []);
-    } catch {
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement de l'historique", "error");
       setHistoryItems([]);
     }
     setShowHistoryModal(true);
@@ -326,8 +357,29 @@ export function PharmacistStockScreen() {
     { value: "name", label: "Nom" },
     { value: "stock", label: "Stock" },
     { value: "price", label: "Prix" },
-    { value: "expiry", label: "Expiration" },
+    { value: "expiry", label: "Date d'expiration" },
   ];
+
+  // Summary stats computed from the currently loaded page
+  const summary = useMemo(() => {
+    return {
+      total: stocks.length,
+      lowStock: stocks.filter((s) => s.isLowStock).length,
+      expired: stocks.filter((s) => s.isExpired).length,
+      expiringSoon: stocks.filter((s) => s.isExpiringSoon && !s.isExpired).length,
+    };
+  }, [stocks]);
+
+  // Filtered medications for the add modal search
+  const filteredMedications = useMemo(() => {
+    const q = medSearch.trim().toLowerCase();
+    if (!q) return medications;
+    return medications.filter(
+      (m) =>
+        m.name.toLowerCase().includes(q) ||
+        m.activeIngredient?.toLowerCase().includes(q)
+    );
+  }, [medications, medSearch]);
 
   return (
     <div className="flex flex-col h-full">
@@ -408,23 +460,71 @@ export function PharmacistStockScreen() {
             </div>
           </div>
 
-          {/* Export / Import / Print buttons */}
-          <div className="grid grid-cols-3 gap-2">
-            <Button variant="outline" size="sm" onClick={() => void handleExport()} className="h-9 gap-1 text-xs font-semibold border-primary/30 text-primary hover:bg-primary/5">
-              <Download className="h-3.5 w-3.5 shrink-0" />
-              <span className="hidden sm:inline">Excel</span>
-            </Button>
-            <Button variant="outline" size="sm" onClick={handlePrint} className="h-9 gap-1 text-xs font-semibold border-primary/30 text-primary hover:bg-primary/5" title="Imprimer / PDF">
-              <Printer className="h-3.5 w-3.5 shrink-0" />
-              <span className="hidden sm:inline">PDF</span>
-            </Button>
+          {/* Overflow actions menu (export / import / print) */}
+          <div className="flex justify-end">
             <input ref={fileInputRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleFileSelect} />
-            <Button variant="outline" size="sm" onClick={() => { setShowImportModal(true); setImportResult(null); }} className="h-9 gap-1 text-xs font-semibold border-primary/30 text-primary hover:bg-primary/5">
-              <Upload className="h-3.5 w-3.5 shrink-0" />
-              <span className="hidden sm:inline">Import</span>
-            </Button>
+            <div className="relative" ref={actionsMenuRef}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowActionsMenu((v) => !v)}
+                className="h-9 gap-1 text-xs font-semibold border-primary/30 text-primary hover:bg-primary/5"
+                aria-expanded={showActionsMenu}
+                aria-label="Actions sur le stock"
+              >
+                <MoreVertical className="h-4 w-4" />
+                <span>Actions</span>
+              </Button>
+              {showActionsMenu && (
+                <div className="absolute right-0 top-full z-20 mt-1 w-44 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+                  <button
+                    onClick={() => { void handleExport(); setShowActionsMenu(false); }}
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs transition-colors hover:bg-muted/50"
+                  >
+                    <Download className="h-3.5 w-3.5 text-primary" />
+                    Exporter en Excel
+                  </button>
+                  <button
+                    onClick={() => { handlePrint(); setShowActionsMenu(false); }}
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs transition-colors hover:bg-muted/50"
+                  >
+                    <Printer className="h-3.5 w-3.5 text-primary" />
+                    Imprimer / PDF
+                  </button>
+                  <button
+                    onClick={() => { setShowImportModal(true); setImportResult(null); setShowActionsMenu(false); }}
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs transition-colors hover:bg-muted/50"
+                  >
+                    <Upload className="h-3.5 w-3.5 text-primary" />
+                    Importer un fichier
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Summary bar */}
+        {!loading && stocks.length > 0 && (
+          <div className="mb-3 grid grid-cols-4 gap-2">
+            <div className="rounded-lg bg-muted/50 px-2 py-1.5 text-center">
+              <p className="text-sm font-bold text-foreground">{summary.total}</p>
+              <p className="text-[9px] text-muted-foreground">Total</p>
+            </div>
+            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 px-2 py-1.5 text-center">
+              <p className="text-sm font-bold text-amber-600">{summary.lowStock}</p>
+              <p className="text-[9px] text-muted-foreground">Stock bas</p>
+            </div>
+            <div className="rounded-lg bg-orange-50 dark:bg-orange-950/30 px-2 py-1.5 text-center">
+              <p className="text-sm font-bold text-orange-600">{summary.expiringSoon}</p>
+              <p className="text-[9px] text-muted-foreground">Bientôt</p>
+            </div>
+            <div className="rounded-lg bg-red-50 dark:bg-red-950/30 px-2 py-1.5 text-center">
+              <p className="text-sm font-bold text-red-600">{summary.expired}</p>
+              <p className="text-[9px] text-muted-foreground">Expirés</p>
+            </div>
+          </div>
+        )}
 
         {lowStockOnly && (
           <p className="text-xs text-amber-600 mb-3 flex items-center gap-1">
@@ -434,9 +534,7 @@ export function PharmacistStockScreen() {
         )}
 
         {loading ? (
-          <div className="flex justify-center py-10">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          </div>
+          <DashboardSkeleton />
         ) : stocks.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-muted-foreground">
             <Package className="h-12 w-12 mb-3 opacity-50" />
@@ -490,10 +588,11 @@ export function PharmacistStockScreen() {
                   <span className="font-semibold text-primary">{formatFCFA(item.price)}</span>
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => void quickAdjust(item.id, item.stock, -1)}
+                      onClick={() => void quickAdjust(item.id, item.stock, -1, item.medication.name)}
                       disabled={item.stock <= 0}
                       className="flex h-6 w-6 items-center justify-center rounded-full border border-border hover:bg-muted disabled:opacity-30"
                       title="Retirer 1"
+                      aria-label="Retirer une unité"
                     >
                       <Minus className="h-3 w-3" />
                     </button>
@@ -501,9 +600,10 @@ export function PharmacistStockScreen() {
                       {item.stock}
                     </span>
                     <button
-                      onClick={() => void quickAdjust(item.id, item.stock, 1)}
+                      onClick={() => void quickAdjust(item.id, item.stock, 1, item.medication.name)}
                       className="flex h-6 w-6 items-center justify-center rounded-full border border-border hover:bg-muted"
                       title="Ajouter 1"
+                      aria-label="Ajouter une unité"
                     >
                       <Plus className="h-3 w-3" />
                     </button>
@@ -536,12 +636,29 @@ export function PharmacistStockScreen() {
             {!editingStock && (
               <div>
                 <label className="text-xs font-medium text-muted-foreground">Médicament</label>
-                <select value={selectedMedId} onChange={(e) => setSelectedMedId(e.target.value)} className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm">
+                <div className="relative mt-1">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={medSearch}
+                    onChange={(e) => setMedSearch(e.target.value)}
+                    placeholder="Rechercher un médicament..."
+                    className="h-9 pl-8 text-sm"
+                  />
+                </div>
+                <select
+                  value={selectedMedId}
+                  onChange={(e) => setSelectedMedId(e.target.value)}
+                  className="mt-2 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                  size={6}
+                >
                   <option value="">Sélectionner...</option>
-                  {medications.map((m) => (
+                  {filteredMedications.map((m) => (
                     <option key={m.id} value={m.id}>{m.name} ({m.dosage} {m.form})</option>
                   ))}
                 </select>
+                {filteredMedications.length === 0 && medSearch && (
+                  <p className="mt-1 text-[11px] text-muted-foreground">Aucun médicament trouvé</p>
+                )}
               </div>
             )}
             <div>

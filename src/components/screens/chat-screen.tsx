@@ -14,6 +14,7 @@ interface Message {
   id: string;
   content: string;
   senderId: string;
+  receiverId?: string;
   isRead: boolean;
   createdAt: string;
   sender: {
@@ -30,6 +31,12 @@ interface OtherUser {
   role: string;
   avatarUrl: string | null;
 }
+
+const ROLE_LABELS: Record<string, string> = {
+  PATIENT: "Patient",
+  PHARMACIST: "Pharmacien",
+  ADMIN: "Admin",
+};
 
 export function ChatScreen() {
   const params = useAppStore((s) => s.nav.params);
@@ -126,6 +133,7 @@ export function ChatScreen() {
           setOtherUser(res.otherUser);
           setLoading(false);
         } catch {
+          useAppStore.getState().pushToast("Erreur de chargement de la conversation", "error");
           setLoading(false);
         }
       })();
@@ -198,12 +206,6 @@ export function ChatScreen() {
     }
   }
 
-  const ROLE_LABELS: Record<string, string> = {
-    PATIENT: "Patient",
-    PHARMACIST: "Pharmacien",
-    ADMIN: "Admin",
-  };
-
   function formatDetailedTime(dateStr: string): string {
     const d = new Date(dateStr);
     const now = new Date();
@@ -248,10 +250,19 @@ export function ChatScreen() {
       {connectionLost && (
         <div className="flex items-center justify-center gap-1.5 bg-amber-50 py-1.5 text-[11px] font-medium text-amber-700">
           <WifiOff className="h-3 w-3" />
-          Connexion perdue — utilisation du mode hors ligne
+          Connexion perdue — reconnexion automatique...
+          <button
+            onClick={() => {
+              setConnectionLost(false);
+              if (otherId) loadConversation(otherId);
+            }}
+            className="ml-2 underline hover:text-amber-900"
+          >
+            Réessayer
+          </button>
         </div>
       )}
-      {isConnected && (
+      {isConnected && !loading && messages.length > 0 && (
         <div className="flex items-center justify-center gap-1.5 bg-green-50 py-0.5 text-[10px] font-medium text-green-600">
           <Wifi className="h-3 w-3" />
           Connecté en temps réel
@@ -261,6 +272,16 @@ export function ChatScreen() {
       {loading && messages.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      ) : messages.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center px-4 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
+            <Send className="h-6 w-6" />
+          </div>
+          <p className="text-sm font-medium text-foreground">Commencez la conversation</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Envoyez un message à {otherUser?.name || "cet utilisateur"} pour démarrer.
+          </p>
         </div>
       ) : (
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
@@ -304,7 +325,7 @@ export function ChatScreen() {
           ))}
           {/* Typing indicator */}
           {otherTyping && (
-            <div className="flex justify-start">
+            <div className="flex justify-start" aria-live="polite">
               <div className="rounded-2xl rounded-bl-md bg-muted px-3 py-2">
                 <div className="flex items-center gap-1">
                   <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/40" style={{ animationDelay: "0ms" }} />
@@ -325,6 +346,7 @@ export function ChatScreen() {
           onKeyDown={handleKeyDown}
           placeholder={isConnected ? "Votre message..." : "Hors ligne - tapez pour envoyer..."}
           className="flex-1"
+          aria-label="Votre message"
         />
         <Button
           size="icon"

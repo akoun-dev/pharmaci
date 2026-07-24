@@ -4,12 +4,23 @@ import type { AuthUser } from "@/lib/store";
 
 async function request<T>(
   url: string,
-  options?: RequestInit
+  options?: RequestInit & { signal?: AbortSignal }
 ): Promise<T> {
   const res = await fetch(url, {
     headers: { "Content-Type": "application/json", ...(options?.headers || {}) },
     ...options,
+    signal: options?.signal,
   });
+  
+  if (res.status === 401) {
+    if (typeof window !== "undefined") {
+      const { useAppStore } = await import("@/lib/store");
+      useAppStore.getState().pushToast("Session expirée. Veuillez vous reconnecter.", "error");
+      useAppStore.getState().setUser(null);
+    }
+    throw new Error("Session expirée");
+  }
+  
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error((data as { error?: string }).error || "Une erreur est survenue");
@@ -18,12 +29,12 @@ async function request<T>(
 }
 
 export const api = {
-  get: <T>(url: string) => request<T>(url),
-  post: <T>(url: string, body?: unknown) =>
-    request<T>(url, { method: "POST", body: body ? JSON.stringify(body) : undefined }),
-  put: <T>(url: string, body?: unknown) =>
-    request<T>(url, { method: "PUT", body: body ? JSON.stringify(body) : undefined }),
-  del: <T>(url: string) => request<T>(url, { method: "DELETE" }),
+  get: <T>(url: string, signal?: AbortSignal) => request<T>(url, { signal }),
+  post: <T>(url: string, body?: unknown, signal?: AbortSignal) =>
+    request<T>(url, { method: "POST", body: body ? JSON.stringify(body) : undefined, signal }),
+  put: <T>(url: string, body?: unknown, signal?: AbortSignal) =>
+    request<T>(url, { method: "PUT", body: body ? JSON.stringify(body) : undefined, signal }),
+  del: <T>(url: string, signal?: AbortSignal) => request<T>(url, { method: "DELETE", signal }),
 };
 
 // ---------- Types ----------

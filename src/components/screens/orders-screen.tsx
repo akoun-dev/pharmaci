@@ -23,6 +23,7 @@ import {
 } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -81,8 +82,8 @@ export function OrdersScreen() {
         status: filter !== "ALL" ? filter : undefined,
       });
       setOrders(res.orders);
-    } catch {
-      // ignore
+    } catch (err) {
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
     }
@@ -147,11 +148,11 @@ export function OrdersScreen() {
           <div className="px-4 pt-3">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
+              <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Rechercher par code ou pharmacie..."
-                className="h-10 w-full rounded-xl border border-primary/20 bg-primary/5 pl-9 pr-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/20"
+                className="h-10 pl-9 text-sm"
               />
             </div>
           </div>
@@ -167,12 +168,14 @@ export function OrdersScreen() {
           )}
 
           {/* Filter tabs */}
-          <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pt-2 pb-1">
+          <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pt-2 pb-1" role="tablist">
             {STATUS_FILTERS.map((f) => {
               const active = filter === f.id;
               return (
                 <button
                   key={f.id}
+                  role="tab"
+                  aria-selected={active}
                   onClick={() => setFilter(f.id)}
                   className={cn(
                     "shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all",

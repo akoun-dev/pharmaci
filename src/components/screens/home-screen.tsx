@@ -13,6 +13,8 @@ import {
   Mic,
   Camera,
   Locate,
+  History,
+  WifiOff,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -55,7 +57,38 @@ export function HomeScreen() {
   const [popularMeds, setPopularMeds] = useState<Medication[]>([]);
   const [loading, setLoading] = useState(true);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
-  const [location, setLocation] = useState("Abidjan, Cocody Riviera");
+  const [location, setLocation] = useState("Localisation en cours...");
+  const [isOnline, setIsOnline] = useState(true);
+
+  // Auto-detect geolocation on first load
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          useAppStore.getState().setUserPosition([latitude, longitude]);
+        },
+        () => {
+          setLocation("Abidjan, Cocody Riviera");
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+  }, []);
+
+  // Online/offline detection
+  useEffect(() => {
+    const setOnline = () => setIsOnline(true);
+    const setOffline = () => setIsOnline(false);
+    window.addEventListener("online", setOnline);
+    window.addEventListener("offline", setOffline);
+    setIsOnline(navigator.onLine);
+    return () => {
+      window.removeEventListener("online", setOnline);
+      window.removeEventListener("offline", setOffline);
+    };
+  }, []);
   const [showScanner, setShowScanner] = useState(false);
 
   // Speech recognition
@@ -171,7 +204,7 @@ export function HomeScreen() {
       prevOrders.current = new Map(active.map((o) => [o.id, o.status]));
       useAppStore.getState().setNotificationCount(active.length);
     } catch {
-      // ignore silently
+      pushToast("Erreur de vérification des notifications", "error");
     }
   }
 
@@ -190,8 +223,8 @@ export function HomeScreen() {
       if (favRes) setFavoriteIds(new Set((favRes as { pharmacies: Pharmacy[] }).pharmacies.map((p) => p.id)));
       // Check notifications in parallel
       void checkNotifications();
-    } catch {
-      // ignore
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
     }
@@ -269,12 +302,31 @@ export function HomeScreen() {
       {/* Header */}
       <AppHeader title="Pharmaci" showCart />
 
+      {/* Offline banner */}
+      {!isOnline && (
+        <div className="flex items-center justify-center gap-1.5 bg-amber-50 px-4 py-1.5 text-xs font-medium text-amber-700">
+          <WifiOff className="h-3 w-3" />
+          Mode hors ligne — certaines fonctionnalités peuvent être limitées
+        </div>
+      )}
+
       {/* Greeting */}
       <div className="px-4 pt-4">
-        <p className="text-sm text-muted-foreground">Bonjour 👋</p>
-        <h1 className="text-xl font-bold text-foreground">
-          {user?.name?.split(" ")[0] || "Cherchons"} votre médicament
-        </h1>
+        {user ? (
+          <>
+            <p className="text-sm text-muted-foreground">Bonjour 👋</p>
+            <h1 className="text-xl font-bold text-foreground">
+              {user.name?.split(" ")[0]}, trouvez votre médicament
+            </h1>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-muted-foreground">Bienvenue 👋</p>
+            <h1 className="text-xl font-bold text-foreground">
+              Découvrez les pharmacies près de chez vous
+            </h1>
+          </>
+        )}
       </div>
 
       {/* Mode tabs */}
@@ -612,7 +664,7 @@ export function HomeScreen() {
         <section className="pt-5 pb-2">
           <div className="flex items-center justify-between px-4">
             <h2 className="flex items-center gap-1.5 text-base font-bold text-foreground">
-              <Clock className="h-4 w-4 text-primary" />
+              <History className="h-4 w-4 text-primary" />
               Récemment consultés
             </h2>
             <button
@@ -705,8 +757,17 @@ export function HomeScreen() {
       </section>
       {/* Barcode scanner overlay */}
       {showScanner && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-black" onClick={() => { stopBarcodeScan(); setShowScanner(false); }}>
-          <div className="relative flex flex-1 flex-col" onClick={(e) => e.stopPropagation()}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex flex-col bg-black" onClick={() => { stopBarcodeScan(); setShowScanner(false); }}>
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="relative flex flex-1 flex-col" onClick={(e) => e.stopPropagation()}>
+
             <div className="flex items-center justify-between bg-black/80 p-4">
               <h2 className="text-base font-bold text-white">Scanner un code-barres</h2>
               <button
@@ -740,8 +801,8 @@ export function HomeScreen() {
                 </div>
               )}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
     </div>

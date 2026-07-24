@@ -24,6 +24,16 @@ import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function ProfileScreen() {
   const user = useAppStore((s) => s.user);
@@ -37,6 +47,8 @@ export function ProfileScreen() {
   const [loadingFav, setLoadingFav] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Personal statistics
   const [orderCount, setOrderCount] = useState(0);
@@ -57,8 +69,8 @@ export function ProfileScreen() {
       const orders = res.orders;
       setOrderCount(orders.length);
       setTotalSpent(orders.reduce((sum, o) => sum + o.totalAmount, 0));
-    } catch {
-      // ignore
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement des statistiques", "error");
     } finally {
       setLoadingStats(false);
     }
@@ -69,22 +81,15 @@ export function ProfileScreen() {
     try {
       const res = await pharmacyApi.favorites();
       setFavorites(res.pharmacies);
-    } catch {
-      // ignore
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur de chargement des favoris", "error");
     } finally {
       setLoadingFav(false);
     }
   }
 
   async function handleLogout() {
-    if (!confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) return;
-    try {
-      await authApi.logout();
-    } catch {
-      // ignore
-    }
-    logout();
-    pushToast("Déconnecté avec succès.", "info");
+    setShowLogoutDialog(true);
   }
 
   async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -98,7 +103,27 @@ export function ProfileScreen() {
     try {
       const base64 = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const maxSize = 200;
+            let w = img.width;
+            let h = img.height;
+            if (w > maxSize || h > maxSize) {
+              if (w > h) { h = Math.round((h / w) * maxSize); w = maxSize; }
+              else { w = Math.round((w / h) * maxSize); h = maxSize; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) { reject(new Error("Canvas not supported")); return; }
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", 0.7));
+          };
+          img.onerror = reject;
+          img.src = reader.result as string;
+        };
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
@@ -243,7 +268,10 @@ export function ProfileScreen() {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-border bg-card p-3">
+              <button
+                onClick={() => navigate("orders")}
+                className="rounded-2xl border border-border bg-card p-3 text-left transition-colors hover:border-primary/40"
+              >
                 <div className="flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
                     <Package className="h-4 w-4" />
@@ -253,7 +281,7 @@ export function ProfileScreen() {
                     <p className="text-[10px] text-muted-foreground">Commandes</p>
                   </div>
                 </div>
-              </div>
+              </button>
               <div className="rounded-2xl border border-border bg-card p-3">
                 <div className="flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
@@ -339,10 +367,66 @@ export function ProfileScreen() {
           Se déconnecter
         </button>
 
+        {/* Delete account */}
+        <button
+          onClick={() => setShowDeleteDialog(true)}
+          className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl border border-border py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/50"
+        >
+          Supprimer mon compte
+        </button>
+
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Pharmaci v1.0 • Côte d'Ivoire
+          Pharmaci v2.0 • Côte d&apos;Ivoire
         </p>
       </div>
+
+      {/* Logout confirmation dialog */}
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Se déconnecter ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir vous déconnecter ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                try { await authApi.logout(); } catch { /* ignore */ }
+                logout();
+                pushToast("Déconnecté avec succès.", "info");
+              }}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              Se déconnecter
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete account confirmation dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer votre compte ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Toutes vos données seront supprimées définitivement.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                pushToast("La suppression de compte n'est pas encore disponible.", "info");
+              }}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

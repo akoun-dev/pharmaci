@@ -17,6 +17,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { AppHeader } from "@/components/app/app-header";
+import { DashboardSkeleton } from "@/components/app/dashboard-skeleton";
 import { useAppStore } from "@/lib/store";
 import { api, formatFCFA } from "@/lib/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -84,7 +85,7 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED: "Annulée",
 };
 
-function ChartTooltip({ active, payload, label }: any) {
+function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
   if (active && payload && payload.length) {
     return (
       <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-sm">
@@ -111,8 +112,8 @@ export function PharmacistDashboardScreen() {
           `/api/pharmacist/stats?period=${period}`
         );
         setStats(res);
-      } catch {
-        // ignore
+      } catch (err) {
+        useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement des statistiques", "error");
       } finally {
         setLoading(false);
       }
@@ -126,8 +127,8 @@ export function PharmacistDashboardScreen() {
         `/api/pharmacist/stats?period=${period}`
       );
       setStats(res);
-    } catch {
-      // ignore
+    } catch (err) {
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de rafraîchissement", "error");
     } finally {
       setRefreshing(false);
     }
@@ -135,8 +136,9 @@ export function PharmacistDashboardScreen() {
 
   if (loading) {
     return (
-      <div className="flex h-dvh items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      <div className="flex flex-col">
+        <AppHeader title="Espace Pharmacien" />
+        <DashboardSkeleton />
       </div>
     );
   }
@@ -151,6 +153,7 @@ export function PharmacistDashboardScreen() {
           <div>
             <p className="text-sm text-muted-foreground">Bonjour</p>
             <h1 className="text-xl font-bold">{user?.name?.split(" ")[0] || "Pharmacien"}</h1>
+            <p className="text-xs text-muted-foreground">{new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}</p>
           </div>
           <div className="flex items-center gap-2">
             <select
@@ -167,6 +170,7 @@ export function PharmacistDashboardScreen() {
               disabled={refreshing}
               className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:bg-muted"
               title="Rafraîchir"
+              aria-label="Rafraîchir les données"
             >
               <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
             </button>
@@ -187,7 +191,7 @@ export function PharmacistDashboardScreen() {
                   <p className="text-xs text-muted-foreground">
                     {stats.orders.pending} en attente
                     {stats.orders.pending > 0 && (
-                      <span className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                      <span className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                         {stats.orders.pending}
                       </span>
                     )}
@@ -257,12 +261,12 @@ export function PharmacistDashboardScreen() {
                   <div className="h-48">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={stats.monthlyRevenue} barSize={24}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.9 0.01 140)" />
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-border opacity-50" />
                         <XAxis
                           dataKey="month"
                           tick={{ fontSize: 11 }}
                           tickLine={false}
-                          axisLine={{ stroke: "oklch(0.9 0.01 140)" }}
+                          axisLine={{ className: "stroke-border" }}
                         />
                         <YAxis
                           tick={{ fontSize: 10 }}

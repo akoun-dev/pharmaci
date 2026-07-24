@@ -109,8 +109,8 @@ export function PharmacistPharmacyScreen() {
       setSelectedServices(p.services ? p.services.split(",").map((s) => s.trim()).filter(Boolean) : []);
       setSelectedPayments(p.payments ? p.payments.split(",").map((s) => s.trim()).filter(Boolean) : []);
       setImagePreview(p.imageUrl);
-    } catch {
-      // ignore
+    } catch (err) {
+      useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
     }
@@ -127,7 +127,27 @@ export function PharmacistPharmacyScreen() {
     try {
       const base64 = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const maxSize = 400;
+            let w = img.width;
+            let h = img.height;
+            if (w > maxSize || h > maxSize) {
+              if (w > h) { h = Math.round((h / w) * maxSize); w = maxSize; }
+              else { w = Math.round((w / h) * maxSize); h = maxSize; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) { reject(new Error("Canvas not supported")); return; }
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", 0.7));
+          };
+          img.onerror = reject;
+          img.src = reader.result as string;
+        };
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
@@ -154,6 +174,10 @@ export function PharmacistPharmacyScreen() {
   }
 
   async function handleSave() {
+    if (!name.trim()) { pushToast("Le nom est obligatoire.", "error"); return; }
+    if (!address.trim()) { pushToast("L'adresse est obligatoire.", "error"); return; }
+    if (!city.trim()) { pushToast("La ville est obligatoire.", "error"); return; }
+    if (!phone.trim()) { pushToast("Le téléphone est obligatoire.", "error"); return; }
     setSaving(true);
     try {
       const data: Record<string, unknown> = {
@@ -261,30 +285,30 @@ export function PharmacistPharmacyScreen() {
             {/* Form */}
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Nom</label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1" />
+                <label htmlFor="pharmacy-name" className="text-xs font-medium text-muted-foreground">Nom</label>
+                <Input id="pharmacy-name" value={name} onChange={(e) => setName(e.target.value)} className="mt-1" />
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Adresse</label>
-                <Input value={address} onChange={(e) => setAddress(e.target.value)} className="mt-1" />
+                <label htmlFor="pharmacy-address" className="text-xs font-medium text-muted-foreground">Adresse</label>
+                <Input id="pharmacy-address" value={address} onChange={(e) => setAddress(e.target.value)} className="mt-1" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Ville</label>
-                  <Input value={city} onChange={(e) => setCity(e.target.value)} className="mt-1" />
+                  <label htmlFor="pharmacy-city" className="text-xs font-medium text-muted-foreground">Ville</label>
+                  <Input id="pharmacy-city" value={city} onChange={(e) => setCity(e.target.value)} className="mt-1" />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Quartier</label>
-                  <Input value={district} onChange={(e) => setDistrict(e.target.value)} className="mt-1" />
+                  <label htmlFor="pharmacy-district" className="text-xs font-medium text-muted-foreground">Quartier</label>
+                  <Input id="pharmacy-district" value={district} onChange={(e) => setDistrict(e.target.value)} className="mt-1" />
                 </div>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Téléphone</label>
-                <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1" />
+                <label htmlFor="pharmacy-phone" className="text-xs font-medium text-muted-foreground">Téléphone</label>
+                <Input id="pharmacy-phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1" />
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Email</label>
-                <Input value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1" />
+                <label htmlFor="pharmacy-email" className="text-xs font-medium text-muted-foreground">Email</label>
+                <Input id="pharmacy-email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1" />
               </div>
 
               {/* GPS coordinates */}
@@ -294,8 +318,9 @@ export function PharmacistPharmacyScreen() {
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[11px] text-muted-foreground">Latitude</label>
+                    <label htmlFor="pharmacy-latitude" className="text-[11px] text-muted-foreground">Latitude</label>
                     <Input
+                      id="pharmacy-latitude"
                       type="number" step="0.000001"
                       value={latitude}
                       onChange={(e) => setLatitude(e.target.value)}
@@ -304,8 +329,9 @@ export function PharmacistPharmacyScreen() {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-muted-foreground">Longitude</label>
+                    <label htmlFor="pharmacy-longitude" className="text-[11px] text-muted-foreground">Longitude</label>
                     <Input
+                      id="pharmacy-longitude"
                       type="number" step="0.000001"
                       value={longitude}
                       onChange={(e) => setLongitude(e.target.value)}
@@ -323,8 +349,9 @@ export function PharmacistPharmacyScreen() {
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[11px] text-muted-foreground">Ouverture</label>
+                    <label htmlFor="pharmacy-opening" className="text-[11px] text-muted-foreground">Ouverture</label>
                     <Input
+                      id="pharmacy-opening"
                       type="time"
                       value={openingTime}
                       onChange={(e) => setOpeningTime(e.target.value)}
@@ -333,8 +360,9 @@ export function PharmacistPharmacyScreen() {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-muted-foreground">Fermeture</label>
+                    <label htmlFor="pharmacy-closing" className="text-[11px] text-muted-foreground">Fermeture</label>
                     <Input
+                      id="pharmacy-closing"
                       type="time"
                       value={closingTime}
                       onChange={(e) => setClosingTime(e.target.value)}
@@ -375,6 +403,7 @@ export function PharmacistPharmacyScreen() {
                         key={svc.value}
                         type="button"
                         onClick={() => toggleService(svc.value)}
+                        aria-pressed={active}
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-all",
                           active
@@ -402,6 +431,7 @@ export function PharmacistPharmacyScreen() {
                         key={pay.value}
                         type="button"
                         onClick={() => togglePayment(pay.value)}
+                        aria-pressed={active}
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-all",
                           active

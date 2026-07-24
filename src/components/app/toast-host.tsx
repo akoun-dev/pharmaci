@@ -11,8 +11,9 @@ export function ToastHost() {
 
   useEffect(() => {
     if (toasts.length === 0) return;
+    // Toasts with an action (undo) stay visible longer so the user can react
     const timers = toasts.map((t) =>
-      setTimeout(() => dismiss(t.id), 3000)
+      setTimeout(() => dismiss(t.id), t.onAction ? 5000 : 3000)
     );
     return () => timers.forEach(clearTimeout);
   }, [toasts, dismiss]);
@@ -20,7 +21,7 @@ export function ToastHost() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-3 z-[100] flex flex-col items-center gap-2 px-4">
+    <div className="pointer-events-none fixed inset-x-0 top-3 z-[100] flex flex-col items-center gap-2 px-4" role="status" aria-live="polite">
       {toasts.map((t) => {
         const Icon =
           t.type === "success"
@@ -39,7 +40,20 @@ export function ToastHost() {
             )}
           >
             <Icon className="mt-0.5 h-5 w-5 shrink-0" />
-            <p className="flex-1 text-sm font-medium leading-snug">{t.message}</p>
+            <div className="flex-1">
+              <p className="text-sm font-medium leading-snug">{t.message}</p>
+              {t.onAction && t.actionLabel && (
+                <button
+                  onClick={() => {
+                    t.onAction?.();
+                    dismiss(t.id);
+                  }}
+                  className="mt-1 text-xs font-bold underline underline-offset-2 hover:opacity-80"
+                >
+                  {t.actionLabel}
+                </button>
+              )}
+            </div>
             <button
               onClick={() => dismiss(t.id)}
               className="shrink-0 opacity-60 hover:opacity-100"

@@ -3,9 +3,11 @@ import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "pharmaci-secret-key-change-in-production-2026"
-);
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is required");
+}
+const encodedSecret = new TextEncoder().encode(JWT_SECRET);
 
 const COOKIE_NAME = "pharmaci-token";
 const TOKEN_EXPIRY = "7d";
@@ -38,13 +40,13 @@ export async function createToken(user: SessionUser): Promise<string> {
     .setSubject(user.id)
     .setIssuedAt()
     .setExpirationTime(TOKEN_EXPIRY)
-    .sign(JWT_SECRET);
+    .sign(encodedSecret);
 }
 
 // Verify a JWT token
 export async function verifyToken(token: string): Promise<SessionUser | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, encodedSecret);
     return payload as unknown as SessionUser;
   } catch {
     return null;

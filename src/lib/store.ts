@@ -95,8 +95,8 @@ interface AppState {
   setNotificationCount: (count: number) => void;
 
   // Toast trigger (simple in-memory)
-  toastQueue: { id: number; message: string; type: "success" | "error" | "info" }[];
-  pushToast: (message: string, type?: "success" | "error" | "info") => void;
+  toastQueue: { id: number; message: string; type: "success" | "error" | "info"; actionLabel?: string; onAction?: () => void }[];
+  pushToast: (message: string, type?: "success" | "error" | "info", options?: { actionLabel?: string; onAction?: () => void }) => void;
   dismissToast: (id: number) => void;
 }
 
@@ -233,11 +233,11 @@ export const useAppStore = create<AppState>()(
 
       // ---------- Toasts ----------
       toastQueue: [],
-      pushToast: (message, type = "info") =>
+      pushToast: (message, type = "info", options) =>
         set((state) => ({
           toastQueue: [
             ...state.toastQueue,
-            { id: ++toastIdCounter, message, type },
+            { id: ++toastIdCounter, message, type, actionLabel: options?.actionLabel, onAction: options?.onAction },
           ],
         })),
       dismissToast: (id) =>
