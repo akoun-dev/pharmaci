@@ -33,7 +33,9 @@ import { AdminPharmaciesScreen } from "@/components/screens/admin-pharmacies-scr
 import { AdminOrdersScreen } from "@/components/screens/admin-orders-screen";
 import { MessagesScreen } from "@/components/screens/messages-screen";
 import { ChatScreen } from "@/components/screens/chat-screen";
-import { Loader2 } from "lucide-react";
+import { ScanOrderScreen } from "@/components/screens/scan-order-screen";
+import { Loader2, ScanBarcode } from "lucide-react";
+import { notificationMessage, pharmacistNotificationMessage, type Order } from "@/lib/api";
 
 const MapScreen = dynamic(
   () => import("@/components/screens/map-screen").then((m) => m.MapScreen),
@@ -65,6 +67,8 @@ function ScreenRouter() {
     screen = <MessagesScreen />;
   } else if (view === "chat") {
     screen = <ChatScreen />;
+  } else if (view === "scan-order") {
+    screen = <ScanOrderScreen />;
   } else if (view === "pharmacist-stock") {
     screen = <PharmacistStockScreen />;
   } else if (view === "pharmacist-pharmacy") {
@@ -137,9 +141,83 @@ function AppShell() {
   const user = useAppStore((s) => s.user);
   const setUser = useAppStore((s) => s.setUser);
   const setTab = useAppStore((s) => s.setTab);
+  const navigate = useAppStore((s) => s.navigate);
+  const view = useAppStore((s) => s.nav.view);
   const onboardingDone = useAppStore((s) => s.onboardingDone);
   const setOnboardingDone = useAppStore((s) => s.setOnboardingDone);
   const guestMode = useAppStore((s) => s.guestMode);
+  const setNotificationCount = useAppStore((s) => s.setNotificationCount);
+
+  // SSE connection for real-time notifications (supports all roles)
+  useEffect(() => {
+    if (!user) return;
+    let eventSource: EventSource | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout>;
+
+    function connectSSE() {
+      try {
+        eventSource = new EventSource("/api/notifications/stream");
+
+        eventSource.addEventListener("notification", (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (data.type === "order_update") {
+              const changes = data.changes as {
+                id: string;
+                code: string;
+                status: string;
+                pharmacyName: string;
+                userName: string;
+                role: string;
+              }[];
+              for (const change of changes) {
+                const msg =
+                  user?.role === "PHARMACIST"
+                    ? pharmacistNotificationMessage(
+                        change.status as Order["status"],
+                        change.userName,
+                        change.code,
+                        change.pharmacyName
+                      )
+                    : notificationMessage(change.status as Order["status"], change.pharmacyName, change.code);
+                useAppStore.getState().pushToast(msg, "info");
+              }
+            }
+          } catch {
+            // ignore
+          }
+        });
+
+        eventSource.addEventListener("count", (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            setNotificationCount(data.count);
+          } catch {
+            // ignore
+          }
+        });
+
+        eventSource.addEventListener("error", () => {
+          eventSource?.close();
+          reconnectTimer = setTimeout(() => connectSSE(), 5000);
+        });
+      } catch {
+        // SSE not supported, retry later
+        reconnectTimer = setTimeout(() => connectSSE(), 10000);
+      }
+    }
+
+    connectSSE();
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+      }
+    };
+  }, [user, setNotificationCount]);
 
   useEffect(() => {
     void (async () => {
@@ -202,6 +280,18 @@ function AppShell() {
           <ScreenRouter />
         </ErrorBoundary>
       </main>
+
+      {/* Floating scan QR button — pharmacist only */}
+      {user?.role === "PHARMACIST" && view !== "scan-order" && (
+        <button
+          onClick={() => navigate("scan-order")}
+          className="fixed bottom-24 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all hover:scale-105 hover:shadow-xl active:scale-95"
+          aria-label="Scanner un QR code"
+        >
+          <ScanBarcode className="h-6 w-6" />
+        </button>
+      )}
+
       <BottomNav />
       <ToastHost />
     </div>

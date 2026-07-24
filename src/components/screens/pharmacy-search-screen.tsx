@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Search, Loader2, MapPin, Mic } from "lucide-react";
+import { Search, Loader2, MapPin, Mic, ArrowUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/lib/store";
-import { pharmacyApi, type Pharmacy } from "@/lib/api";
+import { pharmacyApi, type Pharmacy, haversineDistance, formatDistance } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
 import { PharmacyCard, ServiceBadges } from "@/components/app/pharmacy-card";
 import { cn } from "@/lib/utils";
@@ -32,33 +32,40 @@ export function PharmacySearchScreen() {
     },
   });
 
+  // User position for distance sorting
+  const userPosition = useAppStore((s) => s.userPosition);
+
   // Filters
   const [openNow, setOpenNow] = useState(false);
   const [openOnly, setOpenOnly] = useState(false);
   const [guardOnly, setGuardOnly] = useState(false);
   const [vaccinationOnly, setVaccinationOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<"name" | "rating" | "distance">("name");
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => void load(), 300);
     return () => clearTimeout(timer);
   }, [search, openNow, openOnly, guardOnly, vaccinationOnly]);
 
-  function isOpenNow(p: Pharmacy): boolean {
-    if (p.isOpen24h) return true;
-    if (!p.openingTime || !p.closingTime) return false;
-    const now = new Date();
-    const mins = now.getHours() * 60 + now.getMinutes();
-    const [openH, openM] = p.openingTime.split(":").map(Number);
-    const [closeH, closeM] = p.closingTime.split(":").map(Number);
-    const openMins = openH * 60 + openM;
-    const closeMins = closeH * 60 + closeM;
-    return mins >= openMins && mins <= closeMins;
-  }
+  const sortedPharmacies = useMemo(() => {
+    const result = [...pharmacies];
 
-  const filteredPharmacies = useMemo(() => {
-    if (!openNow) return pharmacies;
-    return pharmacies.filter(isOpenNow);
-  }, [pharmacies, openNow]);
+    // Apply sorting
+    if (sortBy === "rating") {
+      result.sort((a, b) => b.rating - a.rating);
+    } else if (sortBy === "distance" && userPosition) {
+      result.sort((a, b) => {
+        const dA = haversineDistance(userPosition[0], userPosition[1], a.latitude, a.longitude);
+        const dB = haversineDistance(userPosition[0], userPosition[1], b.latitude, b.longitude);
+        return dA - dB;
+      });
+    } else {
+      result.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return result;
+  }, [pharmacies, sortBy, userPosition]);
 
   async function load() {
     setLoading(true);
@@ -68,6 +75,7 @@ export function PharmacySearchScreen() {
         search: search.trim() || undefined,
         onGuard: guardOnly || undefined,
         open24h: openOnly || undefined,
+        openNow: openNow || undefined,
         service: vaccinationOnly ? "vaccination" : undefined,
         page: 1,
         limit: 15,
@@ -92,6 +100,7 @@ export function PharmacySearchScreen() {
         search: search.trim() || undefined,
         onGuard: guardOnly || undefined,
         open24h: openOnly || undefined,
+        openNow: openNow || undefined,
         service: vaccinationOnly ? "vaccination" : undefined,
         page: nextPage,
         limit: 15,
@@ -154,10 +163,53 @@ export function PharmacySearchScreen() {
         />
       </div>
 
-      <div className="px-4 pt-2">
-        <p className="text-xs text-muted-foreground">
-          {loading ? "Recherche..." : `${filteredPharmacies.length} résultat${filteredPharmacies.length > 1 ? "s" : ""}`}
-        </p>
+      {/* Sort controls */}
+      <div className="relative px-4 pt-2">
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            {loading ? "Recherche..." : `${sortedPharmacies.length} résultat${sortedPharmacies.length > 1 ? "s" : ""}`}
+          </p>
+          <div className="relative">
+            <button
+              onClick={() => setShowSortMenu(!showSortMenu)}
+              className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40"
+            >
+              <ArrowUpDown className="h-3 w-3" />
+              {sortBy === "name" ? "Nom" : sortBy === "rating" ? "Note" : "Distance"}
+            </button>
+            {showSortMenu && (
+              <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+                <button
+                  onClick={() => { setSortBy("name"); setShowSortMenu(false); }}
+                  className={cn(
+                    "flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors",
+                    sortBy === "name" ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  Par nom
+                </button>
+                <button
+                  onClick={() => { setSortBy("rating"); setShowSortMenu(false); }}
+                  className={cn(
+                    "flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors",
+                    sortBy === "rating" ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  ★ Meilleure note
+                </button>
+                <button
+                  onClick={() => { setSortBy("distance"); setShowSortMenu(false); }}
+                  className={cn(
+                    "flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors",
+                    sortBy === "distance" ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  📍 Proximité
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 space-y-3 px-4 pt-2 pb-6">
@@ -181,7 +233,7 @@ export function PharmacySearchScreen() {
               </div>
             ))}
           </div>
-        ) : filteredPharmacies.length === 0 ? (
+        ) : sortedPharmacies.length === 0 ? (
           <EmptyState
             icon={Search}
             title="Aucune pharmacie trouvée"
@@ -189,10 +241,12 @@ export function PharmacySearchScreen() {
           />
         ) : (
           <>
-            {filteredPharmacies.map((p) => (
+            {sortedPharmacies.map((p) => (
               <PharmacyCard
                 key={p.id}
                 pharmacy={p}
+                userLat={userPosition?.[0]}
+                userLng={userPosition?.[1]}
                 onClick={() => navigate("pharmacy-detail", { id: p.id })}
               />
             ))}

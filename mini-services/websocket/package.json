@@ -1,0 +1,17 @@
+{
+  "name": "pharmaci-websocket",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx tsx server.ts",
+    "dev": "npx tsx --watch server.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.11.1",
+    "socket.io": "^4"
+  },
+  "devDependencies": {
+    "prisma": "^6.11.1",
+    "tsx": "^4"
+  }
+}

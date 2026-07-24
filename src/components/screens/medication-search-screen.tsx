@@ -8,6 +8,7 @@ import {
   Mic,
   ArrowUpDown,
   TrendingDown,
+  FileText,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,6 +36,7 @@ export function MedicationSearchScreen() {
   const [totalPages, setTotalPages] = useState(1);
   const [sort, setSort] = useState<"name" | "popular">("name");
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [prescriptionOnly, setPrescriptionOnly] = useState(false);
 
   const { isListening, startListening } = useSpeechRecognition({
     onResult: (transcript) => {
@@ -52,7 +54,7 @@ export function MedicationSearchScreen() {
   useEffect(() => {
     const timer = setTimeout(() => void load(), 300);
     return () => clearTimeout(timer);
-  }, [search, category, sort]);
+  }, [search, category, sort, prescriptionOnly]);
 
   useEffect(() => {
     if (!search.trim() || showSuggestions) {
@@ -130,6 +132,7 @@ export function MedicationSearchScreen() {
           search: search.trim() || undefined,
           category: category !== "Tous" ? category : undefined,
           sort: sort !== "name" ? sort : undefined,
+          prescriptionOnly: prescriptionOnly || undefined,
           page: 1,
           limit: 20,
         }),
@@ -156,6 +159,7 @@ export function MedicationSearchScreen() {
         search: search.trim() || undefined,
         category: category !== "Tous" ? category : undefined,
         sort: sort !== "name" ? sort : undefined,
+        prescriptionOnly: prescriptionOnly || undefined,
         page: nextPage,
         limit: 20,
       });
@@ -261,6 +265,19 @@ export function MedicationSearchScreen() {
             </button>
           );
         })}
+        {/* Prescription filter */}
+        <button
+          onClick={() => setPrescriptionOnly((v) => !v)}
+          className={cn(
+            "shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all flex items-center gap-1",
+            prescriptionOnly
+              ? "border-amber-500 bg-amber-50 text-amber-700"
+              : "border-border bg-card text-muted-foreground hover:border-primary/40"
+          )}
+        >
+          <FileText className="h-3 w-3" />
+          Ordonnance
+        </button>
       </div>
 
       {/* Sort controls */}

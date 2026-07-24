@@ -39,13 +39,17 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search")?.trim() || "";
   const lowStockOnly = searchParams.get("lowStock") === "true";
+  const expiryFilter = searchParams.get("expiry") || "";
+  const category = searchParams.get("category") || "";
+  const sort = searchParams.get("sort") || "name";
+  const order = searchParams.get("order") || "asc";
 
   let stocks = await db.pharmacyMedication.findMany({
     where: { pharmacyId: auth.pharmacyId },
     include: { medication: true },
-    orderBy: { medication: { name: "asc" } },
   });
 
+  // Search filter
   if (search) {
     const lower = search.toLowerCase();
     stocks = stocks.filter(
@@ -56,22 +60,75 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  // Low stock filter
   if (lowStockOnly) {
     stocks = stocks.filter((s) => s.stock <= s.lowStockThreshold);
   }
 
+  // Category filter
+  if (category) {
+    stocks = stocks.filter(
+      (s) => s.medication.category.toLowerCase() === category.toLowerCase()
+    );
+  }
+
+  // Expiry filter
+  const now = new Date();
+  if (expiryFilter === "expiring") {
+    const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    stocks = stocks.filter(
+      (s) =>
+        s.expiryDate &&
+        new Date(s.expiryDate) >= now &&
+        new Date(s.expiryDate) <= in30Days
+    );
+  } else if (expiryFilter === "expired") {
+    stocks = stocks.filter(
+      (s) => s.expiryDate && new Date(s.expiryDate) < now
+    );
+  }
+
+  // Sort
+  const multiplier = order === "desc" ? -1 : 1;
+  stocks.sort((a, b) => {
+    switch (sort) {
+      case "stock":
+        return multiplier * (a.stock - b.stock);
+      case "price":
+        return multiplier * (a.price - b.price);
+      case "expiry":
+        const dateA = a.expiryDate ? new Date(a.expiryDate).getTime() : 0;
+        const dateB = b.expiryDate ? new Date(b.expiryDate).getTime() : 0;
+        return multiplier * (dateA - dateB);
+      case "name":
+      default:
+        return multiplier * a.medication.name.localeCompare(b.medication.name);
+    }
+  });
+
+  // Enrich with computed fields
+  const enriched = stocks.map((s) => ({
+    id: s.id,
+    medicationId: s.medicationId,
+    medication: s.medication,
+    price: s.price,
+    stock: s.stock,
+    lowStockThreshold: s.lowStockThreshold,
+    expiryDate: s.expiryDate,
+    isLowStock: s.stock <= s.lowStockThreshold,
+    isExpiringSoon:
+      s.expiryDate
+        ? (new Date(s.expiryDate).getTime() - now.getTime()) /
+            (1000 * 60 * 60 * 24) <=
+            30 &&
+          new Date(s.expiryDate) >= now
+        : false,
+    isExpired: s.expiryDate ? new Date(s.expiryDate) < now : false,
+  }));
+
   return NextResponse.json({
-    stocks: stocks.map((s) => ({
-      id: s.id,
-      medicationId: s.medicationId,
-      medication: s.medication,
-      price: s.price,
-      stock: s.stock,
-      lowStockThreshold: s.lowStockThreshold,
-      expiryDate: s.expiryDate,
-      isLowStock: s.stock <= s.lowStockThreshold,
-    })),
-    total: stocks.length,
+    stocks: enriched,
+    total: enriched.length,
   });
 }
 

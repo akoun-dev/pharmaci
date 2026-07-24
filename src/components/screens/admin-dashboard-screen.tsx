@@ -155,6 +155,45 @@ export function AdminDashboardScreen() {
           </div>
         )}
 
+        {/* Recent orders */}
+        {stats && stats.recentOrders && stats.recentOrders.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-sm font-semibold text-muted-foreground mb-3">Dernières commandes</h2>
+            <div className="space-y-2">
+              {stats.recentOrders.map((o) => (
+                <button
+                  key={o.id}
+                  onClick={() => navigate("order-detail", { id: o.id })}
+                  className="flex w-full items-center justify-between rounded-xl border border-border bg-card p-3 text-left transition-colors hover:bg-accent"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs font-bold">{o.code}</span>
+                      <Badge
+                        className={cn(
+                          "text-[10px] px-1.5 py-0",
+                          ORDER_STATUS[o.status as keyof typeof ORDER_STATUS]?.color
+                        )}
+                      >
+                        {ORDER_STATUS[o.status as keyof typeof ORDER_STATUS]?.label}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {o.user.name} → {o.pharmacy.name}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0 ml-2">
+                    <p className="text-sm font-bold text-primary">{formatFCFA(o.totalAmount)}</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {new Date(o.createdAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Quick actions */}
         <div className="mb-6">
           <h2 className="text-sm font-semibold text-muted-foreground mb-3">Gestion</h2>

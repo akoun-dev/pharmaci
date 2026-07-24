@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Search, Loader2, MessageSquare, Send } from "lucide-react";
 import { AppHeader } from "@/components/app/app-header";
 import { useAppStore } from "@/lib/store";
 import { api, formatRelative } from "@/lib/api";
+import { useWebSocket } from "@/hooks/use-websocket";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
@@ -46,12 +47,20 @@ export function MessagesScreen() {
   const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
   const [searching, setSearching] = useState(false);
 
+  // WebSocket for real-time updates
+  const { isConnected } = useWebSocket({
+    onNewMessage: useCallback(() => {
+      // Silently refresh conversation list when a new message arrives
+      void loadConversations(true);
+    }, []),
+  });
+
   useEffect(() => {
     void loadConversations();
   }, []);
 
-  async function loadConversations() {
-    setLoading(true);
+  async function loadConversations(silent = false) {
+    if (!silent) setLoading(true);
     try {
       const res = await api.get<{ conversations: Conversation[] }>("/api/messages");
       setConversations(res.conversations);

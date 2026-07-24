@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search")?.trim() || "";
     const category = searchParams.get("category")?.trim() || "";
     const sort = searchParams.get("sort")?.trim() || "name";
+    const prescriptionOnly = searchParams.get("prescriptionOnly") === "true";
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
 
@@ -48,6 +49,10 @@ export async function GET(req: NextRequest) {
 
     if (category) {
       andConditions.push({ category });
+    }
+
+    if (prescriptionOnly) {
+      andConditions.push({ prescriptionRequired: true });
     }
 
     const where = andConditions.length > 0 ? { AND: andConditions } : {};

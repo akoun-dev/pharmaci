@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
     const onGuard = searchParams.get("onGuard");
     const open24h = searchParams.get("open24h");
     const service = searchParams.get("service")?.trim() || "";
+    const openNow = searchParams.get("openNow") === "true";
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
 
@@ -80,21 +81,39 @@ export async function GET(req: NextRequest) {
 
     const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
-    const [pharmacies, total] = await Promise.all([
-      db.pharmacy.findMany({
-        where,
-        orderBy: [{ isOnGuard: "desc" }, { rating: "desc" }, { name: "asc" }],
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      db.pharmacy.count({ where }),
-    ]);
+    // If openNow is requested, we filter after fetching because it depends on current time
+    // We fetch all and filter client-side for openNow checks
+
+    // Fetch all matching pharmacies (without pagination first)
+    const allPharmacies = await db.pharmacy.findMany({
+      where,
+      orderBy: [{ isOnGuard: "desc" }, { rating: "desc" }, { name: "asc" }],
+    });
+
+    // Apply openNow filter server-side on the full set
+    const filtered = openNow
+      ? allPharmacies.filter((p) => {
+          if (p.isOpen24h) return true;
+          if (!p.openingTime || !p.closingTime) return false;
+          const now = new Date();
+          const currentMins = now.getHours() * 60 + now.getMinutes();
+          const [openH, openM] = p.openingTime.split(":").map(Number);
+          const [closeH, closeM] = p.closingTime.split(":").map(Number);
+          const openMins = openH * 60 + openM;
+          const closeMins = closeH * 60 + closeM;
+          return currentMins >= openMins && currentMins <= closeMins;
+        })
+      : allPharmacies;
+
+    const total = filtered.length;
+    const totalPages = Math.ceil(total / limit);
+    const paginated = filtered.slice((page - 1) * limit, page * limit);
 
     return NextResponse.json({
-      pharmacies,
+      pharmacies: paginated,
       total,
       page,
-      totalPages: Math.ceil(total / limit),
+      totalPages,
     });
   } catch (error) {
     console.error("[GET /api/pharmacies] Erreur:", error);

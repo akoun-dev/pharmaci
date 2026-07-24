@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Loader2, Save, Clock, MapPin, Phone, Star } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import {
+  Loader2, Save, Clock, MapPin, Phone, Star, Camera,
+  Syringe, ShieldCheck, Truck, CreditCard, DollarSign,
+} from "lucide-react";
 import { AppHeader } from "@/components/app/app-header";
 import { useAppStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 interface PharmacyData {
   id: string;
@@ -24,6 +29,7 @@ interface PharmacyData {
   isOpen24h: boolean;
   isOnGuard: boolean;
   isVerified: boolean;
+  imageUrl: string | null;
   services: string;
   payments: string;
   rating: number;
@@ -31,11 +37,35 @@ interface PharmacyData {
   _count: { medications: number; orders: number; reviews: number };
 }
 
+const SERVICE_OPTIONS = [
+  { value: "vaccination", label: "Vaccination", icon: Syringe },
+  { value: "conseil", label: "Conseil", icon: ShieldCheck },
+  { value: "livraison", label: "Livraison", icon: Truck },
+  { value: "tiers_payant", label: "Tiers-Payant", icon: CreditCard },
+  { value: "pression", label: "Tension", icon: ShieldCheck },
+  { value: "piqure", label: "Piqûre", icon: Syringe },
+  { value: "test", label: "Tests", icon: ShieldCheck },
+  { value: "orthopedie", label: "Orthopédie", icon: ShieldCheck },
+];
+
+const PAYMENT_OPTIONS = [
+  { value: "mobile_money", label: "Mobile Money", icon: Phone },
+  { value: "cash", label: "Espèces", icon: DollarSign },
+  { value: "card", label: "Carte bancaire", icon: CreditCard },
+  { value: "wave", label: "Wave", icon: Phone },
+  { value: "orange_money", label: "Orange Money", icon: Phone },
+  { value: "mtn_money", label: "MTN Money", icon: Phone },
+  { value: "moov", label: "Moov Money", icon: Phone },
+];
+
 export function PharmacistPharmacyScreen() {
   const goBack = useAppStore((s) => s.goBack);
+  const pushToast = useAppStore((s) => s.pushToast);
   const [pharmacy, setPharmacy] = useState<PharmacyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Form state
   const [name, setName] = useState("");
@@ -44,10 +74,15 @@ export function PharmacistPharmacyScreen() {
   const [district, setDistrict] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
   const [openingTime, setOpeningTime] = useState("08:00");
   const [closingTime, setClosingTime] = useState("20:00");
   const [isOpen24h, setIsOpen24h] = useState(false);
   const [isOnGuard, setIsOnGuard] = useState(false);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     void loadPharmacy();
@@ -65,10 +100,15 @@ export function PharmacistPharmacyScreen() {
       setDistrict(p.district || "");
       setPhone(p.phone);
       setEmail(p.email || "");
+      setLatitude(String(p.latitude));
+      setLongitude(String(p.longitude));
       setOpeningTime(p.openingTime);
       setClosingTime(p.closingTime);
       setIsOpen24h(p.isOpen24h);
       setIsOnGuard(p.isOnGuard);
+      setSelectedServices(p.services ? p.services.split(",").map((s) => s.trim()).filter(Boolean) : []);
+      setSelectedPayments(p.payments ? p.payments.split(",").map((s) => s.trim()).filter(Boolean) : []);
+      setImagePreview(p.imageUrl);
     } catch {
       // ignore
     } finally {
@@ -76,27 +116,71 @@ export function PharmacistPharmacyScreen() {
     }
   }
 
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      pushToast("Veuillez sélectionner une image.", "error");
+      return;
+    }
+    setUploadingImage(true);
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      setImagePreview(base64);
+      pushToast("Image chargée. Enregistrez pour confirmer.", "info");
+    } catch {
+      pushToast("Erreur lors du chargement de l'image.", "error");
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  function toggleService(val: string) {
+    setSelectedServices((prev) =>
+      prev.includes(val) ? prev.filter((s) => s !== val) : [...prev, val]
+    );
+  }
+
+  function togglePayment(val: string) {
+    setSelectedPayments((prev) =>
+      prev.includes(val) ? prev.filter((s) => s !== val) : [...prev, val]
+    );
+  }
+
   async function handleSave() {
     setSaving(true);
     try {
-      await api.put("/api/pharmacist/pharmacy", {
+      const data: Record<string, unknown> = {
         name,
         address,
         city,
         district: district || null,
         phone,
         email: email || null,
+        latitude: parseFloat(latitude) || 0,
+        longitude: parseFloat(longitude) || 0,
         openingTime,
         closingTime,
         isOpen24h,
         isOnGuard,
-      });
-      useAppStore.getState().pushToast("Pharmacie mise à jour", "success");
+        services: selectedServices.join(","),
+        payments: selectedPayments.join(","),
+      };
+      if (imagePreview && imagePreview.startsWith("data:")) {
+        data.imageUrl = imagePreview;
+      }
+
+      await api.put("/api/pharmacist/pharmacy", data);
+      pushToast("Pharmacie mise à jour avec succès !", "success");
+      void loadPharmacy();
     } catch (err) {
-      useAppStore.getState().pushToast(
-        err instanceof Error ? err.message : "Erreur",
-        "error"
-      );
+      pushToast(err instanceof Error ? err.message : "Erreur", "error");
     } finally {
       setSaving(false);
     }
@@ -136,6 +220,44 @@ export function PharmacistPharmacyScreen() {
               </div>
             </div>
 
+            {/* Photo upload */}
+            <div className="flex flex-col items-center mb-4">
+              <div className="relative">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="h-24 w-24 cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed border-primary/40 bg-muted/30 transition-colors hover:border-primary/70"
+                >
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Pharmacie" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <Camera className="h-8 w-8 text-muted-foreground/60" />
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingImage}
+                  className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+                  aria-label="Changer la photo"
+                >
+                  {uploadingImage ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Camera className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              </div>
+              <p className="mt-1.5 text-xs text-muted-foreground">Photo de la pharmacie</p>
+            </div>
+
             {/* Form */}
             <div className="space-y-4">
               <div>
@@ -163,6 +285,35 @@ export function PharmacistPharmacyScreen() {
               <div>
                 <label className="text-xs font-medium text-muted-foreground">Email</label>
                 <Input value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1" />
+              </div>
+
+              {/* GPS coordinates */}
+              <div>
+                <label className="text-xs font-medium text-muted-foreground flex items-center gap-1 mb-2">
+                  <MapPin className="h-3 w-3" /> Coordonnées GPS
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] text-muted-foreground">Latitude</label>
+                    <Input
+                      type="number" step="0.000001"
+                      value={latitude}
+                      onChange={(e) => setLatitude(e.target.value)}
+                      className="mt-1"
+                      placeholder="5.345678"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-muted-foreground">Longitude</label>
+                    <Input
+                      type="number" step="0.000001"
+                      value={longitude}
+                      onChange={(e) => setLongitude(e.target.value)}
+                      className="mt-1"
+                      placeholder="-4.012345"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Hours */}
@@ -212,36 +363,67 @@ export function PharmacistPharmacyScreen() {
                 </div>
               </div>
 
-              {/* Info badges */}
-              {pharmacy.services && (
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Services</label>
-                  <div className="flex flex-wrap gap-1">
-                    {pharmacy.services.split(",").filter(Boolean).map((s) => (
-                      <span key={s} className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-                        {s.trim()}
-                      </span>
-                    ))}
-                  </div>
+              {/* Services - editable chips */}
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block">Services proposés</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {SERVICE_OPTIONS.map((svc) => {
+                    const active = selectedServices.includes(svc.value);
+                    const Icon = svc.icon;
+                    return (
+                      <button
+                        key={svc.value}
+                        type="button"
+                        onClick={() => toggleService(svc.value)}
+                        className={cn(
+                          "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-all",
+                          active
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                        )}
+                      >
+                        <Icon className="h-3 w-3" />
+                        {svc.label}
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
+              </div>
 
-              {pharmacy.payments && (
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Paiements</label>
-                  <div className="flex flex-wrap gap-1">
-                    {pharmacy.payments.split(",").filter(Boolean).map((p) => (
-                      <span key={p} className="rounded-full bg-blue-500/10 px-2 py-0.5 text-xs text-blue-600">
-                        {p.trim()}
-                      </span>
-                    ))}
-                  </div>
+              {/* Payments - editable chips */}
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block">Moyens de paiement</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {PAYMENT_OPTIONS.map((pay) => {
+                    const active = selectedPayments.includes(pay.value);
+                    const Icon = pay.icon;
+                    return (
+                      <button
+                        key={pay.value}
+                        type="button"
+                        onClick={() => togglePayment(pay.value)}
+                        className={cn(
+                          "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-all",
+                          active
+                            ? "border-blue-500 bg-blue-500/10 text-blue-700"
+                            : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                        )}
+                      >
+                        <Icon className="h-3 w-3" />
+                        {pay.label}
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
+              </div>
 
-              <Button onClick={() => void handleSave()} disabled={saving} className="w-full">
-                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                Enregistrer
+              <Button onClick={() => void handleSave()} disabled={saving} className="w-full h-11">
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                Enregistrer les modifications
               </Button>
             </div>
           </>

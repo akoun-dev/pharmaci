@@ -53,32 +53,53 @@ const ROLE_COLORS: Record<string, string> = {
 export function AdminUsersScreen() {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     void loadUsers();
-  }, [roleFilter]);
+  }, [roleFilter, page]);
 
   useEffect(() => {
-    const t = setTimeout(() => void loadUsers(), 300);
+    const t = setTimeout(() => { setPage(1); void loadUsers(); }, 300);
     return () => clearTimeout(t);
   }, [search]);
 
   async function loadUsers() {
-    setLoading(true);
+    if (page === 1) setLoading(true);
     try {
       const q = new URLSearchParams();
       if (search) q.set("search", search);
       if (roleFilter) q.set("role", roleFilter);
-      const res = await api.get<{ users: UserItem[] }>(`/api/admin/users?${q.toString()}`);
-      setUsers(res.users);
+      q.set("page", String(page));
+      q.set("limit", "20");
+      const res = await api.get<{ users: UserItem[]; total: number; totalPages: number }>(
+        `/api/admin/users?${q.toString()}`
+      );
+      if (page === 1) {
+        setUsers(res.users);
+      } else {
+        setUsers((prev) => [...prev, ...res.users]);
+      }
+      setTotal(res.total);
+      setTotalPages(res.totalPages);
     } catch {
       // ignore
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
+  }
+
+  function handleLoadMore() {
+    if (loadingMore || page >= totalPages) return;
+    setLoadingMore(true);
+    setPage((p) => p + 1);
   }
 
   async function handleDelete() {
@@ -136,7 +157,7 @@ export function AdminUsersScreen() {
           ].map((tab) => (
             <button
               key={tab.value}
-              onClick={() => setRoleFilter(tab.value)}
+              onClick={() => { setRoleFilter(tab.value); setPage(1); }}
               className={cn(
                 "whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
                 roleFilter === tab.value
@@ -159,6 +180,7 @@ export function AdminUsersScreen() {
             <p className="text-sm">Aucun utilisateur trouvé</p>
           </div>
         ) : (
+          <>
           <div className="space-y-2">
             {users.map((u) => (
               <div
@@ -208,6 +230,16 @@ export function AdminUsersScreen() {
               </div>
             ))}
           </div>
+          {page < totalPages && (
+            <button
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 active:bg-muted/50 mt-3"
+            >
+              {loadingMore ? <Loader2 className="h-4 w-4 animate-spin" /> : "Voir plus"}
+            </button>
+          )}
+        </>
         )}
       </div>
 

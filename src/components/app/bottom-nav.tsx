@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Search,
   Map,
@@ -13,6 +14,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { useAppStore, type MainTab } from "@/lib/store";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 type TabConfig = { id: string; label: string; icon: typeof Search };
@@ -20,6 +22,7 @@ type TabConfig = { id: string; label: string; icon: typeof Search };
 const patientTabs: TabConfig[] = [
   { id: "home", label: "Accueil", icon: Search },
   { id: "map", label: "Carte", icon: Map },
+  { id: "messages", label: "Messages", icon: MessageSquare },
   { id: "orders", label: "Commandes", icon: ClipboardList },
   { id: "profile", label: "Profil", icon: User },
 ];
@@ -44,8 +47,9 @@ const VIEW_TO_TAB: Record<string, string> = {
   "pharmacist-stock": "pharmacist-stock",
   "pharmacist-pharmacy": "pharmacist",
   "pharmacist-order-detail": "orders",
-  "messages": "pharmacist-messages",
-  "chat": "pharmacist-messages",
+  "scan-order": "orders",
+  "messages": "messages",
+  "chat": "messages",
   "admin-users": "admin-users",
   "admin-pharmacies": "admin-pharmacies",
   "admin-orders": "admin-orders",
@@ -58,6 +62,26 @@ export function BottomNav() {
   const navigate = useAppStore((s) => s.navigate);
   const user = useAppStore((s) => s.user);
   const notificationCount = useAppStore((s) => s.notificationCount);
+  const setNotificationCount = useAppStore((s) => s.setNotificationCount);
+  const [pendingOrders, setPendingOrders] = useState(0);
+
+  // Fetch pending orders count for pharmacist badge
+  useEffect(() => {
+    if (user?.role !== "PHARMACIST") return;
+    const fetchPending = async () => {
+      try {
+        const res = await api.get<{ orders: { status: string }[] }>(
+          "/api/pharmacist/orders?status=PENDING"
+        );
+        setPendingOrders(res.orders.length);
+      } catch {
+        // ignore
+      }
+    };
+    fetchPending();
+    const interval = setInterval(fetchPending, 30000);
+    return () => clearInterval(interval);
+  }, [user?.role]);
 
   const role = user?.role;
   const tabs =
@@ -67,12 +91,14 @@ export function BottomNav() {
         ? adminTabs
         : patientTabs;
 
-  const gridCols = tabs.length === 5 ? "grid-cols-5" : "grid-cols-4";
+  const gridCols = tabs.length >= 5 ? "grid-cols-5" : "grid-cols-4";
 
   function handleTabClick(id: string) {
     if (id === "pharmacist-stock") {
       navigate("pharmacist-stock");
     } else if (id === "pharmacist-messages") {
+      navigate("messages");
+    } else if (id === "messages" || id === "admin-messages") {
       navigate("messages");
     } else if (id === "admin-users") {
       navigate("admin-users");
@@ -83,7 +109,10 @@ export function BottomNav() {
     } else {
       setTab(id as MainTab);
     }
-    if (id === "orders") useAppStore.getState().setNotificationCount(0);
+    if (id === "orders") {
+      setNotificationCount(0);
+      setPendingOrders(0);
+    }
   }
 
   function isActive(id: string) {
@@ -93,13 +122,22 @@ export function BottomNav() {
     return false;
   }
 
-  const showBadge = tab === "orders" && notificationCount > 0;
+  // Show pending count for pharmacist on orders tab
+  const showOrdersBadge =
+    (tab === "orders" && notificationCount > 0) ||
+    (user?.role === "PHARMACIST" && pendingOrders > 0);
+
+  const ordersBadgeCount =
+    user?.role === "PHARMACIST"
+      ? Math.max(notificationCount, pendingOrders)
+      : notificationCount;
 
   return (
     <nav className="sticky bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <div className={cn("grid", gridCols)}>
         {tabs.map(({ id, label, icon: Icon }) => {
           const active = isActive(id);
+          const showBadge = id === "orders" && showOrdersBadge;
           return (
             <button
               key={id}
@@ -116,9 +154,9 @@ export function BottomNav() {
                 )}
               >
                 <Icon className="h-5 w-5" strokeWidth={active ? 2.5 : 2} />
-                {id === "orders" && showBadge && (
+                {showBadge && (
                   <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm animate-cart-pop">
-                    {notificationCount > 9 ? "9+" : notificationCount}
+                    {ordersBadgeCount > 9 ? "9+" : ordersBadgeCount}
                   </span>
                 )}
               </div>

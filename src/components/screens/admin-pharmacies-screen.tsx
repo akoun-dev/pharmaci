@@ -34,31 +34,52 @@ interface PharmacyItem {
 export function AdminPharmaciesScreen() {
   const [pharmacies, setPharmacies] = useState<PharmacyItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [search, setSearch] = useState("");
   const [verifiedFilter, setVerifiedFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     void loadPharmacies();
-  }, [verifiedFilter]);
+  }, [verifiedFilter, page]);
 
   useEffect(() => {
-    const t = setTimeout(() => void loadPharmacies(), 300);
+    const t = setTimeout(() => { setPage(1); void loadPharmacies(); }, 300);
     return () => clearTimeout(t);
   }, [search]);
 
   async function loadPharmacies() {
-    setLoading(true);
+    if (page === 1) setLoading(true);
     try {
       const q = new URLSearchParams();
       if (search) q.set("search", search);
       if (verifiedFilter) q.set("verified", verifiedFilter);
-      const res = await api.get<{ pharmacies: PharmacyItem[] }>(`/api/admin/pharmacies?${q.toString()}`);
-      setPharmacies(res.pharmacies);
+      q.set("page", String(page));
+      q.set("limit", "20");
+      const res = await api.get<{ pharmacies: PharmacyItem[]; total: number; totalPages: number }>(
+        `/api/admin/pharmacies?${q.toString()}`
+      );
+      if (page === 1) {
+        setPharmacies(res.pharmacies);
+      } else {
+        setPharmacies((prev) => [...prev, ...res.pharmacies]);
+      }
+      setTotal(res.total);
+      setTotalPages(res.totalPages);
     } catch {
       // ignore
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
+  }
+
+  function handleLoadMore() {
+    if (loadingMore || page >= totalPages) return;
+    setLoadingMore(true);
+    setPage((p) => p + 1);
   }
 
   async function toggleVerified(pharmacy: PharmacyItem) {
@@ -100,7 +121,7 @@ export function AdminPharmaciesScreen() {
           ].map((tab) => (
             <button
               key={tab.value}
-              onClick={() => setVerifiedFilter(tab.value)}
+              onClick={() => { setVerifiedFilter(tab.value); setPage(1); }}
               className={cn(
                 "whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
                 verifiedFilter === tab.value
@@ -123,6 +144,7 @@ export function AdminPharmaciesScreen() {
             <p className="text-sm">Aucune pharmacie trouvée</p>
           </div>
         ) : (
+          <>
           <div className="space-y-2">
             {pharmacies.map((p) => (
               <div
@@ -185,6 +207,16 @@ export function AdminPharmaciesScreen() {
               </div>
             ))}
           </div>
+          {page < totalPages && (
+            <button
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 active:bg-muted/50 mt-3"
+            >
+              {loadingMore ? <Loader2 className="h-4 w-4 animate-spin" /> : "Voir plus"}
+            </button>
+          )}
+        </>
         )}
       </div>
     </div>

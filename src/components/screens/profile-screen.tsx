@@ -13,11 +13,13 @@ import {
   Loader2,
   Camera,
   LogIn,
+  Package,
+  CreditCard,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 import { useAppStore } from "@/lib/store";
-import { authApi, pharmacyApi, type Pharmacy } from "@/lib/api";
+import { authApi, pharmacyApi, orderApi, type Pharmacy, formatFCFA } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -36,9 +38,31 @@ export function ProfileScreen() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Personal statistics
+  const [orderCount, setOrderCount] = useState(0);
+  const [totalSpent, setTotalSpent] = useState(0);
+  const [loadingStats, setLoadingStats] = useState(false);
+
   useEffect(() => {
-    if (user) void loadFavorites();
+    if (user) {
+      void loadFavorites();
+      void loadStats();
+    }
   }, [user]);
+
+  async function loadStats() {
+    setLoadingStats(true);
+    try {
+      const res = await orderApi.list();
+      const orders = res.orders;
+      setOrderCount(orders.length);
+      setTotalSpent(orders.reduce((sum, o) => sum + o.totalAmount, 0));
+    } catch {
+      // ignore
+    } finally {
+      setLoadingStats(false);
+    }
+  }
 
   async function loadFavorites() {
     setLoadingFav(true);
@@ -206,6 +230,45 @@ export function ProfileScreen() {
           )}
         </div>
       </div>
+
+      {/* Personal statistics */}
+      {user.role === "PATIENT" && (
+        <div className="px-4 pt-5">
+          <h3 className="mb-2 px-1 text-xs font-semibold uppercase text-muted-foreground">
+            Statistiques
+          </h3>
+          {loadingStats ? (
+            <div className="flex h-16 items-center justify-center">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-border bg-card p-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                    <Package className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-foreground">{orderCount}</p>
+                    <p className="text-[10px] text-muted-foreground">Commandes</p>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-border bg-card p-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
+                    <CreditCard className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-primary">{formatFCFA(totalSpent)}</p>
+                    <p className="text-[10px] text-muted-foreground">Dépensé</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Favorites — patients only */}
       {user.role === "PATIENT" && (

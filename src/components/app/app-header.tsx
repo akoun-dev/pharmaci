@@ -14,6 +14,7 @@ interface AppHeaderProps {
   onNotificationClick?: () => void;
   rightSlot?: React.ReactNode;
   className?: string;
+  subtitle?: string;
 }
 
 export function AppHeader({
@@ -24,6 +25,7 @@ export function AppHeader({
   onNotificationClick,
   rightSlot,
   className,
+  subtitle,
 }: AppHeaderProps) {
   const goBack = useAppStore((s) => s.goBack);
   const canGoBack = useAppStore((s) => s.nav.history.length > 0);
@@ -51,9 +53,14 @@ export function AppHeader({
       )}
       {showLogo && <Logo size="sm" />}
       {title && (
-        <h1 className="truncate text-base font-semibold text-foreground">
-          {title}
-        </h1>
+        <div className="min-w-0">
+          <h1 className="truncate text-base font-semibold text-foreground">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="truncate text-[11px] text-muted-foreground -mt-0.5">{subtitle}</p>
+          )}
+        </div>
       )}
       <div className="flex-1" />
       {rightSlot}

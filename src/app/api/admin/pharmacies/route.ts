@@ -8,7 +8,7 @@ async function requireAdmin() {
   return user;
 }
 
-// GET - Liste des pharmacies avec infos détaillées
+// GET - Liste des pharmacies avec infos détaillées (avec pagination)
 export async function GET(req: Request) {
   const admin = await requireAdmin();
   if (!admin) {
@@ -19,6 +19,8 @@ export async function GET(req: Request) {
   const search = searchParams.get("search")?.trim() || "";
   const verified = searchParams.get("verified");
   const city = searchParams.get("city")?.trim() || "";
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
 
   const andConditions: Record<string, unknown>[] = [];
   if (search) {
@@ -35,22 +37,32 @@ export async function GET(req: Request) {
 
   const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
-  const pharmacies = await db.pharmacy.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    include: {
-      owner: { select: { id: true, name: true, email: true } },
-      _count: {
-        select: {
-          medications: true,
-          orders: true,
-          reviews: true,
+  const [pharmacies, total] = await Promise.all([
+    db.pharmacy.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        owner: { select: { id: true, name: true, email: true } },
+        _count: {
+          select: {
+            medications: true,
+            orders: true,
+            reviews: true,
+          },
         },
       },
-    },
-  });
+    }),
+    db.pharmacy.count({ where }),
+  ]);
 
-  return NextResponse.json({ pharmacies, total: pharmacies.length });
+  return NextResponse.json({
+    pharmacies,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  });
 }
 
 // PUT - Modifier le statut de vérification d'une pharmacie

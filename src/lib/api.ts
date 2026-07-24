@@ -146,11 +146,12 @@ export interface PharmacyWithPrice {
   pmId: string;
 }
 export const medicationApi = {
-  list: (params?: { search?: string; category?: string; sort?: string; page?: number; limit?: number }) => {
+  list: (params?: { search?: string; category?: string; sort?: string; prescriptionOnly?: boolean; page?: number; limit?: number }) => {
     const q = new URLSearchParams();
     if (params?.search) q.set("search", params.search);
     if (params?.category) q.set("category", params.category);
     if (params?.sort) q.set("sort", params.sort);
+    if (params?.prescriptionOnly) q.set("prescriptionOnly", "true");
     if (params?.page) q.set("page", String(params.page));
     if (params?.limit) q.set("limit", String(params.limit));
     return api.get<{
@@ -176,6 +177,7 @@ export const pharmacyApi = {
     district?: string;
     onGuard?: boolean;
     open24h?: boolean;
+    openNow?: boolean;
     service?: string;
     page?: number;
     limit?: number;
@@ -217,6 +219,54 @@ export const pharmacyApi = {
       api.del<{ success: boolean }>(`/api/pharmacies/${id}/favorite`),
   },
   favorites: () => api.get<{ pharmacies: Pharmacy[] }>("/api/favorites"),
+};
+
+// ---------- Pharmacist Stock (Excel Import/Export) ----------
+export const pharmacistStockApi = {
+  exportUrl: () => "/api/pharmacist/stock/export",
+  /**
+   * Export stock as XLSX. Triggers a file download.
+   */
+  exportExcel: async () => {
+    const res = await fetch("/api/pharmacist/stock/export");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: "Erreur d'export" }));
+      throw new Error((err as { error?: string }).error || "Erreur d'export");
+    }
+    const blob = await res.blob();
+    const disposition = res.headers.get("Content-Disposition") || "";
+    const match = disposition.match(/filename="?([^";]+)"?/);
+    const filename = match ? match[1] : `stock_export_${new Date().toISOString().split("T")[0]}.xlsx`;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  },
+  /**
+   * Import stock from an XLSX file. Returns result with counts.
+   */
+  importExcel: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/pharmacist/stock/import", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error((data as { error?: string }).error || "Erreur d'import");
+    }
+    return data as {
+      success: boolean;
+      imported: number;
+      errors?: string[];
+      details: { totalRows: number; imported: number; failed: number };
+    };
+  },
 };
 
 // ---------- Orders ----------
@@ -294,7 +344,31 @@ export function formatDistance(km: number): string {
   return `${km.toFixed(1)} km`;
 }
 
-// Generate a personalized notification message for an order status change
+// Generate a personalized notification message for a pharmacist
+export function pharmacistNotificationMessage(
+  status: Order["status"],
+  userName: string,
+  code: string,
+  pharmacyName: string
+): string {
+  const user = userName || "Un client";
+  switch (status) {
+    case "PENDING":
+      return `Nouvelle commande #${code} de ${user} — en attente de confirmation`;
+    case "CONFIRMED":
+      return `Commande #${code} confirmée pour ${user}`;
+    case "READY":
+      return `Commande #${code} marquée comme prête pour ${user}`;
+    case "PICKED_UP":
+      return `${user} a récupéré la commande #${code} — merci !`;
+    case "CANCELLED":
+      return `Commande #${code} annulée par ${user}`;
+    default:
+      return `Mise à jour de la commande #${code} de ${user}`;
+  }
+}
+
+// Generate a personalized notification message for an order status change (patient)
 export function notificationMessage(
   status: Order["status"],
   pharmacyName: string,

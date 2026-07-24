@@ -10,6 +10,8 @@ import {
   XCircle,
   ChevronRight,
   ShoppingBag,
+  Search,
+  Bell,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import {
@@ -38,15 +40,39 @@ export function OrdersScreen() {
   const user = useAppStore((s) => s.user);
   const cart = useAppStore((s) => s.cart);
   const cartTotal = useAppStore((s) => s.cartTotal());
+  const notificationCount = useAppStore((s) => s.notificationCount);
+  const setNotificationCount = useAppStore((s) => s.setNotificationCount);
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (user) void load();
     else setLoading(false);
   }, [user, filter]);
+
+  // Compute active orders count for badge
+  const activeOrdersCount = orders.filter(
+    (o) => o.status === "PENDING" || o.status === "CONFIRMED" || o.status === "READY"
+  ).length;
+
+  // Compute filtered + searched orders
+  const filteredOrders = orders.filter((o) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      o.code.toLowerCase().includes(q) ||
+      (o.pharmacy?.name || "").toLowerCase().includes(q)
+    );
+  });
+
+  useEffect(() => {
+    if (user && activeOrdersCount > 0) {
+      setNotificationCount(activeOrdersCount);
+    }
+  }, [activeOrdersCount, user, setNotificationCount]);
 
   async function load() {
     setLoading(true);
@@ -117,8 +143,31 @@ export function OrdersScreen() {
             </div>
           )}
 
+          {/* Search bar */}
+          <div className="px-4 pt-3">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Rechercher par code ou pharmacie..."
+                className="h-10 w-full rounded-xl border border-primary/20 bg-primary/5 pl-9 pr-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          </div>
+
+          {/* Notification badge + count */}
+          {activeOrdersCount > 0 && (
+            <div className="flex items-center gap-1.5 px-4 pt-3">
+              <Bell className="h-3.5 w-3.5 text-primary" />
+              <p className="text-xs font-semibold text-primary">
+                {activeOrdersCount} commande{activeOrdersCount > 1 ? "s" : ""} active{activeOrdersCount > 1 ? "s" : ""}
+              </p>
+            </div>
+          )}
+
           {/* Filter tabs */}
-          <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pt-3 pb-1">
+          <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pt-2 pb-1">
             {STATUS_FILTERS.map((f) => {
               const active = filter === f.id;
               return (
@@ -158,15 +207,15 @@ export function OrdersScreen() {
                   </div>
                 ))}
               </div>
-            ) : orders.length === 0 ? (
+            ) : filteredOrders.length === 0 ? (
               <EmptyState
                 icon={ClipboardList}
-                title="Aucune commande"
-                description="Commencez par rechercher un médicament et passez votre première commande."
-                action={{ label: "Commander un médicament", onClick: () => useAppStore.getState().setTab("home") }}
+                title={searchQuery ? "Aucun résultat" : "Aucune commande"}
+                description={searchQuery ? "Essayez un autre code ou nom de pharmacie." : "Commencez par rechercher un médicament et passez votre première commande."}
+                action={searchQuery ? { label: "Effacer la recherche", onClick: () => setSearchQuery("") } : { label: "Commander un médicament", onClick: () => useAppStore.getState().setTab("home") }}
               />
             ) : (
-              orders.map((o) => (
+              filteredOrders.map((o) => (
                 <button
                   key={o.id}
                   onClick={() => navigate("order-detail", { id: o.id })}
