@@ -9,29 +9,19 @@ import {
   Heart,
   Loader2,
   AlertCircle,
-  Search,
-  Pill,
-  ShoppingCart,
   Navigation,
   MessageSquare,
-  Minus,
-  Plus,
-  Banknote,
-  CheckCircle2,
   X,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import {
   pharmacyApi,
   type Pharmacy,
-  type PharmacyMedication,
   type Review,
-  formatFCFA,
   formatRelative,
 } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StarRating, StatusBadge } from "@/components/app/pharmacy-card";
 import { cn } from "@/lib/utils";
@@ -40,31 +30,21 @@ export function PharmacyDetailScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const params = useAppStore((s) => s.nav.params);
   const user = useAppStore((s) => s.user);
-  const addToCart = useAppStore((s) => s.addToCart);
   const pushToast = useAppStore((s) => s.pushToast);
   const setTab = useAppStore((s) => s.setTab);
 
   const [pharmacy, setPharmacy] = useState<Pharmacy | null>(null);
-  const [medications, setMedications] = useState<PharmacyMedication[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [showAddReview, setShowAddReview] = useState(false);
-  const [medQty, setMedQty] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!params.id) return;
     void load();
   }, [params.id]);
-
-  useEffect(() => {
-    if (!params.id) return;
-    const timer = setTimeout(() => void loadMedications(), 300);
-    return () => clearTimeout(timer);
-  }, [params.id, search]);
 
   async function load() {
     setLoading(true);
@@ -84,17 +64,6 @@ export function PharmacyDetailScreen() {
       // ignore
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function loadMedications() {
-    try {
-      const res = await pharmacyApi.medications(params.id, {
-        search: search.trim() || undefined,
-      });
-      setMedications(res.medications);
-    } catch {
-      // ignore
     }
   }
 
@@ -119,26 +88,6 @@ export function PharmacyDetailScreen() {
     } finally {
       setFavLoading(false);
     }
-  }
-
-  function handleAddToCart(pm: PharmacyMedication) {
-    if (!pharmacy) return;
-    const qty = medQty[pm.id] || 1;
-    if (pm.medication.prescriptionRequired) {
-      pushToast("Médicament sur ordonnance — présentez-la en pharmacie.", "info");
-    }
-    addToCart({
-      medicationId: pm.medication.id,
-      medicationName: pm.medication.name,
-      medicationDosage: pm.medication.dosage,
-      medicationForm: pm.medication.form,
-      pharmacyId: pharmacy.id,
-      pharmacyName: pharmacy.name,
-      unitPrice: pm.price,
-      quantity: qty,
-      prescriptionRequired: pm.medication.prescriptionRequired,
-    });
-    pushToast(`${pm.medication.name} ×${qty} ajouté au panier.`, "success");
   }
 
   if (loading) {
@@ -176,7 +125,7 @@ export function PharmacyDetailScreen() {
             disabled={favLoading}
             className={cn(
               "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-              isFavorite ? "bg-red-50 text-red-500" : "bg-muted text-muted-foreground hover:text-foreground"
+              isFavorite ? "bg-red-500/10 text-red-500" : "bg-muted text-muted-foreground hover:text-foreground"
             )}
             aria-label="Favori"
           >
@@ -277,107 +226,6 @@ export function PharmacyDetailScreen() {
             <Phone className="mr-1.5 h-4 w-4" />
             Appeler
           </a>
-        </div>
-      </div>
-
-      {/* Stock search */}
-      <div className="px-4 pt-5">
-        <h2 className="mb-2 text-base font-bold text-foreground">
-          Médicaments en stock ({medications.length})
-        </h2>
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher dans le stock..."
-            className="h-10 rounded-xl border-primary/20 bg-primary/5 pl-9"
-          />
-        </div>
-
-        <div className="mt-3 space-y-2 pb-4">
-          {loading ? (
-            <div className="space-y-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
-                  <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
-                  <div className="flex-1 space-y-1.5">
-                    <Skeleton className="h-4 w-36 rounded-full" />
-                    <Skeleton className="h-3 w-24 rounded-full" />
-                    <div className="flex items-center gap-2">
-                      <Skeleton className="h-4 w-16 rounded-full" />
-                      <Skeleton className="h-3 w-12 rounded-full" />
-                    </div>
-                  </div>
-                  <Skeleton className="h-8 w-8 rounded-lg" />
-                </div>
-              ))}
-            </div>
-          ) : medications.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              Aucun médicament trouvé.
-            </div>
-          ) : (
-            medications.map((pm) => (
-              <div
-                key={pm.id}
-                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Pill className="h-5 w-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="truncate text-sm font-semibold text-foreground">
-                    {pm.medication.name}
-                  </h3>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {pm.medication.activeIngredient} • {pm.medication.dosage}
-                  </p>
-                  <div className="mt-0.5 flex items-center gap-2">
-                    <span className="text-sm font-bold text-primary">
-                      {formatFCFA(pm.price)}
-                    </span>
-                    {pm.stock > 0 ? (
-                      <span className="flex items-center gap-0.5 text-[10px] text-green-600">
-                        <CheckCircle2 className="h-3 w-3" />
-                        Stock: {pm.stock}
-                      </span>
-                    ) : (
-                      <span className="text-[10px] text-red-600">Rupture</span>
-                    )}
-                  </div>
-                </div>
-                {pm.stock > 0 && (
-                  <div className="flex items-center gap-1">
-                    <div className="flex items-center gap-1 rounded-md border border-border bg-background">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setMedQty((q) => ({ ...q, [pm.id]: Math.max(1, (q[pm.id] || 1) - 1) })); }}
-                        className="flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground"
-                      >
-                        <Minus className="h-3 w-3" />
-                      </button>
-                      <span className="min-w-[1.5ch] text-center text-xs font-semibold tabular-nums text-foreground">
-                        {medQty[pm.id] || 1}
-                      </span>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setMedQty((q) => ({ ...q, [pm.id]: Math.min(pm.stock, (q[pm.id] || 1) + 1) })); }}
-                        className="flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground"
-                      >
-                        <Plus className="h-3 w-3" />
-                      </button>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => handleAddToCart(pm)}
-                      className="h-8 shrink-0 rounded-lg bg-primary px-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
-                    >
-                      <ShoppingCart className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
         </div>
       </div>
 

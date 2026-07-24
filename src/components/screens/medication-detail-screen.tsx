@@ -170,7 +170,7 @@ export function MedicationDetailScreen() {
                   {medication.form}
                 </span>
                 {medication.prescriptionRequired && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-700">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-500">
                     <FileText className="h-3 w-3" />
                     Ordonnance
                   </span>
@@ -194,21 +194,21 @@ export function MedicationDetailScreen() {
       {/* Side effects & contraindications */}
       <div className="grid grid-cols-1 gap-3 px-4 pt-4">
         {medication.sideEffects && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
-            <h3 className="flex items-center gap-1.5 text-xs font-bold text-amber-800">
+          <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
+            <h3 className="flex items-center gap-1.5 text-xs font-bold text-amber-500">
               <Info className="h-3.5 w-3.5" />
               EFFETS SECONDAIRES
             </h3>
-            <p className="mt-1 text-xs text-amber-700">{medication.sideEffects}</p>
+            <p className="mt-1 text-xs text-amber-500/80">{medication.sideEffects}</p>
           </div>
         )}
         {medication.contraindications && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-3">
-            <h3 className="flex items-center gap-1.5 text-xs font-bold text-red-800">
+          <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-3">
+            <h3 className="flex items-center gap-1.5 text-xs font-bold text-red-500">
               <AlertCircle className="h-3.5 w-3.5" />
               CONTRE-INDICATIONS
             </h3>
-            <p className="mt-1 text-xs text-red-700">{medication.contraindications}</p>
+            <p className="mt-1 text-xs text-red-500/80">{medication.contraindications}</p>
           </div>
         )}
       </div>
@@ -229,21 +229,21 @@ export function MedicationDetailScreen() {
               COMPARATEUR DE PRIX
             </div>
             <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs">
-              <div className="rounded-lg bg-green-50 p-2">
-                <p className="text-[10px] text-green-600">Moins cher</p>
-                <p className="mt-0.5 text-sm font-bold text-green-700">
+              <div className="rounded-lg bg-green-500/10 p-2">
+                <p className="text-[10px] text-green-500">Moins cher</p>
+                <p className="mt-0.5 text-sm font-bold text-green-500">
                   {formatFCFA(pharmacies[0].price)}
                 </p>
               </div>
-              <div className="rounded-lg bg-amber-50 p-2">
-                <p className="text-[10px] text-amber-600">Moyen</p>
-                <p className="mt-0.5 text-sm font-bold text-amber-700">
+              <div className="rounded-lg bg-amber-500/10 p-2">
+                <p className="text-[10px] text-amber-500">Moyen</p>
+                <p className="mt-0.5 text-sm font-bold text-amber-500">
                   {formatFCFA(Math.round(pharmacies.reduce((sum, p) => sum + p.price, 0) / pharmacies.length))}
                 </p>
               </div>
-              <div className="rounded-lg bg-red-50 p-2">
-                <p className="text-[10px] text-red-600">Plus cher</p>
-                <p className="mt-0.5 text-sm font-bold text-red-700">
+              <div className="rounded-lg bg-red-500/10 p-2">
+                <p className="text-[10px] text-red-500">Plus cher</p>
+                <p className="mt-0.5 text-sm font-bold text-red-500">
                   {formatFCFA(pharmacies[pharmacies.length - 1].price)}
                 </p>
               </div>
@@ -338,7 +338,7 @@ export function MedicationDetailScreen() {
                   className={cn(
                     "rounded-2xl border p-3",
                     idx === 0 && sort === "price"
-                      ? "border-green-300 bg-green-50/60"
+                      ? "border-green-500/30 bg-green-500/5"
                       : "border-border bg-card"
                   )}
                 >
@@ -355,7 +355,7 @@ export function MedicationDetailScreen() {
                           {p.pharmacy.name}
                         </h3>
                         {idx === 0 && sort === "price" && (
-                          <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">
+                          <span className="shrink-0 rounded-full bg-green-500/10 px-2 py-0.5 text-[10px] font-bold text-green-500">
                             Moins cher
                           </span>
                         )}
@@ -370,7 +370,7 @@ export function MedicationDetailScreen() {
                         </span>
                         <span className="text-muted-foreground">({p.pharmacy.reviewCount})</span>
                         {p.pharmacy.isOnGuard && (
-                          <span className="rounded-full bg-orange-100 px-1.5 py-0.5 text-[10px] font-bold text-orange-700">
+                          <span className="rounded-full bg-orange-500/10 px-1.5 py-0.5 text-[10px] font-bold text-orange-500">
                             Garde
                           </span>
                         )}
@@ -384,7 +384,7 @@ export function MedicationDetailScreen() {
                         <p className="text-lg font-bold text-primary">
                           {formatFCFA(p.price)}
                         </p>
-                        <p className="flex items-center gap-1 text-[11px] text-green-600">
+                        <p className="flex items-center gap-1 text-[11px] text-green-500">
                           <CheckCircle2 className="h-3 w-3" />
                           Stock: {p.stock}
                         </p>
@@ -411,7 +411,7 @@ export function MedicationDetailScreen() {
                       {pharmacies.length > 1 && diff > 0 && (
                         <div className="flex flex-col items-center">
                           {idx === 0 && (
-                            <span className="mb-0.5 text-[8px] font-semibold text-green-600">-{formatFCFA(maxPrice - p.price)}</span>
+                            <span className="mb-0.5 text-[8px] font-semibold text-green-500">-{formatFCFA(maxPrice - p.price)}</span>
                           )}
                           <div className="relative h-12 w-3 overflow-hidden rounded-full bg-muted">
                             <div
