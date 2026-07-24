@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import {
-  Loader2, Save, Clock, MapPin, Phone, Star, Camera,
-  Syringe, ShieldCheck, Truck, CreditCard, DollarSign,
+  Loader2, Save, Clock, MapPin, Phone, Star, Camera, DollarSign,
 } from "lucide-react";
 import { AppHeader } from "@/components/app/app-header";
 import { useAppStore } from "@/lib/store";
@@ -37,25 +36,8 @@ interface PharmacyData {
   _count: { medications: number; orders: number; reviews: number };
 }
 
-const SERVICE_OPTIONS = [
-  { value: "vaccination", label: "Vaccination", icon: Syringe },
-  { value: "conseil", label: "Conseil", icon: ShieldCheck },
-  { value: "livraison", label: "Livraison", icon: Truck },
-  { value: "tiers_payant", label: "Tiers-Payant", icon: CreditCard },
-  { value: "pression", label: "Tension", icon: ShieldCheck },
-  { value: "piqure", label: "Piqûre", icon: Syringe },
-  { value: "test", label: "Tests", icon: ShieldCheck },
-  { value: "orthopedie", label: "Orthopédie", icon: ShieldCheck },
-];
-
 const PAYMENT_OPTIONS = [
-  { value: "mobile_money", label: "Mobile Money", icon: Phone },
   { value: "cash", label: "Espèces", icon: DollarSign },
-  { value: "card", label: "Carte bancaire", icon: CreditCard },
-  { value: "wave", label: "Wave", icon: Phone },
-  { value: "orange_money", label: "Orange Money", icon: Phone },
-  { value: "mtn_money", label: "MTN Money", icon: Phone },
-  { value: "moov", label: "Moov Money", icon: Phone },
 ];
 
 export function PharmacistPharmacyScreen() {
@@ -80,7 +62,6 @@ export function PharmacistPharmacyScreen() {
   const [closingTime, setClosingTime] = useState("20:00");
   const [isOpen24h, setIsOpen24h] = useState(false);
   const [isOnGuard, setIsOnGuard] = useState(false);
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -106,7 +87,6 @@ export function PharmacistPharmacyScreen() {
       setClosingTime(p.closingTime);
       setIsOpen24h(p.isOpen24h);
       setIsOnGuard(p.isOnGuard);
-      setSelectedServices(p.services ? p.services.split(",").map((s) => s.trim()).filter(Boolean) : []);
       setSelectedPayments(p.payments ? p.payments.split(",").map((s) => s.trim()).filter(Boolean) : []);
       setImagePreview(p.imageUrl);
     } catch (err) {
@@ -161,12 +141,6 @@ export function PharmacistPharmacyScreen() {
     }
   }
 
-  function toggleService(val: string) {
-    setSelectedServices((prev) =>
-      prev.includes(val) ? prev.filter((s) => s !== val) : [...prev, val]
-    );
-  }
-
   function togglePayment(val: string) {
     setSelectedPayments((prev) =>
       prev.includes(val) ? prev.filter((s) => s !== val) : [...prev, val]
@@ -193,7 +167,6 @@ export function PharmacistPharmacyScreen() {
         closingTime,
         isOpen24h,
         isOnGuard,
-        services: selectedServices.join(","),
         payments: selectedPayments.join(","),
       };
       if (imagePreview && imagePreview.startsWith("data:")) {
@@ -388,34 +361,6 @@ export function PharmacistPharmacyScreen() {
                     <p className="text-xs text-muted-foreground">Visible dans les gardes</p>
                   </div>
                   <Switch checked={isOnGuard} onCheckedChange={setIsOnGuard} />
-                </div>
-              </div>
-
-              {/* Services - editable chips */}
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">Services proposés</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {SERVICE_OPTIONS.map((svc) => {
-                    const active = selectedServices.includes(svc.value);
-                    const Icon = svc.icon;
-                    return (
-                      <button
-                        key={svc.value}
-                        type="button"
-                        onClick={() => toggleService(svc.value)}
-                        aria-pressed={active}
-                        className={cn(
-                          "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-all",
-                          active
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                        )}
-                      >
-                        <Icon className="h-3 w-3" />
-                        {svc.label}
-                      </button>
-                    );
-                  })}
                 </div>
               </div>
 

@@ -42,9 +42,7 @@ import { StarRating, ServiceBadges, StatusBadge } from "@/components/app/pharmac
 import { cn } from "@/lib/utils";
 
 const paymentLabels: Record<string, { icon: typeof Wallet; label: string }> = {
-  mobile_money: { icon: Wallet, label: "Mobile Money" },
   cash: { icon: Banknote, label: "Espèces" },
-  card: { icon: CreditCard, label: "Carte" },
 };
 
 export function PharmacyDetailScreen() {

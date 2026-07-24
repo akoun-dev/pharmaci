@@ -39,14 +39,13 @@ export function PharmacySearchScreen() {
   const [openNow, setOpenNow] = useState(false);
   const [openOnly, setOpenOnly] = useState(false);
   const [guardOnly, setGuardOnly] = useState(false);
-  const [vaccinationOnly, setVaccinationOnly] = useState(false);
   const [sortBy, setSortBy] = useState<"name" | "rating" | "distance">("name");
   const [showSortMenu, setShowSortMenu] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => void load(), 300);
     return () => clearTimeout(timer);
-  }, [search, openNow, openOnly, guardOnly, vaccinationOnly]);
+  }, [search, openNow, openOnly, guardOnly]);
 
   const sortedPharmacies = useMemo(() => {
     const result = [...pharmacies];
@@ -76,7 +75,6 @@ export function PharmacySearchScreen() {
         onGuard: guardOnly || undefined,
         open24h: openOnly || undefined,
         openNow: openNow || undefined,
-        service: vaccinationOnly ? "vaccination" : undefined,
         page: 1,
         limit: 15,
       });
@@ -101,7 +99,6 @@ export function PharmacySearchScreen() {
         onGuard: guardOnly || undefined,
         open24h: openOnly || undefined,
         openNow: openNow || undefined,
-        service: vaccinationOnly ? "vaccination" : undefined,
         page: nextPage,
         limit: 15,
       });
@@ -155,11 +152,6 @@ export function PharmacySearchScreen() {
           onClick={() => setGuardOnly((v) => !v)}
           label="De garde"
           color="orange"
-        />
-        <FilterChip
-          active={vaccinationOnly}
-          onClick={() => setVaccinationOnly((v) => !v)}
-          label="Vaccination"
         />
       </div>
 
