@@ -16,11 +16,6 @@ import {
   MessageSquare,
   Minus,
   Plus,
-  Syringe,
-  ShieldCheck,
-  Truck,
-  CreditCard,
-  Wallet,
   Banknote,
   CheckCircle2,
   X,
@@ -38,12 +33,8 @@ import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { StarRating, ServiceBadges, StatusBadge } from "@/components/app/pharmacy-card";
+import { StarRating, StatusBadge } from "@/components/app/pharmacy-card";
 import { cn } from "@/lib/utils";
-
-const paymentLabels: Record<string, { icon: typeof Wallet; label: string }> = {
-  cash: { icon: Banknote, label: "Espèces" },
-};
 
 export function PharmacyDetailScreen() {
   const navigate = useAppStore((s) => s.navigate);
@@ -173,11 +164,6 @@ export function PharmacyDetailScreen() {
     );
   }
 
-  const payments = pharmacy.payments
-    .split(",")
-    .map((p) => p.trim())
-    .filter(Boolean);
-
   return (
     <div className="flex flex-col">
       <AppHeader
@@ -268,41 +254,6 @@ export function PharmacyDetailScreen() {
             {pharmacy.phone}
           </a>
         </div>
-
-        {/* Services */}
-        {pharmacy.services && (
-          <div className="mt-3">
-            <h3 className="mb-1.5 text-xs font-semibold uppercase text-muted-foreground">
-              Services
-            </h3>
-            <ServiceBadges services={pharmacy.services} />
-          </div>
-        )}
-
-        {/* Payments */}
-        {payments.length > 0 && (
-          <div className="mt-3">
-            <h3 className="mb-1.5 text-xs font-semibold uppercase text-muted-foreground">
-              Moyens de paiement
-            </h3>
-            <div className="flex flex-wrap gap-1.5">
-              {payments.map((p) => {
-                const meta = paymentLabels[p];
-                if (!meta) return null;
-                const Icon = meta.icon;
-                return (
-                  <span
-                    key={p}
-                    className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
-                  >
-                    <Icon className="h-3 w-3" />
-                    {meta.label}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
         {/* Action buttons */}
         <div className="mt-4 grid grid-cols-2 gap-2">
