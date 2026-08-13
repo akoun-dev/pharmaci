@@ -15,6 +15,8 @@ import {
   Minus,
   Plus,
   Search,
+  LogIn,
+  Lock,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import {
@@ -31,6 +33,7 @@ import { cn, categoryColor } from "@/lib/utils";
 export function MedicationDetailScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const params = useAppStore((s) => s.nav.params);
+  const user = useAppStore((s) => s.user);
   const addToCart = useAppStore((s) => s.addToCart);
   const pushToast = useAppStore((s) => s.pushToast);
   const addRecentlyViewed = useAppStore((s) => s.addRecentlyViewed);
@@ -39,6 +42,11 @@ export function MedicationDetailScreen() {
   const [pharmacies, setPharmacies] = useState<PharmacyWithPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState<"price" | "rating">("price");
+
+  // Visiteur : pas de tri par prix (bouton masqué) → on force le tri par note
+  useEffect(() => {
+    if (!user && sort === "price") setSort("rating");
+  }, [user, sort]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [pharmacySearch, setPharmacySearch] = useState("");
 
@@ -221,8 +229,8 @@ export function MedicationDetailScreen() {
           </h2>
         </div>
 
-        {/* Price comparison summary */}
-        {pharmacies.length > 1 && (
+        {/* Price comparison summary — visiteur : incitation à l'inscription */}
+        {pharmacies.length > 1 && user && (
           <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
             <div className="flex items-center gap-1.5 text-xs font-bold text-primary">
               <TrendingDown className="h-3.5 w-3.5" />
@@ -253,32 +261,51 @@ export function MedicationDetailScreen() {
             </p>
           </div>
         )}
+        {pharmacies.length > 1 && !user && (
+          <button
+            onClick={() => useAppStore.getState().setGuestMode(false)}
+            className="mt-3 flex w-full items-center gap-3 rounded-xl border border-dashed border-primary/40 bg-primary/5 p-3 text-left transition-colors hover:bg-primary/10"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <TrendingDown className="h-4 w-4" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-bold text-foreground">Comparateur de prix</p>
+              <p className="text-[11px] text-muted-foreground">
+                Connectez-vous pour voir le prix le plus bas et réaliser des économies.
+              </p>
+            </div>
+            <LogIn className="h-4 w-4 shrink-0 text-primary" />
+          </button>
+        )}
 
-        {/* Sort toggle */}
-        <div className="mt-3 flex gap-2">
-          <button
-            onClick={() => setSort("price")}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-semibold transition-all",
-              sort === "price"
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-card text-muted-foreground"
-            )}
-          >
-            Moins cher
-          </button>
-          <button
-            onClick={() => setSort("rating")}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-semibold transition-all",
-              sort === "rating"
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-card text-muted-foreground"
-            )}
-          >
-            Mieux notées
-          </button>
-        </div>
+        {/* Sort toggle — visiteur : masqué (tri par prix/note non pertinent) */}
+        {user && (
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={() => setSort("price")}
+              className={cn(
+                "rounded-full border px-3 py-1 text-xs font-semibold transition-all",
+                sort === "price"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-muted-foreground"
+              )}
+            >
+              Moins cher
+            </button>
+            <button
+              onClick={() => setSort("rating")}
+              className={cn(
+                "rounded-full border px-3 py-1 text-xs font-semibold transition-all",
+                sort === "rating"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-muted-foreground"
+              )}
+            >
+              Mieux notées
+            </button>
+          </div>
+        )}
 
         {/* Pharmacy search filter */}
         <div className="relative mt-3">
@@ -337,7 +364,7 @@ export function MedicationDetailScreen() {
                   key={p.pharmacy.id}
                   className={cn(
                     "rounded-2xl border p-3",
-                    idx === 0 && sort === "price"
+                    user && idx === 0 && sort === "price"
                       ? "border-green-500/30 bg-green-500/5"
                       : "border-border bg-card"
                   )}
@@ -354,7 +381,7 @@ export function MedicationDetailScreen() {
                         <h3 className="truncate text-sm font-semibold text-foreground">
                           {p.pharmacy.name}
                         </h3>
-                        {idx === 0 && sort === "price" && (
+                        {user && idx === 0 && sort === "price" && (
                           <span className="shrink-0 rounded-full bg-green-500/10 px-2 py-0.5 text-[10px] font-bold text-green-500">
                             Moins cher
                           </span>
@@ -365,10 +392,14 @@ export function MedicationDetailScreen() {
                         {p.pharmacy.address}
                       </p>
                       <div className="mt-1 flex items-center gap-2 text-xs">
-                        <span className="flex items-center gap-0.5 text-amber-500">
-                          ★ <span className="font-semibold text-foreground">{p.pharmacy.rating.toFixed(1)}</span>
-                        </span>
-                        <span className="text-muted-foreground">({p.pharmacy.reviewCount})</span>
+                        {user && (
+                          <>
+                            <span className="flex items-center gap-0.5 text-amber-500">
+                              ★ <span className="font-semibold text-foreground">{p.pharmacy.rating.toFixed(1)}</span>
+                            </span>
+                            <span className="text-muted-foreground">({p.pharmacy.reviewCount})</span>
+                          </>
+                        )}
                         {p.pharmacy.isOnGuard && (
                           <span className="rounded-full bg-orange-500/10 px-1.5 py-0.5 text-[10px] font-bold text-orange-500">
                             Garde
@@ -380,61 +411,72 @@ export function MedicationDetailScreen() {
                   </button>
                   <div className="mt-2.5 flex items-center justify-between border-t border-border/60 pt-2.5">
                     <div className="flex items-center gap-3">
-                      <div>
-                        <p className="text-lg font-bold text-primary">
-                          {formatFCFA(p.price)}
-                        </p>
-                        <p className="flex items-center gap-1 text-[11px] text-green-500">
-                          <CheckCircle2 className="h-3 w-3" />
-                          Stock: {p.stock}
-                        </p>
-                      </div>
-                      {/* Qty stepper */}
-                      <div className="flex items-center gap-1 rounded-lg border border-border bg-background">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setQuantities((q) => ({ ...q, [p.pharmacy.id]: Math.max(1, (q[p.pharmacy.id] || 1) - 1) })); }}
-                          className="flex h-7 w-7 items-center justify-center text-muted-foreground hover:text-foreground"
-                        >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="min-w-[1.5ch] text-center text-sm font-semibold tabular-nums text-foreground">
-                          {quantities[p.pharmacy.id] || 1}
-                        </span>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setQuantities((q) => ({ ...q, [p.pharmacy.id]: Math.min(p.stock, (q[p.pharmacy.id] || 1) + 1) })); }}
-                          className="flex h-7 w-7 items-center justify-center text-muted-foreground hover:text-foreground"
-                        >
-                          <Plus className="h-3 w-3" />
-                        </button>
-                      </div>
-                      {/* Price comparison bar */}
-                      {pharmacies.length > 1 && diff > 0 && (
-                        <div className="flex flex-col items-center">
-                          {idx === 0 && (
-                            <span className="mb-0.5 text-[8px] font-semibold text-green-500">-{formatFCFA(maxPrice - p.price)}</span>
-                          )}
-                          <div className="relative h-12 w-3 overflow-hidden rounded-full bg-muted">
-                            <div
-                              className="absolute bottom-0 w-full rounded-full bg-gradient-to-t from-green-500 via-amber-400 to-red-400 transition-all"
-                              style={{ height: `${savingsPercent}%` }}
-                            />
+                      {user ? (
+                        <>
+                          <div>
+                            <p className="text-lg font-bold text-primary">
+                              {formatFCFA(p.price)}
+                            </p>
+                            <p className="flex items-center gap-1 text-[11px] text-green-500">
+                              <CheckCircle2 className="h-3 w-3" />
+                              Stock: {p.stock}
+                            </p>
                           </div>
-                          <span className="mt-0.5 text-[9px] text-muted-foreground">{idx + 1}/{pharmacies.length}</span>
-                          {idx === pharmacies.length - 1 && (
-                            <span className="mt-0.5 text-[8px] font-semibold text-red-500">+{formatFCFA(p.price - minPrice)}</span>
+                          {/* Qty stepper */}
+                          <div className="flex items-center gap-1 rounded-lg border border-border bg-background">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setQuantities((q) => ({ ...q, [p.pharmacy.id]: Math.max(1, (q[p.pharmacy.id] || 1) - 1) })); }}
+                              className="flex h-7 w-7 items-center justify-center text-muted-foreground hover:text-foreground"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="min-w-[1.5ch] text-center text-sm font-semibold tabular-nums text-foreground">
+                              {quantities[p.pharmacy.id] || 1}
+                            </span>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setQuantities((q) => ({ ...q, [p.pharmacy.id]: Math.min(p.stock, (q[p.pharmacy.id] || 1) + 1) })); }}
+                              className="flex h-7 w-7 items-center justify-center text-muted-foreground hover:text-foreground"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                          {/* Price comparison bar */}
+                          {pharmacies.length > 1 && diff > 0 && (
+                            <div className="flex flex-col items-center">
+                              {idx === 0 && (
+                                <span className="mb-0.5 text-[8px] font-semibold text-green-500">-{formatFCFA(maxPrice - p.price)}</span>
+                              )}
+                              <div className="relative h-12 w-3 overflow-hidden rounded-full bg-muted">
+                                <div
+                                  className="absolute bottom-0 w-full rounded-full bg-gradient-to-t from-green-500 via-amber-400 to-red-400 transition-all"
+                                  style={{ height: `${savingsPercent}%` }}
+                                />
+                              </div>
+                              <span className="mt-0.5 text-[9px] text-muted-foreground">{idx + 1}/{pharmacies.length}</span>
+                              {idx === pharmacies.length - 1 && (
+                                <span className="mt-0.5 text-[8px] font-semibold text-red-500">+{formatFCFA(p.price - minPrice)}</span>
+                              )}
+                            </div>
                           )}
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Lock className="h-3.5 w-3.5" />
+                          <span>Prix après connexion</span>
                         </div>
                       )}
                     </div>
-                    <Button
-                      size="sm"
-                      onClick={() => handleAddToCart(p)}
-                      className="h-9 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
-                    >
-                      <ShoppingCart className="mr-1 h-3.5 w-3.5" />
-                      {quantities[p.pharmacy.id] > 1 ? `${quantities[p.pharmacy.id]} × ` : ""}
-                      Ajouter
-                    </Button>
+                    {user && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleAddToCart(p)}
+                        className="h-9 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+                      >
+                        <ShoppingCart className="mr-1 h-3.5 w-3.5" />
+                        {quantities[p.pharmacy.id] > 1 ? `${quantities[p.pharmacy.id]} × ` : ""}
+                        Ajouter
+                      </Button>
+                    )}
                   </div>
                 </div>
               );

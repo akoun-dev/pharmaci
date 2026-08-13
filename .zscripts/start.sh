@@ -60,7 +60,7 @@ DEFAULT_PACKAGED_DATABASE_URL="file:$DEFAULT_PACKAGED_DB_PATH"
 if [ -f "./next-service-dist/server.js" ]; then
     echo "🚀 启动 Next.js 服务器..."
     cd next-service-dist/ || exit 1
-    
+
     # 设置环境变量
     export NODE_ENV=production
     export PORT="${PORT:-3000}"
@@ -68,15 +68,19 @@ if [ -f "./next-service-dist/server.js" ]; then
     export DATABASE_URL="${DATABASE_URL:-$DEFAULT_PACKAGED_DATABASE_URL}"
 
     if [ "$DATABASE_URL" = "$DEFAULT_PACKAGED_DATABASE_URL" ]; then
+        # The packaged DB is intentionally NOT shipped by build.sh (it contained
+        # demo admin accounts and PII). Create a fresh empty database on first
+        # run. The operator must run `prisma db push` (with the bundled schema)
+        # and create the first admin out-of-band before going live.
+        mkdir -p "$(dirname "$DEFAULT_PACKAGED_DB_PATH")"
         if [ ! -f "$DEFAULT_PACKAGED_DB_PATH" ]; then
-            echo "❌ 未找到打包后的数据库文件 $DEFAULT_PACKAGED_DB_PATH"
-            echo "   为避免生产环境启动到空数据库，启动已终止"
-            exit 1
+            echo "⚠️  Base de données absente : $DEFAULT_PACKAGED_DB_PATH"
+            echo "    Création d'une base vide. Exécutez 'bun run db:push' (et créez le premier admin) avant la mise en service."
+            : > "$DEFAULT_PACKAGED_DB_PATH"
         fi
-
-        echo "🗄️  当前使用打包数据库: $DEFAULT_PACKAGED_DB_PATH"
+        echo "🗄️  Base de données (par défaut) : $DEFAULT_PACKAGED_DB_PATH"
     else
-        echo "🗄️  当前使用外部指定数据库: $DATABASE_URL"
+        echo "🗄️  Base de données externe : $DATABASE_URL"
     fi
     
     # 后台启动 Next.js

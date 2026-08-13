@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Mail,
   Lock,
@@ -25,6 +25,16 @@ interface ForgotPasswordModalProps {
 
 export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
   const pushToast = useAppStore((s) => s.pushToast);
+  // Track the auto-close timer so it can be cleared if the modal unmounts
+  // (avoids a React state-update on an unmounted component).
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear any pending close timer on unmount.
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
 
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
@@ -99,7 +109,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
       if (data.success) {
         setStep("success");
         pushToast("Mot de passe réinitialisé ! Connectez-vous.", "success");
-        setTimeout(onClose, 2000);
+        closeTimerRef.current = setTimeout(onClose, 2000);
       } else {
         setError(data.error || "Erreur lors de la réinitialisation.");
       }

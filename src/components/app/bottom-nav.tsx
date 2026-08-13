@@ -27,6 +27,13 @@ const patientTabs: TabConfig[] = [
   { id: "profile", label: "Profil", icon: User },
 ];
 
+// Menu réduit en mode visiteur : exploration + point d'accès à la connexion (Profil).
+const visitorTabs: TabConfig[] = [
+  { id: "home", label: "Accueil", icon: Search },
+  { id: "map", label: "Carte", icon: Map },
+  { id: "profile", label: "Profil", icon: User },
+];
+
 const pharmacistTabs: TabConfig[] = [
   { id: "pharmacist", label: "Aperçu", icon: LayoutDashboard },
   { id: "orders", label: "Commandes", icon: ClipboardList },
@@ -84,14 +91,16 @@ export function BottomNav() {
   }, [user?.role]);
 
   const role = user?.role;
-  const tabs =
-    role === "PHARMACIST"
+  const tabs = !user
+    ? visitorTabs
+    : role === "PHARMACIST"
       ? pharmacistTabs
       : role === "ADMIN"
         ? adminTabs
         : patientTabs;
 
-  const gridCols = tabs.length >= 5 ? "grid-cols-5" : "grid-cols-4";
+  const gridCols =
+    tabs.length >= 5 ? "grid-cols-5" : tabs.length === 4 ? "grid-cols-4" : "grid-cols-3";
 
   function handleTabClick(id: string) {
     if (id === "pharmacist-stock") {

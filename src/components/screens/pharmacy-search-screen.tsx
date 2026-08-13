@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Search, Loader2, MapPin, Mic, ArrowUpDown } from "lucide-react";
+import { Search, Loader2, MapPin, Mic, ArrowUpDown, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/lib/store";
@@ -11,12 +11,14 @@ import { PharmacyCard, ServiceBadges } from "@/components/app/pharmacy-card";
 import { cn } from "@/lib/utils";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { EmptyState } from "@/components/ui/empty-state";
+import { GuestPrompt } from "@/components/ui/guest-prompt";
 
 export function PharmacySearchScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const params = useAppStore((s) => s.nav.params);
   const addRecentSearch = useAppStore((s) => s.addRecentSearch);
   const pushToast = useAppStore((s) => s.pushToast);
+  const user = useAppStore((s) => s.user);
 
   const [search, setSearch] = useState(params.q || "");
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
@@ -124,14 +126,16 @@ export function PharmacySearchScreen() {
             className="h-11 rounded-xl border-primary/20 bg-primary/5 pl-9 pr-12"
             autoFocus
           />
-          <button
-            onClick={startListening}
-            disabled={isListening}
-            className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
-            aria-label="Recherche vocale"
-          >
-            <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
-          </button>
+          {user && (
+            <button
+              onClick={startListening}
+              disabled={isListening}
+              className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+              aria-label="Recherche vocale"
+            >
+              <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -292,12 +296,14 @@ function FilterChip({
 // Guard pharmacies list (full screen)
 export function GuardPharmaciesScreen() {
   const navigate = useAppStore((s) => s.navigate);
+  const user = useAppStore((s) => s.user);
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) return;
     void load();
-  }, []);
+  }, [user]);
 
   async function load() {
     setLoading(true);
@@ -311,9 +317,22 @@ export function GuardPharmaciesScreen() {
     }
   }
 
+  if (!user) {
+    return (
+      <div className="flex flex-col">
+        <AppHeader title="Pharmacies de garde" showBack />
+        <GuestPrompt
+          icon={Clock}
+          title="Connexion requise"
+          description="Connectez-vous pour voir les pharmacies de garde ouvertes maintenant près de chez vous."
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col">
-      <AppHeader title="Pharmacies de garde" showBack showCart />
+      <AppHeader title="Pharmacies de garde" showBack />
       <div className="flex-1 space-y-3 px-4 pt-3 pb-6">
         {loading ? (
           <div className="space-y-3">

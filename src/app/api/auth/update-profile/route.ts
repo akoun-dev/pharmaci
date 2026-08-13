@@ -9,7 +9,15 @@ const updateProfileSchema = z.object({
   address: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
   district: z.string().optional().nullable(),
-  avatarUrl: z.string().optional().nullable(),
+  // Reject javascript:/data: URLs that could become XSS/redirect vectors.
+  avatarUrl: z
+    .string()
+    .url("URL d'avatar invalide")
+    .refine((u) => u.startsWith("http:") || u.startsWith("https:"), {
+      message: "L'avatar doit utiliser http(s)",
+    })
+    .optional()
+    .nullable(),
 });
 
 async function requireAuth() {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limit";
 
 async function requirePharmacist() {
   const user = await getCurrentUser();
@@ -35,6 +36,10 @@ export async function POST(req: NextRequest) {
   if (!auth) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
+
+  // Order codes are short (6 chars); throttle brute-force attempts per IP.
+  const limited = rateLimit(req, { limit: 20, windowMs: 60 * 1000 });
+  if (limited) return limited;
 
   let body: unknown;
   try {

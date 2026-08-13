@@ -130,7 +130,6 @@ export const authApi = {
     email: string;
     password: string;
     phone?: string;
-    role?: "PATIENT" | "PHARMACIST";
   }) => api.post<{ user: AuthUser }>("/api/auth/register", data),
   me: () => api.get<{ user: AuthUser & { pharmacy?: { id: string } } }>("/api/auth/me"),
   logout: () => api.post<{ success: boolean }>("/api/auth/logout"),

@@ -174,9 +174,10 @@ export const useAppStore = create<AppState>()(
           cart: state.cart
             .map((c) =>
               c.medicationId === medicationId && c.pharmacyId === pharmacyId
-                ? { ...c, quantity: Math.max(1, quantity) }
+                ? { ...c, quantity }
                 : c
             )
+            // A quantity of 0 or less removes the line item entirely.
             .filter((c) => c.quantity > 0),
         })),
       removeFromCart: (medicationId, pharmacyId) =>

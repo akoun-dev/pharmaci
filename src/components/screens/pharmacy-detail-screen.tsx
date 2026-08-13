@@ -148,10 +148,12 @@ export function PharmacyDetailScreen() {
               <h1 className="text-xl font-bold text-white drop-shadow">{pharmacy.name}</h1>
               <div className="mt-1 flex items-center gap-2">
                 <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} />
-                <span className="flex items-center gap-1 text-xs font-medium text-white">
-                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                  {pharmacy.rating.toFixed(1)} ({pharmacy.reviewCount})
-                </span>
+                {user && (
+                  <span className="flex items-center gap-1 text-xs font-medium text-white">
+                    <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                    {pharmacy.rating.toFixed(1)} ({pharmacy.reviewCount})
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -169,8 +171,12 @@ export function PharmacyDetailScreen() {
               <h1 className="text-lg font-bold text-foreground">{pharmacy.name}</h1>
               <div className="mt-1 flex items-center gap-2">
                 <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} />
-                <StarRating rating={pharmacy.rating} showNumber />
-                <span className="text-xs text-muted-foreground">({pharmacy.reviewCount})</span>
+                {user && (
+                  <>
+                    <StarRating rating={pharmacy.rating} showNumber />
+                    <span className="text-xs text-muted-foreground">({pharmacy.reviewCount})</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -229,7 +235,8 @@ export function PharmacyDetailScreen() {
         </div>
       </div>
 
-      {/* Reviews */}
+      {/* Reviews — visiteur : masqué */}
+      {user && (
       <div className="px-4 pb-6">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-foreground">
@@ -287,6 +294,7 @@ export function PharmacyDetailScreen() {
           )}
         </div>
       </div>
+      )}
 
       {/* Add review modal */}
       {showAddReview && (

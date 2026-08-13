@@ -5,16 +5,12 @@ exec 2>&1
 
 set -e
 
-# 获取脚本所在目录（.zscripts 目录，即 workspace-agent/.zscripts）
-# 使用 $0 获取脚本路径（兼容 sh 和 bash）
+# Derive the project root from the script location (.zscripts is at the repo root).
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+NEXTJS_PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Next.js 项目路径
-NEXTJS_PROJECT_DIR="/home/z/my-project"
-
-# 检查 Next.js 项目目录是否存在
 if [ ! -d "$NEXTJS_PROJECT_DIR" ]; then
-    echo "❌ 错误: Next.js 项目目录不存在: $NEXTJS_PROJECT_DIR"
+    echo "❌ Erreur: répertoire projet introuvable: $NEXTJS_PROJECT_DIR"
     exit 1
 fi
 
@@ -77,18 +73,17 @@ if [ -d "public" ]; then
     cp -r public "$BUILD_DIR/next-service-dist/"
 fi
 
-# 将测试环境数据库复制到构建产物中，生产环境直接使用这份数据库
-if [ -f "./db/custom.db" ]; then
-    echo "🗄️  复制测试环境数据库到构建产物..."
-    mkdir -p "$BUILD_DIR/db"
-    cp -r ./db/. "$BUILD_DIR/db/"
-
-    echo "🗄️  同步构建产物中的数据库结构..."
-    DATABASE_URL="file:$BUILD_DIR/db/custom.db" bun run db:push
-    echo "✅ 构建产物数据库已准备完成"
-    ls -lah "$BUILD_DIR/db"
+# Do NOT ship any database file in the build artifact. The seeded dev DB
+# contains demo admin accounts and PII; shipping it to production is a
+# credential-disclosure incident. The production instance must create a fresh
+# empty DB and run `db:push` (see start.sh), then bootstrap the first admin
+# out-of-band. We only include the Prisma schema so migrations can run.
+if [ -f "prisma/schema.prisma" ]; then
+    echo "  - copie du schéma Prisma (aucune donnée)"
+    mkdir -p "$BUILD_DIR/prisma"
+    cp prisma/schema.prisma "$BUILD_DIR/prisma/"
 else
-    echo "❌ 未找到测试环境数据库文件 ./db/custom.db，无法继续构建生产包"
+    echo "❌ Schéma Prisma introuvable (prisma/schema.prisma)"
     exit 1
 fi
 

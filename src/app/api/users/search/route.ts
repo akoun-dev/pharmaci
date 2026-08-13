@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limit";
 
 // GET /api/users/search?q=... — Recherche d'utilisateurs (tout rôle authentifié)
+// Sécurité : on exclut les ADMIN et on ne renvoie pas l'email pour limiter
+// l'énumération d'adresses (phishing / credential stuffing). L'email n'est
+// utile qu'aux pharmaciens (messagerie patient→pharmacien).
 export async function GET(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
+
+  // Throttle enumeration of users (email/role harvesting).
+  const limited = rateLimit(req, { limit: 30, windowMs: 60 * 1000 });
+  if (limited) return limited;
 
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.trim() || "";
@@ -21,6 +29,8 @@ export async function GET(req: NextRequest) {
     where: {
       AND: [
         { id: { not: user.id } },
+        // Never expose admin accounts via user search.
+        { role: { not: "ADMIN" } },
         {
           OR: [
             { name: { contains: q } },
@@ -32,8 +42,10 @@ export async function GET(req: NextRequest) {
     select: {
       id: true,
       name: true,
-      email: true,
       role: true,
+      // Only return email for pharmacists (contact lookup); patients searching
+      // get name + role only.
+      ...(user.role === "PHARMACIST" ? { email: true } : {}),
     },
     take: limit,
     orderBy: { name: "asc" },

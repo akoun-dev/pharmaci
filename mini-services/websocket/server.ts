@@ -1,15 +1,48 @@
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { Server, type Socket } from "socket.io";
 import { PrismaClient } from "@prisma/client";
+import { jwtVerify } from "jose";
 
 const prisma = new PrismaClient();
 const httpServer = createServer();
 
+// --- JWT verification (shared with the Next.js app via JWT_SECRET) ---
+const JWT_SECRET = process.env.JWT_SECRET;
+const COOKIE_NAME = "pharmaci-token";
+if (!JWT_SECRET) {
+  console.error("JWT_SECRET environment variable is required for the WebSocket server");
+  process.exit(1);
+}
+const encodedSecret = new TextEncoder().encode(JWT_SECRET);
+
+async function verifyToken(token: string) {
+  try {
+    const { payload } = await jwtVerify(token, encodedSecret);
+    return payload as { id: string; email: string; name: string; role: string };
+  } catch {
+    return null;
+  }
+}
+
+// Parse the Cookie header from the handshake and extract a named cookie.
+function readCookie(cookieHeader: string | undefined, name: string): string | null {
+  if (!cookieHeader) return null;
+  for (const part of cookieHeader.split(";")) {
+    const [k, ...rest] = part.trim().split("=");
+    if (k === name) return decodeURIComponent(rest.join("="));
+  }
+  return null;
+}
+
+// --- Allowed origin (restrict to the app to prevent CSWSH) ---
+const ALLOWED_ORIGIN = process.env.WS_ALLOWED_ORIGIN || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 const io = new Server(httpServer, {
-  path: "/",
+  path: "/socket.io/",
   cors: {
-    origin: "*",
+    origin: ALLOWED_ORIGIN,
     methods: ["GET", "POST"],
+    credentials: true,
   },
   pingTimeout: 60000,
   pingInterval: 25000,
@@ -17,6 +50,11 @@ const io = new Server(httpServer, {
 
 // Track which users are online: userId -> Set<socketId>
 const onlineUsers = new Map<string, Set<string>>();
+
+// Extend the socket with a typed userId once authenticated.
+interface AuthedSocket extends Socket {
+  userId?: string;
+}
 
 interface SendMessageData {
   receiverId: string;
@@ -47,44 +85,41 @@ function isUserOnline(userId: string): boolean {
   return onlineUsers.has(userId);
 }
 
-io.on("connection", (socket) => {
-  console.log(`[WS] Connexion: ${socket.id}`);
+// --- Authentication middleware: reject any socket without a valid session cookie ---
+io.use(async (socket: AuthedSocket, next) => {
+  const cookieHeader = socket.handshake.headers.cookie;
+  const token = readCookie(cookieHeader, COOKIE_NAME);
+  if (!token) {
+    return next(new Error("Non authentifié"));
+  }
+  const payload = await verifyToken(token);
+  if (!payload) {
+    return next(new Error("Session invalide ou expirée"));
+  }
+  // Bind the userId strictly to the verified token; the client can no longer
+  // impersonate another user.
+  socket.userId = payload.id;
+  next();
+});
 
-  // User identifies themselves after connecting
-  socket.on("identify", (data: { userId: string; token: string }) => {
-    const { userId, token } = data;
+io.on("connection", (socket: AuthedSocket) => {
+  const userId = socket.userId!;
+  console.log(`[WS] Connexion authentifiée: ${userId} (socket: ${socket.id})`);
 
-    // Basic validation: token should not be empty
-    if (!userId || !token) {
-      socket.emit("error", { message: "Identification invalide" });
-      return;
-    }
+  addOnlineUser(userId, socket.id);
+  socket.join(`user:${userId}`);
 
-    // Store userId on socket for easy access
-    (socket as any).userId = userId;
-    addOnlineUser(userId, socket.id);
-
-    // Join a personal room for targeted messages
-    socket.join(`user:${userId}`);
-
-    console.log(`[WS] Utilisateur identifié: ${userId} (socket: ${socket.id})`);
-
-    // Send confirmation + online status of other users
-    socket.emit("identified", {
-      userId,
-      onlineUsers: Array.from(onlineUsers.keys()),
-    });
-
-    // Broadcast to others that this user is online
-    socket.broadcast.emit("user-status", {
-      userId,
-      isOnline: true,
-    });
+  // Send confirmation + online status of other users
+  socket.emit("identified", {
+    userId,
+    onlineUsers: Array.from(onlineUsers.keys()),
   });
+
+  // Broadcast to others that this user is online
+  socket.broadcast.emit("user-status", { userId, isOnline: true });
 
   // Send a message
   socket.on("send-message", async (data: SendMessageData) => {
-    const userId = (socket as any).userId;
     if (!userId) {
       socket.emit("error", { message: "Non identifié" });
       return;
@@ -103,7 +138,6 @@ io.on("connection", (socket) => {
     }
 
     try {
-      // Persist to database
       const message = await prisma.message.create({
         data: {
           senderId: userId,
@@ -127,10 +161,7 @@ io.on("connection", (socket) => {
         sender: message.sender,
       };
 
-      // Emit to receiver in real-time (if online)
       io.to(`user:${receiverId}`).emit("new-message", messageData);
-
-      // Also send back to sender with full data
       socket.emit("message-sent", messageData);
 
       console.log(`[WS] Message envoyé: ${userId} -> ${receiverId}`);
@@ -142,7 +173,6 @@ io.on("connection", (socket) => {
 
   // Mark messages as read
   socket.on("mark-read", async (data: { senderId: string }) => {
-    const userId = (socket as any).userId;
     if (!userId || !data.senderId) return;
 
     try {
@@ -155,10 +185,7 @@ io.on("connection", (socket) => {
         data: { isRead: true },
       });
 
-      // Notify the sender that messages were read
-      io.to(`user:${data.senderId}`).emit("messages-read", {
-        readBy: userId,
-      });
+      io.to(`user:${data.senderId}`).emit("messages-read", { readBy: userId });
     } catch {
       // ignore
     }
@@ -166,9 +193,7 @@ io.on("connection", (socket) => {
 
   // Typing indicator
   socket.on("typing", (data: TypingData) => {
-    const userId = (socket as any).userId;
     if (!userId) return;
-
     io.to(`user:${data.receiverId}`).emit("typing-indicator", {
       userId,
       isTyping: data.isTyping,
@@ -177,7 +202,6 @@ io.on("connection", (socket) => {
 
   // Load conversation history
   socket.on("load-conversation", async (data: { otherUserId: string }) => {
-    const userId = (socket as any).userId;
     if (!userId || !data.otherUserId) return;
 
     try {
@@ -196,7 +220,6 @@ io.on("connection", (socket) => {
         },
       });
 
-      // Mark unread as read
       const unreadIds = messages
         .filter((m) => m.receiverId === userId && !m.isRead)
         .map((m) => m.id);
@@ -207,13 +230,9 @@ io.on("connection", (socket) => {
           data: { isRead: true },
         });
 
-        // Notify sender that messages were read
-        io.to(`user:${data.otherUserId}`).emit("messages-read", {
-          readBy: userId,
-        });
+        io.to(`user:${data.otherUserId}`).emit("messages-read", { readBy: userId });
       }
 
-      // Get other user info
       const otherUser = await prisma.user.findUnique({
         where: { id: data.otherUserId },
         select: { id: true, name: true, role: true, avatarUrl: true },
@@ -239,17 +258,12 @@ io.on("connection", (socket) => {
 
   // Disconnect
   socket.on("disconnect", () => {
-    const userId = (socket as any).userId;
     if (userId) {
       removeOnlineUser(userId, socket.id);
       console.log(`[WS] Déconnexion: ${userId} (socket: ${socket.id})`);
 
-      // If user has no more active sockets, broadcast offline
       if (!isUserOnline(userId)) {
-        socket.broadcast.emit("user-status", {
-          userId,
-          isOnline: false,
-        });
+        socket.broadcast.emit("user-status", { userId, isOnline: false });
       }
     }
   });
@@ -259,24 +273,18 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = 3003;
+const PORT = parseInt(process.env.WS_PORT || "3003", 10);
 httpServer.listen(PORT, () => {
   console.log(`🚀 Serveur WebSocket démarré sur le port ${PORT}`);
 });
 
 // Graceful shutdown
-process.on("SIGTERM", async () => {
+async function shutdown() {
   console.log("Arrêt du serveur WebSocket...");
   httpServer.close(async () => {
     await prisma.$disconnect();
     process.exit(0);
   });
-});
-
-process.on("SIGINT", async () => {
-  console.log("Arrêt du serveur WebSocket...");
-  httpServer.close(async () => {
-    await prisma.$disconnect();
-    process.exit(0);
-  });
-});
+}
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

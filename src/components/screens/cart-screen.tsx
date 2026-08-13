@@ -20,9 +20,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/empty-state";
+import { GuestPrompt } from "@/components/ui/guest-prompt";
 
 export function CartScreen() {
   const navigate = useAppStore((s) => s.navigate);
+  const user = useAppStore((s) => s.user);
   const cart = useAppStore((s) => s.cart);
   const cartTotal = useAppStore((s) => s.cartTotal());
   const updateQty = useAppStore((s) => s.updateCartQuantity);
@@ -39,6 +41,19 @@ export function CartScreen() {
   async function handleCheckout() {
     navigator.vibrate?.(10);
     navigate("checkout");
+  }
+
+  if (!user) {
+    return (
+      <div className="flex flex-col">
+        <AppHeader title="Mon panier" showBack />
+        <GuestPrompt
+          icon={ShoppingBag}
+          title="Connexion requise"
+          description="Connectez-vous pour accéder à votre panier et passer commande."
+        />
+      </div>
+    );
   }
 
   if (cart.length === 0) {

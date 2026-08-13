@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, unlink, readFile } from "fs/promises";
+import { writeFile, unlink } from "fs/promises";
 import { tmpdir } from "os";
 import { join, resolve } from "path";
-import { exec } from "child_process";
+import { execFile } from "child_process";
 import { promisify } from "util";
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 const PROJECT_ROOT = resolve(process.cwd());
 const PYTHON_BIN = process.env.PYTHON_BIN || join(PROJECT_ROOT, ".venv-speech/bin/python3");
 const WHISPER_MODEL = process.env.WHISPER_MODEL || "small";
+
+// Allowlist of ISO-639-1 codes accepted as the transcription language. Anything
+// else is rejected to avoid passing untrusted input to the child process.
+const ALLOWED_LANGS = new Set(["fr", "en", "ar", "es", "de", "it", "pt"]);
+// Allowlist of whisper model sizes to avoid untrusted input.
+const ALLOWED_MODELS = new Set(["tiny", "base", "small", "medium", "large"]);
 
 const TRANSCRIBE_SCRIPT = `
 import sys, json, os
@@ -33,7 +39,13 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const audio = formData.get("audio") as File | null;
-    const lang = (formData.get("lang") as string) || "fr";
+    const rawLang = (formData.get("lang") as string) || "fr";
+    // Validate against an allowlist; default to French. Strip anything after "-".
+    const lang = rawLang.split("-")[0].toLowerCase();
+    if (!ALLOWED_LANGS.has(lang)) {
+      return NextResponse.json({ error: "Langue non supportée" }, { status: 400 });
+    }
+    const model = ALLOWED_MODELS.has(WHISPER_MODEL) ? WHISPER_MODEL : "small";
 
     if (!audio) {
       return NextResponse.json({ error: "Aucun audio fourni" }, { status: 400 });
@@ -48,11 +60,15 @@ export async function POST(req: NextRequest) {
     await writeFile(tmpAudio, Buffer.from(arrayBuffer));
     await writeFile(tmpScript, TRANSCRIBE_SCRIPT);
 
-    const cmd = `"${PYTHON_BIN}" "${tmpScript}" "${tmpAudio}" "${lang}" "${WHISPER_MODEL}"`;
-    const result = await execAsync(cmd, {
-      timeout: 120_000,
-      maxBuffer: 10 * 1024 * 1024,
-    });
+    // execFile (not exec): no shell, so arguments cannot trigger command substitution.
+    const result = await execFileAsync(
+      PYTHON_BIN,
+      [tmpScript, tmpAudio, lang, model],
+      {
+        timeout: 120_000,
+        maxBuffer: 10 * 1024 * 1024,
+      }
+    );
 
     const output = JSON.parse(result.stdout.trim());
     if (output.error) {

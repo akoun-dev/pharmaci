@@ -83,11 +83,13 @@ export function ServiceBadges({
 export function StatusBadge({
   isOnGuard,
   isOpen24h,
+  hideGuard = false,
 }: {
   isOnGuard: boolean;
   isOpen24h: boolean;
+  hideGuard?: boolean;
 }) {
-  if (isOnGuard) {
+  if (isOnGuard && !hideGuard) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[11px] font-bold text-orange-500">
         DE GARDE
@@ -114,6 +116,7 @@ interface PharmacyCardProps {
   userLng?: number;
   onClick?: () => void;
   compact?: boolean;
+  hideGuard?: boolean;
 }
 
 export function PharmacyCard({
@@ -122,6 +125,7 @@ export function PharmacyCard({
   userLng,
   onClick,
   compact = false,
+  hideGuard = false,
 }: PharmacyCardProps) {
   const distance =
     userLat != null && userLng != null
@@ -146,7 +150,7 @@ export function PharmacyCard({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           <div className="absolute left-3 top-3">
-            <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} />
+            <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} hideGuard={hideGuard} />
           </div>
           <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between">
             <h3 className="text-base font-bold text-white drop-shadow">
@@ -159,7 +163,7 @@ export function PharmacyCard({
         {compact && (
           <div className="flex items-start justify-between gap-2">
             <h3 className="text-sm font-bold text-foreground">{pharmacy.name}</h3>
-            <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} />
+            <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} hideGuard={hideGuard} />
           </div>
         )}
         <div className="flex items-center gap-2">
@@ -214,12 +218,14 @@ export function PharmacyCardCompact({
   userLng,
   isFavorite,
   onClick,
+  hideGuard = false,
 }: {
   pharmacy: Pharmacy;
   userLat?: number;
   userLng?: number;
   isFavorite?: boolean;
   onClick?: () => void;
+  hideGuard?: boolean;
 }) {
   const distance =
     userLat != null && userLng != null
@@ -241,7 +247,7 @@ export function PharmacyCardCompact({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           <div className="absolute left-2 top-2">
-            <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} />
+            <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} hideGuard={hideGuard} />
           </div>
           {isFavorite && (
             <div className="absolute right-2 top-2">
@@ -258,7 +264,7 @@ export function PharmacyCardCompact({
             {pharmacy.name.charAt(0)}
           </span>
           <div className="absolute left-2 top-2">
-            <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} />
+            <StatusBadge isOnGuard={pharmacy.isOnGuard} isOpen24h={pharmacy.isOpen24h} hideGuard={hideGuard} />
           </div>
           {isFavorite && (
             <div className="absolute right-2 top-2">

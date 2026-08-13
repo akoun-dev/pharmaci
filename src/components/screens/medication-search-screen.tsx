@@ -24,6 +24,7 @@ export function MedicationSearchScreen() {
   const params = useAppStore((s) => s.nav.params);
   const addRecentSearch = useAppStore((s) => s.addRecentSearch);
   const pushToast = useAppStore((s) => s.pushToast);
+  const user = useAppStore((s) => s.user);
 
   const [search, setSearch] = useState(params.q || "");
   const [category, setCategory] = useState(params.category || "Tous");
@@ -194,14 +195,16 @@ export function MedicationSearchScreen() {
             className="h-11 rounded-xl border-primary/20 bg-primary/5 pl-9 pr-12"
             autoFocus
           />
-          <button
-            onClick={startListening}
-            disabled={isListening}
-            className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
-            aria-label="Recherche vocale"
-          >
-            <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
-          </button>
+          {user && (
+            <button
+              onClick={startListening}
+              disabled={isListening}
+              className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+              aria-label="Recherche vocale"
+            >
+              <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
+            </button>
+          )}
           {/* Suggestions dropdown */}
           {showSuggestions && (
             <div

@@ -7,6 +7,7 @@ import {
   setAuthCookie,
   type SessionUser,
 } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limit";
 
 const loginSchema = z.object({
   email: z.string().email("Adresse e-mail invalide"),
@@ -29,6 +30,14 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password } = parsed.data;
+
+    // Rate limit login attempts per IP + email to slow brute-force attacks.
+    const limited = rateLimit(request, {
+      limit: 10,
+      windowMs: 15 * 60 * 1000,
+      keyExtra: email.toLowerCase(),
+    });
+    if (limited) return limited;
 
     // Find user by email (include password for verification)
     const user = await db.user.findUnique({

@@ -49,6 +49,39 @@ const MapScreen = dynamic(
   }
 );
 
+// Client-side role guard. Defense in depth: every /api/admin and /api/pharmacist
+// route also rejects unauthorized callers, but we don't render the privileged
+// UI in the first place if the role doesn't match.
+function requireRole(
+  user: { role: string } | null,
+  roles: string[],
+  screen: ReactNode
+): ReactNode {
+  if (!user || !roles.includes(user.role)) {
+    return <AccessDenied />;
+  }
+  return screen;
+}
+
+function AccessDenied() {
+  const setTab = useAppStore((s) => s.setTab);
+  return (
+    <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
+      <p className="text-4xl font-bold text-muted-foreground/30">403</p>
+      <p className="mt-2 text-sm font-medium text-foreground">Accès non autorisé</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Vous n&apos;avez pas les permissions requises pour consulter cette page.
+      </p>
+      <button
+        onClick={() => setTab("home")}
+        className="mt-4 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+      >
+        Retour à l&apos;accueil
+      </button>
+    </div>
+  );
+}
+
 function ScreenRouter() {
   const tab = useAppStore((s) => s.nav.tab);
   const view = useAppStore((s) => s.nav.view);
@@ -58,7 +91,7 @@ function ScreenRouter() {
 
   let screen: ReactNode;
 
-  // Notifications views (accessible from any tab)
+  // Notifications views (accessible from any authenticated tab)
   if (view === "notifications") {
     screen = <NotificationsScreen />;
   } else if (view === "notification-detail") {
@@ -68,19 +101,20 @@ function ScreenRouter() {
   } else if (view === "chat") {
     screen = <ChatScreen />;
   } else if (view === "scan-order") {
-    screen = <ScanOrderScreen />;
+    // Scan-order (look up a customer order by code) is a pharmacist action.
+    screen = requireRole(user, ["PHARMACIST"], <ScanOrderScreen />);
   } else if (view === "pharmacist-stock") {
-    screen = <PharmacistStockScreen />;
+    screen = requireRole(user, ["PHARMACIST"], <PharmacistStockScreen />);
   } else if (view === "pharmacist-pharmacy") {
-    screen = <PharmacistPharmacyScreen />;
+    screen = requireRole(user, ["PHARMACIST"], <PharmacistPharmacyScreen />);
   } else if (view === "pharmacist-order-detail") {
-    screen = <OrderDetailScreen />;
+    screen = requireRole(user, ["PHARMACIST", "ADMIN"], <OrderDetailScreen />);
   } else if (view === "admin-users") {
-    screen = <AdminUsersScreen />;
+    screen = requireRole(user, ["ADMIN"], <AdminUsersScreen />);
   } else if (view === "admin-pharmacies") {
-    screen = <AdminPharmaciesScreen />;
+    screen = requireRole(user, ["ADMIN"], <AdminPharmaciesScreen />);
   } else if (view === "admin-orders") {
-    screen = <AdminOrdersScreen />;
+    screen = requireRole(user, ["ADMIN"], <AdminOrdersScreen />);
   } else if (view === "medication-detail") {
     screen = <MedicationDetailScreen />;
   } else if (view === "pharmacy-detail") {
@@ -119,10 +153,12 @@ function ScreenRouter() {
     else if (user?.role === "PHARMACIST") screen = <PharmacistOrdersScreen />;
     else screen = <OrdersScreen />;
   } else if (tab === "pharmacist") {
-    if (view === "pharmacist-pharmacy") screen = <PharmacistPharmacyScreen />;
+    if (!user || user.role !== "PHARMACIST") {
+      screen = <AccessDenied />;
+    } else if (view === "pharmacist-pharmacy") screen = <PharmacistPharmacyScreen />;
     else screen = <PharmacistDashboardScreen />;
   } else if (tab === "admin") {
-    screen = <AdminDashboardScreen />;
+    screen = requireRole(user, ["ADMIN"], <AdminDashboardScreen />);
   } else if (tab === "profile") {
     if (view === "edit-profile") screen = <EditProfileScreen />;
     else if (view === "change-password") screen = <ChangePasswordScreen />;
@@ -164,9 +200,19 @@ function AppShell() {
   useEffect(() => {
     if (!user) return;
     let eventSource: EventSource | null = null;
-    let reconnectTimer: ReturnType<typeof setTimeout>;
+    let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
 
     function connectSSE() {
+      // Close any pre-existing connection and clear a pending reconnect timer
+      // so we never end up with overlapping EventSource streams.
+      if (eventSource) {
+        eventSource.close();
+        eventSource = null;
+      }
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = undefined;
+      }
       try {
         eventSource = new EventSource("/api/notifications/stream");
 

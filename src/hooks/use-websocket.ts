@@ -56,26 +56,25 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   useEffect(() => {
     if (!user) return;
 
-    const socketInstance = io("/?XTransformPort=3003", {
+    // Connect on the same origin (proxied to the WS service by Caddy/the dev
+    // proxy) so the http-only auth cookie is sent automatically. Authentication
+    // is enforced server-side via the JWT in that cookie; the client no longer
+    // sends a trust-on-client `userId`.
+    const socketInstance = io({
+      path: "/socket.io/",
       transports: ["websocket", "polling"],
-      forceNew: true,
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       timeout: 10000,
+      withCredentials: true,
     });
 
     socketRef.current = socketInstance;
 
     socketInstance.on("connect", () => {
       setIsConnected(true);
-
-      // Identify ourselves
-      socketInstance.emit("identify", {
-        userId: user.id,
-        token: "authenticated",
-      });
     });
 
     socketInstance.on("disconnect", () => {

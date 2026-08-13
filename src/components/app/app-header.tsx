@@ -31,6 +31,7 @@ export function AppHeader({
   const canGoBack = useAppStore((s) => s.nav.history.length > 0);
   const pushToast = useAppStore((s) => s.pushToast);
   const navigate = useAppStore((s) => s.navigate);
+  const user = useAppStore((s) => s.user);
   const cartCount = useAppStore((s) => s.cartCount());
   const notificationCount = useAppStore((s) => s.notificationCount);
   const { theme, setTheme } = useTheme();
@@ -64,7 +65,7 @@ export function AppHeader({
       )}
       <div className="flex-1" />
       {rightSlot}
-      {showCart && (
+      {showCart && user && (
         <button
           onClick={() => navigate("cart")}
           className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"

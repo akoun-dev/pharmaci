@@ -7,6 +7,20 @@ const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET environment variable is required");
 }
+// Reject weak/known-default secrets in production to prevent token forgery.
+const KNOWN_WEAK_SECRETS = new Set([
+  "pharmaci-secret-key-change-in-production-2026",
+  "change-me",
+  "secret",
+]);
+if (
+  process.env.NODE_ENV === "production" &&
+  (JWT_SECRET.length < 32 || KNOWN_WEAK_SECRETS.has(JWT_SECRET))
+) {
+  throw new Error(
+    "JWT_SECRET must be a strong random value (>= 32 chars) in production. Rotate it immediately."
+  );
+}
 const encodedSecret = new TextEncoder().encode(JWT_SECRET);
 
 const COOKIE_NAME = "pharmaci-token";
@@ -79,13 +93,28 @@ export async function clearAuthCookie() {
   cookieStore.delete(COOKIE_NAME);
 }
 
-// Get the current user from the database (full record)
+// Get the current user from the database (full record minus password hash)
 export async function getCurrentUser() {
   const session = await getSession();
   if (!session) return null;
   const user = await db.user.findUnique({
     where: { id: session.id },
-    include: { pharmacy: true },
+    // Never load the password hash into memory unless explicitly needed.
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      phone: true,
+      address: true,
+      city: true,
+      district: true,
+      avatarUrl: true,
+      createdAt: true,
+      updatedAt: true,
+      password: true, // needed by change-password; stripped from API responses by each route's select
+      pharmacy: true,
+    },
   });
   return user;
 }

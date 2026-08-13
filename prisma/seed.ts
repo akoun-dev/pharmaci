@@ -4,7 +4,15 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seeding PHARMACI database...");
+  // Never seed demo accounts (incl. a known admin) into a production database.
+  // The seed is a dev-only convenience and must not run in production.
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "Refusing to seed the database in production. Demo accounts (including a known admin) are dev-only. Create the first admin out-of-band instead."
+    );
+  }
+
+  console.log("🌱 Seeding PHARMACI database (dev)...");
 
   // ---------- USERS ----------
   const patientPassword = await bcrypt.hash("patient123", 10);
@@ -570,10 +578,9 @@ async function main() {
     console.log(`   ✓ Order ${created.code} created`);
   }
 
-  console.log("✅ Seed completed!");
-  console.log("   Patient:  patient@pharmaci.ci / patient123");
-  console.log("   Pharmacist: pharma@pharmaci.ci / pharma123");
-  console.log("   Admin:    admin@pharmaci.ci / admin123");
+  // Do NOT print credentials to stdout. Operators who need the demo accounts
+  // should read COMPTES_TEST.md (dev-only, gitignored) or set them explicitly.
+  console.log("✅ Seed completed (dev). See COMPTES_TEST.md for demo credentials.");
 }
 
 main()

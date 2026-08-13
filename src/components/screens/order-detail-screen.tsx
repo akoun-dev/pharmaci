@@ -155,10 +155,10 @@ export function OrderDetailScreen() {
             <span
               className={cn(
                 "rounded-full px-3 py-1 text-xs font-bold",
-                ORDER_STATUS[order.status].color
+                (ORDER_STATUS[order.status] ?? { color: "bg-muted text-muted-foreground" }).color
               )}
             >
-              {ORDER_STATUS[order.status].label}
+              {(ORDER_STATUS[order.status] ?? { label: order.status }).label}
             </span>
             <span className="text-xs text-muted-foreground">
               {formatDate(order.createdAt)}

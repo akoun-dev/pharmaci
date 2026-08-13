@@ -63,4 +63,9 @@ server.log
 *.db-journal
 prisma/dev.db
 prisma/dev.db-journal.venv-speech
+db/
+prisma/db/
 models/
+
+# Test accounts / credentials docs
+COMPTES_TEST.md

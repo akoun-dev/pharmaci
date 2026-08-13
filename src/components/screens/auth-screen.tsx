@@ -21,7 +21,6 @@ import { Logo } from "@/components/app/logo";
 import { ForgotPasswordModal } from "@/components/app/forgot-password-modal";
 import { authApi } from "@/lib/api";
 import { useAppStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
 
 type Mode = "login" | "register";
 
@@ -37,7 +36,6 @@ export function AuthScreen() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [selectedRole, setSelectedRole] = useState<"PATIENT" | "PHARMACIST">("PATIENT");
 
   const setUser = useAppStore((s) => s.setUser);
   const setTab = useAppStore((s) => s.setTab);
@@ -66,12 +64,13 @@ export function AuthScreen() {
         if (password.length < 6) {
           throw new Error("Le mot de passe doit contenir au moins 6 caractères");
         }
+        // Self-registration is PATIENT-only. Pharmacist/admin accounts are
+        // created by an admin via /api/admin/users.
         const { user } = await authApi.register({
           name: name.trim(),
           email,
           password,
           phone: phone || undefined,
-          role: selectedRole,
         });
         setUser(user);
         redirectByRole(user.role);
@@ -82,13 +81,6 @@ export function AuthScreen() {
     } finally {
       setLoading(false);
     }
-  }
-
-  function fillDemo() {
-    setEmail("patient@pharmaci.ci");
-    setPassword("patient123");
-    setMode("login");
-    setError(null);
   }
 
   return (
@@ -251,47 +243,7 @@ export function AuthScreen() {
             </Button>
           </form>
 
-          {/* Role selection for registration */}
-          {mode === "register" && (
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-muted-foreground">
-                VOUS ÊTES
-              </Label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedRole("PATIENT")}
-                  className={cn(
-                    "rounded-xl border p-3 text-center text-sm font-medium transition-all",
-                    selectedRole === "PATIENT"
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:border-primary/40"
-                  )}
-                >
-                  <User className="mx-auto h-5 w-5 mb-1" />
-                  Patient
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedRole("PHARMACIST")}
-                  className={cn(
-                    "rounded-xl border p-3 text-center text-sm font-medium transition-all",
-                    selectedRole === "PHARMACIST"
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:border-primary/40"
-                  )}
-                >
-                  <svg className="mx-auto h-5 w-5 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 12l2 2 4-4" />
-                    <path d="M3 7V5a2 2 0 012-2h2" />
-                    <path d="M21 7V5a2 2 0 00-2-2h-2" />
-                    <rect x="7" y="12" width="10" height="9" rx="1" />
-                  </svg>
-                  Pharmacien
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Role selection for registration — removed: self-registration is patient-only */}
 
           {/* Switch mode */}
           <p className="mt-6 text-center text-sm text-muted-foreground">

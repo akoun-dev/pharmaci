@@ -13,8 +13,10 @@ const registerSchema = z.object({
   email: z.string().email("Adresse e-mail invalide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
   phone: z.string().optional(),
-  role: z.enum(["PATIENT", "PHARMACIST"]).optional().default("PATIENT"),
 });
+
+// Self-registration is PATIENT-only. Pharmacist/admin accounts must be created
+// by an admin (see /api/admin/users) to prevent privilege escalation.
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,7 +33,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, password, phone, role } = parsed.data;
+    const { name, email, password, phone } = parsed.data;
+    const role = "PATIENT" as const;
 
     // Check if email already exists
     const existingUser = await db.user.findUnique({

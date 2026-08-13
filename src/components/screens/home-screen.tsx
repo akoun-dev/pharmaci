@@ -43,6 +43,7 @@ export function HomeScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const setTab = useAppStore((s) => s.setTab);
   const user = useAppStore((s) => s.user);
+  const guestMode = useAppStore((s) => s.guestMode);
   const pushToast = useAppStore((s) => s.pushToast);
   const addRecentSearch = useAppStore((s) => s.addRecentSearch);
   const recentSearches = useAppStore((s) => s.recentSearches);
@@ -374,7 +375,7 @@ export function HomeScreen() {
             className="h-11 rounded-xl border-primary/20 bg-primary/5 pl-9 pr-12"
           />
           <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
-            {barcodeSupported && (
+            {barcodeSupported && user && (
               <button
                 onClick={() => setShowScanner(true)}
                 className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
@@ -383,14 +384,16 @@ export function HomeScreen() {
                 <Camera className="h-4 w-4" />
               </button>
             )}
-            <button
-              onClick={startListening}
-              disabled={isListening}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
-              aria-label="Recherche vocale"
-            >
-              <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
-            </button>
+            {user && (
+              <button
+                onClick={startListening}
+                disabled={isListening}
+                className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+                aria-label="Recherche vocale"
+              >
+                <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
+              </button>
+            )}
           </div>
           {/* Suggestions dropdown */}
           {showSuggestions && (
@@ -447,14 +450,16 @@ export function HomeScreen() {
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
-                      {p.isOnGuard && (
+                      {user && p.isOnGuard && (
                         <span className="rounded-full bg-orange-500/10 px-1.5 py-0.5 text-[9px] font-bold text-orange-500">
                           Garde
                         </span>
                       )}
-                      <span className="flex items-center gap-0.5 text-[11px] text-amber-500">
-                        ★ {p.rating.toFixed(1)}
-                      </span>
+                      {user && (
+                        <span className="flex items-center gap-0.5 text-[11px] text-amber-500">
+                          ★ {p.rating.toFixed(1)}
+                        </span>
+                      )}
                     </div>
                   </button>
                 ))
@@ -547,7 +552,7 @@ export function HomeScreen() {
 
       {/* Cart banner */}
       <AnimatePresence>
-        {cart.length > 0 && (
+        {cart.length > 0 && user && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -616,7 +621,8 @@ export function HomeScreen() {
         </div>
       </div>
 
-      {/* Pharmacies de garde - horizontal carousel */}
+      {/* Pharmacies de garde — visiteur : bannière incitative */}
+      {user ? (
       <section className="pt-5">
         <div className="flex items-center justify-between px-4">
           <h2 className="text-base font-bold text-foreground flex items-center gap-1.5">
@@ -658,9 +664,28 @@ export function HomeScreen() {
           </div>
         )}
       </section>
+      ) : (
+        <section className="px-4 pt-5">
+          <button
+            onClick={() => useAppStore.getState().setGuestMode(false)}
+            className="flex w-full items-center gap-3 rounded-2xl border border-dashed border-orange-500/40 bg-orange-500/5 p-4 text-left transition-colors hover:bg-orange-500/10"
+          >
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-orange-500/10 text-orange-500">
+              <Clock className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-foreground">Pharmacies de garde</p>
+              <p className="text-xs text-muted-foreground">
+                Connectez-vous pour voir les pharmacies de garde ouvertes maintenant près de chez vous.
+              </p>
+            </div>
+            <ChevronRight className="h-4 w-4 shrink-0 text-orange-500" />
+          </button>
+        </section>
+      )}
 
       {/* Recently viewed */}
-      {recentlyViewed.length > 0 && (
+      {!guestMode && recentlyViewed.length > 0 && (
         <section className="pt-5 pb-2">
           <div className="flex items-center justify-between px-4">
             <h2 className="flex items-center gap-1.5 text-base font-bold text-foreground">
