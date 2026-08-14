@@ -7,6 +7,7 @@ import {
   setAuthCookie,
   type SessionUser,
 } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limit";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -32,6 +33,13 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Rate limit registration attempts per IP to prevent abuse
+    const limited = rateLimit(request, {
+      limit: 5,
+      windowMs: 15 * 60 * 1000, // 15 minutes
+    });
+    if (limited) return limited;
 
     const { name, email, password, phone } = parsed.data;
     const role = "PATIENT" as const;

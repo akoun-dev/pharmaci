@@ -5,6 +5,11 @@ import { getSession } from "@/lib/auth";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+// Maximum connection duration (30 minutes) to prevent resource exhaustion
+const MAX_CONNECTION_DURATION_MS = 30 * 60 * 1000;
+// Polling interval increased from 15s to 30s for better performance
+const POLL_INTERVAL_MS = 30000;
+
 // GET /api/notifications/stream - SSE endpoint for real-time order notifications
 // Supports PATIENT, PHARMACIST, and ADMIN roles
 export async function GET(req: NextRequest) {
@@ -14,6 +19,12 @@ export async function GET(req: NextRequest) {
   }
 
   const encoder = new TextEncoder();
+  
+  // Set a timeout to close the connection after max duration
+  const connectionStartTime = Date.now();
+  const maxDurationTimeout = setTimeout(() => {
+    // Connection will be closed by returning from the start function
+  }, MAX_CONNECTION_DURATION_MS);
 
   let previousStatusMap = new Map<string, string>();
   let previousPendingCount = 0;
@@ -26,6 +37,13 @@ export async function GET(req: NextRequest) {
       );
 
       const poll = async () => {
+        // Check if we've exceeded max connection duration
+        if (Date.now() - connectionStartTime > MAX_CONNECTION_DURATION_MS) {
+          controller.close();
+          clearTimeout(maxDurationTimeout);
+          return;
+        }
+        
         try {
           let where: Record<string, unknown> = {};
           let role: string = session.role;
@@ -135,12 +153,13 @@ export async function GET(req: NextRequest) {
       // Initial poll
       await poll();
 
-      // Poll every 15 seconds
-      const interval = setInterval(poll, 15000);
+      // Poll every 30 seconds (reduced from 15s for better performance)
+      const interval = setInterval(poll, POLL_INTERVAL_MS);
 
       // Cleanup on close
       req.signal.addEventListener("abort", () => {
         clearInterval(interval);
+        clearTimeout(maxDurationTimeout);
       });
     },
   });

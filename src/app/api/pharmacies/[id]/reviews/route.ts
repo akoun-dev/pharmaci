@@ -105,6 +105,15 @@ export async function POST(
       );
     }
 
+    // Rate limit review submissions per user to prevent spam
+    const { rateLimit } = await import("@/lib/rate-limit");
+    const limited = rateLimit(req, {
+      limit: 5,
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      keyExtra: `review:${user.id}`,
+    });
+    if (limited) return limited;
+
     // Vérifier que la pharmacie existe
     const pharmacy = await db.pharmacy.findUnique({
       where: { id },
