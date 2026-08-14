@@ -66,6 +66,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
+  // Rate limit message sending per user to prevent spam
+  const { rateLimit } = await import("@/lib/rate-limit");
+  const limited = rateLimit(req, {
+    limit: 10,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    keyExtra: `msg:${user.id}`,
+  });
+  if (limited) return limited;
+
   let body: unknown;
   try {
     body = await req.json();

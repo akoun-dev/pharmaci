@@ -1,12 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { rateLimit } from "@/lib/rate-limit";
 
 const RESET_CODES = new Map<string, { email: string; expiresAt: Date }>();
 
+// Cleanup expired codes every 5 minutes to prevent memory leaks
+if (typeof globalThis !== "undefined" && !(globalThis as any).__resetCodeCleanup) {
+  (globalThis as any).__resetCodeCleanup = setInterval(() => {
+    const now = Date.now();
+    let deleted = 0;
+    for (const [code, data] of RESET_CODES.entries()) {
+      if (now > data.expiresAt.getTime()) {
+        RESET_CODES.delete(code);
+        deleted++;
+      }
+    }
+    if (deleted > 0) {
+      console.debug(`[ForgotPassword] Cleaned up ${deleted} expired codes`);
+    }
+  }, 5 * 60 * 1000);
+  
+  // Allow cleanup in tests
+  if (typeof process !== "undefined" && process.env.NODE_ENV === "test") {
+    clearInterval((globalThis as any).__resetCodeCleanup);
+    (globalThis as any).__resetCodeCleanup = null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit forgot-password requests per IP+email to prevent abuse
     const body = await request.json();
-    const { email } = body;
+    const email = body?.email;
+    
+    const limited = rateLimit(request, {
+      limit: 3,
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      keyExtra: email || "unknown",
+    });
+    if (limited) return limited;
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(
@@ -34,8 +66,10 @@ export async function POST(request: NextRequest) {
 
     RESET_CODES.set(code, { email: email.toLowerCase(), expiresAt });
 
-    // In production, send email here
-    console.log(`[FORGOT PASSWORD] Code for ${email}: ${code}`);
+    // In production, send email here - NEVER log reset codes in production
+    if (process.env.NODE_ENV === "development") {
+      console.log(`[FORGOT PASSWORD] Code for ${email}: ${code}`);
+    }
 
     return NextResponse.json({
       success: true,

@@ -1,19 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Simple in-memory sliding-window rate limiter.
+ * Simple in-memory sliding-window rate limiter with automatic expiration.
  *
  * Suitable for a single-server deployment. For multi-instance production,
  * replace the store with Redis (or Upstash) keyed by identifier.
  *
  * Entries older than `windowMs` are pruned lazily on each check.
+ * A cleanup interval removes stale entries to prevent memory leaks.
  */
 
 interface Bucket {
   hits: number[];
+  lastAccess: number;
 }
 
 const buckets = new Map<string, Bucket>();
+const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // Cleanup every 5 minutes
+
+// Start cleanup interval to prevent memory leaks
+if (typeof globalThis !== "undefined" && !(globalThis as any).__rateLimitCleanup) {
+  (globalThis as any).__rateLimitCleanup = setInterval(() => {
+    const now = Date.now();
+    let deleted = 0;
+    for (const [key, bucket] of buckets.entries()) {
+      // Remove buckets that haven't been accessed in 2x the max window or are empty
+      if (now - bucket.lastAccess > 2 * 60 * 60 * 1000 || bucket.hits.length === 0) {
+        buckets.delete(key);
+        deleted++;
+      }
+    }
+    if (deleted > 0) {
+      console.debug(`[RateLimit] Cleaned up ${deleted} stale buckets`);
+    }
+  }, CLEANUP_INTERVAL_MS);
+  
+  // Allow cleanup in tests
+  if (typeof process !== "undefined" && process.env.NODE_ENV === "test") {
+    clearInterval((globalThis as any).__rateLimitCleanup);
+    (globalThis as any).__rateLimitCleanup = null;
+  }
+}
 
 function getClientKey(req: NextRequest): string {
   // Prefer the forwarded IP (behind Caddy), fall back to the raw remote.
@@ -37,7 +64,12 @@ export function rateLimit(
   const now = Date.now();
   const cutoff = now - opts.windowMs;
 
-  const bucket = buckets.get(key) ?? { hits: [] };
+  const existingBucket = buckets.get(key);
+  const bucket = existingBucket ?? { hits: [], lastAccess: now };
+  
+  // Update last access time
+  bucket.lastAccess = now;
+  
   // Drop entries outside the window.
   bucket.hits = bucket.hits.filter((t) => t > cutoff);
 
