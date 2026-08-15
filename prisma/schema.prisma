@@ -22,6 +22,7 @@ model User {
   city         String?
   district     String?
   avatarUrl    String?
+  isActive     Boolean  @default(true) // false once the account has been deleted/anonymized
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

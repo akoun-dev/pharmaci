@@ -15,6 +15,8 @@ import {
   LogIn,
   Package,
   CreditCard,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
@@ -22,6 +24,7 @@ import { useAppStore } from "@/lib/store";
 import { authApi, pharmacyApi, orderApi, type Pharmacy, formatFCFA } from "@/lib/api";
 import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -34,6 +37,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export function ProfileScreen() {
   const user = useAppStore((s) => s.user);
@@ -49,6 +60,10 @@ export function ProfileScreen() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   // Personal statistics
   const [orderCount, setOrderCount] = useState(0);
@@ -90,6 +105,25 @@ export function ProfileScreen() {
 
   async function handleLogout() {
     setShowLogoutDialog(true);
+  }
+
+  async function handleDeleteAccount() {
+    if (!deletePassword) {
+      setDeleteError("Veuillez saisir votre mot de passe.");
+      return;
+    }
+    setDeletingAccount(true);
+    setDeleteError(null);
+    try {
+      await authApi.deleteAccount(deletePassword);
+      setShowDeleteDialog(false);
+      logout();
+      pushToast("Votre compte a été supprimé.", "info");
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Une erreur est survenue.");
+    } finally {
+      setDeletingAccount(false);
+    }
   }
 
   async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -399,27 +433,74 @@ export function ProfileScreen() {
       </AlertDialog>
 
       {/* Delete account confirmation dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent className="max-w-sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer votre compte ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. Toutes vos données seront supprimées définitivement.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                pushToast("La suppression de compte n'est pas encore disponible.", "info");
-              }}
+      <Dialog
+        open={showDeleteDialog}
+        onOpenChange={(v) => {
+          setShowDeleteDialog(v);
+          if (!v) {
+            setDeletePassword("");
+            setDeleteError(null);
+            setShowDeletePassword(false);
+          }
+        }}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Supprimer votre compte ?</DialogTitle>
+            <DialogDescription>
+              Cette action est irréversible. Votre profil sera définitivement anonymisé et vous
+              serez déconnecté. Confirmez avec votre mot de passe.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <div className="relative">
+              <Input
+                type={showDeletePassword ? "text" : "password"}
+                value={deletePassword}
+                onChange={(e) => {
+                  setDeletePassword(e.target.value);
+                  setDeleteError(null);
+                }}
+                placeholder="Mot de passe"
+                autoComplete="current-password"
+                disabled={deletingAccount}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void handleDeleteAccount();
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowDeletePassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                aria-label={showDeletePassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              >
+                {showDeletePassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {deleteError && <p className="text-xs text-red-500">{deleteError}</p>}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={deletingAccount}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={() => void handleDeleteAccount()}
+              disabled={deletingAccount}
               className="bg-red-600 text-white hover:bg-red-700"
             >
-              Supprimer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+              {deletingAccount ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Supprimer"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

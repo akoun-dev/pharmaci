@@ -146,6 +146,8 @@ export const authApi = {
       currentPassword,
       newPassword,
     }),
+  deleteAccount: (password: string) =>
+    api.post<{ success: boolean }>("/api/auth/delete-account", { password }),
 };
 
 // ---------- Medications ----------

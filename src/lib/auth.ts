@@ -2,6 +2,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { randomUUID } from "node:crypto";
 import { db } from "@/lib/db";
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -111,13 +112,53 @@ export async function getCurrentUser() {
       city: true,
       district: true,
       avatarUrl: true,
+      isActive: true,
       createdAt: true,
       updatedAt: true,
       password: true, // needed by change-password; stripped from API responses by each route's select
       pharmacy: true,
     },
   });
+  // A deleted/anonymized account keeps its row (for order/review history integrity)
+  // but must never be usable again, even with a still-valid JWT.
+  if (!user || !user.isActive) return null;
   return user;
+}
+
+// Thrown by deactivateUser() when the account can't be removed because it
+// still owns a pharmacy that other users (patients, staff) depend on.
+export class PharmacyOwnerDeletionError extends Error {}
+
+// "Delete" an account without breaking referential integrity: orders,
+// reviews, favorites and messages reference the user and must stay valid
+// for history/audit purposes, so we anonymize the row and disable login
+// instead of hard-deleting it.
+export async function deactivateUser(userId: string) {
+  const target = await db.user.findUnique({
+    where: { id: userId },
+    select: { pharmacy: { select: { id: true, name: true } } },
+  });
+  if (target?.pharmacy) {
+    throw new PharmacyOwnerDeletionError(
+      `Impossible de supprimer ce compte : il possède la pharmacie « ${target.pharmacy.name} ». Réassignez ou supprimez d'abord cette pharmacie.`
+    );
+  }
+
+  const unusablePassword = await hashPassword(`${randomUUID()}${randomUUID()}`);
+  return db.user.update({
+    where: { id: userId },
+    data: {
+      isActive: false,
+      email: `deleted-${userId}@pharmaci.invalid`,
+      name: "Compte supprimé",
+      phone: null,
+      address: null,
+      city: null,
+      district: null,
+      avatarUrl: null,
+      password: unusablePassword,
+    },
+  });
 }
 
 // Generate a unique order code

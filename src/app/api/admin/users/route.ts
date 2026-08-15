@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
-import { requireRole } from "@/lib/auth";
+import { requireRole, deactivateUser, PharmacyOwnerDeletionError } from "@/lib/auth";
 
 const updateUserSchema = z.object({
   role: z.enum(["PATIENT", "PHARMACIST", "ADMIN"]).optional(),
@@ -19,7 +19,6 @@ export async function GET(req: Request) {
   try {
     const adminGuard = await requireRole("ADMIN");
     if (!adminGuard.ok) return adminGuard.error;
-    const admin = adminGuard.user;
 
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search")?.trim() || "";
@@ -39,11 +38,13 @@ export async function GET(req: Request) {
         }
       : {};
 
-    const andConditions: Record<string, unknown>[] = [];
+    // Deleted/anonymized accounts (isActive: false) never show up in the
+    // admin list or role counts — they're kept only for order/review history.
+    const andConditions: Record<string, unknown>[] = [{ isActive: true }];
     if (search) andConditions.push(searchWhere);
     if (role) andConditions.push({ role });
 
-    const where = andConditions.length > 0 ? { AND: andConditions } : {};
+    const where = { AND: andConditions };
 
     const [users, total, roleGroups] = await Promise.all([
       db.user.findMany({
@@ -71,7 +72,7 @@ export async function GET(req: Request) {
       db.user.groupBy({
         by: ["role"],
         _count: { _all: true },
-        where: searchWhere,
+        where: { isActive: true, ...searchWhere },
       }),
     ]);
 
@@ -126,7 +127,7 @@ export async function PUT(req: Request) {
     }
 
     const existing = await db.user.findUnique({ where: { id: userId } });
-    if (!existing) {
+    if (!existing || !existing.isActive) {
       return NextResponse.json({ error: "Utilisateur introuvable" }, { status: 404 });
     }
 
@@ -142,7 +143,7 @@ export async function PUT(req: Request) {
 
     // Guard: never demote the last remaining admin (would lock the system out).
     if (existing.role === "ADMIN" && newRole !== undefined && newRole !== "ADMIN") {
-      const adminCount = await db.user.count({ where: { role: "ADMIN" } });
+      const adminCount = await db.user.count({ where: { role: "ADMIN", isActive: true } });
       if (adminCount <= 1) {
         return NextResponse.json(
           { error: "Impossible : c'est le dernier compte administrateur" },
@@ -213,6 +214,11 @@ export async function PUT(req: Request) {
 }
 
 // DELETE - Supprimer un utilisateur
+//
+// Users have order/review/message history that must stay intact (and, before
+// this, a hard delete simply failed with a foreign-key error for any user who
+// had ever placed an order), so the account is anonymized and locked out
+// instead — see deactivateUser().
 export async function DELETE(req: Request) {
   try {
     const adminGuard = await requireRole("ADMIN");
@@ -230,36 +236,21 @@ export async function DELETE(req: Request) {
     }
 
     const existing = await db.user.findUnique({ where: { id: userId } });
-    if (!existing) {
+    if (!existing || !existing.isActive) {
       return NextResponse.json({ error: "Utilisateur introuvable" }, { status: 404 });
     }
 
-    // A pharmacy owner can't be deleted while the pharmacy references them.
-    const owned = await db.pharmacy.findUnique({
-      where: { ownerId: userId },
-      select: { id: true, name: true },
-    });
-    if (owned) {
-      return NextResponse.json(
-        {
-          error: `Cet utilisateur possède la pharmacie « ${owned.name} ». Réassignez ou supprimez d'abord cette pharmacie.`,
-        },
-        { status: 409 }
-      );
+    try {
+      await deactivateUser(userId);
+    } catch (error) {
+      if (error instanceof PharmacyOwnerDeletionError) {
+        return NextResponse.json({ error: error.message }, { status: 409 });
+      }
+      throw error;
     }
-
-    await db.user.delete({ where: { id: userId } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    // Foreign-key violation (orders/reviews/messages/favorites still reference
-    // the user) → give the admin an actionable message instead of a raw 500.
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2003") {
-      return NextResponse.json(
-        { error: "Impossible de supprimer : cet utilisateur a des données liées (commandes, avis, messages)." },
-        { status: 409 }
-      );
-    }
     console.error("Admin user delete error:", error);
     return NextResponse.json({ error: "Erreur lors de la suppression" }, { status: 500 });
   }
