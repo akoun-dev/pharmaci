@@ -88,12 +88,10 @@ export function AppHeader({
           className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
           aria-label="Me localiser"
         >
-          <MapPin className="h-3.5 w-3.5" />
-          {userPosition ? (
-            <span className="hidden sm:inline">{userPosition[0].toFixed(3)}, {userPosition[1].toFixed(3)}</span>
-          ) : (
-            <span className="hidden sm:inline">Localiser</span>
-          )}
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
+          <span className="whitespace-nowrap">
+            {userPosition ? `${userPosition[0].toFixed(3)}, ${userPosition[1].toFixed(3)}` : "Localiser"}
+          </span>
         </button>
       )}
       {showCart && user && (
