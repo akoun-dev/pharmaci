@@ -212,13 +212,6 @@ export function ProfileScreen() {
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="truncate text-lg font-bold text-foreground">{user.name}</h2>
-            <p className="text-xs text-muted-foreground">
-              {user.role === "PATIENT"
-                ? "Patient"
-                : user.role === "PHARMACIST"
-                ? "Pharmacien"
-                : "Administrateur"}
-            </p>
             <Button
               onClick={() => navigate("edit-profile")}
               size="sm"
