@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowLeft, Bell, ShoppingCart, MapPin } from "lucide-react";
+import { ArrowLeft, Bell, ShoppingCart, MapPin, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useAppStore } from "@/lib/store";
 import { Logo } from "@/components/app/logo";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ export function AppHeader({
   const userPosition = useAppStore((s) => s.userPosition);
   const cartCount = useAppStore((s) => s.cartCount());
   const notificationCount = useAppStore((s) => s.notificationCount);
+  const { theme, setTheme } = useTheme();
 
   function locateUser() {
     if (!("geolocation" in navigator)) {
@@ -99,6 +101,13 @@ export function AppHeader({
           )}
         </button>
       )}
+      <button
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+        aria-label="Changer le thème"
+      >
+        {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      </button>
       {showCart && user && (
         <button
           onClick={() => navigate("cart")}
