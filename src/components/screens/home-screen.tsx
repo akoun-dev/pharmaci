@@ -282,7 +282,7 @@ export function HomeScreen() {
 
   return (
     <div className="flex flex-col">
-      <VoiceModal open={isListening} />
+      <VoiceModal open={isListening} onStop={stopListening} />
       {/* Header */}
       <AppHeader title="Pharmaci" showLogo showCart />
 
@@ -371,7 +371,6 @@ export function HomeScreen() {
               <button
                 onPointerDown={startListening}
                 onPointerUp={stopListening}
-                onPointerLeave={stopListening}
                 onTouchEnd={stopListening}
                 className={cn(
                   "flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary",

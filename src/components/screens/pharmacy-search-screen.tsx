@@ -116,7 +116,7 @@ export function PharmacySearchScreen() {
 
   return (
     <div className="flex flex-col">
-      <VoiceModal open={isListening} />
+      <VoiceModal open={isListening} onStop={stopListening} />
       <AppHeader title="Recherche pharmacie" showBack showCart />
       <div className="px-4 pt-3">
         <div className="relative">
@@ -132,7 +132,6 @@ export function PharmacySearchScreen() {
             <button
               onPointerDown={startListening}
               onPointerUp={stopListening}
-              onPointerLeave={stopListening}
               onTouchEnd={stopListening}
               className={cn(
                 "absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary",
