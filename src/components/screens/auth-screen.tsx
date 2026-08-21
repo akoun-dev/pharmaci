@@ -40,6 +40,7 @@ export function AuthScreen() {
   const setUser = useAppStore((s) => s.setUser);
   const setTab = useAppStore((s) => s.setTab);
   const pushToast = useAppStore((s) => s.pushToast);
+  const hasLoggedIn = useAppStore((s) => s.hasLoggedIn);
 
   function redirectByRole(role: string) {
     if (role === "PHARMACIST") setTab("pharmacist");
@@ -104,11 +105,15 @@ export function AuthScreen() {
         <div className="mx-auto w-full max-w-md rounded-3xl border border-border/60 bg-card p-6 shadow-sm sm:p-8">
           <div className="mb-6 text-center">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              {mode === "login" ? "Bon retour parmi nous" : "Créer un compte"}
+              {mode === "login"
+                ? hasLoggedIn ? "Bon retour parmi nous" : "Connectez-vous"
+                : "Créer un compte"}
             </h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
               {mode === "login"
-                ? "Connectez-vous pour accéder à vos médicaments et ordonnances."
+                ? hasLoggedIn
+                  ? "Connectez-vous pour accéder à vos médicaments et ordonnances."
+                  : "Entrez vos identifiants pour commencer."
                 : "Inscrivez-vous pour rechercher médicaments et pharmacies."}
             </p>
           </div>

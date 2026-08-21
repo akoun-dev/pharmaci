@@ -51,6 +51,7 @@ interface AppState {
   user: AuthUser | null;
   setUser: (user: AuthUser | null) => void;
   logout: () => void;
+  hasLoggedIn: boolean;
 
   // Navigation
   nav: NavState;
@@ -116,8 +117,9 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       // ---------- Auth ----------
       user: null,
-      setUser: (user) => set({ user, ...(user ? {} : { notificationCount: 0 }) }),
+      setUser: (user) => set({ user, ...(user ? { hasLoggedIn: true } : { notificationCount: 0 }) }),
       logout: () => set({ user: null, nav: defaultNav, cart: [], lastReadAt: null }),
+      hasLoggedIn: false,
 
       // ---------- Navigation ----------
       nav: defaultNav,
@@ -263,6 +265,7 @@ export const useAppStore = create<AppState>()(
         onboardingDone: state.onboardingDone,
         notificationCount: state.notificationCount,
         lastReadAt: state.lastReadAt,
+        hasLoggedIn: state.hasLoggedIn,
       }),
     }
   )
