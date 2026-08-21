@@ -93,7 +93,7 @@ export function HomeScreen() {
   const [showScanner, setShowScanner] = useState(false);
 
   // Speech recognition
-  const { isListening, isSupported: speechSupported, startListening } = useSpeechRecognition({
+  const { isListening, isSupported: speechSupported, startListening, stopListening } = useSpeechRecognition({
     onResult: (transcript) => {
       setSearch(transcript);
       addRecentSearch(transcript);
@@ -386,12 +386,17 @@ export function HomeScreen() {
             )}
             {user && (
               <button
-                onClick={startListening}
-                disabled={isListening}
-                className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
-                aria-label="Recherche vocale"
+                onPointerDown={startListening}
+                onPointerUp={stopListening}
+                onPointerLeave={stopListening}
+                onTouchEnd={stopListening}
+                className={cn(
+                  "flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary",
+                  isListening && "bg-primary/20 text-primary animate-pulse"
+                )}
+                aria-label="Recherche vocale (maintenir)"
               >
-                <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
+                <Mic className="h-4 w-4" />
               </button>
             )}
           </div>

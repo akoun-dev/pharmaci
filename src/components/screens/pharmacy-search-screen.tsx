@@ -28,7 +28,7 @@ export function PharmacySearchScreen() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
-  const { isListening, startListening } = useSpeechRecognition({
+  const { isListening, startListening, stopListening } = useSpeechRecognition({
     onResult: (transcript) => {
       setSearch(transcript);
     },
@@ -128,12 +128,17 @@ export function PharmacySearchScreen() {
           />
           {user && (
             <button
-              onClick={startListening}
-              disabled={isListening}
-              className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
-              aria-label="Recherche vocale"
+              onPointerDown={startListening}
+              onPointerUp={stopListening}
+              onPointerLeave={stopListening}
+              onTouchEnd={stopListening}
+              className={cn(
+                "absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary",
+                isListening && "bg-primary/20 text-primary animate-pulse"
+              )}
+              aria-label="Recherche vocale (maintenir)"
             >
-              <Mic className={cn("h-4 w-4", isListening && "animate-pulse text-primary")} />
+              <Mic className="h-4 w-4" />
             </button>
           )}
         </div>
