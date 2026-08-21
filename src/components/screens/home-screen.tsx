@@ -284,7 +284,7 @@ export function HomeScreen() {
     <div className="flex flex-col">
       <VoiceModal open={isListening} onStop={stopListening} />
       {/* Header */}
-      <AppHeader title="Pharmaci" showLogo showCart />
+      <AppHeader title="Pharma CI" showLogo showCart />
 
       {/* Offline banner */}
       {!isOnline && (

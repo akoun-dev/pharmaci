@@ -192,7 +192,7 @@ export async function GET() {
   </div>
 
   <div class="header">
-    <div class="brand">Pharmaci</div>
+    <div class="brand">Pharma CI</div>
     <div class="pharmacy-info">
       <h1>${escHtml(auth.pharmacy.name)}</h1>
       <p>${escHtml(auth.pharmacy.address)}, ${escHtml(auth.pharmacy.city)}</p>

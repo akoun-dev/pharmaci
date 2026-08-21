@@ -310,7 +310,7 @@ function AppShell() {
     return (
       <div className="flex h-dvh items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <Image src="/logo.svg" alt="Pharmaci" width={56} height={56} className="h-14 w-14 rounded-2xl" priority />
+          <Image src="/logo.svg" alt="Pharma CI" width={56} height={56} className="h-14 w-14 rounded-2xl" priority />
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             Chargement...

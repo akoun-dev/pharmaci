@@ -26,7 +26,7 @@ export function Logo({
     <div className={cn("flex items-center gap-2", className)}>
       <Image
         src="/logo.svg"
-        alt="Pharmaci"
+        alt="Pharma CI"
         width={56}
         height={56}
         className={cn(sizeClasses[size], "rounded-xl object-contain")}
@@ -39,7 +39,7 @@ export function Logo({
             textSizes[size]
           )}
         >
-          Pharmaci
+          Pharma CI
         </span>
       )}
     </div>

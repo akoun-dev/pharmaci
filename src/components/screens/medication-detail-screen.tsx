@@ -141,7 +141,7 @@ export function MedicationDetailScreen() {
                 <h1 className="text-lg font-bold text-foreground">{medication.name}</h1>
                 <button
                   onClick={() => {
-                    const text = `${medication.name} - ${medication.dosage} - ${medication.form}\n${medication.activeIngredient}\n\nTrouvé sur Pharmaci`;
+                    const text = `${medication.name} - ${medication.dosage} - ${medication.form}\n${medication.activeIngredient}\n\nTrouvé sur Pharma CI`;
                     if (navigator.share) {
                       navigator.share({ title: medication.name, text }).catch(() => {});
                     } else {

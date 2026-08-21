@@ -376,7 +376,7 @@ export function ProfileScreen() {
         </button>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Pharmaci v2.0 • Côte d&apos;Ivoire
+            Pharma CI v2.0 • Côte d&apos;Ivoire
         </p>
       </div>
 

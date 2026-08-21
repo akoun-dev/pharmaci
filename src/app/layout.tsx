@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pharmaci - Médicaments & Pharmacies en Côte d'Ivoire",
+  title: "Pharma CI - Médicaments & Pharmacies en Côte d'Ivoire",
   description:
     "Trouvez facilement des pharmacies de garde, vérifiez la disponibilité des médicaments et gérez vos ordonnances en Côte d'Ivoire.",
   keywords: [
@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     "Côte d'Ivoire",
     "Abidjan",
     "pharmacie de garde",
-    "Pharmaci",
+    "Pharma CI",
   ],
-  authors: [{ name: "Pharmaci" }],
+  authors: [{ name: "Pharma CI" }],
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: "website",
-    title: "Pharmaci - Médicaments & Pharmacies",
+    title: "Pharma CI - Médicaments & Pharmacies",
     description:
       "Trouvez des pharmacies de garde et médicaments en Côte d'Ivoire",
   },
