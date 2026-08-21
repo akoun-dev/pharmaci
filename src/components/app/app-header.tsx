@@ -89,12 +89,10 @@ export function AppHeader({
           aria-label="Me localiser"
         >
           {userPosition ? (
-            <span className="text-[10px] font-semibold tabular-nums">
+            <span className="hidden sm:inline text-[10px] font-semibold tabular-nums">
               {userPosition[0].toFixed(2)}, {userPosition[1].toFixed(2)}
             </span>
-          ) : (
-            <span className="text-[10px] font-medium text-muted-foreground">GPS</span>
-          )}
+          ) : null}
           <MapPin className="h-4 w-4" />
           {userPosition && (
             <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-green-500" />
