@@ -20,7 +20,7 @@ interface AppHeaderProps {
 export function AppHeader({
   title,
   showBack = false,
-  showLogo = false,
+  showLogo = true,
   showCart = false,
   onNotificationClick,
   rightSlot,
