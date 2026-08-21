@@ -245,6 +245,7 @@ function AppShell() {
                       )
                     : notificationMessage(change.status as Order["status"], change.pharmacyName, change.code);
                 useAppStore.getState().pushToast(msg, "info");
+                useAppStore.getState().setNotificationCount(useAppStore.getState().notificationCount + 1);
               }
             }
           } catch {
@@ -255,10 +256,9 @@ function AppShell() {
         eventSource.addEventListener("count", (e) => {
           try {
             const data = JSON.parse(e.data);
-            const serverCount = data.count as number;
-            const { lastReadAt, notificationCount: currentCount } = useAppStore.getState();
-            if (!lastReadAt || serverCount > currentCount) {
-              setNotificationCount(serverCount);
+            const { lastReadAt } = useAppStore.getState();
+            if (!lastReadAt) {
+              setNotificationCount(data.count as number);
             }
           } catch {
             // ignore
