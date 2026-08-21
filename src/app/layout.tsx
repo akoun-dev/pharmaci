@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Pharma CI - Médicaments & Pharmacies en Côte d'Ivoire",
   description:
-    "Trouvez facilement des pharmacies de garde, vérifiez la disponibilité des médicaments et gérez vos ordonnances en Côte d'Ivoire.",
+    "Trouvez facilement des pharmacies de garde, vérifiez la disponibilité des médicaments et commandez en ligne en Côte d'Ivoire.",
   keywords: [
     "pharmacie",
     "médicaments",

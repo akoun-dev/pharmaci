@@ -112,9 +112,9 @@ export function AuthScreen() {
             <p className="mt-1.5 text-sm text-muted-foreground">
               {mode === "login"
                 ? hasLoggedIn
-                  ? "Connectez-vous pour accéder à vos médicaments et ordonnances."
+                  ? "Recherchez des médicaments et commandez en pharmacie."
                   : "Entrez vos identifiants pour commencer."
-                : "Inscrivez-vous pour rechercher médicaments et pharmacies."}
+                : "Inscrivez-vous pour rechercher des médicaments et pharmacies."}
             </p>
           </div>
 
