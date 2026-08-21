@@ -10,6 +10,7 @@ import { AppHeader } from "@/components/app/app-header";
 import { PharmacyCard, ServiceBadges } from "@/components/app/pharmacy-card";
 import { cn } from "@/lib/utils";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
+import { VoiceModal } from "@/components/app/voice-modal";
 import { EmptyState } from "@/components/ui/empty-state";
 import { GuestPrompt } from "@/components/ui/guest-prompt";
 
@@ -115,6 +116,7 @@ export function PharmacySearchScreen() {
 
   return (
     <div className="flex flex-col">
+      <VoiceModal open={isListening} />
       <AppHeader title="Recherche pharmacie" showBack showCart />
       <div className="px-4 pt-3">
         <div className="relative">

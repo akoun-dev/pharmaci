@@ -18,6 +18,7 @@ import { AppHeader } from "@/components/app/app-header";
 import { cn, categoryColor } from "@/lib/utils";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { EmptyState } from "@/components/ui/empty-state";
+import { VoiceModal } from "@/components/app/voice-modal";
 
 export function MedicationSearchScreen() {
   const navigate = useAppStore((s) => s.navigate);
@@ -175,6 +176,7 @@ export function MedicationSearchScreen() {
 
   return (
     <div className="flex flex-col">
+      <VoiceModal open={isListening} />
       <AppHeader
         title="Recherche médicament"
         showBack

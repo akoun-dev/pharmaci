@@ -33,6 +33,7 @@ import { cn, categoryColor, CATEGORY_COLORS } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { useBarcodeScanner } from "@/hooks/use-barcode-scanner";
+import { VoiceModal } from "@/components/app/voice-modal";
 
 const CATEGORIES = [
   { id: "Tous", label: "Tous", icon: Sparkles },
@@ -281,6 +282,7 @@ export function HomeScreen() {
 
   return (
     <div className="flex flex-col">
+      <VoiceModal open={isListening} />
       {/* Header */}
       <AppHeader title="Pharmaci" showLogo showCart />
 
