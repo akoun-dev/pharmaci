@@ -178,8 +178,8 @@ export function ProfileScreen() {
       <AppHeader title="Profil" showCart />
 
       {/* Profile header */}
-      <div className="px-4 pt-4">
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-5">
+      <div className="flex justify-center px-4 pt-4">
+        <div className="flex w-full max-w-md flex-col items-center gap-3 rounded-2xl border border-border bg-card p-5">
           <div className="relative">
             <input
               ref={fileInputRef}
@@ -210,7 +210,7 @@ export function ProfileScreen() {
               )}
             </button>
           </div>
-          <div className="flex flex-col items-center min-w-0 w-full">
+          <div className="flex min-w-0 flex-col items-center text-center">
             <h2 className="truncate text-lg font-bold text-foreground">{user.name}</h2>
             <p className="truncate text-xs text-muted-foreground">{user.email}</p>
             <Button
