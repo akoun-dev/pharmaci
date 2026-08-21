@@ -179,7 +179,7 @@ export function ProfileScreen() {
 
       {/* Profile header */}
       <div className="px-4 pt-4">
-        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-5">
           <div className="relative">
             <input
               ref={fileInputRef}
@@ -188,11 +188,11 @@ export function ProfileScreen() {
               className="hidden"
               onChange={handlePhotoUpload}
             />
-            <Avatar className="h-16 w-16 border-2 border-primary/30">
+            <Avatar className="h-20 w-20 border-2 border-primary/30">
               {user.avatarUrl ? (
                 <img src={user.avatarUrl} alt={user.name} className="h-full w-full rounded-full object-cover" />
               ) : (
-                <AvatarFallback className="bg-primary/10 text-lg font-bold text-primary">
+                <AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">
                   {initials}
                 </AvatarFallback>
               )}
@@ -210,13 +210,13 @@ export function ProfileScreen() {
               )}
             </button>
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex flex-col items-center min-w-0 w-full">
             <h2 className="truncate text-lg font-bold text-foreground">{user.name}</h2>
             <p className="truncate text-xs text-muted-foreground">{user.email}</p>
             <Button
               onClick={() => navigate("edit-profile")}
               size="sm"
-              className="mt-2 h-8 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+              className="mt-3 h-8 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
             >
               <Edit3 className="mr-1 h-3.5 w-3.5" />
               Modifier
