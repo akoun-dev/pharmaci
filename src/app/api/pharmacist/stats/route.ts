@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireRole } from "@/lib/auth";
 
 export async function GET(req: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user || user.role !== "PHARMACIST") {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-    }
+    const roleGuard = await requireRole("PHARMACIST");
+    if (!roleGuard.ok) return roleGuard.error;
+    const user = roleGuard.user;
 
     const pharmacy = await db.pharmacy.findUnique({
       where: { ownerId: user.id },

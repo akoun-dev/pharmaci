@@ -10,12 +10,12 @@ import {
   Loader2,
   CheckCircle2,
   X,
-  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAppStore } from "@/lib/store";
+import { Logo } from "@/components/app/logo";
 
 type Step = "email" | "code" | "password" | "success";
 
@@ -132,78 +132,80 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-t-3xl bg-card p-6 sm:rounded-3xl animate-fade-in-up"
+        className="relative w-full max-w-md rounded-t-3xl bg-card p-6 sm:rounded-3xl animate-fade-in-up"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {step !== "email" && step !== "success" && (
-              <button
-                onClick={handleBack}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
-                aria-label="Retour"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </button>
-            )}
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-foreground">
-                {step === "email" && "Mot de passe oublié"}
-                {step === "code" && "Code de vérification"}
-                {step === "password" && "Nouveau mot de passe"}
-                {step === "success" && "Réinitialisé !"}
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                {step === "email" && "Recevez un code par email"}
-                {step === "code" && "Entrez le code reçu par email"}
-                {step === "password" && "Choisissez un nouveau mot de passe"}
-                {step === "success" && "Vous pouvez maintenant vous connecter"}
-              </p>
-            </div>
+        <div className="mb-5 flex flex-col items-center gap-3">
+          <Logo size="md" showText={false} />
+          <div className="text-center">
+            <h3 className="text-base font-bold text-foreground">
+              {step === "email" && "Mot de passe oublié"}
+              {step === "code" && "Code de vérification"}
+              {step === "password" && "Nouveau mot de passe"}
+              {step === "success" && "Réinitialisé !"}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {step === "email" && "Recevez un code par email"}
+              {step === "code" && "Entrez le code reçu par email"}
+              {step === "password" && "Choisissez un nouveau mot de passe"}
+              {step === "success" && "Vous pouvez maintenant vous connecter"}
+            </p>
           </div>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
-            aria-label="Fermer"
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
+
+        {/* Back button for steps code & password */}
+        {step !== "email" && step !== "success" && (
+          <button
+            onClick={handleBack}
+            className="absolute left-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
+            aria-label="Retour"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+        )}
+
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
+          aria-label="Fermer"
+        >
+          <X className="h-4 w-4" />
+        </button>
 
         {/* Steps indicator */}
         {step !== "success" && (
-          <div className="mb-5 flex items-center gap-1">
-            {["email", "code", "password"].map((s, i) => {
-              const stepIdx = ["email", "code", "password"].indexOf(step);
-              const isDone = i < stepIdx;
-              const isCurrent = i === stepIdx;
-              return (
-                <div key={s} className="flex flex-1 items-center">
-                  <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all ${
-                      isDone
-                        ? "bg-primary text-primary-foreground"
-                        : isCurrent
-                        ? "border-2 border-primary bg-primary/10 text-primary"
-                        : "border-2 border-border bg-card text-muted-foreground"
-                    }`}
-                  >
-                    {isDone ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
-                  </div>
-                  {i < 2 && (
+          <div className="mb-5 flex justify-center">
+            <div className="flex items-center gap-1">
+              {["email", "code", "password"].map((s, i) => {
+                const stepIdx = ["email", "code", "password"].indexOf(step);
+                const isDone = i < stepIdx;
+                const isCurrent = i === stepIdx;
+                return (
+                  <div key={s} className="flex items-center">
                     <div
-                      className={`h-0.5 flex-1 mx-1 ${
-                        i < stepIdx ? "bg-primary" : "bg-border"
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all ${
+                        isDone
+                          ? "bg-primary text-primary-foreground"
+                          : isCurrent
+                          ? "border-2 border-primary bg-primary/10 text-primary"
+                          : "border-2 border-border bg-card text-muted-foreground"
                       }`}
-                    />
-                  )}
-                </div>
-              );
-            })}
+                    >
+                      {isDone ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
+                    </div>
+                    {i < 2 && (
+                      <div
+                        className={`mx-1 h-0.5 w-8 ${
+                          i < stepIdx ? "bg-primary" : "bg-border"
+                        }`}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -211,9 +213,6 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
         {step === "email" && (
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-muted-foreground">
-                ADRESSE E-MAIL
-              </Label>
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -227,7 +226,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
               </div>
             </div>
             {error && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-500">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-center text-sm text-red-500">
                 {error}
               </div>
             )}
@@ -281,26 +280,26 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
               </div>
             </div>
             {error && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-500">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-center text-sm text-red-500">
                 {error}
               </div>
             )}
-            <div className="flex gap-2">
-              <Button
-                onClick={handleSendCode}
-                variant="outline"
-                disabled={loading}
-                className="h-11 flex-1 rounded-xl border-border text-xs font-medium text-muted-foreground"
-              >
-                Renvoyer le code
-              </Button>
+            <div className="flex flex-col gap-2">
               <Button
                 onClick={handleVerifyCode}
                 disabled={code.length < 4}
-                className="h-11 flex-1 rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                className="h-11 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
               >
                 Vérifier
                 <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button
+                onClick={handleSendCode}
+                variant="ghost"
+                disabled={loading}
+                className="h-11 w-full rounded-xl text-xs font-medium text-muted-foreground"
+              >
+                Renvoyer le code
               </Button>
             </div>
           </div>
@@ -341,7 +340,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
               </div>
             </div>
             {error && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-500">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-center text-sm text-red-500">
                 {error}
               </div>
             )}
@@ -364,7 +363,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 
         {/* Step: Success */}
         {step === "success" && (
-          <div className="flex flex-col items-center py-4 text-center">
+          <div className="flex flex-col items-center py-6 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500">
               <CheckCircle2 className="h-8 w-8" />
             </div>

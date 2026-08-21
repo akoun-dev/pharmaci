@@ -4,7 +4,7 @@ import type { AuthUser } from "@/lib/store";
 
 async function request<T>(
   url: string,
-  options?: RequestInit & { signal?: AbortSignal }
+  options?: RequestInit & { signal?: AbortSignal; silent401?: boolean }
 ): Promise<T> {
   const res = await fetch(url, {
     headers: { "Content-Type": "application/json", ...(options?.headers || {}) },
@@ -13,7 +13,7 @@ async function request<T>(
   });
   
   if (res.status === 401) {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && !options?.silent401) {
       const { useAppStore } = await import("@/lib/store");
       useAppStore.getState().pushToast("Session expirée. Veuillez vous reconnecter.", "error");
       useAppStore.getState().setUser(null);
@@ -131,7 +131,7 @@ export const authApi = {
     password: string;
     phone?: string;
   }) => api.post<{ user: AuthUser }>("/api/auth/register", data),
-  me: () => api.get<{ user: AuthUser & { pharmacy?: { id: string } } }>("/api/auth/me"),
+  me: () => request<{ user: AuthUser & { pharmacy?: { id: string } } }>("/api/auth/me", { silent401: true }),
   logout: () => api.post<{ success: boolean }>("/api/auth/logout"),
   updateProfile: (data: {
     name?: string;

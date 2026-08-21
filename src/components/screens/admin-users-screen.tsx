@@ -74,27 +74,43 @@ export function AdminUsersScreen() {
   const [roleCounts, setRoleCounts] = useState({ PATIENT: 0, PHARMACIST: 0, ADMIN: 0 });
   const [showRoleMenu, setShowRoleMenu] = useState<string | null>(null);
   const [roleTarget, setRoleTarget] = useState<{ user: UserItem; role: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  // Debounce the search term. The fetch effect depends on the debounced value
+  // (not the raw input) so typing while already on page 1 actually triggers a
+  // request — previously the only effect of typing was a no-op setPage(1),
+  // which meant the search never ran on the first page (the common case).
   useEffect(() => {
-    void loadUsers();
-  }, [roleFilter, page]);
-
-  useEffect(() => {
-    const t = setTimeout(() => setPage(1), 300);
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
     return () => clearTimeout(t);
   }, [search]);
 
-  async function loadUsers() {
+  // Abort the in-flight request whenever the filters change so a slow previous
+  // response can't overwrite a newer one (race condition).
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadUsers(controller.signal);
+    return () => controller.abort();
+  }, [roleFilter, page, debouncedSearch]);
+
+  async function loadUsers(signal?: AbortSignal) {
     if (page === 1) setLoading(true);
     try {
       const q = new URLSearchParams();
-      if (search) q.set("search", search);
+      if (debouncedSearch) q.set("search", debouncedSearch);
       if (roleFilter) q.set("role", roleFilter);
       q.set("page", String(page));
       q.set("limit", "20");
-      const res = await api.get<{ users: UserItem[]; total: number; totalPages: number }>(
-        `/api/admin/users?${q.toString()}`
-      );
+      const res = await api.get<{
+        users: UserItem[];
+        total: number;
+        totalPages: number;
+        roleCounts: { PATIENT: number; PHARMACIST: number; ADMIN: number };
+      }>(`/api/admin/users?${q.toString()}`, signal);
       if (page === 1) {
         setUsers(res.users);
       } else {
@@ -102,17 +118,11 @@ export function AdminUsersScreen() {
       }
       setTotal(res.total);
       setTotalPages(res.totalPages);
-      // Compute role counts from current data (approximate from first page)
-      if (page === 1 && !roleFilter) {
-        const counts = { PATIENT: 0, PHARMACIST: 0, ADMIN: 0 };
-        for (const u of res.users) {
-          if (counts[u.role as keyof typeof counts] !== undefined) {
-            counts[u.role as keyof typeof counts]++;
-          }
-        }
-        setRoleCounts(counts);
-      }
+      // Global role distribution comes from the server (groupBy across the
+      // full matching dataset) — no more first-page approximation.
+      if (res.roleCounts) setRoleCounts(res.roleCounts);
     } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);
@@ -128,6 +138,7 @@ export function AdminUsersScreen() {
 
   async function handleDelete() {
     if (!deleteId) return;
+    setDeleting(true);
     try {
       await api.del(`/api/admin/users?id=${deleteId}`);
       useAppStore.getState().pushToast("Utilisateur supprimé", "success");
@@ -138,6 +149,8 @@ export function AdminUsersScreen() {
         err instanceof Error ? err.message : "Erreur",
         "error"
       );
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -307,8 +320,10 @@ export function AdminUsersScreen() {
             Cette action est irréversible.
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteId(null)}>Annuler</Button>
-            <Button variant="destructive" onClick={() => void handleDelete()}>Supprimer</Button>
+            <Button variant="outline" onClick={() => setDeleteId(null)} disabled={deleting}>Annuler</Button>
+            <Button variant="destructive" onClick={() => void handleDelete()} disabled={deleting}>
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Supprimer"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

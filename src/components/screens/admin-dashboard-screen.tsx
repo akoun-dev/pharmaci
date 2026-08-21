@@ -105,7 +105,7 @@ export function AdminDashboardScreen() {
   if (loading) {
     return (
       <div className="flex flex-col">
-        <AppHeader title="Administration" />
+        <AppHeader title="Administration" showLogo />
         <DashboardSkeleton />
       </div>
     );
@@ -131,7 +131,7 @@ export function AdminDashboardScreen() {
 
   return (
     <div className="flex flex-col">
-      <AppHeader title="Administration" />
+      <AppHeader title="Administration" showLogo />
 
       <div className="flex-1 overflow-y-auto px-4 pb-6">
         <div className="mb-4 pt-2">

@@ -33,10 +33,10 @@ export function ToastHost() {
           <div
             key={t.id}
             className={cn(
-              "pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border p-3 shadow-lg animate-fade-in-up",
-              t.type === "success" && "border-green-500/20 bg-green-500/10 text-green-500",
-              t.type === "error" && "border-red-500/20 bg-red-500/10 text-red-500",
-              t.type === "info" && "border-blue-500/20 bg-blue-500/10 text-blue-500"
+              "pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border p-3 shadow-lg animate-fade-in-up bg-card text-foreground",
+              t.type === "success" && "border-green-600/30 bg-green-600 text-white",
+              t.type === "error" && "border-red-600/30 bg-red-600 text-white",
+              t.type === "info" && "border-green-700/30 bg-green-700 text-white"
             )}
           >
             <Icon className="mt-0.5 h-5 w-5 shrink-0" />

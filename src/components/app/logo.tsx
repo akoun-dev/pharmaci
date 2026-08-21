@@ -1,18 +1,21 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export function Logo({
   className,
   size = "md",
+  showText = true,
 }: {
   className?: string;
   size?: "sm" | "md" | "lg";
+  showText?: boolean;
 }) {
   const sizeClasses = {
-    sm: "h-7 w-7 text-sm",
-    md: "h-10 w-10 text-base",
-    lg: "h-14 w-14 text-lg",
+    sm: "h-7 w-7",
+    md: "h-10 w-10",
+    lg: "h-14 w-14",
   };
   const textSizes = {
     sm: "text-lg",
@@ -21,33 +24,24 @@ export function Logo({
   };
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <div
-        className={cn(
-          "flex items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-sm",
-          sizeClasses[size]
-        )}
-      >
-        {/* Cross/plus pharmacy symbol */}
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          className="h-[60%] w-[60%]"
-          aria-hidden="true"
+      <Image
+        src="/logo.svg"
+        alt="Pharmaci"
+        width={56}
+        height={56}
+        className={cn(sizeClasses[size], "rounded-xl object-contain")}
+        priority
+      />
+      {showText && (
+        <span
+          className={cn(
+            "font-bold tracking-tight text-primary",
+            textSizes[size]
+          )}
         >
-          <path
-            d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6V4z"
-            fill="currentColor"
-          />
-        </svg>
-      </div>
-      <span
-        className={cn(
-          "font-bold tracking-tight text-primary",
-          textSizes[size]
-        )}
-      >
-        Pharmaci
-      </span>
+          Pharmaci
+        </span>
+      )}
     </div>
   );
 }

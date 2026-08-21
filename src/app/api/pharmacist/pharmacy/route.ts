@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
-
-async function requirePharmacist() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "PHARMACIST") return null;
-  const pharmacy = await db.pharmacy.findUnique({
-    where: { ownerId: user.id },
-    select: { id: true },
-  });
-  if (!pharmacy) return null;
-  return { user, pharmacyId: pharmacy.id };
-}
+import { requirePharmacistWithPharmacy } from "@/lib/auth";
 
 const updatePharmacySchema = z.object({
   name: z.string().min(1).optional(),
@@ -34,10 +23,9 @@ const updatePharmacySchema = z.object({
 
 // GET - Détails de la pharmacie du pharmacien
 export async function GET() {
-  const auth = await requirePharmacist();
-  if (!auth) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  }
+  const guard = await requirePharmacistWithPharmacy();
+  if (!guard.ok) return guard.error;
+  const auth = guard.auth;
 
   const pharmacy = await db.pharmacy.findUnique({
     where: { id: auth.pharmacyId },
@@ -57,10 +45,9 @@ export async function GET() {
 
 // PUT - Modifier la pharmacie
 export async function PUT(req: NextRequest) {
-  const auth = await requirePharmacist();
-  if (!auth) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  }
+  const guard = await requirePharmacistWithPharmacy();
+  if (!guard.ok) return guard.error;
+  const auth = guard.auth;
 
   let body: unknown;
   try {

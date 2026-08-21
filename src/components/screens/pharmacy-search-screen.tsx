@@ -297,6 +297,7 @@ function FilterChip({
 export function GuardPharmaciesScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const user = useAppStore((s) => s.user);
+  const pushToast = useAppStore((s) => s.pushToast);
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [loading, setLoading] = useState(true);
 

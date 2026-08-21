@@ -2,6 +2,7 @@
 
 import { Star, MapPin, Clock, Phone, Navigation, ShieldCheck, Truck, CreditCard, Syringe, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/lib/store";
 import type { Pharmacy } from "@/lib/api";
 import { formatDistance, haversineDistance } from "@/lib/api";
 
@@ -89,7 +90,9 @@ export function StatusBadge({
   isOpen24h: boolean;
   hideGuard?: boolean;
 }) {
-  if (isOnGuard && !hideGuard) {
+  const user = useAppStore((s) => s.user);
+  const showGuard = isOnGuard && !hideGuard && !!user;
+  if (showGuard) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[11px] font-bold text-orange-500">
         DE GARDE

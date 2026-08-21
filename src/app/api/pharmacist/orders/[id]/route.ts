@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
-
-async function requirePharmacist() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "PHARMACIST") return null;
-  const pharmacy = await db.pharmacy.findUnique({
-    where: { ownerId: user.id },
-    select: { id: true },
-  });
-  if (!pharmacy) return null;
-  return { user, pharmacyId: pharmacy.id };
-}
+import { requirePharmacistWithPharmacy } from "@/lib/auth";
 
 const VALID_TARGET_STATUSES = ["CONFIRMED", "READY", "PICKED_UP", "CANCELLED"] as const;
 
@@ -33,10 +22,9 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requirePharmacist();
-  if (!auth) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  }
+  const guard = await requirePharmacistWithPharmacy();
+  if (!guard.ok) return guard.error;
+  const auth = guard.auth;
 
   const { id } = await params;
 
@@ -61,10 +49,9 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requirePharmacist();
-  if (!auth) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  }
+  const guard = await requirePharmacistWithPharmacy();
+  if (!guard.ok) return guard.error;
+  const auth = guard.auth;
 
   const { id } = await params;
 

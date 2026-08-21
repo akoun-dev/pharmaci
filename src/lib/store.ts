@@ -114,7 +114,7 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       // ---------- Auth ----------
       user: null,
-      setUser: (user) => set({ user }),
+      setUser: (user) => set({ user, ...(user ? {} : { notificationCount: 0 }) }),
       logout: () => set({ user: null, nav: defaultNav, cart: [] }),
 
       // ---------- Navigation ----------
@@ -201,7 +201,7 @@ export const useAppStore = create<AppState>()(
 
       // ---------- Guest mode ----------
       guestMode: false,
-      setGuestMode: (v) => set({ guestMode: v }),
+      setGuestMode: (v) => set({ guestMode: v, notificationCount: 0 }),
 
       // ---------- Recently viewed ----------
       recentlyViewed: [],

@@ -52,7 +52,7 @@ export function AppHeader({
           <ArrowLeft className="h-5 w-5" />
         </button>
       )}
-      {showLogo && <Logo size="sm" />}
+      {showLogo && <Logo size="sm" showText={false} />}
       {title && (
         <div className="min-w-0">
           <h1 className="truncate text-base font-semibold text-foreground">
@@ -82,20 +82,22 @@ export function AppHeader({
           )}
         </button>
       )}
-      <button
-        onClick={onNotificationClick || (() => {
-          navigate("notifications");
-        })}
-        className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
-        aria-label="Notifications"
-      >
-        <Bell className="h-4 w-4" />
-        {notificationCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm animate-cart-pop">
-            {notificationCount > 9 ? "9+" : notificationCount}
-          </span>
-        )}
-      </button>
+      {user && (
+        <button
+          onClick={onNotificationClick || (() => {
+            navigate("notifications");
+          })}
+          className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+          aria-label="Notifications"
+        >
+          <Bell className="h-4 w-4" />
+          {notificationCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm animate-cart-pop">
+              {notificationCount > 9 ? "9+" : notificationCount}
+            </span>
+          )}
+        </button>
+      )}
     </header>
   );
 }

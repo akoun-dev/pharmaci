@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Pill, MapPin, ShoppingCart, Mic, Heart, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/app/logo";
 
 const slides = [
   {
@@ -37,13 +38,16 @@ export function OnboardingScreen({ onDone }: OnboardingScreenProps) {
 
   return (
     <div className="flex min-h-dvh flex-col bg-gradient-to-b from-primary/5 via-background to-background px-6">
-      {/* Skip */}
-      <button
-        onClick={onDone}
-        className="self-end pt-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-      >
-        Passer
-      </button>
+      {/* Header with logo */}
+      <div className="flex items-center justify-between pt-4">
+        <Logo size="sm" />
+        <button
+          onClick={onDone}
+          className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Passer
+        </button>
+      </div>
 
       {/* Content */}
       <div className="flex flex-1 flex-col items-center justify-center gap-8 text-center">

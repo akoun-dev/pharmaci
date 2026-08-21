@@ -15,8 +15,6 @@ import {
   Minus,
   Plus,
   Search,
-  LogIn,
-  Lock,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import {
@@ -29,6 +27,7 @@ import { AppHeader } from "@/components/app/app-header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, categoryColor } from "@/lib/utils";
+import { GuestPrompt } from "@/components/ui/guest-prompt";
 
 export function MedicationDetailScreen() {
   const navigate = useAppStore((s) => s.navigate);
@@ -42,11 +41,6 @@ export function MedicationDetailScreen() {
   const [pharmacies, setPharmacies] = useState<PharmacyWithPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState<"price" | "rating">("price");
-
-  // Visiteur : pas de tri par prix (bouton masqué) → on force le tri par note
-  useEffect(() => {
-    if (!user && sort === "price") setSort("rating");
-  }, [user, sort]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [pharmacySearch, setPharmacySearch] = useState("");
 
@@ -222,6 +216,13 @@ export function MedicationDetailScreen() {
       </div>
 
       {/* Pharmacies with stock */}
+      {!user ? (
+        <GuestPrompt
+          icon={Pill}
+          title="Connectez-vous pour voir les pharmacies"
+          description="Connectez-vous pour voir les pharmacies qui ont ce médicament en stock, comparer les prix et commander."
+        />
+      ) : (
       <div className="px-4 pt-5">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-foreground">
@@ -229,8 +230,8 @@ export function MedicationDetailScreen() {
           </h2>
         </div>
 
-        {/* Price comparison summary — visiteur : incitation à l'inscription */}
-        {pharmacies.length > 1 && user && (
+        {/* Price comparison summary */}
+        {pharmacies.length > 1 && (
           <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
             <div className="flex items-center gap-1.5 text-xs font-bold text-primary">
               <TrendingDown className="h-3.5 w-3.5" />
@@ -261,27 +262,8 @@ export function MedicationDetailScreen() {
             </p>
           </div>
         )}
-        {pharmacies.length > 1 && !user && (
-          <button
-            onClick={() => useAppStore.getState().setGuestMode(false)}
-            className="mt-3 flex w-full items-center gap-3 rounded-xl border border-dashed border-primary/40 bg-primary/5 p-3 text-left transition-colors hover:bg-primary/10"
-          >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <TrendingDown className="h-4 w-4" />
-            </div>
-            <div className="flex-1">
-              <p className="text-xs font-bold text-foreground">Comparateur de prix</p>
-              <p className="text-[11px] text-muted-foreground">
-                Connectez-vous pour voir le prix le plus bas et réaliser des économies.
-              </p>
-            </div>
-            <LogIn className="h-4 w-4 shrink-0 text-primary" />
-          </button>
-        )}
-
-        {/* Sort toggle — visiteur : masqué (tri par prix/note non pertinent) */}
-        {user && (
-          <div className="mt-3 flex gap-2">
+        {/* Sort toggle */}
+        <div className="mt-3 flex gap-2">
             <button
               onClick={() => setSort("price")}
               className={cn(
@@ -305,7 +287,6 @@ export function MedicationDetailScreen() {
               Mieux notées
             </button>
           </div>
-        )}
 
         {/* Pharmacy search filter */}
         <div className="relative mt-3">
@@ -484,6 +465,7 @@ export function MedicationDetailScreen() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

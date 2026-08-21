@@ -42,27 +42,40 @@ export function AdminOrdersScreen() {
   const [statusCounts, setStatusCounts] = useState<Record<string, number>>({
     "": 0, PENDING: 0, CONFIRMED: 0, READY: 0, PICKED_UP: 0, CANCELLED: 0,
   });
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  // Debounce the search so typing on page 1 triggers a fetch (previously the
+  // only effect was a no-op setPage(1)).
   useEffect(() => {
-    void loadOrders();
-  }, [activeTab, page]);
-
-  useEffect(() => {
-    const t = setTimeout(() => setPage(1), 300);
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+      setPage(1);
+    }, 300);
     return () => clearTimeout(t);
   }, [searchQuery]);
 
-  async function loadOrders() {
+  // Abort in-flight requests on filter change to avoid race conditions.
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadOrders(controller.signal);
+    return () => controller.abort();
+  }, [activeTab, page, debouncedSearch]);
+
+  async function loadOrders(signal?: AbortSignal) {
     if (page === 1) setLoading(true);
     try {
       const q = new URLSearchParams();
       if (activeTab) q.set("status", activeTab);
-      if (searchQuery.trim()) q.set("search", searchQuery.trim());
+      if (debouncedSearch) q.set("search", debouncedSearch);
       q.set("page", String(page));
       q.set("limit", "20");
-      const res = await api.get<{ orders: Order[]; total: number; page: number; totalPages: number }>(
-        `/api/admin/orders?${q.toString()}`
-      );
+      const res = await api.get<{
+        orders: Order[];
+        total: number;
+        page: number;
+        totalPages: number;
+        statusCounts?: Record<string, number>;
+      }>(`/api/admin/orders?${q.toString()}`, signal);
       if (page === 1) {
         setOrders(res.orders);
       } else {
@@ -70,13 +83,11 @@ export function AdminOrdersScreen() {
       }
       setTotal(res.total);
       setTotalPages(res.totalPages);
-      if (page === 1 && !activeTab) {
-        setStatusCounts((prev) => ({ ...prev, "": res.total }));
-      }
-      if (page === 1 && activeTab) {
-        setStatusCounts((prev) => ({ ...prev, [activeTab]: res.total }));
-      }
+      // Global status distribution from the server — every tab badge is now
+      // correct, not just the active one.
+      if (res.statusCounts) setStatusCounts(res.statusCounts);
     } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);

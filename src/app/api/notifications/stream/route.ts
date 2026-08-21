@@ -85,6 +85,8 @@ export async function GET(req: NextRequest) {
           }
 
           // Detect changes (status updates and new orders)
+          // Skip notifications on first poll (previousStatusMap is empty)
+          const isFirstPoll = previousStatusMap.size === 0;
           const changes: {
             id: string;
             code: string;
@@ -94,28 +96,30 @@ export async function GET(req: NextRequest) {
             role: string;
           }[] = [];
 
-          for (const order of orders) {
-            const prevStatus = previousStatusMap.get(order.id);
-            if (!prevStatus) {
-              // New order
-              changes.push({
-                id: order.id,
-                code: order.code,
-                status: order.status,
-                pharmacyName: order.pharmacy?.name || "Pharmacie",
-                userName: order.user?.name || "Client",
-                role,
-              });
-            } else if (prevStatus !== order.status) {
-              // Status change
-              changes.push({
-                id: order.id,
-                code: order.code,
-                status: order.status,
-                pharmacyName: order.pharmacy?.name || "Pharmacie",
-                userName: order.user?.name || "Client",
-                role,
-              });
+          if (!isFirstPoll) {
+            for (const order of orders) {
+              const prevStatus = previousStatusMap.get(order.id);
+              if (!prevStatus) {
+                // New order
+                changes.push({
+                  id: order.id,
+                  code: order.code,
+                  status: order.status,
+                  pharmacyName: order.pharmacy?.name || "Pharmacie",
+                  userName: order.user?.name || "Client",
+                  role,
+                });
+              } else if (prevStatus !== order.status) {
+                // Status change
+                changes.push({
+                  id: order.id,
+                  code: order.code,
+                  status: order.status,
+                  pharmacyName: order.pharmacy?.name || "Pharmacie",
+                  userName: order.user?.name || "Client",
+                  role,
+                });
+              }
             }
           }
 

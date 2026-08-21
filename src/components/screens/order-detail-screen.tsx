@@ -41,12 +41,15 @@ export function OrderDetailScreen() {
   const navigate = useAppStore((s) => s.navigate);
   const pushToast = useAppStore((s) => s.pushToast);
   const addToCart = useAppStore((s) => s.addToCart);
+  const user = useAppStore((s) => s.user);
+  const isPharmacist = user?.role === "PHARMACIST";
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [qrUrl, setQrUrl] = useState<string>("");
   const [showQR, setShowQR] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     if (!params.id) return;
@@ -88,6 +91,26 @@ export function OrderDetailScreen() {
       pushToast(err instanceof Error ? err.message : "Erreur", "error");
     } finally {
       setCancelling(false);
+    }
+  }
+
+  // Pharmacist status action. Uses PUT /api/orders/[id], which authorizes the
+  // owning pharmacist (canManageOrder) and restores stock when cancelling —
+  // unlike POST /api/orders/[id]/cancel which is patient-only.
+  async function handleStatusUpdate(
+    newStatus: Order["status"],
+    successMsg: string
+  ) {
+    if (!order) return;
+    setUpdatingStatus(true);
+    try {
+      const res = await orderApi.updateStatus(order.id, newStatus);
+      setOrder(res.order);
+      pushToast(successMsg, "success");
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Erreur", "error");
+    } finally {
+      setUpdatingStatus(false);
     }
   }
 
@@ -225,8 +248,8 @@ export function OrderDetailScreen() {
           )}
         </div>
 
-        {/* Verification code */}
-        {!isCancelled && (
+        {/* Verification code (patient only) */}
+        {!isCancelled && !isPharmacist && (
           <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
             <p className="text-xs font-semibold uppercase text-primary">
               Code de vérification
@@ -252,6 +275,35 @@ export function OrderDetailScreen() {
             >
               Afficher le QR Code
             </Button>
+          </div>
+        )}
+
+        {/* Client info (pharmacist only) */}
+        {isPharmacist && order.user && (
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-xs font-semibold uppercase text-muted-foreground">
+              Client
+            </p>
+            <p className="mt-1 text-sm font-bold text-foreground">
+              {order.user.name}
+            </p>
+            {order.user.phone && (
+              <a
+                href={`tel:${order.user.phone}`}
+                className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-500"
+              >
+                <Phone className="h-3.5 w-3.5" />
+                {order.user.phone}
+              </a>
+            )}
+            <div className="mt-2 rounded-lg bg-primary/5 px-3 py-2">
+              <p className="text-[10px] font-semibold uppercase text-muted-foreground">
+                Code de retrait à vérifier
+              </p>
+              <p className="font-mono text-base font-bold text-primary">
+                {order.code}
+              </p>
+            </div>
           </div>
         )}
 
@@ -367,8 +419,8 @@ export function OrderDetailScreen() {
           </div>
         )}
 
-        {/* Re-order button */}
-        {order.items && order.items.length > 0 && (
+        {/* Re-order button (patient only) */}
+        {!isPharmacist && order.items && order.items.length > 0 && (
           <Button
             onClick={handleReorder}
             className="h-10 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
@@ -378,23 +430,126 @@ export function OrderDetailScreen() {
           </Button>
         )}
 
-        {/* Cancel button */}
-        {(order.status === "PENDING" || order.status === "CONFIRMED") && (
-          <Button
-            onClick={handleCancel}
-            disabled={cancelling}
-            variant="outline"
-            className="h-10 w-full rounded-xl border-red-500/30 text-sm font-semibold text-red-500 hover:bg-red-500/10"
-          >
-            {cancelling ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
+        {/* Cancel button (patient only — the patient cancel endpoint restores
+            stock and is restricted to the order owner). */}
+        {!isPharmacist &&
+          (order.status === "PENDING" || order.status === "CONFIRMED") && (
+            <Button
+              onClick={handleCancel}
+              disabled={cancelling}
+              variant="outline"
+              className="h-10 w-full rounded-xl border-red-500/30 text-sm font-semibold text-red-500 hover:bg-red-500/10"
+            >
+              {cancelling ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <XCircle className="mr-1.5 h-4 w-4" />
+                  Annuler la commande
+                </>
+              )}
+            </Button>
+          )}
+
+        {/* Status actions (pharmacist only). These go through PUT /api/orders/[id]
+            which is authorized for the owning pharmacist and restores stock on
+            cancellation — covering the full PENDING → PICKED_UP flow that was
+            previously only reachable via QR scan. */}
+        {isPharmacist && !isCancelled && order.status !== "PICKED_UP" && (
+          <div className="space-y-2">
+            {order.status === "PENDING" && (
               <>
-                <XCircle className="mr-1.5 h-4 w-4" />
-                Annuler la commande
+                <Button
+                  onClick={() =>
+                    handleStatusUpdate("CONFIRMED", "Commande confirmée.")
+                  }
+                  disabled={updatingStatus}
+                  className="h-11 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  {updatingStatus ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                      Confirmer la commande
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={() =>
+                    handleStatusUpdate("CANCELLED", "Commande refusée.")
+                  }
+                  disabled={updatingStatus}
+                  variant="outline"
+                  className="h-10 w-full rounded-xl border-red-500/30 text-sm font-semibold text-red-500 hover:bg-red-500/10"
+                >
+                  {updatingStatus ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <XCircle className="mr-1.5 h-4 w-4" />
+                      Refuser
+                    </>
+                  )}
+                </Button>
               </>
             )}
-          </Button>
+            {order.status === "CONFIRMED" && (
+              <>
+                <Button
+                  onClick={() =>
+                    handleStatusUpdate("READY", "Commande marquée comme prête.")
+                  }
+                  disabled={updatingStatus}
+                  className="h-11 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  {updatingStatus ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                      Marquer comme prête
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={() =>
+                    handleStatusUpdate("CANCELLED", "Commande annulée.")
+                  }
+                  disabled={updatingStatus}
+                  variant="outline"
+                  className="h-10 w-full rounded-xl border-red-500/30 text-sm font-semibold text-red-500 hover:bg-red-500/10"
+                >
+                  {updatingStatus ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <XCircle className="mr-1.5 h-4 w-4" />
+                      Annuler
+                    </>
+                  )}
+                </Button>
+              </>
+            )}
+            {order.status === "READY" && (
+              <Button
+                onClick={() =>
+                  handleStatusUpdate("PICKED_UP", "Commande récupérée.")
+                }
+                disabled={updatingStatus}
+                className="h-11 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                {updatingStatus ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                    Marquer comme récupérée
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         )}
       </div>
 

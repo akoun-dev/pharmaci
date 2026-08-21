@@ -213,7 +213,7 @@ export function HomeScreen() {
     setLoading(true);
     try {
       const [guardRes, medsRes, catRes, favRes] = await Promise.all([
-        pharmacyApi.list({ onGuard: true, limit: 4 }),
+        user ? pharmacyApi.list({ onGuard: true, limit: 4 }) : Promise.resolve({ pharmacies: [] }),
         medicationApi.list({ sort: "popular", limit: 6 }),
         medicationApi.categories(),
         user ? pharmacyApi.favorites() : Promise.resolve({ pharmacies: [] }),
@@ -223,7 +223,7 @@ export function HomeScreen() {
       setCategories(catRes.categories);
       if (favRes) setFavoriteIds(new Set((favRes as { pharmacies: Pharmacy[] }).pharmacies.map((p) => p.id)));
       // Check notifications in parallel
-      void checkNotifications();
+      if (user) void checkNotifications();
     } catch (err) {
       pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
@@ -301,7 +301,7 @@ export function HomeScreen() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <AppHeader title="Pharmaci" showCart />
+      <AppHeader title="Pharmaci" showLogo showCart />
 
       {/* Offline banner */}
       {!isOnline && (
@@ -315,14 +315,14 @@ export function HomeScreen() {
       <div className="px-4 pt-4">
         {user ? (
           <>
-            <p className="text-sm text-muted-foreground">Bonjour 👋</p>
+            <p className="text-sm text-muted-foreground">Bonjour</p>
             <h1 className="text-xl font-bold text-foreground">
               {user.name?.split(" ")[0]}, trouvez votre médicament
             </h1>
           </>
         ) : (
           <>
-            <p className="text-sm text-muted-foreground">Bienvenue 👋</p>
+            <p className="text-sm text-muted-foreground">Bienvenue</p>
             <h1 className="text-xl font-bold text-foreground">
               Découvrez les pharmacies près de chez vous
             </h1>

@@ -93,7 +93,7 @@ export function AuthScreen() {
         >
           Mode visiteur
         </button>
-        <Logo size="lg" />
+        <Logo size="lg" showText={false} />
         <p className="mt-1 text-sm text-muted-foreground">
           Votre santé, à portée de main
         </p>
@@ -178,23 +178,12 @@ export function AuthScreen() {
             )}
 
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor="password"
-                  className="text-xs font-semibold text-muted-foreground"
-                >
-                  MOT DE PASSE
-                </Label>
-                {mode === "login" && (
-                  <button
-                    type="button"
-                    className="text-xs font-medium text-primary hover:underline"
-                    onClick={() => setShowForgotPassword(true)}
-                  >
-                    Mot de passe oublié ?
-                  </button>
-                )}
-              </div>
+              <Label
+                htmlFor="password"
+                className="text-xs font-semibold text-muted-foreground"
+              >
+                MOT DE PASSE
+              </Label>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -219,10 +208,19 @@ export function AuthScreen() {
                   )}
                 </button>
               </div>
+              {mode === "login" && (
+                <button
+                  type="button"
+                  className="text-xs font-medium text-primary hover:underline"
+                  onClick={() => setShowForgotPassword(true)}
+                >
+                  Mot de passe oublié ?
+                </button>
+              )}
             </div>
 
             {error && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-500">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-center text-sm text-red-500">
                 {error}
               </div>
             )}

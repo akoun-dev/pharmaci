@@ -1,22 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
-
-async function requireAdmin() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") return null;
-  return user;
-}
+import { requireRole } from "@/lib/auth";
 
 const VALID_STATUSES = ["PENDING", "CONFIRMED", "READY", "PICKED_UP", "CANCELLED"] as const;
 
 // GET - Toutes les commandes (admin) avec pagination et recherche
 export async function GET(req: Request) {
   try {
-    const admin = await requireAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-    }
+    const adminGuard = await requireRole("ADMIN");
+    if (!adminGuard.ok) return adminGuard.error;
 
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status") || undefined;
@@ -40,7 +32,19 @@ export async function GET(req: Request) {
 
     const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
-    const [orders, total] = await Promise.all([
+    // Search-only filter (ignores the status tab) for the global status counts
+    // so every tab badge is correct, not just the active one.
+    const searchWhere = search
+      ? {
+          OR: [
+            { code: { contains: search.toUpperCase() } },
+            { user: { name: { contains: search } } },
+            { pharmacy: { name: { contains: search } } },
+          ],
+        }
+      : {};
+
+    const [orders, total, statusGroups] = await Promise.all([
       db.order.findMany({
         where,
         orderBy: { createdAt: "desc" },
@@ -53,13 +57,31 @@ export async function GET(req: Request) {
         },
       }),
       db.order.count({ where }),
+      db.order.groupBy({
+        by: ["status"],
+        _count: { _all: true },
+        where: searchWhere,
+      }),
     ]);
+
+    const statusCounts: Record<string, number> = {
+      "": total,
+      PENDING: 0,
+      CONFIRMED: 0,
+      READY: 0,
+      PICKED_UP: 0,
+      CANCELLED: 0,
+    };
+    for (const g of statusGroups) {
+      if (g.status in statusCounts) statusCounts[g.status] = g._count._all;
+    }
 
     return NextResponse.json({
       orders,
       total,
       page,
       totalPages: Math.ceil(total / limit),
+      statusCounts,
     });
   } catch (error) {
     console.error("Admin orders error:", error);

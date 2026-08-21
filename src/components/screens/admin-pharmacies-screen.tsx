@@ -52,27 +52,39 @@ export function AdminPharmaciesScreen() {
   const [total, setTotal] = useState(0);
   const [verifiedCounts, setVerifiedCounts] = useState({ all: 0, verified: 0, unverified: 0 });
   const [verifyTarget, setVerifyTarget] = useState<PharmacyItem | null>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  // Debounce the search so typing on page 1 triggers a fetch (previously the
+  // only effect was a no-op setPage(1)).
   useEffect(() => {
-    void loadPharmacies();
-  }, [verifiedFilter, page]);
-
-  useEffect(() => {
-    const t = setTimeout(() => setPage(1), 300);
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
     return () => clearTimeout(t);
   }, [search]);
 
-  async function loadPharmacies() {
+  // Abort in-flight requests on filter change to avoid race conditions.
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadPharmacies(controller.signal);
+    return () => controller.abort();
+  }, [verifiedFilter, page, debouncedSearch]);
+
+  async function loadPharmacies(signal?: AbortSignal) {
     if (page === 1) setLoading(true);
     try {
       const q = new URLSearchParams();
-      if (search) q.set("search", search);
+      if (debouncedSearch) q.set("search", debouncedSearch);
       if (verifiedFilter) q.set("verified", verifiedFilter);
       q.set("page", String(page));
       q.set("limit", "20");
-      const res = await api.get<{ pharmacies: PharmacyItem[]; total: number; totalPages: number }>(
-        `/api/admin/pharmacies?${q.toString()}`
-      );
+      const res = await api.get<{
+        pharmacies: PharmacyItem[];
+        total: number;
+        totalPages: number;
+        verifiedCounts?: { all: number; verified: number; unverified: number };
+      }>(`/api/admin/pharmacies?${q.toString()}`, signal);
       if (page === 1) {
         setPharmacies(res.pharmacies);
       } else {
@@ -80,16 +92,11 @@ export function AdminPharmaciesScreen() {
       }
       setTotal(res.total);
       setTotalPages(res.totalPages);
-      if (page === 1 && !verifiedFilter) {
-        setVerifiedCounts((prev) => ({ ...prev, all: res.total }));
-      }
-      if (page === 1 && verifiedFilter === "true") {
-        setVerifiedCounts((prev) => ({ ...prev, verified: res.total }));
-      }
-      if (page === 1 && verifiedFilter === "false") {
-        setVerifiedCounts((prev) => ({ ...prev, unverified: res.total }));
-      }
+      // Global verified distribution from the server — every tab badge is now
+      // correct, not just the active one.
+      if (res.verifiedCounts) setVerifiedCounts(res.verifiedCounts);
     } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       useAppStore.getState().pushToast(err instanceof Error ? err.message : "Erreur de chargement", "error");
     } finally {
       setLoading(false);

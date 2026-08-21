@@ -1,22 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
-
-async function requirePharmacist() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "PHARMACIST") return null;
-  const pharmacy = await db.pharmacy.findUnique({
-    where: { ownerId: user.id },
-    select: { id: true },
-  });
-  if (!pharmacy) return null;
-  return { user, pharmacyId: pharmacy.id };
-}
+import { requirePharmacistWithPharmacy } from "@/lib/auth";
 
 const updateStockSchema = z.object({
   price: z.number().int().positive().optional(),
   stock: z.number().int().min(0).optional(),
+  // Atomic stock adjustment (±N). Preferred over `stock` for quick +/- edits:
+  // it composes with concurrent order decrements instead of overwriting them.
+  stockDelta: z.number().int().optional(),
   lowStockThreshold: z.number().int().min(0).optional(),
   expiryDate: z.string().optional().nullable(),
 });
@@ -26,10 +18,9 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requirePharmacist();
-  if (!auth) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  }
+  const guard = await requirePharmacistWithPharmacy();
+  if (!guard.ok) return guard.error;
+  const auth = guard.auth;
 
   const { id } = await params;
 
@@ -68,27 +59,53 @@ export async function PUT(
   if (data.lowStockThreshold !== undefined) updateData.lowStockThreshold = data.lowStockThreshold;
   if (data.expiryDate !== undefined) updateData.expiryDate = data.expiryDate ? new Date(data.expiryDate) : null;
 
-  if (data.stock !== undefined) {
+  // Resolve the effective stock change. A `stockDelta` (atomic) is preferred
+  // over an absolute `stock` so that concurrent order decrements — applied as
+  // atomic increments in their own transaction — are preserved instead of being
+  // clobbered by a value computed from a stale snapshot.
+  let stockDeltaToApply: number | null = null;
+  if (data.stockDelta !== undefined && data.stockDelta !== 0) {
+    stockDeltaToApply = data.stockDelta;
+  } else if (data.stock !== undefined) {
     const diff = data.stock - existing.stock;
-    updateData.stock = data.stock;
+    if (diff !== 0) stockDeltaToApply = diff;
+  }
 
-    if (diff !== 0) {
-      await db.stockHistory.create({
+  if (stockDeltaToApply === null && Object.keys(updateData).length === 0) {
+    return NextResponse.json({ error: "Aucune donnée à modifier" }, { status: 400 });
+  }
+
+  // Commit the stock change and its history row together so they can't diverge.
+  const updated = await db.$transaction(async (tx) => {
+    if (stockDeltaToApply !== null) {
+      // Read the current value inside the transaction and clamp at 0 so a
+      // manual edit can't drive the stock negative.
+      const row = await tx.pharmacyMedication.findUnique({
+        where: { id },
+        select: { stock: true },
+      });
+      const next = Math.max(0, (row?.stock ?? 0) + stockDeltaToApply);
+      updateData.stock = next;
+
+      await tx.stockHistory.create({
         data: {
           pharmacyId: auth.pharmacyId,
           medicationId: existing.medicationId,
-          changeType: diff > 0 ? "ADD" : "REMOVE",
-          quantity: Math.abs(diff),
-          note: diff > 0 ? `Ajout de ${diff} unités` : `Retrait de ${Math.abs(diff)} unités`,
+          changeType: stockDeltaToApply > 0 ? "ADD" : "REMOVE",
+          quantity: Math.abs(stockDeltaToApply),
+          note:
+            stockDeltaToApply > 0
+              ? `Ajout de ${stockDeltaToApply} unités`
+              : `Retrait de ${Math.abs(stockDeltaToApply)} unités`,
         },
       });
     }
-  }
 
-  const updated = await db.pharmacyMedication.update({
-    where: { id },
-    data: updateData,
-    include: { medication: true },
+    return tx.pharmacyMedication.update({
+      where: { id },
+      data: updateData,
+      include: { medication: true },
+    });
   });
 
   return NextResponse.json({ stock: updated });
@@ -99,10 +116,9 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requirePharmacist();
-  if (!auth) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  }
+  const guard = await requirePharmacistWithPharmacy();
+  if (!guard.ok) return guard.error;
+  const auth = guard.auth;
 
   const { id } = await params;
 

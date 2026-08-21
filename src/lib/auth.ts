@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 
@@ -127,4 +128,57 @@ export function generateOrderCode(): string {
     code += chars[Math.floor(Math.random() * chars.length)];
   }
   return `PHARMACI-${code}`;
+}
+
+// ---------- Route guards ----------
+//
+// Shared guards so every protected route returns consistent status codes:
+//   - 401 when there is no session (lets the API client auto-logout, see
+//     src/lib/api.ts — previously pharmacist/admin routes returned 403 on an
+//     expired session, leaving the user stuck).
+//   - 403 when the session is valid but the role doesn't match.
+//
+// They use a discriminated union (`ok`) so call sites can narrow cleanly:
+//   const guard = await requirePharmacistWithPharmacy();
+//   if (!guard.ok) return guard.error;   // guard.error is NextResponse here
+//   const auth = guard.auth;
+
+type GuardOk<T> = { ok: true } & T;
+type GuardErr = { ok: false; error: NextResponse };
+
+export async function requireRole(role: "PHARMACIST" | "ADMIN"): Promise<
+  GuardOk<{ user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>> }> | GuardErr
+> {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { ok: false, error: NextResponse.json({ error: "Non authentifié" }, { status: 401 }) };
+  }
+  if (user.role !== role) {
+    return { ok: false, error: NextResponse.json({ error: "Non autorisé" }, { status: 403 }) };
+  }
+  return { ok: true, user };
+}
+
+// Pharmacist guard that also resolves the caller's pharmacy. Returns an
+// `auth` object shaped like the old per-route helper ({ user, pharmacyId }) so
+// existing call sites keep working.
+export async function requirePharmacistWithPharmacy(): Promise<
+  GuardOk<{ auth: { user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>; pharmacyId: string } }> | GuardErr
+> {
+  const roleGuard = await requireRole("PHARMACIST");
+  if (!roleGuard.ok) return { ok: false, error: roleGuard.error };
+  const pharmacy = await db.pharmacy.findUnique({
+    where: { ownerId: roleGuard.user.id },
+    select: { id: true },
+  });
+  if (!pharmacy) {
+    return {
+      ok: false,
+      error: NextResponse.json(
+        { error: "Aucune pharmacie associée à ce compte" },
+        { status: 403 }
+      ),
+    };
+  }
+  return { ok: true, auth: { user: roleGuard.user, pharmacyId: pharmacy.id } };
 }

@@ -137,7 +137,7 @@ export function PharmacistDashboardScreen() {
   if (loading) {
     return (
       <div className="flex flex-col">
-        <AppHeader title="Espace Pharmacien" />
+        <AppHeader title="Espace Pharmacien" showLogo />
         <DashboardSkeleton />
       </div>
     );
@@ -145,7 +145,7 @@ export function PharmacistDashboardScreen() {
 
   return (
     <div className="flex flex-col">
-      <AppHeader title={stats?.pharmacyName || "Espace Pharmacien"} />
+      <AppHeader title={stats?.pharmacyName || "Espace Pharmacien"} showLogo />
 
       <div className="flex-1 overflow-y-auto px-4 pb-6">
         {/* Welcome + refresh */}

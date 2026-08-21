@@ -205,6 +205,9 @@ export function MapScreen() {
   // Filter & sort pharmacies
   const processedPharmacies = useMemo(() => {
     let list = [...pharmacies];
+    if (!user) {
+      list = list.filter((p) => !p.isOnGuard);
+    }
     if (nearbyOnly && userPos) {
       list = list
         .map((p) => ({ ...p, _dist: computeDistance(userPos, p) }))
@@ -222,16 +225,18 @@ export function MapScreen() {
       {/* Filters */}
       <div className="flex items-center justify-between border-b border-border/60 bg-card px-4 py-2.5">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Switch
-              id="guard"
-              checked={guardOnly}
-              onCheckedChange={setGuardOnly}
-            />
-            <label htmlFor="guard" className="text-sm font-medium text-foreground whitespace-nowrap">
-              Garde
-            </label>
-          </div>
+          {user && (
+            <div className="flex items-center gap-2">
+              <Switch
+                id="guard"
+                checked={guardOnly}
+                onCheckedChange={setGuardOnly}
+              />
+              <label htmlFor="guard" className="text-sm font-medium text-foreground whitespace-nowrap">
+                Garde
+              </label>
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <Switch
               id="nearby"
@@ -280,6 +285,7 @@ export function MapScreen() {
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            maxZoom={19}
           />
           <Recenter center={recenterTo} />
           {userPos && (
@@ -291,7 +297,7 @@ export function MapScreen() {
             <Marker
               key={p.id}
               position={[p.latitude, p.longitude]}
-              icon={p.isOnGuard ? guardIcon : pharmacyIcon}
+              icon={user && p.isOnGuard ? guardIcon : pharmacyIcon}
               eventHandlers={{
                 click: () => {
                   setSelected(p);
@@ -357,7 +363,7 @@ export function MapScreen() {
                       </span>
                     )}
                   </div>
-                  {selected.isOnGuard && (
+                  {user && selected.isOnGuard && (
                     <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[10px] font-bold text-orange-500">
                       <Clock className="h-3 w-3" />
                       Pharmacie de garde
@@ -374,7 +380,7 @@ export function MapScreen() {
                   Appeler
                 </a>
                 <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${selected.latitude},${selected.longitude}`}
+                  href={`https://routing.openstreetmap.de/routed-car/route.html?start=${userPos ? `${userPos[1]},${userPos[0]}` : ""}&end=${selected.longitude},${selected.latitude}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-1 rounded-lg bg-primary py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
@@ -428,7 +434,7 @@ export function MapScreen() {
                         <h4 className="truncate text-sm font-semibold text-foreground">
                           {p.name}
                         </h4>
-                        {p.isOnGuard && (
+                        {user && p.isOnGuard && (
                           <span className="shrink-0 rounded bg-orange-500/10 px-1 py-0.5 text-[9px] font-bold text-orange-500">
                             Garde
                           </span>

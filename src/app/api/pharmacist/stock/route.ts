@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
-
-async function requirePharmacist() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "PHARMACIST") return null;
-  const pharmacy = await db.pharmacy.findUnique({
-    where: { ownerId: user.id },
-    select: { id: true },
-  });
-  if (!pharmacy) return null;
-  return { user, pharmacyId: pharmacy.id };
-}
+import { requirePharmacistWithPharmacy } from "@/lib/auth";
 
 const addStockSchema = z.object({
   medicationId: z.string().min(1),
@@ -22,19 +11,11 @@ const addStockSchema = z.object({
   expiryDate: z.string().optional().nullable(),
 });
 
-const updateStockSchema = z.object({
-  price: z.number().int().positive().optional(),
-  stock: z.number().int().min(0).optional(),
-  lowStockThreshold: z.number().int().min(0).optional(),
-  expiryDate: z.string().optional().nullable(),
-});
-
 // GET - Liste des stocks de la pharmacie
 export async function GET(req: NextRequest) {
-  const auth = await requirePharmacist();
-  if (!auth) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  }
+  const guard = await requirePharmacistWithPharmacy();
+  if (!guard.ok) return guard.error;
+  const auth = guard.auth;
 
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search")?.trim() || "";
@@ -134,10 +115,9 @@ export async function GET(req: NextRequest) {
 
 // POST - Ajouter un médicament en stock
 export async function POST(req: NextRequest) {
-  const auth = await requirePharmacist();
-  if (!auth) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  }
+  const guard = await requirePharmacistWithPharmacy();
+  if (!guard.ok) return guard.error;
+  const auth = guard.auth;
 
   let body: unknown;
   try {

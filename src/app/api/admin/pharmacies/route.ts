@@ -1,20 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requireRole } from "@/lib/auth";
 
-async function requireAdmin() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") return null;
-  return user;
-}
+const updatePharmacySchema = z.object({
+  isVerified: z.boolean(),
+});
 
 // GET - Liste des pharmacies avec infos détaillées (avec pagination)
 export async function GET(req: Request) {
   try {
-    const admin = await requireAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-    }
+    const adminGuard = await requireRole("ADMIN");
+    if (!adminGuard.ok) return adminGuard.error;
 
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search")?.trim() || "";
@@ -38,7 +35,18 @@ export async function GET(req: Request) {
 
     const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
-    const [pharmacies, total] = await Promise.all([
+    // Search-only filter (ignores the verified tab) for the global verified
+    // counts so every tab badge reflects the full matching dataset.
+    const searchWhere = search
+      ? {
+          OR: [
+            { name: { contains: search } },
+            { address: { contains: search } },
+          ],
+        }
+      : {};
+
+    const [pharmacies, total, verifiedTotal, unverifiedTotal] = await Promise.all([
       db.pharmacy.findMany({
         where,
         orderBy: { createdAt: "desc" },
@@ -56,6 +64,8 @@ export async function GET(req: Request) {
         },
       }),
       db.pharmacy.count({ where }),
+      db.pharmacy.count({ where: { ...searchWhere, isVerified: true } }),
+      db.pharmacy.count({ where: { ...searchWhere, isVerified: false } }),
     ]);
 
     return NextResponse.json({
@@ -63,6 +73,11 @@ export async function GET(req: Request) {
       total,
       page,
       totalPages: Math.ceil(total / limit),
+      verifiedCounts: {
+        all: verifiedTotal + unverifiedTotal,
+        verified: verifiedTotal,
+        unverified: unverifiedTotal,
+      },
     });
   } catch (error) {
     console.error("Admin pharmacies error:", error);
@@ -73,10 +88,8 @@ export async function GET(req: Request) {
 // PUT - Modifier le statut de vérification d'une pharmacie
 export async function PUT(req: Request) {
   try {
-    const admin = await requireAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-    }
+    const adminGuard = await requireRole("ADMIN");
+    if (!adminGuard.ok) return adminGuard.error;
 
     const { searchParams } = new URL(req.url);
     const pharmacyId = searchParams.get("id");
@@ -91,14 +104,17 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Corps invalide" }, { status: 400 });
     }
 
-    const { isVerified } = body as { isVerified?: boolean };
-    if (isVerified === undefined) {
-      return NextResponse.json({ error: "isVerified requis" }, { status: 400 });
+    const parsed = updatePharmacySchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Données invalides", details: parsed.error.flatten() },
+        { status: 400 }
+      );
     }
 
     const pharmacy = await db.pharmacy.update({
       where: { id: pharmacyId },
-      data: { isVerified },
+      data: { isVerified: parsed.data.isVerified },
     });
 
     return NextResponse.json({ pharmacy });

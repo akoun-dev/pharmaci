@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { requirePharmacistWithPharmacy } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
-
-async function requirePharmacist() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "PHARMACIST") return null;
-  const pharmacy = await db.pharmacy.findUnique({
-    where: { ownerId: user.id },
-    select: { id: true },
-  });
-  if (!pharmacy) return null;
-  return { user, pharmacyId: pharmacy.id };
-}
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   PENDING: ["CONFIRMED", "CANCELLED"],
@@ -32,10 +21,9 @@ const STATUS_LABELS: Record<string, string> = {
 
 // POST - Rechercher une commande par code QR
 export async function POST(req: NextRequest) {
-  const auth = await requirePharmacist();
-  if (!auth) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
-  }
+  const guard = await requirePharmacistWithPharmacy();
+  if (!guard.ok) return guard.error;
+  const auth = guard.auth;
 
   // Order codes are short (6 chars); throttle brute-force attempts per IP.
   const limited = rateLimit(req, { limit: 20, windowMs: 60 * 1000 });

@@ -97,6 +97,10 @@ export function PharmacistStockScreen() {
   const [addThreshold, setAddThreshold] = useState("10");
   const [addExpiry, setAddExpiry] = useState("");
   const [saving, setSaving] = useState(false);
+  // Tracks the stock row currently being quick-adjusted (±1) so we can disable
+  // its buttons during the in-flight request and avoid stacking concurrent
+  // mutations (lost updates).
+  const [quickAdjustingId, setQuickAdjustingId] = useState<string | null>(null);
 
   // Export / Import state
   const [showImportModal, setShowImportModal] = useState(false);
@@ -213,9 +217,12 @@ export function PharmacistStockScreen() {
     setSaving(true);
     try {
       const data: Record<string, unknown> = {};
-      if (addPrice) data.price = parseInt(addPrice, 10);
+      // Use explicit "" checks: a value of "0" (e.g. a low-stock threshold of
+      // 0) is legitimate and must be sent, whereas an empty field means "leave
+      // unchanged".
+      if (addPrice !== "") data.price = parseInt(addPrice, 10);
       if (addStock !== "") data.stock = parseInt(addStock, 10);
-      if (addThreshold) data.lowStockThreshold = parseInt(addThreshold, 10);
+      if (addThreshold !== "") data.lowStockThreshold = parseInt(addThreshold, 10);
       data.expiryDate = addExpiry || null;
       await api.put(`/api/pharmacist/stock/${editingStock.id}`, data);
       setEditingStock(null);
@@ -238,20 +245,26 @@ export function PharmacistStockScreen() {
     }
   }
 
-  // Quick adjust +1/-1 — with undo via toast
+  // Quick adjust +1/-1. Sent as an atomic *delta* (stockDelta) rather than an
+  // absolute value computed from the snapshot, so a concurrent order decrement
+  // (also applied atomically in its own transaction) is never overwritten. The
+  // button is disabled while the request is in flight to avoid stacking.
   async function quickAdjust(stockId: string, currentStock: number, delta: number, medName: string) {
-    const newStock = Math.max(0, currentStock + delta);
+    // Never let a manual decrement push the stock below zero.
+    const safeDelta = Math.max(-currentStock, delta);
+    if (safeDelta === 0) return;
+    setQuickAdjustingId(stockId);
     try {
-      await api.put(`/api/pharmacist/stock/${stockId}`, { stock: newStock });
+      await api.put(`/api/pharmacist/stock/${stockId}`, { stockDelta: safeDelta });
       pushToast(
-        delta > 0 ? `+${delta} · ${medName}` : `${delta} · ${medName}`,
+        safeDelta > 0 ? `+${safeDelta} · ${medName}` : `${safeDelta} · ${medName}`,
         "success",
         {
           actionLabel: "Annuler",
           onAction: async () => {
             try {
-              await api.put(`/api/pharmacist/stock/${stockId}`, { stock: currentStock });
-              pushToast(`${medName} restauré à ${currentStock}`, "info");
+              await api.put(`/api/pharmacist/stock/${stockId}`, { stockDelta: -safeDelta });
+              pushToast(`${medName} : ajustement annulé`, "info");
               void loadStocks();
             } catch {
               pushToast("Impossible d'annuler", "error");
@@ -262,6 +275,8 @@ export function PharmacistStockScreen() {
       void loadStocks();
     } catch (err) {
       pushToast(err instanceof Error ? err.message : "Erreur", "error");
+    } finally {
+      setQuickAdjustingId(null);
     }
   }
 
@@ -589,7 +604,7 @@ export function PharmacistStockScreen() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => void quickAdjust(item.id, item.stock, -1, item.medication.name)}
-                      disabled={item.stock <= 0}
+                      disabled={item.stock <= 0 || quickAdjustingId === item.id}
                       className="flex h-6 w-6 items-center justify-center rounded-full border border-border hover:bg-muted disabled:opacity-30"
                       title="Retirer 1"
                       aria-label="Retirer une unité"
@@ -601,7 +616,8 @@ export function PharmacistStockScreen() {
                     </span>
                     <button
                       onClick={() => void quickAdjust(item.id, item.stock, 1, item.medication.name)}
-                      className="flex h-6 w-6 items-center justify-center rounded-full border border-border hover:bg-muted"
+                      disabled={quickAdjustingId === item.id}
+                      className="flex h-6 w-6 items-center justify-center rounded-full border border-border hover:bg-muted disabled:opacity-30"
                       title="Ajouter 1"
                       aria-label="Ajouter une unité"
                     >

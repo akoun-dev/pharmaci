@@ -202,6 +202,7 @@ export function CheckoutScreen() {
   const cart = useAppStore((s) => s.cart);
   const cartTotal = useAppStore((s) => s.cartTotal());
   const clearCart = useAppStore((s) => s.clearCart);
+  const removeItem = useAppStore((s) => s.removeFromCart);
   const pushToast = useAppStore((s) => s.pushToast);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
@@ -215,30 +216,56 @@ export function CheckoutScreen() {
 
   async function handleConfirm() {
     setLoading(true);
+    // Create one order per pharmacy. We remove each pharmacy's items from the
+    // cart as soon as its order succeeds, so a partial failure (or a manual
+    // retry) never recreates orders that were already placed — no duplicates.
+    const created: Order[] = [];
+    const failedPharmacies: string[] = [];
     try {
-      // Create one order per pharmacy
-      const created: Order[] = [];
       for (const [pharmacyId, items] of pharmacyEntries) {
-        const res = await orderApi.create({
-          pharmacyId,
-          items: items.map((i) => ({
-            medicationId: i.medicationId,
-            quantity: i.quantity,
-          })),
-          notes: notes || undefined,
-        });
-        created.push(res.order);
+        try {
+          const res = await orderApi.create({
+            pharmacyId,
+            items: items.map((i) => ({
+              medicationId: i.medicationId,
+              quantity: i.quantity,
+            })),
+            notes: notes || undefined,
+          });
+          created.push(res.order);
+          // Drop the successfully ordered items so a later failure only
+          // leaves the not-yet-ordered pharmacies in the cart on retry.
+          for (const item of items) {
+            removeItem(item.medicationId, item.pharmacyId);
+          }
+        } catch {
+          failedPharmacies.push(items[0].pharmacyName);
+        }
       }
-      clearCart();
-      pushToast(`${created.length} commande(s) créée(s) !`, "success");
-      // Navigate to the first order's detail
-      if (created.length === 1) {
-        navigate("order-detail", { id: created[0].id });
+
+      if (created.length === pharmacyEntries.length) {
+        clearCart();
+      }
+
+      if (created.length > 0) {
+        if (failedPharmacies.length > 0) {
+          pushToast(
+            `${created.length} commande(s) créée(s). Échec pour : ${failedPharmacies.join(", ")}.`,
+            "info"
+          );
+        } else {
+          pushToast(`${created.length} commande(s) créée(s) !`, "success");
+        }
+        // Navigate to the first order's detail only when there is a single,
+        // fully-placed order; otherwise show the list of orders.
+        if (created.length === 1 && failedPharmacies.length === 0) {
+          navigate("order-detail", { id: created[0].id });
+        } else {
+          useAppStore.getState().setTab("orders");
+        }
       } else {
-        useAppStore.getState().setTab("orders");
+        pushToast("Échec de la création des commandes. Veuillez réessayer.", "error");
       }
-    } catch (err) {
-      pushToast(err instanceof Error ? err.message : "Erreur", "error");
     } finally {
       setLoading(false);
     }

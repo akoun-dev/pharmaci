@@ -32,11 +32,13 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Pharmaci",
+    title: "Pharma CI",
   },
   icons: [
-    { rel: "icon", url: "/logo.svg", type: "image/svg+xml" },
-    { rel: "apple-touch-icon", url: "/icon-192.png" },
+    { rel: "icon", url: "/icon.svg", type: "image/svg+xml" },
+    { rel: "icon", url: "/favicon.ico", sizes: "32x32" },
+    { rel: "icon", url: "/icon.png", sizes: "any" },
+    { rel: "apple-touch-icon", url: "/apple-icon.png", sizes: "180x180" },
   ],
   openGraph: {
     type: "website",

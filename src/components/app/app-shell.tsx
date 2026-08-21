@@ -35,6 +35,7 @@ import { MessagesScreen } from "@/components/screens/messages-screen";
 import { ChatScreen } from "@/components/screens/chat-screen";
 import { ScanOrderScreen } from "@/components/screens/scan-order-screen";
 import { Loader2, ScanBarcode } from "lucide-react";
+import Image from "next/image";
 import { notificationMessage, pharmacistNotificationMessage, type Order } from "@/lib/api";
 
 const MapScreen = dynamic(
@@ -119,6 +120,11 @@ function ScreenRouter() {
     screen = <MedicationDetailScreen />;
   } else if (view === "pharmacy-detail") {
     screen = <PharmacyDetailScreen />;
+  } else if (view === "order-detail") {
+    // Routed at the top level so the order detail is reachable from any tab
+    // (notably the admin tab, where navigate("order-detail") previously left
+    // tab="admin" and fell through to the admin dashboard — a dead link).
+    screen = <OrderDetailScreen />;
   } else if (tab === "home") {
     switch (view) {
       case "medication-search":
@@ -304,11 +310,7 @@ function AppShell() {
     return (
       <div className="flex h-dvh items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-8 w-8">
-              <path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6V4z" />
-            </svg>
-          </div>
+          <Image src="/logo.svg" alt="Pharmaci" width={56} height={56} className="h-14 w-14 rounded-2xl" priority />
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             Chargement...

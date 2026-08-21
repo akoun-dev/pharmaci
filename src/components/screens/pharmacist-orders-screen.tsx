@@ -106,22 +106,19 @@ export function PharmacistOrdersScreen() {
   async function loadOrders() {
     setLoading(true);
     try {
-      const q = activeTab ? `?status=${activeTab}` : "";
-      const res = await api.get<{ orders: Order[] }>(`/api/pharmacist/orders${q}`);
-      let filtered = res.orders;
+      // Search is now applied server-side (the history is capped to the most
+      // recent 200 matching orders), so we no longer ship the full history to
+      // filter it in the browser.
+      const params = new URLSearchParams();
+      if (activeTab) params.set("status", activeTab);
+      if (search.trim()) params.set("search", search.trim());
+      const qs = params.toString();
+      const res = await api.get<{ orders: Order[] }>(
+        `/api/pharmacist/orders${qs ? `?${qs}` : ""}`
+      );
+      const filtered = res.orders;
 
-      // Client-side search
-      if (search.trim()) {
-        const lower = search.toLowerCase();
-        filtered = filtered.filter(
-          (o) =>
-            o.code.toLowerCase().includes(lower) ||
-            o.user.name.toLowerCase().includes(lower) ||
-            o.user.phone?.toLowerCase().includes(lower)
-        );
-      }
-
-      // Sort
+      // Sort (client-side, bounded by the server result cap)
       filtered.sort((a, b) => {
         if (sortBy === "amount") return b.totalAmount - a.totalAmount;
         if (sortBy === "patient") return a.user.name.localeCompare(b.user.name);
@@ -151,6 +148,7 @@ export function PharmacistOrdersScreen() {
     const labels: Record<string, string> = {
       CONFIRMED: "Confirmer cette commande ?",
       READY: "Marquer cette commande comme prête ?",
+      PICKED_UP: "Marquer cette commande comme récupérée ?",
       CANCELLED: "Annuler cette commande ?",
     };
     setConfirmAction({
@@ -167,10 +165,13 @@ export function PharmacistOrdersScreen() {
     setUpdatingId(orderId);
     try {
       await api.put(`/api/pharmacist/orders/${orderId}`, { status: newStatus });
-      pushToast(
-        newStatus === "CANCELLED" ? "Commande annulée" : "Statut mis à jour",
-        newStatus === "CANCELLED" ? "info" : "success"
-      );
+      const successMsg =
+        newStatus === "CANCELLED"
+          ? "Commande annulée"
+          : newStatus === "PICKED_UP"
+            ? "Commande récupérée"
+            : "Statut mis à jour";
+      pushToast(successMsg, newStatus === "CANCELLED" ? "info" : "success");
       void loadOrders();
     } catch (err) {
       pushToast(err instanceof Error ? err.message : "Erreur", "error");
@@ -185,6 +186,10 @@ export function PharmacistOrdersScreen() {
         return { label: "Confirmer", status: "CONFIRMED", icon: CheckCircle, color: "text-blue-500" };
       case "CONFIRMED":
         return { label: "Prête", status: "READY", icon: Package, color: "text-green-500" };
+      case "READY":
+        // Closing the loop at the counter (without a QR scan) used to be
+        // impossible from the list — only the QR scan screen offered it.
+        return { label: "Récupérée", status: "PICKED_UP", icon: CheckCircle, color: "text-emerald-500" };
       default:
         return null;
     }
