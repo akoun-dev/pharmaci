@@ -30,6 +30,8 @@ export function NotificationsScreen() {
   const user = useAppStore((s) => s.user);
   const guestMode = useAppStore((s) => s.guestMode);
   const setNotificationCount = useAppStore((s) => s.setNotificationCount);
+  const markNotificationsRead = useAppStore((s) => s.markNotificationsRead);
+  const lastReadAt = useAppStore((s) => s.lastReadAt);
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,8 +53,11 @@ export function NotificationsScreen() {
       const active = res.orders.filter(
         (o) => o.status === "PENDING" || o.status === "CONFIRMED" || o.status === "READY"
       );
-      setOrders(active);
-      setNotificationCount(0);
+      const unread = lastReadAt
+        ? active.filter((o) => new Date(o.updatedAt || o.createdAt).getTime() > lastReadAt)
+        : active;
+      setOrders(unread);
+      setNotificationCount(unread.length);
     } catch {
       setError(true);
     } finally {
@@ -108,15 +113,28 @@ export function NotificationsScreen() {
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-bold text-foreground">
               {orders.length > 0
-                ? `${orders.length} notification${orders.length > 1 ? "s" : ""} active${orders.length > 1 ? "s" : ""}`
+                ? `${orders.length} notification${orders.length > 1 ? "s" : ""} non lue${orders.length > 1 ? "s" : ""}`
                 : "Aucune notification"}
             </h2>
-            <button
-              onClick={() => useAppStore.getState().setTab("orders")}
-              className="text-xs font-semibold text-primary hover:underline"
-            >
-              Toutes les commandes
-            </button>
+            <div className="flex items-center gap-3">
+              {orders.length > 0 && (
+                <button
+                  onClick={() => {
+                    markNotificationsRead();
+                    setOrders([]);
+                  }}
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
+                  Tout marquer lu
+                </button>
+              )}
+              <button
+                onClick={() => useAppStore.getState().setTab("orders")}
+                className="text-xs font-semibold text-muted-foreground hover:underline"
+              >
+                Commandes
+              </button>
+            </div>
           </div>
 
           {loading ? (
@@ -157,10 +175,10 @@ export function NotificationsScreen() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">
-                  Tout est calme
+                  Tout est lu
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Vous serez notifié quand le statut d&apos;une commande changera.
+                  Pas de nouvelles notifications. Vous serez notifié quand le statut d&apos;une commande changera.
                 </p>
               </div>
             </div>

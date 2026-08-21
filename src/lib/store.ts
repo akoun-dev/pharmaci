@@ -93,6 +93,8 @@ interface AppState {
   // Notifications
   notificationCount: number;
   setNotificationCount: (count: number) => void;
+  lastReadAt: number | null;
+  markNotificationsRead: () => void;
 
   // Toast trigger (simple in-memory)
   toastQueue: { id: number; message: string; type: "success" | "error" | "info"; actionLabel?: string; onAction?: () => void }[];
@@ -115,7 +117,7 @@ export const useAppStore = create<AppState>()(
       // ---------- Auth ----------
       user: null,
       setUser: (user) => set({ user, ...(user ? {} : { notificationCount: 0 }) }),
-      logout: () => set({ user: null, nav: defaultNav, cart: [] }),
+      logout: () => set({ user: null, nav: defaultNav, cart: [], lastReadAt: null }),
 
       // ---------- Navigation ----------
       nav: defaultNav,
@@ -231,6 +233,8 @@ export const useAppStore = create<AppState>()(
       // ---------- Notifications ----------
       notificationCount: 0,
       setNotificationCount: (count) => set({ notificationCount: count }),
+      lastReadAt: null,
+      markNotificationsRead: () => set({ notificationCount: 0, lastReadAt: Date.now() }),
 
       // ---------- Toasts ----------
       toastQueue: [],
@@ -258,6 +262,7 @@ export const useAppStore = create<AppState>()(
         userPosition: state.userPosition,
         onboardingDone: state.onboardingDone,
         notificationCount: state.notificationCount,
+        lastReadAt: state.lastReadAt,
       }),
     }
   )

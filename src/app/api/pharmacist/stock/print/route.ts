@@ -249,7 +249,7 @@ export async function GET() {
   </div>
 
   <div class="footer">
-    Pharmaci — Document généré le ${now.toLocaleDateString("fr-FR")} — État du stock
+    Pharma CI — Document généré le ${now.toLocaleDateString("fr-FR")} — État du stock
   </div>
 
   <script>
