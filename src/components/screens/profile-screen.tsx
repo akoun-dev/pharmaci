@@ -212,6 +212,7 @@ export function ProfileScreen() {
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="truncate text-lg font-bold text-foreground">{user.name}</h2>
+            <p className="truncate text-xs text-muted-foreground">{user.email}</p>
             <Button
               onClick={() => navigate("edit-profile")}
               size="sm"
@@ -230,7 +231,6 @@ export function ProfileScreen() {
           Informations
         </h3>
         <div className="divide-y divide-border/60 rounded-2xl border border-border bg-card">
-          <InfoRow icon={Mail} label="Email" value={user.email} />
           {user.phone && (
             <InfoRow icon={Phone} label="Téléphone" value={user.phone} />
           )}
