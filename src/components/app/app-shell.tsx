@@ -255,7 +255,11 @@ function AppShell() {
         eventSource.addEventListener("count", (e) => {
           try {
             const data = JSON.parse(e.data);
-            setNotificationCount(data.count);
+            const serverCount = data.count as number;
+            const { lastReadAt, notificationCount: currentCount } = useAppStore.getState();
+            if (!lastReadAt || serverCount > currentCount) {
+              setNotificationCount(serverCount);
+            }
           } catch {
             // ignore
           }

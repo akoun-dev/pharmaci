@@ -53,10 +53,10 @@ export function NotificationsScreen() {
       const active = res.orders.filter(
         (o) => o.status === "PENDING" || o.status === "CONFIRMED" || o.status === "READY"
       );
+      setOrders(active);
       const unread = lastReadAt
         ? active.filter((o) => new Date(o.updatedAt || o.createdAt).getTime() > lastReadAt)
         : active;
-      setOrders(unread);
       setNotificationCount(unread.length);
     } catch {
       setError(true);
@@ -113,7 +113,7 @@ export function NotificationsScreen() {
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-bold text-foreground">
               {orders.length > 0
-                ? `${orders.length} notification${orders.length > 1 ? "s" : ""} non lue${orders.length > 1 ? "s" : ""}`
+                ? `${orders.length} notification${orders.length > 1 ? "s" : ""}`
                 : "Aucune notification"}
             </h2>
             <div className="flex items-center gap-3">
@@ -121,7 +121,7 @@ export function NotificationsScreen() {
                 <button
                   onClick={() => {
                     markNotificationsRead();
-                    setOrders([]);
+                    setNotificationCount(0);
                   }}
                   className="text-xs font-semibold text-primary hover:underline"
                 >
@@ -175,20 +175,25 @@ export function NotificationsScreen() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">
-                  Tout est lu
+                  Aucune notification
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Pas de nouvelles notifications. Vous serez notifié quand le statut d&apos;une commande changera.
+                  Vous serez notifié quand le statut d&apos;une commande changera.
                 </p>
               </div>
             </div>
           ) : (
             <div className="space-y-3">
-              {orders.map((o) => (
+              {orders.map((o) => {
+                const isUnread = !lastReadAt || new Date(o.updatedAt || o.createdAt).getTime() > lastReadAt;
+                return (
                 <button
                   key={o.id}
                   onClick={() => navigate("notification-detail", { id: o.id })}
-                  className="w-full rounded-2xl border border-border bg-card p-3 text-left transition-all hover:border-primary/40 hover:shadow-sm"
+                  className={cn(
+                    "w-full rounded-2xl border bg-card p-3 text-left transition-all hover:border-primary/40 hover:shadow-sm",
+                    isUnread ? "border-primary/30" : "border-border opacity-70"
+                  )}
                 >
                   <div className="flex items-start gap-3">
                     <div
@@ -205,7 +210,7 @@ export function NotificationsScreen() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-medium text-foreground leading-snug">
+                        <p className={cn("text-sm font-medium leading-snug", isUnread ? "text-foreground" : "text-muted-foreground")}>
                           {notificationMessage(
                             o.status,
                             o.pharmacy?.name || "Pharmacie",
@@ -228,12 +233,16 @@ export function NotificationsScreen() {
                         <span className="text-xs font-semibold text-primary">
                           {formatFCFA(o.totalAmount)}
                         </span>
+                        {isUnread && (
+                          <span className="ml-auto h-2 w-2 rounded-full bg-primary" />
+                        )}
                       </div>
                     </div>
                     <ChevronRight className="mt-3 h-4 w-4 shrink-0 text-muted-foreground" />
                   </div>
                 </button>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
