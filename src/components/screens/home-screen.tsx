@@ -12,7 +12,6 @@ import {
   ShoppingCart,
   Mic,
   Camera,
-  Locate,
   History,
   WifiOff,
 } from "lucide-react";
@@ -58,25 +57,7 @@ export function HomeScreen() {
   const [popularMeds, setPopularMeds] = useState<Medication[]>([]);
   const [loading, setLoading] = useState(true);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
-  const [location, setLocation] = useState("Localisation en cours...");
   const [isOnline, setIsOnline] = useState(true);
-
-  // Auto-detect geolocation on first load
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-          useAppStore.getState().setUserPosition([latitude, longitude]);
-        },
-        () => {
-          setLocation("Abidjan, Cocody Riviera");
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    }
-  }, []);
 
   // Online/offline detection
   useEffect(() => {
@@ -582,49 +563,6 @@ export function HomeScreen() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Location section */}
-      <div className="px-4 pt-4">
-        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <MapPin className="h-5 w-5" />
-          </div>
-          <div className="flex-1">
-            <p className="text-xs font-semibold uppercase text-muted-foreground">
-              Ma Localisation
-            </p>
-            <p className="text-sm font-semibold text-foreground">{location}</p>
-          </div>
-          <button
-            onClick={() => {
-              if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                  (pos) => {
-                    const { latitude, longitude } = pos.coords;
-                    setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-                    useAppStore.getState().setUserPosition([latitude, longitude]);
-                    pushToast("Position mise à jour avec précision.", "success");
-                  },
-                  (err) => {
-                    const msg =
-                      err.code === err.PERMISSION_DENIED
-                        ? "Localisation refusée. Activez-la dans les paramètres."
-                        : "Impossible d'obtenir votre position.";
-                    pushToast(msg, "error");
-                  },
-                  { enableHighAccuracy: true, timeout: 10000 }
-                );
-              } else {
-                pushToast("Géolocalisation non disponible.", "error");
-              }
-            }}
-            className="flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-          >
-            <Locate className="h-3.5 w-3.5" />
-            Localiser
-          </button>
-        </div>
-      </div>
 
       {/* Pharmacies de garde — visiteur : bannière incitative */}
       {user ? (

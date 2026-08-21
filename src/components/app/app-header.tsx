@@ -1,7 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bell, ShoppingCart, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { ArrowLeft, Bell, ShoppingCart, MapPin } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { Logo } from "@/components/app/logo";
 import { cn } from "@/lib/utils";
@@ -32,9 +31,27 @@ export function AppHeader({
   const pushToast = useAppStore((s) => s.pushToast);
   const navigate = useAppStore((s) => s.navigate);
   const user = useAppStore((s) => s.user);
+  const userPosition = useAppStore((s) => s.userPosition);
   const cartCount = useAppStore((s) => s.cartCount());
   const notificationCount = useAppStore((s) => s.notificationCount);
-  const { theme, setTheme } = useTheme();
+
+  function locateUser() {
+    if (!("geolocation" in navigator)) {
+      pushToast("Géolocalisation non disponible.", "error");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        useAppStore.getState().setUserPosition([latitude, longitude]);
+        pushToast("Position mise à jour.", "success");
+      },
+      () => {
+        pushToast("Localisation refusée.", "error");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
 
   return (
     <header
@@ -65,6 +82,18 @@ export function AppHeader({
       )}
       <div className="flex-1" />
       {rightSlot}
+      {user && (
+        <button
+          onClick={locateUser}
+          className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+          aria-label="Me localiser"
+        >
+          <MapPin className="h-4 w-4" />
+          {userPosition && (
+            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-green-500" />
+          )}
+        </button>
+      )}
       {showCart && user && (
         <button
           onClick={() => navigate("cart")}
