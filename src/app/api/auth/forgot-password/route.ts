@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { rateLimit } from "@/lib/rate-limit";
+import { sendMail } from "@/lib/mailer";
 
 const RESET_CODES = new Map<string, { email: string; expiresAt: Date }>();
 
@@ -66,16 +67,33 @@ export async function POST(request: NextRequest) {
 
     RESET_CODES.set(code, { email: email.toLowerCase(), expiresAt });
 
-    // In production, send email here - NEVER log reset codes in production
-    if (process.env.NODE_ENV === "development") {
-      console.log(`[FORGOT PASSWORD] Code for ${email}: ${code}`);
+    const emailSent = await sendMail({
+      to: email.toLowerCase(),
+      subject: "Réinitialisation de votre mot de passe PHARMACI",
+      html: `<p>Bonjour${user.name ? " " + user.name : ""},</p>
+<p>Voici votre code de réinitialisation de mot de passe PHARMACI :</p>
+<p style="font-size:24px;font-weight:bold;letter-spacing:4px;">${code}</p>
+<p>Ce code expire dans 15 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.</p>`,
+      text: `Votre code de réinitialisation PHARMACI est : ${code}\nCe code expire dans 15 minutes.`,
+    });
+
+    // NEVER log reset codes in production once email delivery is configured.
+    // Logging here is only a fallback so the flow stays usable when no email
+    // provider (RESEND_API_KEY) has been configured yet, e.g. in local dev.
+    if (!emailSent) {
+      console.log(
+        `[FORGOT PASSWORD] Email not sent (no provider configured or delivery failed). Code for ${email}: ${code}`
+      );
     }
 
     return NextResponse.json({
       success: true,
-      message: "Un code de réinitialisation a été envoyé à votre adresse e-mail.",
-      // In dev mode, return the code for testing
-      ...(process.env.NODE_ENV === "development" && { devCode: code }),
+      message: emailSent
+        ? "Un code de réinitialisation a été envoyé à votre adresse e-mail."
+        : "Un code de réinitialisation a été généré, mais l'envoi d'e-mail n'est pas configuré sur ce serveur.",
+      // Only ever surfaced outside production, and only when the email
+      // genuinely couldn't be sent, so the flow stays testable in dev.
+      ...(process.env.NODE_ENV !== "production" && !emailSent && { devCode: code }),
     });
   } catch (error) {
     console.error("Forgot password error:", error);

@@ -62,6 +62,15 @@ L'app est accessible sur http://localhost:3000.
 | `bun run db:migrate` | Créer une migration |
 | `bun run db:reset` | Réinitialiser la base |
 
+## Variables d'environnement
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Chemin de la base SQLite (ex: `file:./dev.db`) |
+| `JWT_SECRET` | Secret de signature des tokens JWT (>= 32 caractères en production) |
+| `RESEND_API_KEY` | Clé API [Resend](https://resend.com) pour l'envoi des e-mails de réinitialisation de mot de passe. Sans elle, le code est seulement journalisé côté serveur. |
+| `EMAIL_FROM` | Adresse d'expédition des e-mails (optionnel, valeur par défaut fournie) |
+
 ## Comptes de démo
 
 | Rôle | Email | Mot de passe |
