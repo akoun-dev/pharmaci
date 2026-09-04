@@ -18,7 +18,10 @@ import {
   ChevronRight,
   Bell,
   ShoppingCart,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +43,7 @@ export default function PharmacistLayout({ children }: { children: React.ReactNo
   const pushToast = useAppStore((s) => s.pushToast);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     if (!user || user.role !== "PHARMACIST") {
@@ -56,20 +60,23 @@ export default function PharmacistLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
+    <div className="flex min-h-screen w-full bg-[#f7faf8] text-foreground dark:bg-background">
       {/* Sidebar desktop */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col border-r border-border bg-card transition-all duration-300",
+          "hidden lg:flex flex-col border-r border-border/80 bg-[#10261d] text-white transition-all duration-300",
           sidebarOpen ? "w-64" : "w-16"
         )}
       >
         {/* Logo */}
-        <div className="flex h-14 items-center gap-2 border-b border-border px-3">
+        <div className="flex h-16 items-center gap-2 border-b border-white/10 px-4">
           {sidebarOpen ? (
             <Link href="/pharmacist" className="flex items-center gap-2">
               <Image src="/logo.svg" alt="Pharma CI" width={28} height={28} className="h-7 w-7 rounded-lg" />
-              <span className="text-sm font-bold text-primary">Pharma CI</span>
+              <div>
+                <span className="block text-sm font-bold text-white">Pharma CI</span>
+                <span className="block text-[10px] text-emerald-200/70">Espace pharmacien</span>
+              </div>
             </Link>
           ) : (
             <Link href="/pharmacist">
@@ -78,14 +85,14 @@ export default function PharmacistLayout({ children }: { children: React.ReactNo
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="ml-auto flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
+            className="ml-auto flex h-7 w-7 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white"
           >
             <ChevronRight className={cn("h-4 w-4 transition-transform", sidebarOpen && "rotate-180")} />
           </button>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 space-y-1 p-2">
+          <nav className="flex-1 space-y-1 p-3">
           {NAV_ITEMS.map((item) => {
             const active = item.href === "/pharmacist" ? pathname === "/pharmacist" : pathname.startsWith(item.href);
             return (
@@ -96,7 +103,7 @@ export default function PharmacistLayout({ children }: { children: React.ReactNo
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                   active
                     ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    : "text-white/65 hover:bg-white/10 hover:text-white"
                 )}
                 title={!sidebarOpen ? item.label : undefined}
               >
@@ -108,10 +115,10 @@ export default function PharmacistLayout({ children }: { children: React.ReactNo
         </nav>
 
         {/* Bottom */}
-        <div className="border-t border-border p-2">
+        <div className="border-t border-white/10 p-3">
           <Link
             href="/"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/65 hover:bg-white/10 hover:text-white"
             title={!sidebarOpen ? "Retour app" : undefined}
           >
             <ShoppingCart className="h-5 w-5 shrink-0" />
@@ -119,7 +126,7 @@ export default function PharmacistLayout({ children }: { children: React.ReactNo
           </Link>
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-500/10"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-300 hover:bg-red-500/10"
             title={!sidebarOpen ? "Deconnexion" : undefined}
           >
             <LogOut className="h-5 w-5 shrink-0" />
@@ -177,18 +184,50 @@ export default function PharmacistLayout({ children }: { children: React.ReactNo
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar mobile */}
-        <header className="flex h-14 items-center gap-3 border-b border-border bg-card/95 px-4 backdrop-blur lg:hidden">
+        <header className="flex h-16 items-center gap-3 border-b border-border/80 bg-card/95 px-4 backdrop-blur lg:hidden">
           <button onClick={() => setMobileOpen(true)} className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted">
             <Menu className="h-5 w-5" />
           </button>
           <Image src="/logo.svg" alt="Pharma CI" width={24} height={24} className="h-6 w-6 rounded-md" />
           <span className="text-sm font-bold text-primary">Pharma CI</span>
           <div className="flex-1" />
-          <span className="text-xs text-muted-foreground">{user.name}</span>
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground"
+            aria-label="Changer le thème"
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <div className="hidden text-right sm:block">
+            <p className="text-xs font-semibold">{user.name}</p>
+            <p className="text-[10px] text-muted-foreground">Pharmacien</p>
+          </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
+        <header className="hidden h-16 items-center justify-between border-b border-border/80 bg-card/90 px-8 backdrop-blur lg:flex">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-primary">Centre de gestion</p>
+            <p className="text-sm text-muted-foreground">Pilotez votre activité en un coup d&apos;œil</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-muted" aria-label="Notifications">
+              <Bell className="h-4 w-4" />
+              <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-primary" />
+            </button>
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-muted" aria-label="Changer le thème">
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <div className="flex items-center gap-2 border-l border-border pl-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">{user.name.charAt(0)}</div>
+              <div>
+                <p className="text-xs font-semibold">{user.name}</p>
+                <p className="text-[10px] text-muted-foreground">Pharmacien</p>
+              </div>
+            </div>
+          </div>
+        </header>
+        <main className="w-full flex-1 overflow-y-auto p-4 lg:p-8">{children}</main>
       </div>
     </div>
   );

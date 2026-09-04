@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import {
   ShoppingCart,
-  DollarSign,
   Package,
   Star,
   TrendingUp,
   Clock,
   ArrowUpRight,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { api, formatFCFA } from "@/lib/api";
@@ -16,15 +17,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Stats {
-  totalOrders: number;
-  pendingOrders: number;
-  totalRevenue: number;
-  periodRevenue: number;
-  totalStock: number;
-  lowStockCount: number;
-  averageRating: number;
-  reviewCount: number;
-  topMedications: Array<{ name: string; count: number }>;
+  pharmacyName: string;
+  orders: { total: number; pending: number; confirmed: number; ready: number; pickedUp: number; cancelled: number };
+  revenue: number;
+  revenueMonth: number;
+  monthlyRevenue: Array<{ month: string; revenue: number }>;
+  stock: { totalItems: number; lowStock: number; inStock: number; expiringSoon: number; expired: number };
+  reviews: { total: number; average: number };
   recentOrders: Array<{
     id: string;
     code: string;
@@ -32,6 +31,7 @@ interface Stats {
     totalAmount: number;
     createdAt: string;
     user: { name: string };
+    items: Array<{ medication: { name: string } }>;
   }>;
 }
 
@@ -55,15 +55,12 @@ export default function PharmacistDashboardPage() {
   const user = useAppStore((s) => s.user);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    void load();
-  }, []);
+  const [period, setPeriod] = useState("all");
 
   async function load() {
     setLoading(true);
     try {
-      const res = await api.get<Stats>("/api/pharmacist/stats");
+      const res = await api.get<Stats>(`/api/pharmacist/stats?period=${period}`);
       setStats(res);
     } catch {
       // ignore
@@ -71,6 +68,10 @@ export default function PharmacistDashboardPage() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    void Promise.resolve().then(load);
+  }, [period]);
 
   if (loading) {
     return (
@@ -91,10 +92,18 @@ export default function PharmacistDashboardPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Bonjour, {user?.name?.split(" ")[0]}
         </h1>
-        <p className="text-sm text-muted-foreground">Voici le resume de votre pharmacie</p>
+        <p className="text-sm text-muted-foreground">Voici le résumé de {stats.pharmacyName}</p>
+        <div className="mt-4 flex items-center gap-2">
+          <select value={period} onChange={(e) => setPeriod(e.target.value)} className="h-9 rounded-lg border border-border bg-card px-3 text-xs font-semibold">
+            <option value="all">Toute la période</option>
+            <option value="month">Ce mois</option>
+            <option value="week">Cette semaine</option>
+          </select>
+          <button onClick={() => void load()} className="flex h-9 items-center gap-2 rounded-lg border border-border bg-card px-3 text-xs font-semibold hover:bg-muted"><RefreshCw className="h-3.5 w-3.5" /> Actualiser</button>
+        </div>
       </div>
 
       {/* KPI cards */}
@@ -104,10 +113,10 @@ export default function PharmacistDashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-muted-foreground">Commandes</p>
-                <p className="mt-1 text-2xl font-bold">{stats.totalOrders}</p>
-                {stats.pendingOrders > 0 && (
+                <p className="mt-1 text-2xl font-bold">{stats.orders.total}</p>
+                {stats.orders.pending > 0 && (
                   <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                    <Clock className="h-3 w-3" /> {stats.pendingOrders} en attente
+                    <Clock className="h-3 w-3" /> {stats.orders.pending} en attente
                   </span>
                 )}
               </div>
@@ -123,11 +132,11 @@ export default function PharmacistDashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-muted-foreground">Revenu total</p>
-                <p className="mt-1 text-2xl font-bold">{formatFCFA(stats.totalRevenue)}</p>
-                <p className="text-xs text-muted-foreground">+{formatFCFA(stats.periodRevenue)} ce mois</p>
+                <p className="mt-1 text-2xl font-bold">{formatFCFA(stats.revenue)}</p>
+                <p className="text-xs text-muted-foreground">+{formatFCFA(stats.revenueMonth)} sur la période</p>
               </div>
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/10 text-green-600">
-                <DollarSign className="h-6 w-6" />
+                <TrendingUp className="h-6 w-6" />
               </div>
             </div>
           </CardContent>
@@ -138,10 +147,10 @@ export default function PharmacistDashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-muted-foreground">Stock</p>
-                <p className="mt-1 text-2xl font-bold">{stats.totalStock}</p>
-                {stats.lowStockCount > 0 && (
+                <p className="mt-1 text-2xl font-bold">{stats.stock.inStock}</p>
+                {stats.stock.lowStock > 0 && (
                   <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600">
-                    {stats.lowStockCount} en rupture
+                    {stats.stock.lowStock} stock bas
                   </span>
                 )}
               </div>
@@ -157,8 +166,8 @@ export default function PharmacistDashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-muted-foreground">Avis</p>
-                <p className="mt-1 text-2xl font-bold">{stats.averageRating.toFixed(1)}</p>
-                <p className="text-xs text-muted-foreground">{stats.reviewCount} avis</p>
+                <p className="mt-1 text-2xl font-bold">{stats.reviews.average.toFixed(1)}</p>
+                <p className="text-xs text-muted-foreground">{stats.reviews.total} avis</p>
               </div>
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
                 <Star className="h-6 w-6" />
@@ -202,37 +211,18 @@ export default function PharmacistDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Top medications */}
+        {/* Revenue overview */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Top Medicaments</CardTitle>
+            <CardTitle className="text-base">Revenus sur 6 mois</CardTitle>
           </CardHeader>
           <CardContent>
-            {stats.topMedications.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">Aucune donnee</p>
-            ) : (
-              <div className="space-y-3">
-                {stats.topMedications.map((m, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
-                        {i + 1}
-                      </span>
-                      <span className="text-sm font-medium truncate max-w-[150px]">{m.name}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="h-1.5 w-16 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-primary"
-                          style={{ width: `${(m.count / (stats.topMedications[0]?.count || 1)) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-semibold text-muted-foreground">{m.count}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="space-y-4">
+              {stats.monthlyRevenue.map((month) => {
+                const max = Math.max(...stats.monthlyRevenue.map((item) => item.revenue), 1);
+                return <div key={month.month} className="space-y-1.5"><div className="flex justify-between text-xs"><span className="font-medium">{month.month}</span><span className="text-muted-foreground">{formatFCFA(month.revenue)}</span></div><div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${(month.revenue / max) * 100}%` }} /></div></div>;
+              })}
+            </div>
           </CardContent>
         </Card>
       </div>

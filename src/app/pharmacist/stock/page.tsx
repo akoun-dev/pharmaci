@@ -52,8 +52,8 @@ export default function PharmacistStockPage() {
   async function load() {
     setLoading(true);
     try {
-      const res = await api.get<{ stock: StockItem[] }>("/api/pharmacist/stock?limit=500");
-      setItems(res.stock);
+      const res = await api.get<{ stocks: StockItem[] }>("/api/pharmacist/stock?limit=500");
+      setItems(res.stocks);
     } catch {
       pushToast("Erreur de chargement.", "error");
     } finally {

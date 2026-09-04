@@ -297,7 +297,9 @@ function AppShell() {
             pharmacyId: res.user.pharmacy?.id || null,
           });
           if (res.user.role === "PHARMACIST") {
-            setTab("pharmacist");
+            // Keep the pharmacist experience on the responsive web back-office.
+            window.location.replace("/pharmacist");
+            return;
           } else if (res.user.role === "ADMIN") {
             setTab("admin");
           }

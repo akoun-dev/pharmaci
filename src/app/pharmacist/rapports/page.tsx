@@ -9,22 +9,18 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ReportStats {
-  totalOrders: number;
-  totalRevenue: number;
-  periodRevenue: number;
-  totalStock: number;
-  lowStockCount: number;
-  averageRating: number;
-  reviewCount: number;
-  topMedications: Array<{ name: string; count: number }>;
+  orders: { total: number; pending: number };
+  revenue: number;
+  revenueMonth: number;
+  stock: { totalItems: number; lowStock: number; inStock: number };
+  reviews: { total: number; average: number };
+  monthlyRevenue: Array<{ month: string; revenue: number }>;
 }
 
 export default function PharmacistReportsPage() {
   const pushToast = useAppStore((s) => s.pushToast);
   const [stats, setStats] = useState<ReportStats | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => { void load(); }, []);
 
   async function load() {
     setLoading(true);
@@ -37,6 +33,8 @@ export default function PharmacistReportsPage() {
       setLoading(false);
     }
   }
+
+  useEffect(() => { void Promise.resolve().then(load); }, []);
 
   if (loading) {
     return (
@@ -70,7 +68,7 @@ export default function PharmacistReportsPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Commandes totales</p>
-                <p className="text-xl font-bold">{stats.totalOrders}</p>
+                <p className="text-xl font-bold">{stats.orders.total}</p>
               </div>
             </div>
           </CardContent>
@@ -83,7 +81,7 @@ export default function PharmacistReportsPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Revenu total</p>
-                <p className="text-xl font-bold">{formatFCFA(stats.totalRevenue)}</p>
+                <p className="text-xl font-bold">{formatFCFA(stats.revenue)}</p>
               </div>
             </div>
           </CardContent>
@@ -96,7 +94,7 @@ export default function PharmacistReportsPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Articles en stock</p>
-                <p className="text-xl font-bold">{stats.totalStock}</p>
+                <p className="text-xl font-bold">{stats.stock.inStock}</p>
               </div>
             </div>
           </CardContent>
@@ -109,29 +107,9 @@ export default function PharmacistReportsPage() {
           <CardTitle className="text-base">Medicaments les plus commandes</CardTitle>
         </CardHeader>
         <CardContent>
-          {stats.topMedications.length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">Aucune donnee</p>
-          ) : (
             <div className="space-y-3">
-              {stats.topMedications.map((m, i) => {
-                const maxCount = stats.topMedications[0]?.count || 1;
-                return (
-                  <div key={i} className="flex items-center gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{m.name}</p>
-                      <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-muted">
-                        <div className="h-full rounded-full bg-primary" style={{ width: `${(m.count / maxCount) * 100}%` }} />
-                      </div>
-                    </div>
-                    <span className="text-sm font-bold text-muted-foreground">{m.count}</span>
-                  </div>
-                );
-              })}
+              {stats.monthlyRevenue.map((m) => <div key={m.month} className="flex items-center gap-3"><span className="w-10 text-xs font-medium">{m.month}</span><div className="h-2 flex-1 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, (m.revenue / Math.max(...stats.monthlyRevenue.map((item) => item.revenue), 1)) * 100)}%` }} /></div><span className="w-24 text-right text-xs font-semibold">{formatFCFA(m.revenue)}</span></div>)}
             </div>
-          )}
         </CardContent>
       </Card>
 
@@ -142,7 +120,7 @@ export default function PharmacistReportsPage() {
             <CardTitle className="text-base">Revenu mensuel</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{formatFCFA(stats.periodRevenue)}</p>
+            <p className="text-3xl font-bold">{formatFCFA(stats.revenueMonth)}</p>
             <p className="mt-1 text-xs text-muted-foreground">Ce mois-ci</p>
           </CardContent>
         </Card>
@@ -152,10 +130,10 @@ export default function PharmacistReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold">{stats.averageRating.toFixed(1)}</p>
+              <p className="text-3xl font-bold">{stats.reviews.average.toFixed(1)}</p>
               <span className="text-sm text-muted-foreground">/ 5</span>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">{stats.reviewCount} avis recus</p>
+            <p className="mt-1 text-xs text-muted-foreground">{stats.reviews.total} avis reçus</p>
           </CardContent>
         </Card>
       </div>

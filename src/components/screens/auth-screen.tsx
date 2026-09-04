@@ -43,7 +43,10 @@ export function AuthScreen() {
   const hasLoggedIn = useAppStore((s) => s.hasLoggedIn);
 
   function redirectByRole(role: string) {
-    if (role === "PHARMACIST") setTab("pharmacist");
+    if (role === "PHARMACIST") {
+      // Pharmacists use the full-width web back-office, not the patient SPA shell.
+      window.location.assign("/pharmacist");
+    }
     else if (role === "ADMIN") setTab("admin");
     else setTab("home");
   }
